@@ -4,7 +4,7 @@ public class Symbol implements Token {
 	public String contents;
 	
 	public Symbol(String contents) {
-		this.contents = contents;
+		this.contents = contents; 
 	}
 	
 	public String toString() {

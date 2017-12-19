@@ -25,6 +25,11 @@ public class ClassToken implements Token, ArgType {
 		return "Class: '" + this.longName + "'";
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof ClassToken && ((ClassToken)o).longName == this.longName;
+	}
+	
 	/**
 	 * Returns true if this token is a Class name, having setup this class with the java library directory and
 	 * the imports to the file.
