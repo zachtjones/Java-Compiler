@@ -15,8 +15,10 @@ import tokens.RightParentheses;
 import tokens.Semicolon;
 import tokens.Symbol;
 import tokens.Token;
+import declarations.statements.DoWhileStatement;
 import declarations.statements.Expression;
 import declarations.statements.IfStatement;
+import declarations.statements.WhileStatement;
 
 public class MethodDeclaration {
 	
@@ -115,13 +117,14 @@ public class MethodDeclaration {
 	 * @param end The end index to go until. (this is the token before the right curly brace)
 	 * @param tokenSeq The sequence of tokens.
 	 * @return The statement parsed.
+	 * @throws IOException 
 	 */
-	private static ArrayList<Statement> parseBlock(int start, int end, ArrayList<Token> tokenSeq){
+	private static ArrayList<Statement> parseBlock(int start, int end, ArrayList<Token> tokenSeq) throws IOException{
 		ArrayList<Statement> results = new ArrayList<Statement>();
 		for (int i = start; i <= end; i++) {
 			Token currToken = tokenSeq.get(i);
 			if (currToken instanceof KeywordToken) {
-				// if, while, do, try, switch
+				// if, while, do, try, switch, for
 				KeywordToken kt = (KeywordToken) currToken;
 				switch(kt.t) {
 				case IF:// if (condition) { block }
@@ -130,25 +133,46 @@ public class MethodDeclaration {
 					is.expression = parseExpression(i + 2, endCondition, tokenSeq);
 					int endBlock = Parser.getMatchingParen(endCondition + 2, tokenSeq);
 					is.block = parseBlock(endCondition + 2, endBlock - 1, tokenSeq);
-				case WHILE:
-					//TODO
-				case DO:
-				case TRY:
-				case SWITCH:
-					
+					results.add(is);
+					i = endBlock;
 					break;
+				case WHILE:
+					WhileStatement ws = new WhileStatement();
+					endCondition = Parser.getMatchingParen(i + 2, tokenSeq) - 1;
+					ws.expression = parseExpression(i + 2, endCondition, tokenSeq);
+					endBlock = Parser.getMatchingParen(endCondition + 2, tokenSeq);
+					ws.block = parseBlock(endCondition + 2, endBlock - 1, tokenSeq);
+					results.add(ws);
+					i = endBlock;
+					break;
+				case DO: // do { statement(s) } while (expression);
+					DoWhileStatement ds = new DoWhileStatement();
+					endBlock = Parser.getMatchingBrace(i + 2, tokenSeq);
+					ds.block = parseBlock(i + 2, endBlock - 1, tokenSeq);
+					endCondition = Parser.getMatchingParen(endBlock + 2, tokenSeq);
+					ds.expression = parseExpression(endBlock + 2, endCondition - 1, tokenSeq);
+					results.add(ds);
+					i = endBlock + 1; // condition );
+					break;
+				case TRY:
+					throw new IOException("Try parsing not implemented yet.");
+				case SWITCH:
+					throw new IOException("Switch parsing not implemented yet.");
+				case FOR: // for ( ; ; ) { block } or for ( : ) { block } 
+					throw new IOException("For loops not implemented yet.");
 				default:
 					// not if, while, do, try, or switch
 					int semiIndex = getSemicolon(i, tokenSeq);
 					results.add(parseStatement(i, semiIndex - 1, tokenSeq));
-					i = semiIndex + 1;
+					i = semiIndex;
+					break;
 				}
 				
 			} else {
 				// find the next semicolon
 				int semiIndex = getSemicolon(i, tokenSeq);
 				results.add(parseStatement(i, semiIndex - 1, tokenSeq));
-				i = semiIndex + 1;
+				i = semiIndex;
 			}
 		}
 		
@@ -159,35 +183,46 @@ public class MethodDeclaration {
 	 * @param start The starting index to search.
 	 * @param tokenSeq The sequence of tokens
 	 * @return The index of the next semicolon found, or -1 if not found.
+	 * @throws IOException 
 	 */
-	private static int getSemicolon(int start, ArrayList<Token> tokenSeq) {
+	private static int getSemicolon(int start, ArrayList<Token> tokenSeq) throws IOException {
 		for (int i = start; i < tokenSeq.size(); i++) {
 			if (tokenSeq.get(i) instanceof Semicolon) {
 				return i;
 			}
 		}
-		return -1;
+		throw new IOException("Semicolon index not found.");
 	}
 	
 	/**
-	 * Parses a statement.
+	 * Parses a statement. (inclusive range)
 	 * @param start The start index to look from.
 	 * @param end The end index to go until. (this is the token before the semicolon)
 	 * @param tokenSeq The sequence of tokens.
 	 * @return The statement parsed.
 	 */
 	private static Statement parseStatement(int start, int end, ArrayList<Token> tokenSeq) {
+		System.out.print("Statement: ");
+		for (int i = start; i <= end; i++) {
+			System.out.print(tokenSeq.get(i) + " ");
+		}
+		System.out.println();
 		// TODO
 		return null;
 	}
 	/**
-	 * Parses an expression.
+	 * Parses an expression. (inclusive range)
 	 * @param start The start index to look from.
 	 * @param end The end index to go until. (this is the token before the semicolon)
 	 * @param tokenSeq The sequence of tokens.
 	 * @return The expression parsed.
 	 */
 	private static Expression parseExpression(int start, int end, ArrayList<Token> tokenSeq) {
+		System.out.print("Expression: ");
+		for (int i = start; i <= end; i++) {
+			System.out.print(tokenSeq.get(i) + " ");
+		}
+		System.out.println();
 		// TODO
 		return null;
 	}
