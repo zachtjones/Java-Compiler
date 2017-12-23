@@ -8,16 +8,19 @@ import tokens.ClassToken;
 import tokens.CommaToken;
 import tokens.KeywordToken;
 import tokens.KeywordType;
-import tokens.LeftCurlyBrace;
 import tokens.LeftParentheses;
-import tokens.RightCurlyBrace;
 import tokens.RightParentheses;
 import tokens.Semicolon;
 import tokens.Symbol;
 import tokens.Token;
+import tokens.assignment.EqualsToken;
+import declarations.statements.Assignment;
+import declarations.statements.Declaration;
+import declarations.statements.DeclarationAssignment;
 import declarations.statements.DoWhileStatement;
 import declarations.statements.Expression;
 import declarations.statements.IfStatement;
+import declarations.statements.ReturnStatement;
 import declarations.statements.WhileStatement;
 
 public class MethodDeclaration {
@@ -200,15 +203,51 @@ public class MethodDeclaration {
 	 * @param end The end index to go until. (this is the token before the semicolon)
 	 * @param tokenSeq The sequence of tokens.
 	 * @return The statement parsed.
+	 * @throws IOException 
 	 */
-	private static Statement parseStatement(int start, int end, ArrayList<Token> tokenSeq) {
-		System.out.print("Statement: ");
-		for (int i = start; i <= end; i++) {
-			System.out.print(tokenSeq.get(i) + " ");
+	private static Statement parseStatement(int start, int end, ArrayList<Token> tokenSeq) throws IOException {
+		// of the form: declaration, declaration = expression, assignment = expression, return expression
+		boolean containsEquals = false;
+		for (int i = start; i < end; i++) {
+			if (tokenSeq.get(i) instanceof EqualsToken) {
+				containsEquals = true;
+			}
 		}
-		System.out.println();
-		// TODO
-		return null;
+		if (containsEquals) { // either declaration assignment, or plain assignment
+			if (tokenSeq.get(start) instanceof ArgType) { // declaration assignment
+				DeclarationAssignment da = new DeclarationAssignment();
+				da.type = (ArgType) tokenSeq.get(start);
+				da.name = ((Symbol) tokenSeq.get(start + 1)).contents;
+				da.assingment = parseExpression(start + 3, end, tokenSeq);
+				return da;
+			} else { // plain assignment
+				Assignment a = new Assignment();
+				a.name = ((Symbol) tokenSeq.get(start)).contents;
+				a.assingment = parseExpression(start + 2, end, tokenSeq);
+				return a;
+			}
+		}
+		// can be declaration, or return expression
+		if (tokenSeq.get(start) instanceof KeywordToken) {
+			KeywordToken kt = (KeywordToken) tokenSeq.get(start);
+			if (kt.t == KeywordType.RETURN) {
+				if (end == start + 1) {
+					// return;
+					return new ReturnStatement();
+				} else {
+					// return <expression>;
+					ReturnStatement rs = new ReturnStatement();
+					rs.expression = parseExpression(start + 1, end, tokenSeq);
+					return rs;
+				}
+			}
+		}
+		// can only be a declaration at this point
+		// type name;
+		Declaration d = new Declaration();
+		d.type = (ArgType) tokenSeq.get(start);
+		d.name = ((Symbol) tokenSeq.get(start + 1)).contents;
+		return d;
 	}
 	/**
 	 * Parses an expression. (inclusive range)
