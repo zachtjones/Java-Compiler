@@ -6,20 +6,29 @@ import java.util.ArrayList;
 import parser.Parser;
 import tokens.ClassToken;
 import tokens.CommaToken;
+import tokens.IncrementToken;
 import tokens.KeywordToken;
 import tokens.KeywordType;
 import tokens.LeftParentheses;
+import tokens.NumberToken;
 import tokens.RightParentheses;
 import tokens.Semicolon;
 import tokens.Symbol;
 import tokens.Token;
 import tokens.assignment.EqualsToken;
+import tokens.assignment.MinusEqualsToken;
+import tokens.assignment.PlusEqualsToken;
 import declarations.statements.Assignment;
 import declarations.statements.Declaration;
 import declarations.statements.DeclarationAssignment;
 import declarations.statements.DoWhileStatement;
 import declarations.statements.Expression;
+import declarations.statements.ForStatement;
 import declarations.statements.IfStatement;
+import declarations.statements.MinusEqualsStatement;
+import declarations.statements.PlusEqualsStatement;
+import declarations.statements.PostIncrement;
+import declarations.statements.PreIncrement;
 import declarations.statements.ReturnStatement;
 import declarations.statements.WhileStatement;
 
@@ -161,8 +170,20 @@ public class MethodDeclaration {
 					throw new IOException("Try parsing not implemented yet.");
 				case SWITCH:
 					throw new IOException("Switch parsing not implemented yet.");
-				case FOR: // for ( ; ; ) { block } or for ( : ) { block } 
-					throw new IOException("For loops not implemented yet.");
+				case FOR: // for ( init ; condition ; increment ) { block }
+					// or for ( declaration : iterable ) { block } 
+					ForStatement fs = new ForStatement();
+					endBlock = getSemicolon(i, tokenSeq);
+					fs.init = parseStatement(i + 2, endBlock - 1, tokenSeq);
+					i = endBlock + 1;
+					endBlock = getSemicolon(i, tokenSeq);
+					fs.condition = parseExpression(i, endBlock - 1, tokenSeq);
+					i = endBlock + 1;
+					endBlock = Parser.getMatchingParen(i, tokenSeq);
+					fs.increment = parseStatement(i, endBlock - 1, tokenSeq);
+					i = endBlock + 1;
+					results.add(fs);
+					break;
 				default:
 					// not if, while, do, try, or switch
 					int semiIndex = getSemicolon(i, tokenSeq);
@@ -242,12 +263,24 @@ public class MethodDeclaration {
 				}
 			}
 		}
-		// can only be a declaration at this point
-		// type name;
-		Declaration d = new Declaration();
-		d.type = (ArgType) tokenSeq.get(start);
-		d.name = ((Symbol) tokenSeq.get(start + 1)).contents;
-		return d;
+		if (tokenSeq.get(start) instanceof ArgType) { // check for declaration
+			// type name;
+			Declaration d = new Declaration();
+			d.type = (ArgType) tokenSeq.get(start);
+			d.name = ((Symbol) tokenSeq.get(start + 1)).contents;
+			return d;
+		}
+		// could also be += or -=
+		// symbol += expression
+		if (tokenSeq.get(start + 1) instanceof PlusEqualsToken) {
+			return new PlusEqualsStatement( (Symbol)tokenSeq.get(start), parseExpression(start + 2, end, tokenSeq));
+		}
+		// symbol -= expression
+		if (tokenSeq.get(start + 1) instanceof MinusEqualsToken) {
+			return new MinusEqualsStatement( (Symbol)tokenSeq.get(start), parseExpression(start + 2, end, tokenSeq));
+		}
+		// just an expression on it
+		return parseExpression(start, end, tokenSeq);
 	}
 	/**
 	 * Parses an expression. (inclusive range)
@@ -257,6 +290,21 @@ public class MethodDeclaration {
 	 * @return The expression parsed.
 	 */
 	private static Expression parseExpression(int start, int end, ArrayList<Token> tokenSeq) {
+		if (end == start) {
+			// either a constant value or a symbol
+			if (tokenSeq.get(start) instanceof Symbol) {
+				return (Symbol) tokenSeq.get(start);
+			} else if (tokenSeq.get(start) instanceof NumberToken) {
+				return (NumberToken) tokenSeq.get(start);
+			}
+		}
+		/*// increment and decrement operations
+		if (tokenSeq.get(start) instanceof IncrementToken) { // ++i;
+			return new PreIncrement((Symbol) tokenSeq.get(start + 1));
+		}
+		if (tokenSeq.get(start + 1) instanceof IncrementToken) { // i++;
+			return new PostIncrement((Symbol) tokenSeq.get(start));
+		}*/
 		System.out.print("Expression: ");
 		for (int i = start; i <= end; i++) {
 			System.out.print(tokenSeq.get(i) + " ");

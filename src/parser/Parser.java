@@ -42,6 +42,7 @@ import tokens.LogicalAndToken;
 import tokens.LogicalOrToken;
 import tokens.MinusToken;
 import tokens.ModulusToken;
+import tokens.NumberToken;
 import tokens.QuestionToken;
 import tokens.RightBracket;
 import tokens.RightCurlyBrace;
@@ -165,6 +166,8 @@ public class Parser {
 					result.contents.add(BitwiseXOrToken.getInstance());
 				} else if (QuestionToken.matches(token)) {
 					result.contents.add(QuestionToken.getInstance());
+				} else if (NumberToken.matches(token)){
+					result.contents.add(new NumberToken(token));
 				} else {
 					// generic Token for now
 					result.contents.add(new Symbol(token));
