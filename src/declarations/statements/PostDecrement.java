@@ -1,9 +1,8 @@
 package declarations.statements;
 
-import declarations.Statement;
 import tokens.Symbol;
 
-public class PostDecrement implements Statement {
+public class PostDecrement implements Expression {
 	public Symbol s;
 	
 	public PostDecrement(Symbol s) {

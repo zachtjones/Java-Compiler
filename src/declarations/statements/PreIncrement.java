@@ -1,9 +1,8 @@
 package declarations.statements;
 
-import declarations.Statement;
 import tokens.Symbol;
 
-public class PreIncrement implements Statement {
+public class PreIncrement implements Expression {
 	public Symbol s;
 	
 	public PreIncrement(Symbol s) {
