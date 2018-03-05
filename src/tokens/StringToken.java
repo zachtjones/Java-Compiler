@@ -2,7 +2,9 @@ package tokens;
 
 import java.util.StringTokenizer;
 
-public class StringToken implements Token {
+import declarations.statements.Expression;
+
+public class StringToken implements Token, Expression {
 	
 	public String contents = ""; // converted string result
 	

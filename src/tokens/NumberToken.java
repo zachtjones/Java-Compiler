@@ -14,8 +14,19 @@ public class NumberToken implements Token, Expression {
 			this.value = Long.parseLong(token);
 		}
 	}
-	
+
 	public static boolean matches(String token) {
 		return token.matches("-?\\d+(\\.\\d+)?"); // regex for numbers
+	}
+	
+	/**
+	 * Multiplies this by -1.
+	 */
+	public void negate() {
+		if (this.value instanceof Long) {
+			this.value = -this.value.longValue();
+		} else {
+			this.value = -this.value.doubleValue();
+		}
 	}
 }

@@ -1,6 +1,8 @@
 package tokens;
 
-public class Symbol implements Token {
+import declarations.statements.Expression;
+
+public class Symbol implements Token, Expression {
 	public String contents;
 	
 	public Symbol(String contents) {
