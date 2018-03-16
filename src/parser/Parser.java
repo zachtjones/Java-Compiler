@@ -68,7 +68,7 @@ public class Parser {
 		// 3rd pass, convert complex operations (+=, ...)
 		result.contents = groupOperators(result);
 		// 4th pass, convert ClassTokens to classes
-		groupTokens(result);
+		buildTree(result);
 
 		return result;
 	}
@@ -332,7 +332,7 @@ public class Parser {
 		return results;
 	}
 	
-	private static void groupTokens(ParserResult result) throws IOException {
+	private static void buildTree(ParserResult result) throws IOException {
 		ArrayList<Token> contents = result.contents;
 		for (int i = 0; i < contents.size(); i++) {
 			Token t = contents.get(i);
