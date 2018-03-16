@@ -18,6 +18,7 @@ import tokens.ColonToken;
 import tokens.CommaToken;
 import tokens.DecrementToken;
 import tokens.DivideToken;
+import tokens.DotToken;
 import tokens.GreaterThanEqualToken;
 import tokens.assignment.BitAndEqualsToken;
 import tokens.assignment.BitOrEqualsToken;
@@ -168,6 +169,8 @@ public class Parser {
 					result.contents.add(QuestionToken.getInstance());
 				} else if (NumberToken.matches(token)){
 					result.contents.add(new NumberToken(token));
+				} else if (DotToken.matches(token)) {
+					result.contents.add(DotToken.getInstance());
 				} else {
 					// generic Token for now
 					result.contents.add(new Symbol(token));
@@ -369,18 +372,22 @@ public class Parser {
 					} 
 					result.classes.add(new ClassDeclaration(name, startBlockIndex, endBlockIndex, result.contents));
 				} else if (k.t == KeywordType.INTERFACE) {
+					throw new IOException("Interface parsing not implemented yet.");
 					// TODO
 				} else if (k.t == KeywordType.ENUM) {
+					throw new IOException("Enum parsing not implemented yet.");
 					// TODO
 				}
 			}
 		}
 	}
+	
 	/**
 	 * Gets the index of the closing brace for the block. 
 	 * The starting point of the block is the index after the opening (left) brace.
+	 * @throws IOException If it can't find the closing bracket
 	 */
-	public static int getMatchingBrace(int startBlock, ArrayList<Token> contents) {
+	public static int getMatchingBrace(int startBlock, ArrayList<Token> contents) throws IOException {
 		int count = 0;
 		for (int i = startBlock; i < contents.size(); i++) {
 			boolean isRightCurly = contents.get(i) instanceof RightCurlyBrace;
@@ -400,13 +407,15 @@ public class Parser {
 				}
 			}
 		}
-		return -1;
+		throw new IOException("Matching curly brace not found.");
 	}
+
 	/**
 	 * Gets the index of the closing parenthesis for the 'block'. 
 	 * The starting point of the 'block' is the index after the opening (left) parenthesis.
+	 * @throws IOException If it can't find the closing parenthesis
 	 */
-	public static int getMatchingParen(int startBlock, ArrayList<Token> contents) {
+	public static int getMatchingParen(int startBlock, ArrayList<Token> contents) throws IOException {
 		int count = 0;
 		for (int i = startBlock; i < contents.size(); i++) {
 			boolean isRightParen = contents.get(i) instanceof RightParentheses;
@@ -426,6 +435,34 @@ public class Parser {
 				}
 			}
 		}
-		return -1;
+		throw new IOException("Matching parenthesis not found.");
+	}
+	
+	/**
+	 * Gets the index of the closing bracket for the 'block'. 
+	 * The starting point of the 'block' is the index after the opening (left) bracket.
+	 * @throws IOException If it can't find the closing bracket.
+	 */
+	public static int getMatchingBracket(int startBlock, ArrayList<Token> contents) throws IOException {
+		int count = 0;
+		for (int i = startBlock; i < contents.size(); i++) {
+			boolean isRightParen = contents.get(i) instanceof RightBracket;
+			boolean isLeftParen = contents.get(i) instanceof LeftBracket;
+			if (count == 0) {
+				if (isRightParen) {
+					// found matching, return it
+					return i;
+				} else if (isLeftParen) {
+					count++;
+				}
+			} else {
+				if (isRightParen) {
+					count --; // one less to go through
+				} else if (isLeftParen) {
+					count ++;
+				}
+			}
+		}
+		throw new IOException("Matching bracket not found.");
 	}
 }
