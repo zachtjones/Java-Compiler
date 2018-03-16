@@ -6,11 +6,10 @@ import java.util.ArrayList;
 import parser.Parser;
 import tokens.ClassToken;
 import tokens.CommaToken;
-import tokens.IncrementToken;
 import tokens.KeywordToken;
 import tokens.KeywordType;
 import tokens.LeftParentheses;
-import tokens.NumberToken;
+import tokens.RightCurlyBrace;
 import tokens.RightParentheses;
 import tokens.Semicolon;
 import tokens.Symbol;
@@ -22,13 +21,10 @@ import declarations.statements.Assignment;
 import declarations.statements.Declaration;
 import declarations.statements.DeclarationAssignment;
 import declarations.statements.DoWhileStatement;
-import declarations.statements.Expression;
 import declarations.statements.ForStatement;
 import declarations.statements.IfStatement;
 import declarations.statements.MinusEqualsStatement;
 import declarations.statements.PlusEqualsStatement;
-import declarations.statements.PostIncrement;
-import declarations.statements.PreIncrement;
 import declarations.statements.ReturnStatement;
 import declarations.statements.WhileStatement;
 
@@ -133,7 +129,7 @@ public class MethodDeclaration {
 	 */
 	private static ArrayList<Statement> parseBlock(int start, int end, ArrayList<Token> tokenSeq) throws IOException{
 		ArrayList<Statement> results = new ArrayList<Statement>();
-		for (int i = start; i <= end; i++) {
+		for (int i = start; i < end; i++) { // no one token statements
 			Token currToken = tokenSeq.get(i);
 			if (currToken instanceof KeywordToken) {
 				// if, while, do, try, switch, for
@@ -141,19 +137,19 @@ public class MethodDeclaration {
 				switch(kt.t) {
 				case IF:// if (condition) { block }
 					IfStatement is = new IfStatement();
-					int endCondition = Parser.getMatchingParen(i + 2, tokenSeq) - 1;
-					is.expression = parseExpression(i + 2, endCondition, tokenSeq);
-					int endBlock = Parser.getMatchingParen(endCondition + 2, tokenSeq);
-					is.block = parseBlock(endCondition + 2, endBlock - 1, tokenSeq);
+					int closingParen = Parser.getMatchingParen(i + 2, tokenSeq);
+					is.expression = ExpressionParser.parseExpression(i + 2, closingParen - 1, tokenSeq);
+					int endBlock = Parser.getMatchingBrace(closingParen + 2, tokenSeq);
+					is.block = parseBlock(closingParen + 2, endBlock - 1, tokenSeq);
 					results.add(is);
 					i = endBlock;
 					break;
-				case WHILE:
+				case WHILE: // while (condition) { block }
 					WhileStatement ws = new WhileStatement();
-					endCondition = Parser.getMatchingParen(i + 2, tokenSeq) - 1;
-					ws.expression = parseExpression(i + 2, endCondition, tokenSeq);
-					endBlock = Parser.getMatchingParen(endCondition + 2, tokenSeq);
-					ws.block = parseBlock(endCondition + 2, endBlock - 1, tokenSeq);
+					closingParen = Parser.getMatchingParen(i + 2, tokenSeq);
+					ws.expression = ExpressionParser.parseExpression(i + 2, closingParen - 1, tokenSeq);
+					endBlock = Parser.getMatchingBrace(closingParen + 2, tokenSeq);
+					ws.block = parseBlock(closingParen + 2, endBlock - 1, tokenSeq);
 					results.add(ws);
 					i = endBlock;
 					break;
@@ -161,10 +157,10 @@ public class MethodDeclaration {
 					DoWhileStatement ds = new DoWhileStatement();
 					endBlock = Parser.getMatchingBrace(i + 2, tokenSeq);
 					ds.block = parseBlock(i + 2, endBlock - 1, tokenSeq);
-					endCondition = Parser.getMatchingParen(endBlock + 2, tokenSeq);
-					ds.expression = parseExpression(endBlock + 2, endCondition - 1, tokenSeq);
+					closingParen = Parser.getMatchingParen(endBlock + 2, tokenSeq);
+					ds.expression = ExpressionParser.parseExpression(endBlock + 2, closingParen - 1, tokenSeq);
 					results.add(ds);
-					i = endBlock + 1; // condition );
+					i = endBlock + 1;
 					break;
 				case TRY:
 					throw new IOException("Try parsing not implemented yet.");
@@ -177,7 +173,7 @@ public class MethodDeclaration {
 					fs.init = parseStatement(i + 2, endBlock - 1, tokenSeq);
 					i = endBlock + 1;
 					endBlock = getSemicolon(i, tokenSeq);
-					fs.condition = parseExpression(i, endBlock - 1, tokenSeq);
+					fs.condition = ExpressionParser.parseExpression(i, endBlock - 1, tokenSeq);
 					i = endBlock + 1;
 					endBlock = Parser.getMatchingParen(i, tokenSeq);
 					fs.increment = parseStatement(i, endBlock - 1, tokenSeq);
@@ -191,7 +187,8 @@ public class MethodDeclaration {
 					i = semiIndex;
 					break;
 				}
-				
+			} else if (currToken instanceof RightCurlyBrace) {
+				break; // done, end of block at end of block
 			} else {
 				// find the next semicolon
 				int semiIndex = getSemicolon(i, tokenSeq);
@@ -202,12 +199,13 @@ public class MethodDeclaration {
 		
 		return results;
 	}
+	
 	/**
 	 * Finds the next semicolon in the tokenSeq
 	 * @param start The starting index to search.
 	 * @param tokenSeq The sequence of tokens
-	 * @return The index of the next semicolon found, or -1 if not found.
-	 * @throws IOException 
+	 * @return The index of the next semicolon found.
+	 * @throws IOException If the semicolon is not found before the end of the token sequence.
 	 */
 	private static int getSemicolon(int start, ArrayList<Token> tokenSeq) throws IOException {
 		for (int i = start; i < tokenSeq.size(); i++) {
@@ -239,12 +237,12 @@ public class MethodDeclaration {
 				DeclarationAssignment da = new DeclarationAssignment();
 				da.type = (ArgType) tokenSeq.get(start);
 				da.name = ((Symbol) tokenSeq.get(start + 1)).contents;
-				da.assingment = parseExpression(start + 3, end, tokenSeq);
+				da.assingment = ExpressionParser.parseExpression(start + 3, end, tokenSeq);
 				return da;
 			} else { // plain assignment
 				Assignment a = new Assignment();
 				a.name = ((Symbol) tokenSeq.get(start)).contents;
-				a.assingment = parseExpression(start + 2, end, tokenSeq);
+				a.assingment = ExpressionParser.parseExpression(start + 2, end, tokenSeq);
 				return a;
 			}
 		}
@@ -258,7 +256,7 @@ public class MethodDeclaration {
 				} else {
 					// return <expression>;
 					ReturnStatement rs = new ReturnStatement();
-					rs.expression = parseExpression(start + 1, end, tokenSeq);
+					rs.expression = ExpressionParser.parseExpression(start + 1, end, tokenSeq);
 					return rs;
 				}
 			}
@@ -273,46 +271,18 @@ public class MethodDeclaration {
 		// could also be += or -=
 		// symbol += expression
 		if (tokenSeq.get(start + 1) instanceof PlusEqualsToken) {
-			return new PlusEqualsStatement( (Symbol)tokenSeq.get(start), parseExpression(start + 2, end, tokenSeq));
+			return new PlusEqualsStatement( (Symbol)tokenSeq.get(start), ExpressionParser.parseExpression(start + 2, end, tokenSeq));
 		}
 		// symbol -= expression
 		if (tokenSeq.get(start + 1) instanceof MinusEqualsToken) {
-			return new MinusEqualsStatement( (Symbol)tokenSeq.get(start), parseExpression(start + 2, end, tokenSeq));
+			return new MinusEqualsStatement( (Symbol)tokenSeq.get(start), ExpressionParser.parseExpression(start + 2, end, tokenSeq));
 		}
 		// just an expression on it
-		return parseExpression(start, end, tokenSeq);
+		return ExpressionParser.parseExpression(start, end, tokenSeq);
 	}
-	/**
-	 * Parses an expression. (inclusive range)
-	 * @param start The start index to look from.
-	 * @param end The end index to go until. (this is the token before the semicolon)
-	 * @param tokenSeq The sequence of tokens.
-	 * @return The expression parsed.
-	 */
-	private static Expression parseExpression(int start, int end, ArrayList<Token> tokenSeq) {
-		if (end == start) {
-			// either a constant value or a symbol
-			if (tokenSeq.get(start) instanceof Symbol) {
-				return (Symbol) tokenSeq.get(start);
-			} else if (tokenSeq.get(start) instanceof NumberToken) {
-				return (NumberToken) tokenSeq.get(start);
-			}
-		}
-		/*// increment and decrement operations
-		if (tokenSeq.get(start) instanceof IncrementToken) { // ++i;
-			return new PreIncrement((Symbol) tokenSeq.get(start + 1));
-		}
-		if (tokenSeq.get(start + 1) instanceof IncrementToken) { // i++;
-			return new PostIncrement((Symbol) tokenSeq.get(start));
-		}*/
-		System.out.print("Expression: ");
-		for (int i = start; i <= end; i++) {
-			System.out.print(tokenSeq.get(i) + " ");
-		}
-		System.out.println();
-		// TODO
-		return null;
-	}
+
+	
+	
 }
 
 class Parameter {
