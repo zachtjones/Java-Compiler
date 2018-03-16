@@ -1,10 +1,8 @@
-package declarations;
+package parser;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-import declarations.statements.ArrayInitializerSize;
-import declarations.statements.ConstructorCall;
 import declarations.statements.Expression;
 import declarations.statements.MethodCall;
 import declarations.statements.PostDecrement;
@@ -12,21 +10,13 @@ import declarations.statements.PostIncrement;
 import declarations.statements.PreDecrement;
 import declarations.statements.PreIncrement;
 import declarations.statements.PropertyAccess;
-import declarations.statements.Field;
-import parser.Parser;
 import tokens.AdditionToken;
-import tokens.ClassToken;
-import tokens.ClassTokenArray;
-import tokens.CommaToken;
 import tokens.DecrementToken;
 import tokens.DotToken;
 import tokens.IncrementToken;
-import tokens.KeywordToken;
-import tokens.KeywordType;
 import tokens.LeftParentheses;
 import tokens.MinusToken;
 import tokens.NumberToken;
-import tokens.RightParentheses;
 import tokens.StringToken;
 import tokens.Symbol;
 import tokens.Token;
@@ -48,6 +38,7 @@ public class ExpressionParser {
 		return null;
 	}
 	
+	/** Parses a 2-token sequence */
 	private static Expression parseDouble(int start, ArrayList<Token> tokenSeq) {
 		// can be: i++, i--, ++i, --i, -i, +i (unary minus and plus operators)
 		// unary + does nothing.
@@ -99,8 +90,7 @@ public class ExpressionParser {
 			if (matching == end) {
 				return m;
 			}
-			// TODO method call is part of expression
-			// could be . or any math expression
+			// method call is part of expression -- parsed when called again
 		}
 		
 		

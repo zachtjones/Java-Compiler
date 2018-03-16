@@ -3,6 +3,7 @@ package declarations;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import parser.ExpressionParser;
 import parser.Parser;
 import tokens.ClassToken;
 import tokens.CommaToken;
