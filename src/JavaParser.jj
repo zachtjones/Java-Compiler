@@ -1,0 +1,321 @@
+/**
+* @author Zach Jones (zachtjones16@gmail.com)
+* This file generates the parser, using JavaCC
+* Some parts of this file are taken from the examples in JavaCC documentation.
+*/
+
+PARSER_BEGIN(JavaParser)
+
+public class JavaParser {
+
+    public static void parse(String file) {
+        JavaParser parser = new JavaParser(new java.io.FileInputStream(file));
+        try {
+            parser.CompilationUnit();
+            System.out.println("File passed. Syntax is valid.");
+        } catch (ParseException e) {
+            System.out.println(e.toString());
+        }
+    }
+
+}
+
+PARSER_END(JavaParser)
+
+/* Now specify the lexer commands */
+
+SKIP : /* WHITE SPACE */
+{
+  " " | "\t" | "\n" | "\r" | "\f"
+}
+
+SPECIAL_TOKEN : /* COMMENTS */
+{
+  <LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <BLOCK_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+}
+
+TOKEN : /* RESERVED WORDS AND LITERALS */
+{
+  < ABSTRACT: "abstract" >
+| < BOOLEAN: "boolean" >
+| < BREAK: "break" >
+| < BYTE: "byte" >
+| < CASE: "case" >
+| < CATCH: "catch" >
+| < CHAR: "char" >
+| < CLASS: "class" >
+| < CONST: "const" >
+| < CONTINUE: "continue" >
+| < _DEFAULT: "default" >
+| < DO: "do" >
+| < DOUBLE: "double" >
+| < ELSE: "else" >
+| < EXTENDS: "extends" >
+| < FALSE: "false" >
+| < FINAL: "final" >
+| < FINALLY: "finally" >
+| < FLOAT: "float" >
+| < FOR: "for" >
+| < GOTO: "goto" >
+| < IF: "if" >
+| < IMPLEMENTS: "implements" >
+| < IMPORT: "import" >
+| < INSTANCEOF: "instanceof" >
+| < INT: "int" >
+| < INTERFACE: "interface" >
+| < LONG: "long" >
+| < NATIVE: "native" >
+| < NEW: "new" >
+| < NULL: "null" >
+| < PACKAGE: "package">
+| < PRIVATE: "private" >
+| < PROTECTED: "protected" >
+| < PUBLIC: "public" >
+| < RETURN: "return" >
+| < SHORT: "short" >
+| < STATIC: "static" >
+| < SUPER: "super" >
+| < SWITCH: "switch" >
+| < SYNCHRONIZED: "synchronized" >
+| < THIS: "this" >
+| < THROW: "throw" >
+| < THROWS: "throws" >
+| < TRANSIENT: "transient" >
+| < TRUE: "true" >
+| < TRY: "try" >
+| < VOID: "void" >
+| < VOLATILE: "volatile" >
+| < WHILE: "while" >
+}
+
+TOKEN : /* LITERALS */
+{
+  < INTEGER_LITERAL:
+        <DECIMAL_LITERAL> (["l","L"])?
+      | <HEX_LITERAL> (["l","L"])?
+      | <OCTAL_LITERAL> (["l","L"])?
+  >
+|
+  < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+|
+  < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+|
+  < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+|
+  < FLOATING_POINT_LITERAL:
+        (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
+      | "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
+      | (["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
+      | (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"]
+  >
+|
+  < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+|
+  < CHARACTER_LITERAL:
+      "'"
+      (   (~["'","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )
+      "'"
+  >
+|
+  < STRING_LITERAL:
+      "\""
+      (   (~["\"","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )*
+      "\""
+  >
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+    < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+|   < #LETTER: [ "A"-"Z", "a"-"z", "_" ] >
+|   < #DIGIT: [ "0"-"9" ] >
+}
+
+TOKEN : /* SEPARATORS */
+{
+  < LPAREN: "(" >
+| < RPAREN: ")" >
+| < LBRACE: "{" >
+| < RBRACE: "}" >
+| < LBRACKET: "[" >
+| < RBRACKET: "]" >
+| < SEMICOLON: ";" >
+| < COMMA: "," >
+| < DOT: "." >
+}
+
+TOKEN : /* OPERATORS */
+{
+  < ASSIGN: "=" >
+| < GT: ">" >
+| < LT: "<" >
+| < BANG: "!" >
+| < TILDE: "~" >
+| < HOOK: "?" >
+| < COLON: ":" >
+| < EQ: "==" >
+| < LE: "<=" >
+| < GE: ">=" >
+| < NE: "!=" >
+| < SC_OR: "||" >
+| < SC_AND: "&&" >
+| < INCR: "++" >
+| < DECR: "--" >
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < STAR: "*" >
+| < SLASH: "/" >
+| < BIT_AND: "&" >
+| < BIT_OR: "|" >
+| < XOR: "^" >
+| < REM: "%" >
+| < LSHIFT: "<<" >
+| < RSIGNEDSHIFT: ">>" >
+| < RUNSIGNEDSHIFT: ">>>" >
+| < PLUSASSIGN: "+=" >
+| < MINUSASSIGN: "-=" >
+| < STARASSIGN: "*=" >
+| < SLASHASSIGN: "/=" >
+| < ANDASSIGN: "&=" >
+| < ORASSIGN: "|=" >
+| < XORASSIGN: "^=" >
+| < REMASSIGN: "%=" >
+| < LSHIFTASSIGN: "<<=" >
+| < RSIGNEDSHIFTASSIGN: ">>=" >
+| < RUNSIGNEDSHIFTASSIGN: ">>>=" >
+}
+
+
+/*************  ACTUAL GRAMMAR NOW *******/
+// the whole file is a compilation unit
+void CompilationUnit(): {}
+{
+    [Package()] (ImportDec())* (TypeDec())* <EOF>
+}
+
+void Package(): {}
+{
+    <PACKAGE> PackageName() <SEMICOLON>
+}
+
+void PackageName(): {}
+{
+    <IDENTIFIER> | PackageName() <DOT> <IDENTIFIER>
+}
+
+void ImportDec(): {}
+{
+    <IMPORT> [PackageName() <DOT>] <IDENTIFIER> <SEMICOLON>
+}
+
+// type declarations -- class, interface, enum
+void TypeDec(): {}
+{
+    ClassDec() | InterfaceDec() | EnumDec()
+}
+
+void ClassDec(): {}
+{
+    ClassModifiers() <CLASS> <IDENTIFIER>
+    (<EXTENDS> ClassType())?
+    (<IMPLEMENTS> Interfaces())?
+    ClassBody()
+}
+
+void ClassModifiers(): {}
+{   /* will only max have 2 of these */
+    (<PUBLIC> | <ABSTRACT> | <FINAL>)? (<PUBLIC> | <ABSTRACT> | <FINAL>)?
+}
+
+void ClassType(): {}
+{
+    TypeName()
+}
+
+void Interfaces(): {}
+{
+    TypeName() (<COMMA> TypeName())*
+}
+
+void TypeName(): {}
+{
+    <IDENTIFIER> | PackageName() <DOT> <IDENTIFIER>
+}
+
+void ClassBody(): {}
+{
+    <LBRACE> ClassBodyDeclarations() <RBRACE>
+}
+
+void ClassBodyDeclarations(): {}
+{
+    (ClassBodyDeclaration())*
+}
+
+void ClassBodyDeclaration() : {}
+{
+    StaticInitializer() | ClassFieldDeclaration() | ClassFunctionDeclaration()
+}
+
+void StaticInitializer(): {}
+{
+    <STATIC> Block()
+}
+
+void ClassFieldDeclaration(): {}
+{
+    [FieldModifiers()] Type() VariableDeclarator()
+}
+
+void ClassFunctionDeclaration(): {}
+{
+    ClassConstruct() | ClassMethod()
+}
+
+void ClassConstruct(): {}
+{
+    [<PUBLIC> | <PROTECTED> | <PRIVATE>] <IDENTIFIER> ArgumentList() Block()
+}
+
+void ClassMethod(): {}
+{
+
+}
+
+/* Statements  */
+void VariableDeclarator() :
+{}
+{
+  VariableDeclaratorId() [ "=" VariableInitializer() ]
+}
+
+void VariableDeclaratorId() :
+{}
+{
+  <IDENTIFIER> ( "[" "]" )*
+}
+
+/* Expressions */
+
+/*
+void InterfaceDec(): {}
+{}
+
+void EnumDec(): {}
+{}
+*/
