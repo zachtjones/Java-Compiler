@@ -8,7 +8,7 @@ PARSER_BEGIN(JavaParser)
 
 public class JavaParser {
 
-    public static void parse(String file) {
+    public static void parse(String file) throws java.io.FileNotFoundException {
         JavaParser parser = new JavaParser(new java.io.FileInputStream(file));
         try {
             parser.CompilationUnit();
@@ -203,101 +203,98 @@ TOKEN : /* OPERATORS */
 
 /*************  ACTUAL GRAMMAR NOW *******/
 // the whole file is a compilation unit
-void CompilationUnit(): {}
+void CompilationUnit() :
+{}
 {
-    [Package()] (ImportDec())* (TypeDec())* <EOF>
+  [ PackageDeclaration() ]
+  ( ImportDeclaration() )*
+  ( TypeDeclaration() )*
+  <EOF>
 }
 
-void Package(): {}
+void PackageDeclaration() :
+{}
 {
-    <PACKAGE> PackageName() <SEMICOLON>
+  "package" Name() ";"
 }
 
-void PackageName(): {}
+void ImportDeclaration() :
+{}
 {
-    <IDENTIFIER> | PackageName() <DOT> <IDENTIFIER>
+  "import" Name() [ "." "*" ] ";"
 }
 
-void ImportDec(): {}
+void TypeDeclaration() :
+{}
 {
-    <IMPORT> [PackageName() <DOT>] <IDENTIFIER> <SEMICOLON>
+  LOOKAHEAD( ( "abstract" | "final" | "public" )* "class" )
+  ClassDeclaration()
+|
+  InterfaceDeclaration()
+|
+  ";"
 }
 
-// type declarations -- class, interface, enum
-void TypeDec(): {}
+
+/*
+ * Declaration syntax follows.
+ */
+
+void ClassDeclaration() :
+{}
 {
-    ClassDec() | InterfaceDec() | EnumDec()
+  ( "abstract" | "final" | "public" )*
+  "class" <IDENTIFIER> [ "extends" Name() ] [ "implements" NameList() ]
+  "{" ( ClassBodyDeclaration() )* "}"
 }
 
-void ClassDec(): {}
+void ClassBodyDeclaration() :
+{}
 {
-    ClassModifiers() <CLASS> <IDENTIFIER>
-    (<EXTENDS> ClassType())?
-    (<IMPLEMENTS> Interfaces())?
-    ClassBody()
+  LOOKAHEAD(2)
+  StaticInitializer()
+|
+  LOOKAHEAD( [ "public" | "protected" | "private" ] Name() "(" )
+  ConstructorDeclaration()
+|
+  LOOKAHEAD( MethodDeclarationLookahead() )
+  MethodDeclaration()
+|
+  FieldDeclaration()
 }
 
-void ClassModifiers(): {}
-{   /* will only max have 2 of these */
-    (<PUBLIC> | <ABSTRACT> | <FINAL>)? (<PUBLIC> | <ABSTRACT> | <FINAL>)?
-}
-
-void ClassType(): {}
+// This production is to determine lookahead only.
+void MethodDeclarationLookahead() :
+{}
 {
-    TypeName()
+  ( "public" | "protected" | "private" | "static" | "abstract" | "final" | "native" | "synchronized" )*
+  ResultType() <IDENTIFIER> "("
 }
 
-void Interfaces(): {}
+void InterfaceDeclaration() :
+{}
 {
-    TypeName() (<COMMA> TypeName())*
+  ( "abstract" | "public" )*
+  "interface" <IDENTIFIER> [ "extends" NameList() ]
+  "{" ( InterfaceMemberDeclaration() )* "}"
 }
 
-void TypeName(): {}
+void InterfaceMemberDeclaration() :
+{}
 {
-    <IDENTIFIER> | PackageName() <DOT> <IDENTIFIER>
+  LOOKAHEAD( MethodDeclarationLookahead() )
+  MethodDeclaration()
+|
+  FieldDeclaration()
 }
 
-void ClassBody(): {}
+void FieldDeclaration() :
+{}
 {
-    <LBRACE> ClassBodyDeclarations() <RBRACE>
+  ( "public" | "protected" | "private" | "static" | "final" | "transient" | "volatile" )*
+  Type() VariableDeclarator() ( "," VariableDeclarator() )* ";"
 }
 
-void ClassBodyDeclarations(): {}
-{
-    (ClassBodyDeclaration())*
-}
-
-void ClassBodyDeclaration() : {}
-{
-    StaticInitializer() | ClassFieldDeclaration() | ClassFunctionDeclaration()
-}
-
-void StaticInitializer(): {}
-{
-    <STATIC> Block()
-}
-
-void ClassFieldDeclaration(): {}
-{
-    [FieldModifiers()] Type() VariableDeclarator()
-}
-
-void ClassFunctionDeclaration(): {}
-{
-    ClassConstruct() | ClassMethod()
-}
-
-void ClassConstruct(): {}
-{
-    [<PUBLIC> | <PROTECTED> | <PRIVATE>] <IDENTIFIER> ArgumentList() Block()
-}
-
-void ClassMethod(): {}
-{
-
-}
-
-/* Statements  */
 void VariableDeclarator() :
 {}
 {
@@ -310,12 +307,571 @@ void VariableDeclaratorId() :
   <IDENTIFIER> ( "[" "]" )*
 }
 
-/* Expressions */
+void VariableInitializer() :
+{}
+{
+  "{" [ VariableInitializer() ( LOOKAHEAD(2) "," VariableInitializer() )* ] [ "," ] "}"
+|
+  Expression()
+}
+
+void MethodDeclaration() :
+{}
+{
+  ( "public" | "protected" | "private" | "static" | "abstract" | "final" | "native" | "synchronized" )*
+  ResultType() MethodDeclarator() [ "throws" NameList() ]
+  ( Block() | ";" )
+}
+
+void MethodDeclarator() :
+{}
+{
+  <IDENTIFIER> FormalParameters() ( "[" "]" )*
+}
+
+void FormalParameters() :
+{}
+{
+  "(" [ FormalParameter() ( "," FormalParameter() )* ] ")"
+}
+
+void FormalParameter() :
+{}
+{
+  Type() VariableDeclaratorId()
+}
+
+void ConstructorDeclaration() :
+{}
+{
+  [ "public" | "protected" | "private" ]
+  <IDENTIFIER> FormalParameters() [ "throws" NameList() ]
+  "{" [ LOOKAHEAD(2) ExplicitConstructorInvocation() ] ( BlockStatement() )* "}"
+}
+
+void ExplicitConstructorInvocation() :
+{}
+{
+  "this" Arguments() ";"
+|
+  "super" Arguments() ";"
+}
+
+void StaticInitializer() :
+{}
+{
+  "static" Block()
+}
+
 
 /*
-void InterfaceDec(): {}
-{}
+ * Type, name and expression syntax follows.
+ */
 
-void EnumDec(): {}
+void Type() :
 {}
-*/
+{
+  ( PrimitiveType() | Name() ) ( "[" "]" )*
+}
+
+void PrimitiveType() :
+{}
+{
+  "boolean"
+|
+  "char"
+|
+  "byte"
+|
+  "short"
+|
+  "int"
+|
+  "long"
+|
+  "float"
+|
+  "double"
+}
+
+void ResultType() :
+{}
+{
+  "void"
+|
+  Type()
+}
+
+void Name() :
+/*
+ * A lookahead of 2 is required below since "Name" can be followed
+ * by a ".*" when used in the context of an "ImportDeclaration".
+ */
+{}
+{
+  <IDENTIFIER>
+  ( LOOKAHEAD(2) "." <IDENTIFIER>
+  )*
+}
+
+void NameList() :
+{}
+{
+  Name()
+  ( "," Name()
+  )*
+}
+
+
+/*
+ * Expression syntax follows.
+ */
+
+void Expression() :
+{}
+{
+  LOOKAHEAD( PrimaryExpression() AssignmentOperator() )
+  Assignment()
+|
+  ConditionalExpression()
+}
+
+void Assignment() :
+{}
+{
+  PrimaryExpression() AssignmentOperator() Expression()
+}
+
+void AssignmentOperator() :
+{}
+{
+  "=" | "*=" | "/=" | "%=" | "+=" | "-=" | "<<=" | ">>=" | ">>>=" | "&=" | "^=" | "|="
+}
+
+void ConditionalExpression() :
+{}
+{
+  ConditionalOrExpression() [ "?" Expression() ":" ConditionalExpression() ]
+}
+
+void ConditionalOrExpression() :
+{}
+{
+  ConditionalAndExpression() ( "||" ConditionalAndExpression() )*
+}
+
+void ConditionalAndExpression() :
+{}
+{
+  InclusiveOrExpression() ( "&&" InclusiveOrExpression() )*
+}
+
+void InclusiveOrExpression() :
+{}
+{
+  ExclusiveOrExpression() ( "|" ExclusiveOrExpression() )*
+}
+
+void ExclusiveOrExpression() :
+{}
+{
+  AndExpression() ( "^" AndExpression() )*
+}
+
+void AndExpression() :
+{}
+{
+  EqualityExpression() ( "&" EqualityExpression() )*
+}
+
+void EqualityExpression() :
+{}
+{
+  InstanceOfExpression() ( ( "==" | "!=" ) InstanceOfExpression() )*
+}
+
+void InstanceOfExpression() :
+{}
+{
+  RelationalExpression() [ "instanceof" Type() ]
+}
+
+void RelationalExpression() :
+{}
+{
+  ShiftExpression() ( ( "<" | ">" | "<=" | ">=" ) ShiftExpression() )*
+}
+
+void ShiftExpression() :
+{}
+{
+  AdditiveExpression() ( ( "<<" | ">>" | ">>>" ) AdditiveExpression() )*
+}
+
+void AdditiveExpression() :
+{}
+{
+  MultiplicativeExpression() ( ( "+" | "-" ) MultiplicativeExpression() )*
+}
+
+void MultiplicativeExpression() :
+{}
+{
+  UnaryExpression() ( ( "*" | "/" | "%" ) UnaryExpression() )*
+}
+
+void UnaryExpression() :
+{}
+{
+  ( "+" | "-" ) UnaryExpression()
+|
+  PreIncrementExpression()
+|
+  PreDecrementExpression()
+|
+  UnaryExpressionNotPlusMinus()
+}
+
+void PreIncrementExpression() :
+{}
+{
+  "++" PrimaryExpression()
+}
+
+void PreDecrementExpression() :
+{}
+{
+  "--" PrimaryExpression()
+}
+
+void UnaryExpressionNotPlusMinus() :
+{}
+{
+  ( "~" | "!" ) UnaryExpression()
+|
+  LOOKAHEAD( CastLookahead() )
+  CastExpression()
+|
+  PostfixExpression()
+}
+
+// This production is to determine lookahead only.  The LOOKAHEAD specifications
+// below are not used, but they are there just to indicate that we know about
+// this.
+void CastLookahead() :
+{}
+{
+  LOOKAHEAD(2)
+  "(" PrimitiveType()
+|
+  LOOKAHEAD("(" Name() "[")
+  "(" Name() "[" "]"
+|
+  "(" Name() ")" ( "~" | "!" | "(" | <IDENTIFIER> | "this" | "super" | "new" | Literal() )
+}
+
+void PostfixExpression() :
+{}
+{
+  PrimaryExpression() [ "++" | "--" ]
+}
+
+void CastExpression() :
+{}
+{
+  LOOKAHEAD(2)
+  "(" PrimitiveType() ( "[" "]" )* ")" UnaryExpression()
+|
+  "(" Name() ( "[" "]" )* ")" UnaryExpressionNotPlusMinus()
+}
+
+void PrimaryExpression() :
+{}
+{
+  PrimaryPrefix() ( PrimarySuffix() )*
+}
+
+void PrimaryPrefix() :
+{}
+{
+  Literal()
+|
+  Name()
+|
+  "this"
+|
+  "super" "." <IDENTIFIER>
+|
+  "(" Expression() ")"
+|
+  AllocationExpression()
+}
+
+void PrimarySuffix() :
+{}
+{
+  "[" Expression() "]"
+|
+  "." <IDENTIFIER>
+|
+  Arguments()
+}
+
+void Literal() :
+{}
+{
+  <INTEGER_LITERAL>
+|
+  <FLOATING_POINT_LITERAL>
+|
+  <CHARACTER_LITERAL>
+|
+  <STRING_LITERAL>
+|
+  BooleanLiteral()
+|
+  NullLiteral()
+}
+
+void BooleanLiteral() :
+{}
+{
+  "true"
+|
+  "false"
+}
+
+void NullLiteral() :
+{}
+{
+  "null"
+}
+
+void Arguments() :
+{}
+{
+  "(" [ ArgumentList() ] ")"
+}
+
+void ArgumentList() :
+{}
+{
+  Expression() ( "," Expression() )*
+}
+
+void AllocationExpression() :
+{}
+{
+  LOOKAHEAD(2)
+  "new" PrimitiveType() ArrayDimensions()
+|
+  "new" Name() ( Arguments() | ArrayDimensions() )
+}
+
+/*
+ * The second LOOKAHEAD specification below is to parse to PrimarySuffix
+ * if there is an expression between the "[...]".
+ */
+void ArrayDimensions() :
+{}
+{
+  ( LOOKAHEAD(2) "[" Expression() "]" )+ ( LOOKAHEAD(2) "[" "]" )*
+}
+
+
+/*
+ * Statement syntax follows.
+ */
+
+void Statement() :
+{}
+{
+  LOOKAHEAD(2)
+  LabeledStatement()
+|
+  Block()
+|
+  EmptyStatement()
+|
+  StatementExpression() ";"
+|
+  SwitchStatement()
+|
+  IfStatement()
+|
+  WhileStatement()
+|
+  DoStatement()
+|
+  ForStatement()
+|
+  BreakStatement()
+|
+  ContinueStatement()
+|
+  ReturnStatement()
+|
+  ThrowStatement()
+|
+  SynchronizedStatement()
+|
+  TryStatement()
+}
+
+void LabeledStatement() :
+{}
+{
+  <IDENTIFIER> ":" Statement()
+}
+
+void Block() :
+{}
+{
+  "{" ( BlockStatement() )* "}"
+}
+
+void BlockStatement() :
+{}
+{
+  LOOKAHEAD(Type() <IDENTIFIER>)
+  LocalVariableDeclaration() ";"
+|
+  Statement()
+}
+
+void LocalVariableDeclaration() :
+{}
+{
+  Type() VariableDeclarator() ( "," VariableDeclarator() )*
+}
+
+void EmptyStatement() :
+{}
+{
+  ";"
+}
+
+void StatementExpression() :
+/*
+ * The last expansion of this production accepts more than the legal
+ * Java expansions for StatementExpression.
+ */
+{}
+{
+  PreIncrementExpression()
+|
+  PreDecrementExpression()
+|
+  LOOKAHEAD( PrimaryExpression() AssignmentOperator() )
+  Assignment()
+|
+  PostfixExpression()
+}
+
+void SwitchStatement() :
+{}
+{
+  "switch" "(" Expression() ")" "{"
+    ( SwitchLabel() ( BlockStatement() )* )*
+  "}"
+}
+
+void SwitchLabel() :
+{}
+{
+  "case" Expression() ":"
+|
+  "default" ":"
+}
+
+void IfStatement() :
+/*
+ * The disambiguating algorithm of JavaCC automatically binds dangling
+ * else's to the innermost if statement.  The LOOKAHEAD specification
+ * is to tell JavaCC that we know what we are doing.
+ */
+{}
+{
+  "if" "(" Expression() ")" Statement() [ LOOKAHEAD(1) "else" Statement() ]
+}
+
+void WhileStatement() :
+{}
+{
+  "while" "(" Expression() ")" Statement()
+}
+
+void DoStatement() :
+{}
+{
+  "do" Statement() "while" "(" Expression() ")" ";"
+}
+
+void ForStatement() :
+{}
+{
+  "for" "(" [ ForInit() ] ";" [ Expression() ] ";" [ ForUpdate() ] ")" Statement()
+}
+
+void ForInit() :
+{}
+{
+  LOOKAHEAD( Type() <IDENTIFIER> )
+  LocalVariableDeclaration()
+|
+  StatementExpressionList()
+}
+
+void StatementExpressionList() :
+{}
+{
+  StatementExpression() ( "," StatementExpression() )*
+}
+
+void ForUpdate() :
+{}
+{
+  StatementExpressionList()
+}
+
+void BreakStatement() :
+{}
+{
+  "break" [ <IDENTIFIER> ] ";"
+}
+
+void ContinueStatement() :
+{}
+{
+  "continue" [ <IDENTIFIER> ] ";"
+}
+
+void ReturnStatement() :
+{}
+{
+  "return" [ Expression() ] ";"
+}
+
+void ThrowStatement() :
+{}
+{
+  "throw" Expression() ";"
+}
+
+void SynchronizedStatement() :
+{}
+{
+  "synchronized" "(" Expression() ")" Block()
+}
+
+void TryStatement() :
+/*
+ * Semantic check required here to make sure that at least one
+ * finally/catch is present.
+ */
+{}
+{
+  "try" Block()
+  ( "catch" "(" FormalParameter() ")" Block() )*
+  [ "finally" Block() ]
+}
