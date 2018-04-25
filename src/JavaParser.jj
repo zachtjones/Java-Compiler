@@ -14,6 +14,7 @@ public class JavaParser {
             parser.CompilationUnit();
             System.out.println("File passed. Syntax is valid.");
         } catch (ParseException e) {
+            e.printStackTrace();
             System.out.println(e.toString());
         }
     }
@@ -243,8 +244,28 @@ void TypeDeclaration() :{}
 void ClassDeclaration() :{}
 {
   ( "abstract" | "final" | "public" )*
-  "class" <IDENTIFIER> [ "extends" Name() ] [ "implements" NameList() ]
+  "class" <IDENTIFIER> [ TypeParameters() ]
+  [ "extends" Name() ]
+  [ "implements" NameList() ]
   "{" ( ClassBodyDeclaration() )* "}"
+}
+
+void TypeParameters() :
+{}
+{
+    <LT> TypeParameter() ( <COMMA> TypeParameter() )* <GT>
+}
+
+void TypeParameter() :
+{}
+{
+    <IDENTIFIER> [<EXTENDS> Bound()]
+}
+
+void Bound() :
+{}
+{
+    Name() ( "&" Name())*
 }
 
 void ClassBodyDeclaration() :
