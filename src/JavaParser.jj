@@ -51,6 +51,7 @@ TOKEN : /* RESERVED WORDS AND LITERALS */
 | < DO: "do" >
 | < DOUBLE: "double" >
 | < ELSE: "else" >
+| < ENUM: "enum" >
 | < EXTENDS: "extends" >
 | < FALSE: "false" >
 | < FINAL: "final" >
@@ -203,8 +204,7 @@ TOKEN : /* OPERATORS */
 
 /*************  ACTUAL GRAMMAR NOW *******/
 // the whole file is a compilation unit
-void CompilationUnit() :
-{}
+void CompilationUnit() :{}
 {
   [ PackageDeclaration() ]
   ( ImportDeclaration() )*
@@ -212,27 +212,27 @@ void CompilationUnit() :
   <EOF>
 }
 
-void PackageDeclaration() :
-{}
+void PackageDeclaration() :{}
 {
   "package" Name() ";"
 }
 
-void ImportDeclaration() :
-{}
+void ImportDeclaration() :{}
 {
   "import" Name() [ "." "*" ] ";"
 }
 
-void TypeDeclaration() :
-{}
+void TypeDeclaration() :{}
 {
-  LOOKAHEAD( ( "abstract" | "final" | "public" )* "class" )
-  ClassDeclaration()
-|
-  InterfaceDeclaration()
-|
-  ";"
+    LOOKAHEAD( ( "abstract" | "final" | "public" )* "class" )
+    ClassDeclaration()
+
+|   LOOKAHEAD( ( "abstract" | "public")* "interface" )
+    InterfaceDeclaration()
+
+|   EnumDeclaration()
+
+|   ";"
 }
 
 
@@ -240,8 +240,7 @@ void TypeDeclaration() :
  * Declaration syntax follows.
  */
 
-void ClassDeclaration() :
-{}
+void ClassDeclaration() :{}
 {
   ( "abstract" | "final" | "public" )*
   "class" <IDENTIFIER> [ "extends" Name() ] [ "implements" NameList() ]
@@ -286,6 +285,16 @@ void InterfaceMemberDeclaration() :
   MethodDeclaration()
 |
   FieldDeclaration()
+}
+
+void EnumDeclaration() : {}
+{
+    (<PUBLIC>)* <ENUM> <IDENTIFIER> <LBRACE> EnumBody() <RBRACE>
+}
+
+void EnumBody() : {}
+{ // the constants that could be the values of the ENUM
+    <IDENTIFIER> ("," <IDENTIFIER>)*
 }
 
 void FieldDeclaration() :
