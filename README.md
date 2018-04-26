@@ -20,6 +20,6 @@ You may get really strange error messages if you use any of these.
 - Method references
 
 ## Current known bugs
-- Nested generics (ex: HashMap<String, ArrayList<String>>) have to be written without the >>
-  - write instead as HashMap<String, ArrayList<String> >
+- Nested generics (ex: <code>HashMap&lt;String, ArrayList&lt;String&gt;&gt;</code>) have to be written without the <code>&gt;&gt;
+  - write instead as HashMap&lt;String, ArrayList&lt;String&gt; &gt;
   - nested generics makes the grammar not context-free, so this might be hard to implement
