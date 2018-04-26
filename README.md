@@ -1,5 +1,6 @@
 # Java Compiler
-This is a java program used to compile Java files
+This is a java program used to compile Java files, outputting native x86-64 code instead
+of .class files.
 
 ## Introduction
 This program is written in Java, with the use of JavaCC as the parser.
@@ -20,6 +21,6 @@ You may get really strange error messages if you use any of these.
 - Method references
 
 ## Current known bugs
-- Nested generics (ex: <code>HashMap&lt;String, ArrayList&lt;String&gt;&gt;</code>) have to be written without the <code>&gt;&gt;
-  - write instead as HashMap&lt;String, ArrayList&lt;String&gt; &gt;
+- Nested generics (ex: <code>HashMap&lt;String, ArrayList&lt;String&gt;&gt;</code>) have to be written without the <code>&gt;&gt;</code>
+  - write instead as <code>HashMap&lt;String, ArrayList&lt;String&gt; &gt;</code>
   - nested generics makes the grammar not context-free, so this might be hard to implement
