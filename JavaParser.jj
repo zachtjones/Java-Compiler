@@ -35,6 +35,11 @@ SPECIAL_TOKEN : /* COMMENTS */
   <LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
 | <BLOCK_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
+/*
+SPECIAL_TOKEN : // ANNOTATIONS
+{
+  <ANNOTATION: "@" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+}*/
 
 TOKEN : /* RESERVED WORDS AND LITERALS */
 {
@@ -244,28 +249,16 @@ void TypeDeclaration() :{}
 void ClassDeclaration() :{}
 {
   ( "abstract" | "final" | "public" )*
-  "class" <IDENTIFIER> [ TypeParameters() ]
+  "class" <IDENTIFIER> [ ClassTypeParameters() ]
   [ "extends" Name() ]
   [ "implements" NameList() ]
   "{" ( ClassBodyDeclaration() )* "}"
 }
 
-void TypeParameters() :
+void ClassTypeParameters() :
 {}
 {
-    <LT> TypeParameter() ( <COMMA> TypeParameter() )* <GT>
-}
-
-void TypeParameter() :
-{}
-{
-    <IDENTIFIER> [<EXTENDS> Bound()]
-}
-
-void Bound() :
-{}
-{
-    Name() ( "&" Name())*
+    <LT> Name() ( <COMMA> Name() )* <GT>
 }
 
 void ClassBodyDeclaration() :
@@ -436,20 +429,21 @@ void Name() :
 /*
  * A lookahead of 2 is required below since "Name" can be followed
  * by a ".*" when used in the context of an "ImportDeclaration".
+ * Also support generics, making this require even more lookahead
  */
 {}
 {
+  // could be X<Y extends Z>
   <IDENTIFIER>
-  ( LOOKAHEAD(2) "." <IDENTIFIER>
-  )*
+    ( LOOKAHEAD(<EXTENDS> Name()) <EXTENDS> Name())?
+    ( LOOKAHEAD(<LT> NameList() <GT>) <LT> NameList() <GT>)?
+  ( LOOKAHEAD(2) "." <IDENTIFIER>  )*
 }
 
 void NameList() :
 {}
 {
-  Name()
-  ( "," Name()
-  )*
+  Name() ( "," Name() )*
 }
 
 

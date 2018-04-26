@@ -1,3 +1,11 @@
-bin/*
+*.class
 lib/*
+JavaParser.java
+JavaParserConstants.java
+JavaParserTokenManager.java
+ParseException.java
+SimpleCharStream.java
+Token.java
+TokenMgrError.java
 
+/bin/
