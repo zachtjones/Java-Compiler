@@ -30,16 +30,12 @@ SKIP : /* WHITE SPACE */
   " " | "\t" | "\n" | "\r" | "\f"
 }
 
-SPECIAL_TOKEN : /* COMMENTS */
+SPECIAL_TOKEN : /* Comments and Annotations */
 {
   <LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
 | <BLOCK_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+| <ANNOTATION: "@" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
 }
-/*
-SPECIAL_TOKEN : // ANNOTATIONS
-{
-  <ANNOTATION: "@" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
-}*/
 
 TOKEN : /* RESERVED WORDS AND LITERALS */
 {
