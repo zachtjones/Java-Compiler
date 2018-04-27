@@ -1,14 +1,26 @@
 import java.io.FileNotFoundException;
-//import java.util.ArrayList;
+import tree.*;
 
 public class JavaCompiler {
 
-	public static void main(String[] args) throws FileNotFoundException {
-		if (args.length == 0) {
+	public static void main(String[] args) {
+		if (args.length != 1) {
 			usage();
 		}
 		String file = args[0];
-		JavaParser.parse(file);
+		try {
+			CompilationUnit c = JavaParser.parse(file);
+			System.out.println("File passed. Syntax is valid.");
+			// next task
+		} catch (ParseException e) {
+            System.out.print("Syntax error at line ");
+            System.out.print(e.currentToken.next.beginLine);
+            System.out.println(", column " + e.currentToken.next.beginColumn);
+            System.out.print("Check near: \"");
+            System.out.println(e.currentToken.next.image + "\"");
+        } catch (FileNotFoundException e) {
+        	System.out.println("Error: the input file was not found.");
+        }
 	}
 
 	private static void usage() {

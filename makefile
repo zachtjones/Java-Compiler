@@ -1,6 +1,6 @@
 all:
 	javacc JavaParser.jj
-	javac *.java
+	javac JavaCompiler.java
 
 clean:
 	rm -f JavaParserConstants.java
@@ -10,4 +10,5 @@ clean:
 	rm -f Token.java
 	rm -f TokenMgrError.java
 	rm -f *.class
+	rm -f tree/*.class
 

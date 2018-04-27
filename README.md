@@ -15,6 +15,7 @@ So far, only the syntax of the language is checked.
 
 ## Java Features not implemented
 You may get really strange error messages if you use any of these.
+- Diamond for generics  (ex: <code>ArrayList<String> s = new ArrayList<>()</code>)
 - Nested classes
 - Annotations (currently treated as comments)
 - Lambdas

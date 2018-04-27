@@ -5,18 +5,16 @@
 */
 
 PARSER_BEGIN(JavaParser)
+import java.io.FileNotFoundException;
+import java.io.FileInputStream;
+import tree.*;
+import java.util.ArrayList;
 
 public class JavaParser {
 
-    public static void parse(String file) throws java.io.FileNotFoundException {
-        JavaParser parser = new JavaParser(new java.io.FileInputStream(file));
-        try {
-            parser.CompilationUnit();
-            System.out.println("File passed. Syntax is valid.");
-        } catch (ParseException e) {
-            e.printStackTrace();
-            System.out.println(e.toString());
-        }
+    public static CompilationUnit parse(String file) throws FileNotFoundException, ParseException {
+        JavaParser parser = new JavaParser(new FileInputStream(file));
+        return parser.CompilationUnit();
     }
 
 }
@@ -206,35 +204,64 @@ TOKEN : /* OPERATORS */
 
 /*************  ACTUAL GRAMMAR NOW *******/
 // the whole file is a compilation unit
-void CompilationUnit() :{}
+CompilationUnit CompilationUnit() :
 {
-  [ PackageDeclaration() ]
-  ( ImportDeclaration() )*
-  ( TypeDeclaration() )*
-  <EOF>
+    CompilationUnit c = new CompilationUnit();
+    ImportNode temp;
+    TypeNode temp2;
+}
+{
+    [ c.packageName=PackageDeclaration() ]
+    ( temp=ImportDeclaration() { c.imports.add(temp); } )*
+    ( temp2=TypeDeclaration() { c.types.add(temp2); })*
+    <EOF>
+    {
+        return c;
+    }
 }
 
-void PackageDeclaration() :{}
+NameNode PackageDeclaration() :
 {
-  "package" Name() ";"
+    NameNode n;
+}
+{
+    "package" n=Name() ";"
+    {
+        return n;
+    }
 }
 
-void ImportDeclaration() :{}
+ImportNode ImportDeclaration() :
 {
-  "import" Name() [ "." "*" ] ";"
+    ImportNode n = new ImportNode();
+}
+{
+    <IMPORT> n.name=Name()
+    [ <DOT> <STAR> { n.isAll = true; } ]
+    <SEMICOLON>
+    {
+        return n;
+    }
 }
 
-void TypeDeclaration() :{}
+TypeNode TypeDeclaration() :
+{
+    TypeNode t = new TypeNode();
+}
 {
     LOOKAHEAD( ( "abstract" | "final" | "public" )* "class" )
-    ClassDeclaration()
+    t.c=ClassDeclaration()
+    { return t; }
 
 |   LOOKAHEAD( ( "abstract" | "public")* "interface" )
-    InterfaceDeclaration()
+    t.i=InterfaceDeclaration()
+    { return t; }
 
-|   EnumDeclaration()
+|   t.e=EnumDeclaration()
+    { return t; }
 
 |   ";"
+    { return t; }
 }
 
 
@@ -242,19 +269,36 @@ void TypeDeclaration() :{}
  * Declaration syntax follows.
  */
 
-void ClassDeclaration() :{}
+ClassNode ClassDeclaration() :
 {
-  ( "abstract" | "final" | "public" )*
-  "class" <IDENTIFIER> [ ClassTypeParameters() ]
-  [ "extends" Name() ]
-  [ "implements" NameList() ]
-  "{" ( ClassBodyDeclaration() )* "}"
+    ClassNode c = new ClassNode();
+    Token t;
+}
+{
+    ( <ABSTRACT> { c.isAbstract=true; }
+        | <FINAL> { c.isFinal=true; }
+        | <PUBLIC> { c.isPublic=true; } )*
+    <CLASS> t=<IDENTIFIER> [ c.typeParams=ClassTypeParameters() ]
+    [ <EXTENDS> c.superclass=Name() ]
+    [ <IMPLEMENTS> c.interfaces=NameList() ]
+    <LBRACE> ( ClassBodyDeclaration() )* <RBRACE>
+    {
+        c.name = t.image;
+        return c;
+    }
 }
 
-void ClassTypeParameters() :
-{}
+ArrayList<NameNode> ClassTypeParameters() :
 {
-    <LT> Name() ( <COMMA> Name() )* <GT>
+    ArrayList<NameNode> n = new ArrayList<NameNode>();
+    NameNode temp;
+}
+{
+    <LT> temp=Name() { n.add(temp); }
+    ( <COMMA> temp=Name() { n.add(temp); })* <GT>
+    {
+        return n;
+    }
 }
 
 void ClassBodyDeclaration() :
@@ -280,12 +324,19 @@ void MethodDeclarationLookahead() :
   ResultType() <IDENTIFIER> "("
 }
 
-void InterfaceDeclaration() :
-{}
+InterfaceNode InterfaceDeclaration() :
 {
-  ( "abstract" | "public" )*
-  "interface" <IDENTIFIER> [ "extends" NameList() ]
-  "{" ( InterfaceMemberDeclaration() )* "}"
+    InterfaceNode i = new InterfaceNode();
+    Token t;
+}
+{
+    ( <ABSTRACT> | <PUBLIC> )*
+    <INTERFACE> t=<IDENTIFIER> { i.name = t.image; }
+    [ <EXTENDS> NameList() ]
+    "{" ( InterfaceMemberDeclaration() )* "}"
+    {
+        return i;
+    }
 }
 
 void InterfaceMemberDeclaration() :
@@ -297,14 +348,30 @@ void InterfaceMemberDeclaration() :
   FieldDeclaration()
 }
 
-void EnumDeclaration() : {}
+EnumNode EnumDeclaration() :
 {
-    (<PUBLIC>)* <ENUM> <IDENTIFIER> <LBRACE> EnumBody() <RBRACE>
+    EnumNode e = new EnumNode();
+    Token t;
+}
+{
+    (<PUBLIC>)* <ENUM> t=<IDENTIFIER> {e.name = t.image; }
+    <LBRACE> e.values=EnumBody() <RBRACE>
+    {
+        return e;
+    }
 }
 
-void EnumBody() : {}
+ArrayList<String> EnumBody() :
+{
+    ArrayList<String> a = new ArrayList<String>();
+    Token t;
+}
 { // the constants that could be the values of the ENUM
-    <IDENTIFIER> ("," <IDENTIFIER>)*
+    t=<IDENTIFIER> { a.add(t.image); }
+    ("," t=<IDENTIFIER> { a.add(t.image); })*
+    {
+        return a;
+    }
 }
 
 void FieldDeclaration() :
@@ -421,25 +488,38 @@ void ResultType() :
   Type()
 }
 
-void Name() :
+NameNode Name() :
 /*
  * A lookahead of 2 is required below since "Name" can be followed
  * by a ".*" when used in the context of an "ImportDeclaration".
  * Also support generics, making this require even more lookahead
  */
-{}
 {
-  // could be X<Y extends Z>
-  <IDENTIFIER>
-    ( LOOKAHEAD(<EXTENDS> Name()) <EXTENDS> Name())?
-    ( LOOKAHEAD(<LT> NameList() <GT>) <LT> NameList() <GT>)?
-  ( LOOKAHEAD(2) "." <IDENTIFIER>  )*
+    NameNode n = new NameNode();
+    Token t;
+}
+{
+    // could be X<Y extends Z>
+    t=<IDENTIFIER> { n.primaryName = t.image; }
+    ( LOOKAHEAD(<EXTENDS> Name()) <EXTENDS> n.extendsNode=Name())?
+    ( LOOKAHEAD(<LT> NameList() <GT>) <LT> n.generics=NameList() <GT>)?
+    ( LOOKAHEAD(2) "." n.secondaryName=Name()  )*
+    {
+        return n;
+    }
 }
 
-void NameList() :
-{}
+ArrayList<NameNode> NameList() :
 {
-  Name() ( "," Name() )*
+    ArrayList<NameNode> n = new ArrayList<NameNode>();
+    NameNode temp;
+}
+{
+    temp=Name(){ n.add(temp); }
+    ( <COMMA> temp=Name() { n.add(temp); } )*
+    {
+        return n;
+    }
 }
 
 
