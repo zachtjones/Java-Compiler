@@ -29,3 +29,9 @@ public class JavaCompiler {
 	}
 
 }
+class T {
+	public int m()[] { // this is valid
+		int[] n = {,};
+		return n;
+	}
+}

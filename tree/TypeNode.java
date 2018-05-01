@@ -1,9 +1,9 @@
 package tree;
 
 public class TypeNode implements Node {
-    // only one of these will not be null
-    // if they are all null, then the code was just ';'
-    public ClassNode c;
-    public InterfaceNode i;
-    public EnumNode e;
+    // one of these two will not be null
+    public PrimitiveTypeNode primitive;
+    public NameNode name;
+
+    public int arrayDims; // 0 for not array;
 }

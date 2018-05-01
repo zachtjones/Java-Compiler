@@ -7,5 +7,5 @@ import java.util.ArrayList;
 public class CompilationUnit implements Node {
     public NameNode packageName;
     public ArrayList<ImportNode> imports = new ArrayList<>();
-    public ArrayList<TypeNode> types = new ArrayList<>();
+    public ArrayList<TypeDecNode> types = new ArrayList<>();
 }

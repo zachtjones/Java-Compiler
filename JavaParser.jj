@@ -208,7 +208,7 @@ CompilationUnit CompilationUnit() :
 {
     CompilationUnit c = new CompilationUnit();
     ImportNode temp;
-    TypeNode temp2;
+    TypeDecNode temp2;
 }
 {
     [ c.packageName=PackageDeclaration() ]
@@ -244,9 +244,9 @@ ImportNode ImportDeclaration() :
     }
 }
 
-TypeNode TypeDeclaration() :
+TypeDecNode TypeDeclaration() :
 {
-    TypeNode t = new TypeNode();
+    TypeDecNode t = new TypeDecNode();
 }
 {
     LOOKAHEAD( ( "abstract" | "final" | "public" )* "class" )
@@ -260,7 +260,7 @@ TypeNode TypeDeclaration() :
 |   t.e=EnumDeclaration()
     { return t; }
 
-|   ";"
+|   <SEMICOLON>
     { return t; }
 }
 
@@ -273,6 +273,7 @@ ClassNode ClassDeclaration() :
 {
     ClassNode c = new ClassNode();
     Token t;
+    ClassBodyNode b;
 }
 {
     ( <ABSTRACT> { c.isAbstract=true; }
@@ -281,7 +282,7 @@ ClassNode ClassDeclaration() :
     <CLASS> t=<IDENTIFIER> [ c.typeParams=ClassTypeParameters() ]
     [ <EXTENDS> c.superclass=Name() ]
     [ <IMPLEMENTS> c.interfaces=NameList() ]
-    <LBRACE> ( ClassBodyDeclaration() )* <RBRACE>
+    <LBRACE> ( b=ClassBodyDeclaration() { c.body.add(b); } )* <RBRACE>
     {
         c.name = t.image;
         return c;
@@ -301,19 +302,33 @@ ArrayList<NameNode> ClassTypeParameters() :
     }
 }
 
-void ClassBodyDeclaration() :
-{}
+ClassBodyNode ClassBodyDeclaration() :
 {
-  LOOKAHEAD(2)
-  StaticInitializer()
+    ClassBodyNode c = new ClassBodyNode();
+}
+{
+    LOOKAHEAD(2)
+    c.staticInit=StaticInitializer()
+    {
+        return c;
+    }
 |
-  LOOKAHEAD( [ "public" | "protected" | "private" ] Name() "(" )
-  ConstructorDeclaration()
+    LOOKAHEAD( [ "public" | "protected" | "private" ] Name() "(" )
+    c.constructor=ConstructorDeclaration()
+    {
+        return c;
+    }
 |
-  LOOKAHEAD( MethodDeclarationLookahead() )
-  MethodDeclaration()
+    LOOKAHEAD( MethodDeclarationLookahead() )
+    c.method=MethodDeclaration()
+    {
+        return c;
+    }
 |
-  FieldDeclaration()
+    c.field=FieldDeclaration()
+    {
+        return c;
+    }
 }
 
 // This production is to determine lookahead only.
@@ -332,7 +347,7 @@ InterfaceNode InterfaceDeclaration() :
 {
     ( <ABSTRACT> | <PUBLIC> )*
     <INTERFACE> t=<IDENTIFIER> { i.name = t.image; }
-    [ <EXTENDS> NameList() ]
+    [ <EXTENDS> i.supers=NameList() ]
     "{" ( InterfaceMemberDeclaration() )* "}"
     {
         return i;
@@ -374,65 +389,133 @@ ArrayList<String> EnumBody() :
     }
 }
 
-void FieldDeclaration() :
-{}
+FieldDeclarationNode FieldDeclaration() :
 {
-  ( "public" | "protected" | "private" | "static" | "final" | "transient" | "volatile" )*
-  Type() VariableDeclarator() ( "," VariableDeclarator() )* ";"
+    FieldDeclarationNode f = new FieldDeclarationNode();
+    VariableDecNode v;
+}
+{
+    ( <PUBLIC> { f.isPublic=true; } | <PROTECTED> { f.isProtected=true; }
+    | <PRIVATE> { f.isPrivate=true; } | <STATIC> { f.isStatic=true; }
+    | <FINAL> { f.isFinal=true; } | <TRANSIENT> { f.isTransient=true; }
+    | <VOLATILE> { f.isVolatile=true; } )*
+    f.type=Type() v=VariableDeclarator() { f.variables.add(v); }
+    ( "," v=VariableDeclarator() { f.variables.add(v); } )* ";"
+    {
+        return f;
+    }
 }
 
-void VariableDeclarator() :
-{}
+VariableDecNode VariableDeclarator() :
 {
-  VariableDeclaratorId() [ "=" VariableInitializer() ]
+    VariableDecNode v = new VariableDecNode();
+}
+{
+    v.id=VariableDeclaratorId() [ "=" v.init=VariableInitializer() ]
+    {
+        return v;
+    }
 }
 
-void VariableDeclaratorId() :
-{}
+VariableIdNode VariableDeclaratorId() :
 {
-  <IDENTIFIER> ( "[" "]" )*
+    VariableIdNode v = new VariableIdNode();
+    Token t;
+}
+{
+    t=<IDENTIFIER>{ v.name=t.image; }
+    ( <LBRACKET> <RBRACKET> {v.numDimensions++; } )*
+    {
+        return v;
+    }
 }
 
-void VariableInitializer() :
-{}
+VariableInitializerNode VariableInitializer() :
 {
-  "{" [ VariableInitializer() ( LOOKAHEAD(2) "," VariableInitializer() )* ] [ "," ] "}"
+    VariableInitializerNode n = new VariableInitializerNode();
+    VariableInitializerNode temp;
+}
+{
+    <LBRACE> [ temp=VariableInitializer() { n.nextLevel.add(temp); }
+    ( LOOKAHEAD(2) <COMMA> temp=VariableInitializer() { n.nextLevel.add(temp); } )* ] [ "," ] <RBRACE>
+    {
+        return n;
+    }
 |
-  Expression()
+    n.e=Expression()
+    {
+        return n;
+    }
 }
 
-void MethodDeclaration() :
-{}
+MethodNode MethodDeclaration() :
 {
-  ( "public" | "protected" | "private" | "static" | "abstract" | "final" | "native" | "synchronized" )*
-  ResultType() MethodDeclarator() [ "throws" NameList() ]
-  ( Block() | ";" )
+    MethodNode m = new MethodNode();
+}
+{
+    ( <PUBLIC> { m.isPublic=true;} | <PROTECTED> { m.isProtected=true; }
+    | <PRIVATE> { m.isPrivate=true; } | <STATIC> { m.isStatic=true; }
+    | <ABSTRACT> { m.isAbstract=true; } | <FINAL> { m.isFinal=true; }
+    | <NATIVE> { m.isNative=true; } | <SYNCHRONIZED> { m.isSynchronized=true; } )*
+    m.resultType=ResultType() m.dec=MethodDeclarator() [ <THROWS> m.throwsList=NameList() ]
+    ( m.code=Block() | ";" )
+    {
+        return m;
+    }
 }
 
-void MethodDeclarator() :
-{}
+MethodDeclaratorNode MethodDeclarator() :
 {
-  <IDENTIFIER> FormalParameters() ( "[" "]" )*
+    MethodDeclaratorNode m = new MethodDeclaratorNode();
+    Token t;
+}
+{
+    t=<IDENTIFIER> { m.name = t.image; }
+    m.params=FormalParameters() ( <LBRACKET> <RBRACKET>{ m.arrayDims ++; } )*
+    {
+        return m;
+    }
 }
 
-void FormalParameters() :
-{}
+ArrayList<ParamNode> FormalParameters() :
 {
-  "(" [ FormalParameter() ( "," FormalParameter() )* ] ")"
+    ArrayList<ParamNode> p = new ArrayList<ParamNode>();
+    ParamNode temp;
+}
+{
+    <LPAREN> [ temp=FormalParameter() { p.add(temp); }
+    ( <COMMA> temp=FormalParameter() { p.add(temp); })* ] <RPAREN>
+    {
+        return p;
+    }
 }
 
-void FormalParameter() :
-{}
+ParamNode FormalParameter() :
 {
-  Type() VariableDeclaratorId()
+    ParamNode p = new ParamNode();
+}
+{
+    p.type=Type() p.id=VariableDeclaratorId()
+    {
+        return p;
+    }
 }
 
-void ConstructorDeclaration() :
-{}
+ConstructorNode ConstructorDeclaration() :
 {
-  [ "public" | "protected" | "private" ]
-  <IDENTIFIER> FormalParameters() [ "throws" NameList() ]
-  "{" [ LOOKAHEAD(2) ExplicitConstructorInvocation() ] ( BlockStatement() )* "}"
+    ConstructorNode c = new ConstructorNode();
+    Token t;
+    BlockStatementNode b;
+}
+{
+    [ <PUBLIC> { c.isPublic = true; }
+    | <PROTECTED> {c.isProtected = true;}
+    | <PRIVATE> {c.isPrivate = true; } ]
+    t=<IDENTIFIER> { c.name = t.image; }
+    c.params=FormalParameters()
+    [ <THROWS> c.throwsList=NameList() ]
+    <LBRACE> [ LOOKAHEAD(2) ExplicitConstructorInvocation() ]
+     ( b=BlockStatement() { c.code.add(b); } )* <RBRACE>
 }
 
 void ExplicitConstructorInvocation() :
@@ -443,10 +526,12 @@ void ExplicitConstructorInvocation() :
   "super" Arguments() ";"
 }
 
-void StaticInitializer() :
-{}
+BlockNode StaticInitializer() :
 {
-  "static" Block()
+    BlockNode b;
+}
+{
+  "static" b=Block() { return b; }
 }
 
 
@@ -454,38 +539,39 @@ void StaticInitializer() :
  * Type, name and expression syntax follows.
  */
 
-void Type() :
-{}
+TypeNode Type() :
 {
-  ( PrimitiveType() | Name() ) ( "[" "]" )*
+    TypeNode t = new TypeNode();
+}
+{
+    ( t.primitive=PrimitiveType() | t.name=Name() )
+    ( <LBRACKET> <RBRACKET>{ t.arrayDims++; } )*
+    { return t; }
 }
 
-void PrimitiveType() :
-{}
+PrimitiveTypeNode PrimitiveType() :
 {
-  "boolean"
-|
-  "char"
-|
-  "byte"
-|
-  "short"
-|
-  "int"
-|
-  "long"
-|
-  "float"
-|
-  "double"
+    PrimitiveTypeNode t = new PrimitiveTypeNode();
+}
+{
+    <BOOLEAN> { t.type = PrimitiveTypeNode.BOOLEAN; return t; }
+|   <CHAR> { t.type = PrimitiveTypeNode.CHAR; return t; }
+|   <BYTE> { t.type = PrimitiveTypeNode.BYTE; return t; }
+|   <SHORT> { t.type = PrimitiveTypeNode.SHORT; return t; }
+|   <INT> { t.type = PrimitiveTypeNode.INT; return t; }
+|   <LONG> { t.type = PrimitiveTypeNode.LONG; return t; }
+|   <FLOAT> { t.type = PrimitiveTypeNode.FLOAT; return t; }
+|   <DOUBLE> { t.type = PrimitiveTypeNode.DOUBLE; return t; }
 }
 
-void ResultType() :
-{}
+ResultTypeNode ResultType() :
 {
-  "void"
+    ResultTypeNode r = new ResultTypeNode();
+}
+{
+  <VOID> { r.isVoid = true; return r; }
 |
-  Type()
+  r.type=Type() { return r; }
 }
 
 NameNode Name() :
@@ -783,72 +869,145 @@ void ArrayDimensions() :
  * Statement syntax follows.
  */
 
-void Statement() :
-{}
+StatementNode Statement() :
 {
-  LOOKAHEAD(2)
-  LabeledStatement()
+    StatementNode s = new StatementNode();
+}
+{
+    LOOKAHEAD(2)
+    s.labeled=LabeledStatement()
+    {
+        return s;
+    }
 |
-  Block()
+    s.block=Block()
+    {
+        return s;
+    }
 |
-  EmptyStatement()
+    EmptyStatement()
+    {
+        s.isEmpty = false;
+        return s;
+    }
 |
-  StatementExpression() ";"
+    s.statement=StatementExpression() <SEMICOLON>
+    {
+        return s;
+    }
 |
-  SwitchStatement()
+    s.switchNode=SwitchStatement()
+    {
+        return s;
+    }
 |
-  IfStatement()
+    s.ifNode=IfStatement()
+    {
+        return s;
+    }
 |
-  WhileStatement()
+    s.whileNode=WhileStatement()
+    {
+        return s;
+    }
 |
-  DoStatement()
+    s.doNode=DoStatement()
+    {
+        return s;
+    }
 |
-  ForStatement()
+    s.forNode=ForStatement()
+    {
+        return s;
+    }
 |
-  BreakStatement()
+    s.breakNode=BreakStatement()
+    {
+        return s;
+    }
 |
-  ContinueStatement()
+    s.continueNode=ContinueStatement()
+    {
+        return s;
+    }
 |
-  ReturnStatement()
+    s.returnNode=ReturnStatement()
+    {
+        return s;
+    }
 |
-  ThrowStatement()
+    s.throwNode=ThrowStatement()
+    {
+        return s;
+    }
 |
-  SynchronizedStatement()
+    s.synchNode=SynchronizedStatement()
+    {
+        return s;
+    }
 |
-  TryStatement()
+    s.tryNode=TryStatement()
+    {
+        return s;
+    }
 }
 
-void LabeledStatement() :
-{}
+LabeledStatementNode LabeledStatement() :
 {
-  <IDENTIFIER> ":" Statement()
+    LabeledStatementNode l;
+    Token t;
+}
+{
+    t=<IDENTIFIER> { l.name = t.image; } ":" l.statement=Statement()
+    {
+        return l;
+    }
 }
 
-void Block() :
-{}
+BlockNode Block() :
 {
-  "{" ( BlockStatement() )* "}"
+    BlockNode b = new BlockNode();
+    b.statements = new ArrayList<BlockStatementNode>();
+    BlockStatementNode s;
+}
+{
+    <LBRACE> ( s=BlockStatement()
+    { b.statements.add(s); } )* <RBRACE>
 }
 
-void BlockStatement() :
-{}
+BlockStatementNode BlockStatement() :
 {
-  LOOKAHEAD(Type() <IDENTIFIER>)
-  LocalVariableDeclaration() ";"
+    BlockStatementNode b = new BlockStatementNode();
+}
+{
+    LOOKAHEAD(Type() <IDENTIFIER>)
+    b.dec=LocalVariableDeclaration() <SEMICOLON>
+    {
+        return b;
+    }
 |
-  Statement()
+    b.statement=Statement()
+    {
+        return b;
+    }
 }
 
-void LocalVariableDeclaration() :
-{}
+LocalVariableDecNode LocalVariableDeclaration() :
 {
-  Type() VariableDeclarator() ( "," VariableDeclarator() )*
+    LocalVariableDecNode d = new LocalVariableDecNode();
+    d.declarators = new ArrayList<VariableDecNode>();
+    VariableDecNode temp;
+}
+{
+    d.type=Type() temp=VariableDeclarator() { d.declarators.add(temp); }
+    ( <COMMA> temp=VariableDeclarator() { d.declarators.add(temp); })*
 }
 
+// don't need a return type here
 void EmptyStatement() :
 {}
 {
-  ";"
+    <SEMICOLON>
 }
 
 void StatementExpression() :
@@ -868,110 +1027,215 @@ void StatementExpression() :
   PostfixExpression()
 }
 
-void SwitchStatement() :
-{}
+SwitchStatementNode SwitchStatement() :
 {
-  "switch" "(" Expression() ")" "{"
-    ( SwitchLabel() ( BlockStatement() )* )*
-  "}"
+    SwitchStatementNode s = new SwitchStatementNode();
+    s.labels = new ArrayList<SwitchLabelNode>();
+    s.statements = new ArrayList<ArrayList<BlockStatementNode>>();
+    SwitchLabelNode temp;
+    BlockStatementNode temp2;
+    ArrayList<BlockStatementNode> currStatements = new ArrayList<BlockStatementNode>();
+    /* This rule is a bit funky as you can have a variable number of statements
+      in each labeled thing */
+}
+{
+    <SWITCH> <LPAREN> s.expression=Expression() <RPAREN> <LBRACE>
+        ( temp=SwitchLabel() { s.labels.add(temp); }
+            ( temp2=BlockStatement() { currStatements.add(temp2); } )*
+            {
+                s.statements.add(currStatements);
+                currStatements = new ArrayList<BlockStatementNode>();
+            }
+        )*
+    <RBRACE>
+    {
+        return s;
+    }
 }
 
-void SwitchLabel() :
-{}
+SwitchLabelNode SwitchLabel() :
 {
-  "case" Expression() ":"
+    SwitchLabelNode s = new SwitchLabelNode();
+}
+{
+  <CASE> s.expression=Expression() { return s; } <COLON>
 |
-  "default" ":"
+  <_DEFAULT> { s.isDefault=true; return s; } <COLON>
 }
 
-void IfStatement() :
+IfStatementNode IfStatement() :
 /*
  * The disambiguating algorithm of JavaCC automatically binds dangling
  * else's to the innermost if statement.  The LOOKAHEAD specification
  * is to tell JavaCC that we know what we are doing.
+ * This also does handle the if .. else if ... else ...
+ * as the second if is part of the last expression thing.
  */
-{}
 {
-  "if" "(" Expression() ")" Statement() [ LOOKAHEAD(1) "else" Statement() ]
+    IfStatementNode i = new IfStatementNode();
+}
+{
+    <IF> <LPAREN> i.expression=Expression() <RPAREN>
+    i.statement=Statement() [ LOOKAHEAD(1) <ELSE> i.elsePart=Statement() ]
+    {
+        return i;
+    }
 }
 
-void WhileStatement() :
-{}
+WhileStatementNode WhileStatement() :
 {
-  "while" "(" Expression() ")" Statement()
+    WhileStatementNode w = new WhileStatementNode();
+}
+{
+    <WHILE> <LPAREN> w.expression=Expression() <RPAREN>
+    w.statement=Statement()
+    {
+        return w;
+    }
 }
 
-void DoStatement() :
-{}
+DoStatementNode DoStatement() :
 {
-  "do" Statement() "while" "(" Expression() ")" ";"
+    DoStatementNode d = new DoStatementNode();
+}
+{
+    <DO> d.statement=Statement() <WHILE> <LPAREN>
+    d.expression=Expression() <RPAREN> <SEMICOLON>
+    {
+        return d;
+    }
 }
 
-void ForStatement() :
-{}
+ForStatementNode ForStatement() :
 {
-  "for" "(" [ ForInit() ] ";" [ Expression() ] ";" [ ForUpdate() ] ")" Statement()
+    ForStatementNode f = new ForStatementNode();
+}
+{
+    <FOR> <LPAREN> [ f.init=ForInit() ] <SEMICOLON>
+    [ f.condition=Expression() ] <SEMICOLON>
+    [ f.update=ForUpdate() ] <RPAREN> f.block=Statement()
+    {
+        return f;
+    }
 }
 
-void ForInit() :
-{}
+ForInitNode ForInit() :
 {
-  LOOKAHEAD( Type() <IDENTIFIER> )
-  LocalVariableDeclaration()
+    ForInitNode f = new ForInitNode();
+}
+{
+    LOOKAHEAD( Type() <IDENTIFIER> )
+    f.dec=LocalVariableDeclaration()
+    {
+        return f;
+    }
 |
-  StatementExpressionList()
+    f.items=StatementExpressionList()
+    {
+        return f;
+    }
 }
 
-void StatementExpressionList() :
-{}
+ArrayList<StatementExprNode> StatementExpressionList() :
 {
-  StatementExpression() ( "," StatementExpression() )*
+    ArrayList<StatementExprNode> s = new ArrayList<StatementExprNode>();
+    StatementExprNode temp;
 }
-
-void ForUpdate() :
-{}
 {
-  StatementExpressionList()
+    temp=StatementExpression() { s.add(temp); }
+    ( <COMMA> temp=StatementExpression() { s.add(temp); } )*
+    {
+        return s;
+    }
 }
 
-void BreakStatement() :
-{}
+ArrayList<StatementExprNode> ForUpdate() :
 {
-  "break" [ <IDENTIFIER> ] ";"
+    /* This rule is just a statement expression list */
+    ArrayList<StatementExprNode> t;
 }
-
-void ContinueStatement() :
-{}
 {
-  "continue" [ <IDENTIFIER> ] ";"
+    t=StatementExpressionList()
+    {
+        return t;
+    }
 }
 
-void ReturnStatement() :
-{}
+BreakStatementNode BreakStatement() :
 {
-  "return" [ Expression() ] ";"
+    BreakStatementNode b = new BreakStatementNode();
+    Token t;
 }
-
-void ThrowStatement() :
-{}
 {
-  "throw" Expression() ";"
+    <BREAK> [ t=<IDENTIFIER> { b.name = t.image; }] <SEMICOLON>
+    {
+        return b;
+    }
 }
 
-void SynchronizedStatement() :
-{}
+ContinueStatementNode ContinueStatement() :
 {
-  "synchronized" "(" Expression() ")" Block()
+    ContinueStatementNode c = new ContinueStatementNode();
+    Token t;
+}
+{
+    <CONTINUE> [ t=<IDENTIFIER> { c.name = t.image; } ] <SEMICOLON>
+    {
+        return c;
+    }
 }
 
-void TryStatement() :
+ReturnStatementNode ReturnStatement() :
+{
+    ReturnStatementNode r =  new ReturnStatementNode();
+}
+{
+    <RETURN> [ r.expression=Expression() ] <SEMICOLON>
+    {
+        return r;
+    }
+}
+
+ThrowStatementNode ThrowStatement() :
+{
+    ThrowStatementNode t = new ThrowStatementNode();
+}
+{
+    <THROW> t.expression=Expression() <SEMICOLON>
+    {
+        return t;
+    }
+}
+
+SynchronizedStatementNode SynchronizedStatement() :
+{
+    SynchronizedStatementNode s = new SynchronizedStatementNode();
+}
+{
+    <SYNCHRONIZED> <LPAREN> s.expression=Expression()
+    <RPAREN> s.block=Block()
+    {
+        return s;
+    }
+}
+
+TryStatementNode TryStatement() :
 /*
  * Semantic check required here to make sure that at least one
  * finally/catch is present.
  */
-{}
 {
-  "try" Block()
-  ( "catch" "(" FormalParameter() ")" Block() )*
-  [ "finally" Block() ]
+    TryStatementNode t = new TryStatementNode();
+    t.catchParams = new ArrayList<ParamNode>();
+    ParamNode temp;
+    BlockNode temp2;
+}
+{
+    <TRY> t.block=Block()
+    ( <CATCH> <LPAREN> temp=FormalParameter() { t.catchParams.add(temp); } <RPAREN>
+     temp2=Block() { t.catchBlocks.add(temp2); } )*
+    [ <FINALLY> t.finallyPart=Block() ]
+    {
+        return t;
+    }
 }

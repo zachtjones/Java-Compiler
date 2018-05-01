@@ -12,6 +12,6 @@ public class ClassNode implements Node {
     public String name;
     public NameNode superclass;
     public ArrayList<NameNode> interfaces;
-    //public ClassBodyNode body;
+    public ArrayList<ClassBodyNode> body = new ArrayList<>();
     public ArrayList<NameNode> typeParams;
 }
