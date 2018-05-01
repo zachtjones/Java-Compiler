@@ -8,4 +8,6 @@ SimpleCharStream.java
 Token.java
 TokenMgrError.java
 
-/bin/
+.classpath
+.project
+
