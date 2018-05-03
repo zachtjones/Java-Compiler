@@ -4,7 +4,7 @@ of .class files.
 
 ## Introduction
 This program is written in Java, with the use of JavaCC as the parser.
-So far, only the syntax of the language is checked.
+So far, only the syntax of the language is checked, and the tree is generated.
 
 ## Usage
 1. ```make```
