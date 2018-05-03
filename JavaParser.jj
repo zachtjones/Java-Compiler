@@ -515,7 +515,10 @@ ConstructorNode ConstructorDeclaration() :
     c.params=FormalParameters()
     [ <THROWS> c.throwsList=NameList() ]
     <LBRACE> [ LOOKAHEAD(2) ExplicitConstructorInvocation() ]
-     ( b=BlockStatement() { c.code.add(b); } )* <RBRACE>
+    ( b=BlockStatement() { c.code.add(b); } )* <RBRACE>
+    {
+        return c;
+    }
 }
 
 void ExplicitConstructorInvocation() :
@@ -613,132 +616,381 @@ ArrayList<NameNode> NameList() :
  * Expression syntax follows.
  */
 
-void Expression() :
-{}
+ExpressionNode Expression() :
 {
-  LOOKAHEAD( PrimaryExpression() AssignmentOperator() )
-  Assignment()
+    ExpressionNode temp;
+}
+{
+    LOOKAHEAD( PrimaryExpression() AssignmentOperator() )
+    temp=Assignment() { return temp; }
 |
-  ConditionalExpression()
+    temp=ConditionalExpression() { return temp; }
 }
 
-void Assignment() :
-{}
+ExpressionNode Assignment() :
 {
-  PrimaryExpression() AssignmentOperator() Expression()
+    ExpressionNode e = new ExpressionNode();
+}
+{
+    e.op1 = PrimaryExpression()
+    e.assignType = AssignmentOperator()
+    e.op2 = Expression()
+    {
+        return e;
+    }
 }
 
-void AssignmentOperator() :
+int AssignmentOperator() :
 {}
 {
-  "=" | "*=" | "/=" | "%=" | "+=" | "-=" | "<<=" | ">>=" | ">>>=" | "&=" | "^=" | "|="
+    "=" { return JavaParserConstants.ASSIGN; }
+|   "*=" { return JavaParserConstants.STARASSIGN; }
+|   "/=" { return JavaParserConstants.SLASHASSIGN; }
+|   "%=" { return JavaParserConstants.REMASSIGN; }
+|   "+=" { return JavaParserConstants.PLUSASSIGN; }
+|   "-=" { return JavaParserConstants.MINUSASSIGN; }
+|   "<<=" { return JavaParserConstants.LSHIFTASSIGN; }
+|   ">>=" { return JavaParserConstants.RSIGNEDSHIFTASSIGN; }
+|   ">>>=" { return JavaParserConstants.RUNSIGNEDSHIFTASSIGN; }
+|   "&=" { return JavaParserConstants.ANDASSIGN; }
+|   "^=" { return JavaParserConstants.XORASSIGN; }
+|   "|=" { return JavaParserConstants.ORASSIGN; }
 }
 
-void ConditionalExpression() :
-{}
+ExpressionNode ConditionalExpression() :
 {
-  ConditionalOrExpression() [ "?" Expression() ":" ConditionalExpression() ]
+    ExpressionNode e = new ExpressionNode();
+    ExpressionNode temp;
+    ExpressionNode truePart = null;
+    ExpressionNode falsePart = null;
+}
+{
+    temp=ConditionalOrExpression()
+    [ "?" truePart=Expression() ":" falsePart=ConditionalExpression() ]
+    {
+        if (truePart == null) {
+            return temp;
+        } else {
+            e.op1 = temp;
+            e.op2 = truePart;
+            e.op3 = falsePart;
+            return e;
+        }
+    }
 }
 
-void ConditionalOrExpression() :
-{}
+ExpressionNode ConditionalOrExpression() :
 {
-  ConditionalAndExpression() ( "||" ConditionalAndExpression() )*
+    ExpressionNode e = new ExpressionNode();
+    e.ops = new ArrayList<ExpressionNode>();
+    ExpressionNode temp;
+}
+{
+    temp=ConditionalAndExpression() { e.ops.add(temp); }
+    ( "||" temp=ConditionalAndExpression() { e.ops.add(temp); } )*
+    {
+        if (e.ops.size() == 1) { // not actually OR of any terms
+            return temp; // just return the item
+        } else {
+            e.isConditionalOr = true;
+            return e; // return the list
+        }
+    }
 }
 
-void ConditionalAndExpression() :
-{}
+ExpressionNode ConditionalAndExpression() :
 {
-  InclusiveOrExpression() ( "&&" InclusiveOrExpression() )*
+    ExpressionNode e = new ExpressionNode();
+    e.ops = new ArrayList<ExpressionNode>();
+    ExpressionNode temp;
+}
+{
+    temp=InclusiveOrExpression() { e.ops.add(temp); }
+    ( "&&" temp=InclusiveOrExpression() { e.ops.add(temp); } )*
+    {
+        if (e.ops.size() == 1) { // not actually AND of any terms
+            return temp;
+        } else {
+            e.isConditionalAnd = true;
+            return e;
+        }
+    }
 }
 
-void InclusiveOrExpression() :
-{}
+ExpressionNode InclusiveOrExpression() :
 {
-  ExclusiveOrExpression() ( "|" ExclusiveOrExpression() )*
+    ExpressionNode e = new ExpressionNode();
+    e.ops = new ArrayList<ExpressionNode>();
+    ExpressionNode temp;
+}
+{
+    temp=ExclusiveOrExpression() { e.ops.add(temp); }
+    ( "|" ExclusiveOrExpression() )*
+    {
+        if (e.ops.size() == 1) { // not actually | of any terms
+            return temp;
+        } else {
+            e.isBitwiseOr = true;
+            return e;
+        }
+    }
 }
 
-void ExclusiveOrExpression() :
-{}
+ExpressionNode ExclusiveOrExpression() :
 {
-  AndExpression() ( "^" AndExpression() )*
+    ExpressionNode e = new ExpressionNode();
+    e.ops = new ArrayList<ExpressionNode>();
+    ExpressionNode temp;
+}
+{
+    temp=AndExpression() { e.ops.add(temp); }
+    ( "^" AndExpression() { e.ops.add(temp); } )*
+    {
+        if (e.ops.size() == 1) { // not actually ^ of terms
+            return temp;
+        } else {
+            e.isBitwiseXOr = true;
+            return e;
+        }
+    }
 }
 
-void AndExpression() :
-{}
+ExpressionNode AndExpression() :
 {
-  EqualityExpression() ( "&" EqualityExpression() )*
+    ExpressionNode e = new ExpressionNode();
+    e.ops = new ArrayList<ExpressionNode>();
+    ExpressionNode temp;
+}
+{
+    temp=EqualityExpression() { e.ops.add(temp); }
+    ( "&" temp=EqualityExpression() { e.ops.add(temp); } )*
+    {
+        if (e.ops.size() == 1) { // not actually & of terms
+            return temp;
+        } else {
+            e.isBitwiseAnd = true;
+            return e;
+        }
+    }
 }
 
-void EqualityExpression() :
-{}
+ExpressionNode EqualityExpression() :
 {
-  InstanceOfExpression() ( ( "==" | "!=" ) InstanceOfExpression() )*
+    ExpressionNode e = new ExpressionNode();
+    e.ops = new ArrayList<ExpressionNode>();
+    e.tokens = new ArrayList<Integer>();
+    ExpressionNode temp;
+    // catch here is that there could be == and != mixed
+
+}
+{
+    temp=InstanceOfExpression() { e.ops.add(temp); }
+    ( ( "==" { e.tokens.add(JavaParserConstants.EQ); }
+      | "!=" { e.tokens.add(JavaParserConstants.NE); })
+    temp=InstanceOfExpression() { e.ops.add(temp); })*
+    {
+        if (e.ops.size() == 1) { // not actually == or != expression
+            return temp;
+        } else {
+            e.isEqualsCondition = true;
+            return e;
+        }
+    }
 }
 
-void InstanceOfExpression() :
-{}
+ExpressionNode InstanceOfExpression() :
 {
-  RelationalExpression() [ "instanceof" Type() ]
+    ExpressionNode e = new ExpressionNode();
+    ExpressionNode temp;
+    TypeNode t;
+}
+{
+    temp=RelationalExpression()
+    [ "instanceof" t=Type() {
+        e.op1 = temp;
+        e.type1 = t;
+        e.isInstanceOfExpression = true;
+    } ]
+    {
+        if (e.isInstanceOfExpression) {
+            return e;
+        } else { // simple expression instead
+            return temp;
+        }
+    }
 }
 
-void RelationalExpression() :
-{}
+ExpressionNode RelationalExpression() :
 {
-  ShiftExpression() ( ( "<" | ">" | "<=" | ">=" ) ShiftExpression() )*
+    ExpressionNode e = new ExpressionNode();
+    e.ops = new ArrayList<ExpressionNode>();
+    e.tokens = new ArrayList<Integer>();
+    ExpressionNode temp;
+}
+{
+    temp=ShiftExpression() { e.ops.add(temp); }
+    (
+      ( "<" {e.tokens.add(JavaParserConstants.LT); }
+      | ">" {e.tokens.add(JavaParserConstants.GT); }
+      | "<=" {e.tokens.add(JavaParserConstants.LE);}
+      | ">=" {e.tokens.add(JavaParserConstants.GE); })
+      temp=ShiftExpression() { e.ops.add(temp); }
+    )*
+    {
+        if (e.ops.size() == 1) { // not a relational expresssion
+            return temp;
+        } else {
+            e.isRelationalExpression = true;
+            return e;
+        }
+    }
 }
 
-void ShiftExpression() :
-{}
+ExpressionNode ShiftExpression() :
 {
-  AdditiveExpression() ( ( "<<" | ">>" | ">>>" ) AdditiveExpression() )*
+    ExpressionNode e = new ExpressionNode();
+    e.ops = new ArrayList<ExpressionNode>();
+    e.tokens = new ArrayList<Integer>();
+    ExpressionNode temp;
+}
+{
+    temp=AdditiveExpression() { e.ops.add(temp); }
+    ( ( "<<" { e.tokens.add(JavaParserConstants.LSHIFT); }
+    |   ">>" { e.tokens.add(JavaParserConstants.RSIGNEDSHIFT); }
+    |   ">>>" { e.tokens.add(JavaParserConstants.RUNSIGNEDSHIFT); })
+    temp=AdditiveExpression() { e.ops.add(temp); })*
+    {
+        if (e.ops.size() == 1) { // not a shift expression
+            return temp;
+        } else {
+            e.isShiftExpression = true;
+            return e;
+        }
+    }
 }
 
-void AdditiveExpression() :
-{}
+ExpressionNode AdditiveExpression() :
 {
-  MultiplicativeExpression() ( ( "+" | "-" ) MultiplicativeExpression() )*
+    ExpressionNode e = new ExpressionNode();
+    e.ops = new ArrayList<ExpressionNode>();
+    e.tokens = new ArrayList<Integer>();
+    ExpressionNode temp;
+}
+{
+    temp=MultiplicativeExpression() { e.ops.add(temp); }
+    ( ( "+" { e.tokens.add(JavaParserConstants.PLUS); }
+    |   "-" { e.tokens.add(JavaParserConstants.MINUS); })
+    temp=MultiplicativeExpression() { e.ops.add(temp); })*
+    {
+        if (e.ops.size() == 1) { // not additive expression
+            return temp;
+        } else {
+            e.isAdditiveExpression = true;
+            return e;
+        }
+    }
 }
 
-void MultiplicativeExpression() :
-{}
+ExpressionNode MultiplicativeExpression() :
 {
-  UnaryExpression() ( ( "*" | "/" | "%" ) UnaryExpression() )*
+    ExpressionNode e = new ExpressionNode();
+    e.ops = new ArrayList<ExpressionNode>();
+    e.tokens = new ArrayList<Integer>();
+    ExpressionNode temp;
+}
+{
+    temp=UnaryExpression() { e.ops.add(temp); }
+    ( ( "*" { e.tokens.add(JavaParserConstants.STAR); }
+    |   "/" { e.tokens.add(JavaParserConstants.SLASH); }
+    |   "%" { e.tokens.add(JavaParserConstants.REM); })
+    temp=UnaryExpression() { e.ops.add(temp); })*
+    {
+        if (e.ops.size() == 1) {
+            return temp;
+        } else {
+            e.isMultiplicativeExpression = true;
+            return e;
+        }
+    }
 }
 
-void UnaryExpression() :
-{}
+ExpressionNode UnaryExpression() :
 {
-  ( "+" | "-" ) UnaryExpression()
+    ExpressionNode e = new ExpressionNode();
+}
+{
+    ( "+" | "-" {e.isUnaryMinusExpression = true; } )
+    e.op1=UnaryExpression()
+    {
+        if (e.isUnaryMinusExpression) {
+            return e;
+        } else { // unary +, no meaning
+            return e.op1; // don't need extra nodes
+        }
+    }
 |
-  PreIncrementExpression()
+    e.op1=PreIncrementExpression()
+    {
+        e.isPreIncrementExpression = true;
+        return e;
+    }
 |
-  PreDecrementExpression()
+    e.op1=PreDecrementExpression()
+    {
+        e.isPreDecrementExpression = true;
+        return e;
+    }
 |
-  UnaryExpressionNotPlusMinus()
+    e=UnaryExpressionNotPlusMinus()
+    {
+        return e;
+    }
 }
 
-void PreIncrementExpression() :
-{}
+ExpressionNode PreIncrementExpression() :
 {
-  "++" PrimaryExpression()
+    ExpressionNode e; // already know this is ++
+}
+{
+    "++" e=PrimaryExpression()
+    {
+        return e;
+    }
 }
 
-void PreDecrementExpression() :
-{}
+ExpressionNode PreDecrementExpression() :
 {
-  "--" PrimaryExpression()
+    ExpressionNode e; // already know -- from previous rule
+}
+{
+    "--" e=PrimaryExpression()
+    {
+        return e;
+    }
 }
 
-void UnaryExpressionNotPlusMinus() :
-{}
+ExpressionNode UnaryExpressionNotPlusMinus() :
 {
-  ( "~" | "!" ) UnaryExpression()
+    ExpressionNode e = new ExpressionNode();
+}
+{
+    ( "~" { e.isBitwiseNotExpression = true;}
+    | "!" { e.isLogicalNotExpression = true; })
+    e.op1=UnaryExpression()
+    {
+        return e;
+    }
 |
-  LOOKAHEAD( CastLookahead() )
-  CastExpression()
+    LOOKAHEAD( CastLookahead() )
+    e=CastExpression()
+    {
+        return e;
+    }
 |
-  PostfixExpression()
+    e=PostfixExpression()
+    {
+        return e;
+    }
 }
 
 // This production is to determine lookahead only.  The LOOKAHEAD specifications
@@ -756,112 +1008,199 @@ void CastLookahead() :
   "(" Name() ")" ( "~" | "!" | "(" | <IDENTIFIER> | "this" | "super" | "new" | Literal() )
 }
 
-void PostfixExpression() :
-{}
+ExpressionNode PostfixExpression() :
 {
-  PrimaryExpression() [ "++" | "--" ]
+    ExpressionNode e = new ExpressionNode();
+}
+{
+    e.op1=PrimaryExpression()
+    [ "++" { e.isPostIncrementExpression = true; return e;}
+    | "--" { e.isPostDecrementExpression = true; return e;}]
+    // neither so just return e.op1
+    {
+        return e.op1;
+    }
 }
 
-void CastExpression() :
-{}
+ExpressionNode CastExpression() :
 {
-  LOOKAHEAD(2)
-  "(" PrimitiveType() ( "[" "]" )* ")" UnaryExpression()
+    ExpressionNode e = new ExpressionNode();
+    PrimitiveTypeNode p;
+}
+{
+    LOOKAHEAD(2)
+    "(" e.primitiveType=PrimitiveType()
+    ( "[" "]" { e.arrayDims++; } )* ")"
+    e.op1=UnaryExpression()
+    {
+        return e;
+    }
 |
-  "(" Name() ( "[" "]" )* ")" UnaryExpressionNotPlusMinus()
+    "(" e.objectType=Name()
+    ( "[" "]" { e.arrayDims++; })* ")"
+    e.op1=UnaryExpressionNotPlusMinus()
+    {
+        return e;
+    }
 }
 
-void PrimaryExpression() :
-{}
+ExpressionNode PrimaryExpression() :
 {
-  PrimaryPrefix() ( PrimarySuffix() )*
+    ExpressionNode e = new ExpressionNode();
+    e.ops = new ArrayList<ExpressionNode>();
+    ExpressionNode temp;
+}
+{
+    e.op1=PrimaryPrefix()
+    ( temp=PrimarySuffix() { e.ops.add(temp); } )*
+    {
+        if (e.ops.size() == 0) {
+            return e.op1; // just the prefix
+        }
+        return e; // the entire expression
+    }
 }
 
-void PrimaryPrefix() :
-{}
+ExpressionNode PrimaryPrefix() :
 {
-  Literal()
+    ExpressionNode e = new ExpressionNode();
+    Token t;
+}
+{
+    e.literalValue=Literal()
+    {
+        return e;
+    }
 |
-  Name()
+    e.name=Name()
+    {
+        return e;
+    }
 |
-  "this"
+    "this"
+    {
+        e.isThis = true;
+        return e;
+    }
 |
-  "super" "." <IDENTIFIER>
+    "super" "." t=<IDENTIFIER>
+    {
+        e.superIdentifier = t.image;
+        return e;
+    }
 |
-  "(" Expression() ")"
+    // parentheses are for specifying tree order,
+    // so don't need them in the result
+    "(" e=Expression() ")"
+    {
+        return e;
+    }
 |
-  AllocationExpression()
+    e=AllocationExpression()
+    {
+        return e;
+    }
 }
 
-void PrimarySuffix() :
-{}
+ExpressionNode PrimarySuffix() :
 {
-  "[" Expression() "]"
+    ExpressionNode e = new ExpressionNode();
+    Token t;
+}
+{
+    "[" e.op1=Expression() "]"
+    {
+        e.isArrayIndexExpression = true;
+        return e;
+    }
 |
-  "." <IDENTIFIER>
+    "." t=<IDENTIFIER>
+    {
+        e.propertyIdentifier = t.image;
+        return e;
+    }
 |
   Arguments()
 }
 
-void Literal() :
-{}
+String Literal() :
 {
-  <INTEGER_LITERAL>
-|
-  <FLOATING_POINT_LITERAL>
-|
-  <CHARACTER_LITERAL>
-|
-  <STRING_LITERAL>
-|
-  BooleanLiteral()
-|
-  NullLiteral()
+    Token t;
+}
+{
+    t=<INTEGER_LITERAL> { return t.image; }
+|   t=<FLOATING_POINT_LITERAL> { return t.image; }
+|   t=<CHARACTER_LITERAL> { return t.image; }
+|   t=<STRING_LITERAL> { return t.image; }
+|   t=<TRUE> { return t.image; }
+|   t=<FALSE> { return t.image; }
+|   t=<NULL> { return t.image; }
 }
 
-void BooleanLiteral() :
-{}
+ExpressionNode Arguments() :
 {
-  "true"
+    ExpressionNode e = new ExpressionNode();
+    e.isArguments = true;
+}
+{
+    "(" [ e.ops=ArgumentList() ] ")"
+    {
+        return e;
+    }
+}
+
+ArrayList<ExpressionNode> ArgumentList() :
+{
+    ArrayList<ExpressionNode> a = new ArrayList<ExpressionNode>();
+    ExpressionNode e;
+}
+{
+    e=Expression() { a.add(e); }
+    ( "," e=Expression() { a.add(e); })*
+    {
+        return a;
+    }
+}
+
+ExpressionNode AllocationExpression() :
+{
+    ExpressionNode e = new ExpressionNode();
+}
+{
+    LOOKAHEAD(2)
+    "new" e.primitiveType=PrimitiveType() e.ops=ArrayDimensions()
+    {
+        e.isArrayAllocPrim = true;
+        return e;
+    }
 |
-  "false"
-}
-
-void NullLiteral() :
-{}
-{
-  "null"
-}
-
-void Arguments() :
-{}
-{
-  "(" [ ArgumentList() ] ")"
-}
-
-void ArgumentList() :
-{}
-{
-  Expression() ( "," Expression() )*
-}
-
-void AllocationExpression() :
-{}
-{
-  LOOKAHEAD(2)
-  "new" PrimitiveType() ArrayDimensions()
-|
-  "new" Name() ( Arguments() | ArrayDimensions() )
+    "new" e.name=Name() ( e.op1=Arguments()
+    {
+        e.isConstructorCall = true;
+        return e;
+    }
+    | e.ops=ArrayDimensions()
+    {
+        e.isArrayAllocClass = true;
+        return e;
+    } )
 }
 
 /*
  * The second LOOKAHEAD specification below is to parse to PrimarySuffix
  * if there is an expression between the "[...]".
  */
-void ArrayDimensions() :
-{}
+ArrayList<ExpressionNode> ArrayDimensions() :
 {
-  ( LOOKAHEAD(2) "[" Expression() "]" )+ ( LOOKAHEAD(2) "[" "]" )*
+    ArrayList<ExpressionNode> e = new ArrayList<ExpressionNode>();
+    ExpressionNode temp;
+}
+{
+    ( LOOKAHEAD(2) "[" temp=Expression() { e.add(temp); }"]" )+
+    ( LOOKAHEAD(2) "[" "]" { e.add(null); })*
+    {
+        return e;
+    }
 }
 
 
@@ -954,7 +1293,7 @@ StatementNode Statement() :
 
 LabeledStatementNode LabeledStatement() :
 {
-    LabeledStatementNode l;
+    LabeledStatementNode l = new LabeledStatementNode();
     Token t;
 }
 {
@@ -973,6 +1312,9 @@ BlockNode Block() :
 {
     <LBRACE> ( s=BlockStatement()
     { b.statements.add(s); } )* <RBRACE>
+    {
+        return b;
+    }
 }
 
 BlockStatementNode BlockStatement() :
@@ -1001,6 +1343,9 @@ LocalVariableDecNode LocalVariableDeclaration() :
 {
     d.type=Type() temp=VariableDeclarator() { d.declarators.add(temp); }
     ( <COMMA> temp=VariableDeclarator() { d.declarators.add(temp); })*
+    {
+        return d;
+    }
 }
 
 // don't need a return type here
@@ -1010,21 +1355,39 @@ void EmptyStatement() :
     <SEMICOLON>
 }
 
-void StatementExpression() :
+StatementExprNode StatementExpression() :
 /*
  * The last expansion of this production accepts more than the legal
  * Java expansions for StatementExpression.
  */
-{}
 {
-  PreIncrementExpression()
+    StatementExprNode e = new StatementExprNode();
+}
+{
+    e.expression=PreIncrementExpression()
+    {
+        e.isPreIncrement = true;
+        return e;
+    }
 |
-  PreDecrementExpression()
+    e.expression=PreDecrementExpression()
+    {
+        e.isPreDecrement = true;
+        return e;
+    }
 |
-  LOOKAHEAD( PrimaryExpression() AssignmentOperator() )
-  Assignment()
+    LOOKAHEAD( PrimaryExpression() AssignmentOperator() )
+    e.expression=Assignment()
+    {
+        e.isAssignment = true;
+        return e;
+    }
 |
-  PostfixExpression()
+    e.expression=PostfixExpression()
+    {
+        e.isPostfixExpression = true;
+        return e;
+    }
 }
 
 SwitchStatementNode SwitchStatement() :

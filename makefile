@@ -5,6 +5,7 @@ all:
 clean:
 	rm -f JavaParserConstants.java
 	rm -f JavaParserTokenManager.java
+	rm -f JavaParser.java
 	rm -f ParseException.java
 	rm -f SimpleCharStream.java
 	rm -f Token.java
