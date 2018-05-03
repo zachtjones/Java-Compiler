@@ -1120,7 +1120,10 @@ ExpressionNode PrimarySuffix() :
         return e;
     }
 |
-  Arguments()
+    e=Arguments() // just grab the args
+    {
+        return e;
+    }
 }
 
 String Literal() :
