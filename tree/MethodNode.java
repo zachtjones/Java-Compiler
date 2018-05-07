@@ -1,6 +1,9 @@
 package tree;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import helper.ClassLookup;
 
 public class MethodNode implements Node {
     public boolean isPublic;
@@ -16,5 +19,17 @@ public class MethodNode implements Node {
     public MethodDeclaratorNode dec;
     public ArrayList<NameNode> throwsList;
     public BlockNode code;
+    
+	@Override
+	public void resolveNames(ClassLookup c) throws IOException {
+		resultType.resolveNames(c);
+		dec.resolveNames(c);
+		if (throwsList != null) {
+			for (NameNode n : throwsList) {
+				n.resolveNames(c);
+			}
+		}
+		code.resolveNames(c);
+	}
 
 }

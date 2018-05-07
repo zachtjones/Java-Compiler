@@ -1,6 +1,9 @@
 package tree;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import helper.ClassLookup;
 
 public class FieldDeclarationNode implements Node {
     public boolean isPublic;
@@ -13,4 +16,9 @@ public class FieldDeclarationNode implements Node {
 
     public TypeNode type;
     public ArrayList<VariableDecNode> variables = new ArrayList<>();
+    
+	@Override
+	public void resolveNames(ClassLookup c) throws IOException {
+		type.resolveNames(c);
+	}
 }

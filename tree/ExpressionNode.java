@@ -1,6 +1,9 @@
 package tree;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import helper.ClassLookup;
 
 public class ExpressionNode implements Node {
     // any of the int constants are from JavaParserConstants class.
@@ -137,4 +140,28 @@ public class ExpressionNode implements Node {
     // new ClassName(args...)
     //    see name for the class name, op1 for args
     public boolean isConstructorCall;
+
+    
+	@Override
+	public void resolveNames(ClassLookup c) throws IOException {
+		// for simplicity, check all fields
+		if (op1 != null) op1.resolveNames(c);
+		if (op2 != null) op2.resolveNames(c);
+		if (op3 != null) op3.resolveNames(c);
+		if (ops != null) {
+			for (ExpressionNode e : ops) {
+				e.resolveNames(c);
+			}
+		}
+		if (type1 != null) {
+			type1.resolveNames(c);
+		}
+		if (objectType != null) {
+			objectType.resolveNames(c);
+		}
+		if (name != null) {
+			name.resolveNames(c);
+		}
+	}
+
 }

@@ -1,5 +1,9 @@
 package tree;
 
+import java.io.IOException;
+
+import helper.ClassLookup;
+
 /** Represents a primitive type */
 public class PrimitiveTypeNode implements Node {
     public static final int BOOLEAN = 0;
@@ -12,4 +16,9 @@ public class PrimitiveTypeNode implements Node {
     public static final int DOUBLE = 7;
 
     public int type; // holds value 0-7 inclusive
+
+	@Override
+	public void resolveNames(ClassLookup c) throws IOException {
+		// don't do anything
+	}
 }
