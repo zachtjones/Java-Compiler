@@ -90,7 +90,6 @@ public class ClassLookup {
 					if (line.matches("<li><a href=\".*")) {
 						String name = line.replaceAll("<li><a href=\"", "");
 						name = name.replaceAll("\\.html.*", "");
-						name = name.replaceAll("/", "\\."); // replace / with .
 						pw.println(name);
 					}
 				}
@@ -102,7 +101,7 @@ public class ClassLookup {
 			List<String> lines = Files.readAllLines(f.toPath());
 			for (String line : lines) {
 				// just the last part of the fully qualified name
-				String shortestName = line.replaceAll(".*\\.", "");
+				String shortestName = line.replaceAll(".*/", "");
 				javaItems.put(shortestName, line);
 			}
 			lookedUpJava = true;
