@@ -14,7 +14,7 @@ public class JavaParser {
 
     public static CompilationUnit parse(String file) throws FileNotFoundException, ParseException {
         JavaParser parser = new JavaParser(new FileInputStream(file));
-        return parser.CompilationUnit();
+        return parser.CompilationUnit(file);
     }
 
 }
@@ -204,7 +204,7 @@ TOKEN : /* OPERATORS */
 
 /*************  ACTUAL GRAMMAR NOW *******/
 // the whole file is a compilation unit
-CompilationUnit CompilationUnit() :
+CompilationUnit CompilationUnit(String filename) :
 {
     CompilationUnit c = new CompilationUnit();
     ImportNode temp;

@@ -1,5 +1,10 @@
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import helper.ClassLookup;
 import tree.*;
+import intermediate.*;
 
 public class JavaCompiler {
 
@@ -10,8 +15,17 @@ public class JavaCompiler {
 		String file = args[0];
 		try {
 			CompilationUnit c = JavaParser.parse(file);
+			// update the class lookup tables (short names to full names)
+			String packageName = c.packageName == null ? null : c.packageName.getFullName();
+			ClassLookup lookup = new ClassLookup(file, packageName, c.imports);
+			
+			c.resolveNames(lookup);
 			System.out.println("File passed. Syntax is valid.");
-			// next task
+			// next task - print out the intermediate code
+			/*ArrayList<InterFile> files = c.compile();
+			for (InterFile f : files) {
+				System.out.println(f);
+			}*/
 		} catch (ParseException e) {
             System.out.print("Syntax error at line ");
             System.out.print(e.currentToken.next.beginLine);
@@ -20,7 +34,9 @@ public class JavaCompiler {
             System.out.println(e.currentToken.next.image + "\"");
         } catch (FileNotFoundException e) {
         	System.out.println("Error: the input file was not found.");
-        }
+        } catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		}
 	}
 
 	private static void usage() {
