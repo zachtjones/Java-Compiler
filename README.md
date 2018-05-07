@@ -15,6 +15,8 @@ So far, only the syntax of the language is checked, and the tree is generated.
 
 ## Java Features not implemented
 You may get really strange error messages if you use any of these.
+- For...in loops (ex: for (Integer e : list) { ... }  )
+- Final local variables
 - Diamond for generics  (ex: <code>ArrayList<String> s = new ArrayList<>()</code>)
 - Nested classes
 - Annotations (currently treated as comments)
