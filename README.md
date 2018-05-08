@@ -13,6 +13,13 @@ So far, only the syntax of the language is checked, and the tree is generated.
   - invokes the compiler on the main source file
   - this compiles the file, and all files that it depends on
 
+## Tests
+- ```cd tests```
+- ```./makeScript.sh```
+  - this script writes the runTests.sh script
+- ```./runTests.sh```
+  - this script runs the JavaCompiler program on the inputs.
+
 ## Java Features not implemented
 You may get really strange error messages if you use any of these.
 - For...in loops (ex: for (Integer e : list) { ... }  )
