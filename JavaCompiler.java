@@ -21,10 +21,11 @@ public class JavaCompiler {
 			
 			c.resolveNames(lookup);
 			// next task - print out the intermediate code
-			/*ArrayList<InterFile> files = c.compile();
+			ArrayList<InterFile> files = c.compile();
 			for (InterFile f : files) {
 				System.out.println(f);
-			}*/
+				System.out.println();
+			}
 		} catch (ParseException e) {
             System.out.print("Syntax error at line ");
             System.out.print(e.currentToken.next.beginLine);
