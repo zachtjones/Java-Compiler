@@ -77,6 +77,10 @@ Control flow
 - Unsigned := "unsigned"
 - Jump := "jump"
 
+Memory
+- Store := "store"
+- Load := "load"
+
 ## Syntax
 ```
 File -> ( StructureDeclaration )* ( FunctionDeclaration )* <EOF>
@@ -97,7 +101,13 @@ AssignStatement -> "assign" Register "=" Expression
 
 MoveStatement -> "move" Register "to" Register
 
-ControlStatement -> JumpStatement | BranchStatement | CallStatement | ReturnStatement
+ControlStatement -> JumpStatement | BranchStatement | CallStatement | ReturnStatement | MemoryStatement
+
+MemoryStatement -> LoadStatement | StoreStatement
+
+LoadStatement -> "load" Register "from" ( Label | Register )
+
+StoreStatement -> "store" Register "at" ( Label | Register )
 
 JumpStatement -> "jump" ( Label | Register )
 
