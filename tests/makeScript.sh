@@ -13,7 +13,7 @@ for file in *.java; do
 	echo "	echo \"$file\ failed!\"" >> runTests.sh
 	echo "	numFailing=\$numFailing+1" >> runTests.sh
 	echo "fi" >> runTests.sh
-	echo "rm -f \$jilName" >> runTests.sh
+	echo "rm -f $jilName" >> runTests.sh
 	total=$(($total + 1))
 done
 

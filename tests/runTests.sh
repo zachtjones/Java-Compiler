@@ -6,7 +6,7 @@ if [ `echo $?` -eq "1" ] ; then
 	echo "EnumTest.java\ failed!"
 	numFailing=$numFailing+1
 fi
-rm -f $jilName
+rm -f EnumTest.jil
 numTotal=1
 passed=$(($numTotal - $numFailing))
 echo "$passed / $numTotal tests passed"
