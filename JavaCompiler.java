@@ -1,5 +1,6 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
@@ -23,8 +24,10 @@ public class JavaCompiler {
 			// next task - print out the intermediate code
 			ArrayList<InterFile> files = c.compile();
 			for (InterFile f : files) {
-				System.out.println(f);
-				System.out.println();
+				PrintWriter pw = new PrintWriter(f.getFileName());
+				pw.println(f.toString());
+				pw.flush();
+				pw.close();
 			}
 		} catch (ParseException e) {
             System.out.print("Syntax error at line ");
