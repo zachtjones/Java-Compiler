@@ -4,12 +4,19 @@
 * Some parts of this file are taken from the examples in JavaCC documentation.
 */
 
+options {
+    // instances so we can have multiple at same time
+    STATIC = false;
+}
+
 PARSER_BEGIN(JavaParser)
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import tree.*;
 import java.util.ArrayList;
 
+// hide the warnings from dead code -- there's no way to block it
+@SuppressWarnings("unused")
 public class JavaParser {
 
     public static CompilationUnit parse(String file) throws FileNotFoundException, ParseException {
