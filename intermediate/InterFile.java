@@ -45,7 +45,7 @@ public class InterFile {
 	/** Gets the file's name (no path part) as a String.
 	 */
 	public String getFileName() {
-		return fileName;
+		return fileName + ".jil";
 	}
 	
 	@Override
