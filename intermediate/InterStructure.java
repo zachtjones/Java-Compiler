@@ -37,6 +37,7 @@ public class InterStructure {
 			result.append(types.get(i));
 			result.append(' ');
 			result.append(names.get(i));
+			result.append(';');
 			result.append('\n');
 		}
 		

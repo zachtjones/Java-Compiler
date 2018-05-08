@@ -1,9 +1,9 @@
 // file: EnumTest.jil
 
 structure static
-	int RED
-	int BLUE
-	int GREEN
+	int RED;
+	int BLUE;
+	int GREEN;
 end structure
 
 init static
