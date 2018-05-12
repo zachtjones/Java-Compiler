@@ -1,17 +1,9 @@
 // file: EnumTest.jil
 
 structure static
-	int RED;
-	int BLUE;
-	int GREEN;
+	int RED = 0;
+	int BLUE = 1;
+	int GREEN = 2;
 end structure
 
-init static
-	set %i0 = 0;
-	store %i0 at RED;
-	set %i1 = 1;
-	store %i1 at BLUE;
-	set %i2 = 2;
-	store %i2 at GREEN;
-end init static
 
