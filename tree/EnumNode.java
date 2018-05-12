@@ -5,9 +5,6 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import intermediate.InterFile;
-import intermediate.RegisterType;
-import intermediate.SetStatement;
-import intermediate.StoreStatementLabel;
 
 public class EnumNode implements Node {
     public String name;
@@ -32,9 +29,7 @@ public class EnumNode implements Node {
 		}
 		for (int i = 0; i < values.size(); i++) {
 			String id = values.get(i);
-			f.addField("int", id, true);
-			f.addStaticInit(new SetStatement(RegisterType.INT, i, "" + i));
-			f.addStaticInit(new StoreStatementLabel(RegisterType.INT, i, id));
+			f.addField("int", id, true, String.valueOf(i));
 		}
 		return f;
 	}

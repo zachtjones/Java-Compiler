@@ -27,10 +27,22 @@ public class InterFile {
      * false if it is instance-based.
      */
     public void addField(String type, String name, boolean isStatic) {
+    	addField(type, name, isStatic, null);
+    }
+    
+    /**
+     * Adds a field to the intermediate file
+     * @param type The string that is the type of the field
+     * @param name The identifier of the field
+     * @param isStatic true if the field is static, 
+     * @param value The default value of the field.
+     * false if it is instance-based.
+     */
+    public void addField(String type, String name, boolean isStatic, String value) {
     	if (isStatic) {
-    		this.staticPart.addMember(type, name);
+    		this.staticPart.addMember(type, name, value);
     	} else {
-    		this.instancePart.addMember(type, name);
+    		this.instancePart.addMember(type, name, value);
     	}
     }
     
