@@ -261,7 +261,7 @@ TypeDecNode TypeDeclaration() :
     { return t; }
 
 |   LOOKAHEAD( ( "abstract" | "public")* "interface" )
-    t.i=InterfaceDeclaration()
+    t.i=ClassDeclaration()
     { return t; }
 
 |   t.e=EnumDeclaration()
@@ -291,6 +291,7 @@ ClassNode ClassDeclaration() :
     [ <IMPLEMENTS> c.interfaces=NameList() ]
     <LBRACE> ( b=ClassBodyDeclaration() { c.body.add(b); } )* <RBRACE>
     {
+        c.isInterface = false;
         c.name = t.image;
         return c;
     }
@@ -346,28 +347,41 @@ void MethodDeclarationLookahead() :
   ResultType() <IDENTIFIER> "("
 }
 
-InterfaceNode InterfaceDeclaration() :
+ClassNode InterfaceDeclaration() :
 {
-    InterfaceNode i = new InterfaceNode();
+    ClassNode c = new ClassNode();
+    ClassBodyNode b;
     Token t;
 }
 {
     ( <ABSTRACT> | <PUBLIC> )*
-    <INTERFACE> t=<IDENTIFIER> { i.name = t.image; }
-    [ <EXTENDS> i.supers=NameList() ]
-    "{" ( InterfaceMemberDeclaration() )* "}"
+    <INTERFACE> t=<IDENTIFIER> { c.name = t.image; }
+    [ <EXTENDS> c.supers=NameList() ]
+    "{" ( b=InterfaceMemberDeclaration() { c.body.add(b); } )* "}"
     {
-        return i;
+        c.isInterface = true;
+        c.isAbstract = true;
+        c.isPublic = true;
+        return c;
     }
 }
 
-void InterfaceMemberDeclaration() :
-{}
+ClassBodyNode InterfaceMemberDeclaration() :
 {
-  LOOKAHEAD( MethodDeclarationLookahead() )
-  MethodDeclaration()
+    ClassBodyNode c = new ClassBodyNode();
+}
+{
+    LOOKAHEAD( MethodDeclarationLookahead() )
+    c.method=MethodDeclaration()
+    {
+        c.method.isPublic = true;
+        return c;
+    }
 |
-  FieldDeclaration()
+    c.field=FieldDeclaration()
+    {
+        return c;
+    }
 }
 
 EnumNode EnumDeclaration() :
