@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
+import helper.CompileException;
 
 public class TryStatementNode implements Node {
 	
@@ -15,15 +16,28 @@ public class TryStatementNode implements Node {
     public BlockNode finallyPart; // optional
 
 	@Override
-	public void resolveNames(ClassLookup c) throws IOException {
-		block.resolveNames(c);
+	public void resolveImports(ClassLookup c) throws IOException {
+		block.resolveImports(c);
 		for (int i = 0; i < catchParams.size(); i++) {
-			catchParams.get(i).resolveNames(c);
-			catchBlocks.get(i).resolveNames(c);
+			catchParams.get(i).resolveImports(c);
+			catchBlocks.get(i).resolveImports(c);
 		}
 		if (finallyPart != null) {
-			finallyPart.resolveNames(c);
+			finallyPart.resolveImports(c);
 		}
+	}
+
+	@Override
+	public void resolveSymbols(SymbolTable s) throws CompileException {
+		block.resolveSymbols(s);
+		for (int i = 0; i < catchParams.size(); i++) {
+			catchParams.get(i).resolveSymbols(s);
+			catchBlocks.get(i).resolveSymbols(s);
+		}
+		if (finallyPart != null) {
+			finallyPart.resolveSymbols(s);
+		}
+		
 	}
     
     

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
+import helper.CompileException;
 import intermediate.InterFile;
 
 public class EnumNode implements Node {
@@ -11,8 +12,13 @@ public class EnumNode implements Node {
     public ArrayList<String> values;
     
 	@Override
-	public void resolveNames(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws IOException {
 		// nothing needed
+	}
+	
+	@Override
+	public void resolveSymbols(SymbolTable s) throws CompileException {
+		// nothing needed either -- only simple enum's supported.
 	}
 
 	/**
@@ -33,4 +39,6 @@ public class EnumNode implements Node {
 		}
 		return f;
 	}
+
+	
 }

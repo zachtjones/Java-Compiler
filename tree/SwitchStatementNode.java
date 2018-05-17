@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
+import helper.CompileException;
 
 public class SwitchStatementNode implements Node {
     public ExpressionNode expression;
@@ -12,12 +13,23 @@ public class SwitchStatementNode implements Node {
     public ArrayList<ArrayList<BlockStatementNode> > statements;
     
 	@Override
-	public void resolveNames(ClassLookup c) throws IOException {
-		expression.resolveNames(c);
+	public void resolveImports(ClassLookup c) throws IOException {
+		expression.resolveImports(c);
 		for (int i = 0; i < labels.size(); i++) {
-			labels.get(i).resolveNames(c);
+			labels.get(i).resolveImports(c);
 			for (BlockStatementNode b : statements.get(i)) {
-				b.resolveNames(c);
+				b.resolveImports(c);
+			}
+		}
+	}
+
+	@Override
+	public void resolveSymbols(SymbolTable s) throws CompileException {
+		expression.resolveSymbols(s);
+		for (int i = 0; i < labels.size(); i++) {
+			labels.get(i).resolveSymbols(s);
+			for (BlockStatementNode b : statements.get(i)) {
+				b.resolveSymbols(s);
 			}
 		}
 	}

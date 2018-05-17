@@ -3,6 +3,7 @@ package tree;
 import java.io.IOException;
 
 import helper.ClassLookup;
+import helper.CompileException;
 
 /** Represents a primitive type */
 public class PrimitiveTypeNode implements Node {
@@ -18,7 +19,31 @@ public class PrimitiveTypeNode implements Node {
     public int type; // holds value 0-7 inclusive
 
 	@Override
-	public void resolveNames(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws IOException {
 		// don't do anything
 	}
+	
+	@Override
+	public void resolveSymbols(SymbolTable s) throws CompileException {
+		// nothing to do here.
+	}
+	
+	/**
+	 * Returns the intermediate file's representation for this type.
+	 */
+	public String interRep() {
+		switch(type) {
+		case BOOLEAN: return "bool";
+		case CHAR: return "char";
+		case BYTE: return "byte";
+		case SHORT: return "short";
+		case INT: return "int";
+		case LONG: return "long";
+		case FLOAT: return "float";
+		case DOUBLE: return "double";
+		}
+		return "Error: primitive node type not recognized";
+	}
+
+	
 }

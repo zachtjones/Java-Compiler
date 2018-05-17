@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
+import helper.CompileException;
+import intermediate.InterStatement;
 
 public class ExpressionNode implements Node {
-    // any of the int constants are from JavaParserConstants class.
 
     // these are set based on the types used below
     public ExpressionNode op1;
@@ -26,6 +27,7 @@ public class ExpressionNode implements Node {
     // set if this is an assignment (op1 assignType op2)
     //  this is =, +=, ... >>>=
     public int assignType;
+    public boolean isAssign;
 
     // op1 ? op2 : op3
     public boolean isConditionalTernary;
@@ -143,25 +145,60 @@ public class ExpressionNode implements Node {
 
     
 	@Override
-	public void resolveNames(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws IOException {
 		// for simplicity, check all fields
-		if (op1 != null) op1.resolveNames(c);
-		if (op2 != null) op2.resolveNames(c);
-		if (op3 != null) op3.resolveNames(c);
+		if (op1 != null) op1.resolveImports(c);
+		if (op2 != null) op2.resolveImports(c);
+		if (op3 != null) op3.resolveImports(c);
 		if (ops != null) {
 			for (ExpressionNode e : ops) {
-				e.resolveNames(c);
+				e.resolveImports(c);
 			}
 		}
 		if (type1 != null) {
-			type1.resolveNames(c);
+			type1.resolveImports(c);
 		}
 		if (objectType != null) {
-			objectType.resolveNames(c);
+			objectType.resolveImports(c);
 		}
 		if (name != null) {
-			name.resolveNames(c);
+			name.resolveImports(c);
 		}
 	}
+
+	@Override
+	public void resolveSymbols(SymbolTable s) throws CompileException {
+		// for simplicity, check all fields
+		if (op1 != null) op1.resolveSymbols(s);
+		if (op2 != null) op2.resolveSymbols(s);
+		if (op3 != null) op3.resolveSymbols(s);
+		if (ops != null) {
+			for (ExpressionNode e : ops) {
+				e.resolveSymbols(s);
+			}
+		}
+		if (type1 != null) {
+			type1.resolveSymbols(s);
+		}
+		if (objectType != null) {
+			objectType.resolveSymbols(s);
+		}
+		if (name != null) {
+			name.resolveSymbols(s);
+		}
+	}
+
+	public ArrayList<InterStatement> compile() throws CompileException {
+		ArrayList<InterStatement> statements = new ArrayList<>();
+		
+		
+		
+		if (statements.isEmpty())
+			throw new CompileException("Expression compile not fully implemented yet.");
+		// TODO Auto-generated method stub
+		return statements;
+	}
+
+
 
 }

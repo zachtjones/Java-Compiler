@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
+import helper.CompileException;
 import intermediate.InterFile;
 
 /** Represents a CompilationUnit, that is a source file.
@@ -13,19 +14,30 @@ public class CompilationUnit implements Node {
     public ArrayList<ImportNode> imports = new ArrayList<>();
     public ArrayList<TypeDecNode> types = new ArrayList<>();
 
-	public void resolveNames(ClassLookup c) throws IOException {
+    @Override
+	public void resolveImports(ClassLookup c) throws IOException {
 		// pass down to the types to do
 		for (TypeDecNode t : types) {
-			t.resolveNames(c);
+			t.resolveImports(c);
 		}
+	}
+	
+	@Override
+	public void resolveSymbols(SymbolTable s) throws CompileException {
+		// pass down to the types to do
+		for (TypeDecNode t : types) {
+			t.resolveSymbols(new SymbolTable(null, SymbolTable.className));
+		}
+		
 	}
 
 	/**
 	 * Compiles the various types in this CompilationUnit
 	 * @return An ArrayList of the types converted to their 
 	 * intermediate representation.
+	 * @throws CompileException If there is an error compiling this.
 	 */
-	public ArrayList<InterFile> compile() {
+	public ArrayList<InterFile> compile() throws CompileException {
 		ArrayList<InterFile> a = new ArrayList<InterFile>();
 		// names are already resolved, so there should be no need
 		//   to pass down the imports -- everything can be figured out
@@ -42,4 +54,6 @@ public class CompilationUnit implements Node {
 		
 		return a;
 	}
+
+	
 }

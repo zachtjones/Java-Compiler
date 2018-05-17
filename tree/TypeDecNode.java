@@ -3,6 +3,7 @@ package tree;
 import java.io.IOException;
 
 import helper.ClassLookup;
+import helper.CompileException;
 import intermediate.InterFile;
 
 public class TypeDecNode implements Node {
@@ -13,23 +14,36 @@ public class TypeDecNode implements Node {
     public EnumNode e;
     
 	@Override
-	public void resolveNames(ClassLookup c1) throws IOException {
+	public void resolveImports(ClassLookup c1) throws IOException {
 		if (c != null) {
-			c.resolveNames(c1);
+			c.resolveImports(c1);
 		} else if (i != null) {
-			i.resolveNames(c1);
+			i.resolveImports(c1);
 		} else if (e != null) {
-			e.resolveNames(c1);
+			e.resolveImports(c1);
 		}
 		
+	}
+	
+	@Override
+	public void resolveSymbols(SymbolTable s) throws CompileException {
+		if (c != null) {
+			c.resolveSymbols(s);
+		} else if (i != null) {
+			i.resolveSymbols(s);
+		} else if (e != null) {
+			e.resolveSymbols(s);
+		}
 	}
 
 	/**
 	 * Passes down the compile job to the class/interface/enum
 	 * @param packageName the package's name, or null if default.
 	 * @return The intermediate file node.
+	 * @throws CompileException If there is an error compiling 
+	 * this type declaration.
 	 */
-	public InterFile compile(String packageName) {
+	public InterFile compile(String packageName) throws CompileException {
 		if (this.c != null) {
 			return c.compile(packageName);
 		} else if (this.i != null) {
@@ -40,4 +54,6 @@ public class TypeDecNode implements Node {
 		// empty type declaration (just ; ) , or not implemented yet.
 		return null;
 	}
+
+	
 }

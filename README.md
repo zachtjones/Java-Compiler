@@ -13,6 +13,15 @@ So far, only the syntax of the language is checked, and the tree is generated.
   - invokes the compiler on the main source file
   - this compiles the file, and all files that it depends on
 
+## Compiler passes
+1. Parses the language, and builds the resulting tree from the context-free grammar.
+  - classes: JavaParser.jj and generated java source files. (using JavaCC)
+2. Resolve imports, and fully qualify names.
+  - classes: tree/\*.java - method resolveImports()
+3. Build the symbol table, and resolve the declarations of the symbols
+  - classes: tree/\*.java - method resolveSymbols()
+4. Compile to intermediate language (IL) code.
+
 ## Tests
 - ```cd tests```
 - ```./makeScript.sh```

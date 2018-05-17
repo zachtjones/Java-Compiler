@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
+import helper.CompileException;
 import tree.*;
 import intermediate.*;
 
@@ -19,8 +20,14 @@ public class JavaCompiler {
 			// update the class lookup tables (short names to full names)
 			String packageName = c.packageName == null ? null : c.packageName.getSimpleName();
 			ClassLookup lookup = new ClassLookup(file, packageName, c.imports);
+			// resolve the imports
+			c.resolveImports(lookup);
 			
-			c.resolveNames(lookup);
+			System.out.println("Symbol table: ");
+			
+			// resolve the symbols (use a symbol table)
+			c.resolveSymbols(null);
+			
 			// next task - print out the intermediate code
 			ArrayList<InterFile> files = c.compile();
 			for (InterFile f : files) {
@@ -38,6 +45,8 @@ public class JavaCompiler {
         } catch (FileNotFoundException e) {
         	System.out.println("Error: the input file was not found.");
         } catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		} catch (CompileException e) {
 			System.out.println("Error: " + e.getMessage());
 		}
 	}
