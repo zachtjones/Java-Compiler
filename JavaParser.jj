@@ -657,6 +657,7 @@ ExpressionNode Assignment() :
     e.assignType = AssignmentOperator()
     e.op2 = Expression()
     {
+        e.isAssign = true;
         return e;
     }
 }
@@ -664,18 +665,18 @@ ExpressionNode Assignment() :
 int AssignmentOperator() :
 {}
 {
-    "=" { return JavaParserConstants.ASSIGN; }
-|   "*=" { return JavaParserConstants.STARASSIGN; }
-|   "/=" { return JavaParserConstants.SLASHASSIGN; }
-|   "%=" { return JavaParserConstants.REMASSIGN; }
-|   "+=" { return JavaParserConstants.PLUSASSIGN; }
-|   "-=" { return JavaParserConstants.MINUSASSIGN; }
-|   "<<=" { return JavaParserConstants.LSHIFTASSIGN; }
-|   ">>=" { return JavaParserConstants.RSIGNEDSHIFTASSIGN; }
-|   ">>>=" { return JavaParserConstants.RUNSIGNEDSHIFTASSIGN; }
-|   "&=" { return JavaParserConstants.ANDASSIGN; }
-|   "^=" { return JavaParserConstants.XORASSIGN; }
-|   "|=" { return JavaParserConstants.ORASSIGN; }
+    "=" { return AssignmentOperator.ASSIGN; }
+|   "*=" { return AssignmentOperator.STARASSIGN; }
+|   "/=" { return AssignmentOperator.SLASHASSIGN; }
+|   "%=" { return AssignmentOperator.REMASSIGN; }
+|   "+=" { return AssignmentOperator.PLUSASSIGN; }
+|   "-=" { return AssignmentOperator.MINUSASSIGN; }
+|   "<<=" { return AssignmentOperator.LSHIFTASSIGN; }
+|   ">>=" { return AssignmentOperator.RSIGNEDSHIFTASSIGN; }
+|   ">>>=" { return AssignmentOperator.RUNSIGNEDSHIFTASSIGN; }
+|   "&=" { return AssignmentOperator.ANDASSIGN; }
+|   "^=" { return AssignmentOperator.XORASSIGN; }
+|   "|=" { return AssignmentOperator.ORASSIGN; }
 }
 
 ExpressionNode ConditionalExpression() :
