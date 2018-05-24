@@ -25,10 +25,7 @@ public class JavaCompiler {
 			
 			System.out.println("Symbol table: ");
 			
-			// resolve the symbols (use a symbol table)
-			c.resolveSymbols(null);
-			
-			// next task - print out the intermediate code
+			// next task - compile -- print out the table.
 			ArrayList<InterFile> files = c.compile();
 			for (InterFile f : files) {
 				PrintWriter pw = new PrintWriter(f.getFileName());
@@ -48,6 +45,7 @@ public class JavaCompiler {
 			System.out.println("Error: " + e.getMessage());
 		} catch (CompileException e) {
 			System.out.println("Error: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 

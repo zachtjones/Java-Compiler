@@ -18,7 +18,7 @@ Registers
 - LongReg := "%l" &lt;Integer&gt;
 - FloatReg := "%f" &lt;Integer&gt;
 - DoubleReg := "%d" &lt;Integer&gt;
-- ReferenceReg := "%r" "(" Identifier ")" &lt;Integer&gt;
+- ReferenceReg := "%r" &lt;Integer&gt;
 
 Types
 - Void := "void"

@@ -7,8 +7,10 @@ public class InterFunction {
 	public String name;
 	public String returnType;
 	public boolean isInstance; // instance or static
+	public boolean isInit; // static init or instance init
 	
 	public ArrayList<String> paramTypes;
+	public ArrayList<String> paramNames;
 	
 	public ArrayList<String> throwsList;
 	
@@ -17,6 +19,7 @@ public class InterFunction {
 	
 	public InterFunction() {
 		this.paramTypes = new ArrayList<String>();
+		this.paramNames = new ArrayList<String>();
 		this.throwsList = new ArrayList<String>();
 		this.statements = new ArrayList<InterStatement>();
 	}
@@ -33,11 +36,14 @@ public class InterFunction {
 		sb.append(name);
 		// parameters
 		sb.append(" (");
-		for (String s : paramTypes) {
-			sb.append(s);
+		for (int i = 0; i < paramTypes.size(); i++) {
+			sb.append(paramNames.get(i));
+			sb.append('<');
+			sb.append(paramTypes.get(i));
+			sb.append('>');
 			sb.append(' ');
 		}
-		sb.append(") ");
+		sb.append(')');
 		
 		sb.append(" returns ");
 		sb.append(returnType);
