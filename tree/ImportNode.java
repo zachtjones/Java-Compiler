@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
 public class ImportNode implements Node {
     public NameNode name;
@@ -15,7 +17,7 @@ public class ImportNode implements Node {
 	}
 
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
 		// don't need to resolve imports any more, as they are already done.
 	}
 }

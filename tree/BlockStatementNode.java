@@ -1,11 +1,10 @@
 package tree;
 
 import java.io.IOException;
-import java.util.ArrayList;
-
 import helper.ClassLookup;
 import helper.CompileException;
-import intermediate.InterStatement;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
 public class BlockStatementNode implements Node {
     // only one of these is not null
@@ -23,21 +22,14 @@ public class BlockStatementNode implements Node {
 	}
     
     @Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
 		// pass down -- local variable declaration puts an entry
     	if (statement != null) {
-    		statement.resolveSymbols(s);
+    		statement.compile(s, f, r);
     	} else {
-    		dec.resolveSymbols(s);
+    		dec.compile(s, f, r);
     	}
 		
 	}
-
-	public ArrayList<InterStatement> compile() throws CompileException {
-		// TODO
-		throw new CompileException("Block statement node compile not implemented.");
-	}
-
-	
     
 }

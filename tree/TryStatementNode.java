@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
 public class TryStatementNode implements Node {
 	
@@ -28,16 +30,8 @@ public class TryStatementNode implements Node {
 	}
 
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
-		block.resolveSymbols(s);
-		for (int i = 0; i < catchParams.size(); i++) {
-			catchParams.get(i).resolveSymbols(s);
-			catchBlocks.get(i).resolveSymbols(s);
-		}
-		if (finallyPart != null) {
-			finallyPart.resolveSymbols(s);
-		}
-		
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+		throw new CompileException("try statements not implemented yet.");
 	}
     
     

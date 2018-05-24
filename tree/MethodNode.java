@@ -7,8 +7,9 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
-public class MethodNode implements Node {
+public class MethodNode {
     public boolean isPublic;
     public boolean isProtected;
     public boolean isPrivate;
@@ -23,7 +24,7 @@ public class MethodNode implements Node {
     public ArrayList<NameNode> throwsList;
     public BlockNode code;
     
-	@Override
+	
 	public void resolveImports(ClassLookup c) throws IOException {
 		resultType.resolveImports(c);
 		dec.resolveImports(c);
@@ -33,16 +34,6 @@ public class MethodNode implements Node {
 			}
 		}
 		code.resolveImports(c);
-	}
-	
-	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
-		// create new scope, use the declaratorNode to add to the new scope
-		SymbolTable paramTable = new SymbolTable(s, SymbolTable.parameter);
-		dec.resolveSymbols(paramTable);
-		// create new scope under the parameters for the code
-		SymbolTable codeTable = new SymbolTable(paramTable, SymbolTable.local);
-		code.resolveSymbols(codeTable);
 	}
 
 	/**
@@ -59,9 +50,15 @@ public class MethodNode implements Node {
 		
 		// TODO - final and synchronized, ... modifiers
 		
-		// add the block of statements
-		func.statements = code.compile();
+		RegisterAllocator r = new RegisterAllocator();
 		
+		// create new scope, use the declaratorNode to add to the new scope
+		SymbolTable paramTable = new SymbolTable(syms, SymbolTable.parameter);
+		dec.compile(paramTable, func, r);
+		
+		// create new scope under the parameters for the code
+		SymbolTable codeTable = new SymbolTable(paramTable, SymbolTable.local);
+		code.compile(codeTable, func, r);
 		f.addFunction(func);
 	}
 

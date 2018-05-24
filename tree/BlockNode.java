@@ -2,10 +2,13 @@ package tree;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import intermediate.InterStatement;
+import intermediate.EndScopeStatement;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
 public class BlockNode implements Node {
     public ArrayList<BlockStatementNode> statements;
@@ -19,17 +22,18 @@ public class BlockNode implements Node {
 	}
 	
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
-		// pass down, but with new scope, as blocks create scope
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+		// create new scope for variables
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.local);
+		// compile with this new table, placing declarations where needed.
 		for (BlockStatementNode b : statements) {
-			b.resolveSymbols(newTable);
+			b.compile(newTable, f, r);
 		}
-	}
-
-	public ArrayList<InterStatement> compile() throws CompileException {
-		throw new CompileException("Block node compiling not implemented yet.");
-		// TODO Auto-generated method stub
+		// remove all new symbols from the table
+		HashMap<String, String> entries = s.getCurrentEntries();
+		entries.forEach((name, type) -> {
+			f.statements.add(new EndScopeStatement(name));
+		});
 	}
 
 	

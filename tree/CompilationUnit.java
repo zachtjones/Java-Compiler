@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
 /** Represents a CompilationUnit, that is a source file.
 *  @author Zach Jones */
@@ -23,12 +25,8 @@ public class CompilationUnit implements Node {
 	}
 	
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
-		// pass down to the types to do
-		for (TypeDecNode t : types) {
-			t.resolveSymbols(new SymbolTable(null, SymbolTable.className));
-		}
-		
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+		// don't call this method.
 	}
 
 	/**

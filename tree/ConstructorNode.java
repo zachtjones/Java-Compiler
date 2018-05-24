@@ -7,9 +7,9 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
-import intermediate.InterStatement;
+import intermediate.RegisterAllocator;
 
-public class ConstructorNode implements Node {
+public class ConstructorNode {
     public boolean isPublic;
     public boolean isProtected;
     public boolean isPrivate;
@@ -26,7 +26,6 @@ public class ConstructorNode implements Node {
     // the statements that make up the rest of the block
     public ArrayList<BlockStatementNode> code = new ArrayList<>();
 
-	@Override
 	public void resolveImports(ClassLookup c) throws IOException {
 		for (ParamNode p : params) {
 			p.resolveImports(c);
@@ -40,54 +39,47 @@ public class ConstructorNode implements Node {
 			b.resolveImports(c);
 		}
 	}
-	
-	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
-		// add in the parameters
-		SymbolTable newTable = new SymbolTable(s, SymbolTable.parameter);
-		for (ParamNode p : params) {
-			newTable.putEntry(p.id.name, p.type.interRep());
-		}
-		// pass down to the code with the parameters in the table
-		for (BlockStatementNode b : code) {
-			b.resolveSymbols(newTable);
-		}
-	}
 
 	/**
 	 * Compiles this constructor into the intermediate file.
 	 * @param f The intermediate file to compile into.
+	 * @param s The symbol table for the class.
 	 * @throws CompileException If there is a compiling error.
 	 */
-	public void compile(InterFile f) throws CompileException {
+	public void compile(InterFile f, SymbolTable s) throws CompileException {
 		// name is <init>
 		InterFunction func = new InterFunction();
 		func.name = "<init>";
+		func.isInstance = true;
 		// returns object name
 		func.returnType = name;
+		
+		// symbol table for parameters
+		SymbolTable newTable = new SymbolTable(s, SymbolTable.parameter);
+		RegisterAllocator r = new RegisterAllocator();
 		
 		// add the parameters
 		for (ParamNode p : this.params) {
 			func.paramTypes.add(p.type.interRep());
+			func.paramNames.add(p.id.name);
+			newTable.putEntry(p.id.name, p.type.interRep());
 		}
 		
 		// throws the throws list
-		for (NameNode n : this.throwsList) {
-			func.throwsList.add(n.primaryName);
+		if (this.throwsList != null) {
+			for (NameNode n : this.throwsList) {
+				func.throwsList.add(n.primaryName);
+			}
 		}
-		
 		// add in the implicit super() call
 		// TODO func.statements.add(new );
 		
 		// compile the block
 		for (BlockStatementNode b : this.code) {
-			ArrayList<InterStatement> stmt = b.compile();
-			for (InterStatement i : stmt) {
-				func.statements.add(i);
-			}
+			b.compile(newTable, func, r);
 		}
 		
-		// add the function
+		// add the function to the intermediate file.
 		f.addFunction(func);		
 	}
 

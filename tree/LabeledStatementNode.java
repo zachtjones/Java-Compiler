@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
 public class LabeledStatementNode implements Node {
     public String name;
@@ -15,9 +17,12 @@ public class LabeledStatementNode implements Node {
 	}
 
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
 		// put the label into the table
 		s.putEntry(name, "Label");
-		statement.resolveSymbols(s);
+		
+		// java doesn't have goto, so the only jumping of labeled statements is
+		//  in break or continue statements.
+		throw new CompileException("Labeled statements are not supported (yet).");
 	}
 }

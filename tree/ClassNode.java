@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
 /** This represents a class in the tree
 * @author Zach Jones
@@ -45,14 +47,8 @@ public class ClassNode implements Node {
 	}
 	
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
-		this.body.sort((ClassBodyNode c1, ClassBodyNode c2) -> {
-			if (c1.field != null) return -1; // put fields first
-			return 0;
-		});
-		for (ClassBodyNode c : body) {
-			c.resolveSymbols(s);
-		}
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+		// this method should not be called.
 	}
 
 	public InterFile compile(String packageName) throws CompileException {
@@ -84,7 +80,7 @@ public class ClassNode implements Node {
 			return 0;
 		});
 		
-		// fields / methods
+		// fields / methods -- each one gets new register allocator and function.
 		SymbolTable syms = new SymbolTable(null, SymbolTable.className);
 		for (ClassBodyNode c : body) {
 			c.compile(f, syms);

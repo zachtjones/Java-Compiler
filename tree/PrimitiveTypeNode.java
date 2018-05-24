@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
 /** Represents a primitive type */
 public class PrimitiveTypeNode implements Node {
@@ -24,7 +26,7 @@ public class PrimitiveTypeNode implements Node {
 	}
 	
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
 		// nothing to do here.
 	}
 	

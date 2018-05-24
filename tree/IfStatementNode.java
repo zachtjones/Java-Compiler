@@ -4,6 +4,11 @@ import java.io.IOException;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.BranchStatementEQZ;
+import intermediate.InterFunction;
+import intermediate.JumpStatement;
+import intermediate.LabelStatement;
+import intermediate.RegisterAllocator;
 
 public class IfStatementNode implements Node {
     public ExpressionNode expression;
@@ -20,13 +25,32 @@ public class IfStatementNode implements Node {
 	}
 
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
 		// create new scope
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.local);
-		expression.resolveSymbols(newTable);
-		statement.resolveSymbols(newTable);
+		
+		LabelStatement elseLbl = new LabelStatement("L_ELSE" + r.getNum());
+		LabelStatement endLbl = new LabelStatement("L_END" + r.getNum());
+		
+		// if expression == 0, goto else
+		// start with the expression
+		expression.compile(newTable, f, r);
+		// branch if == 0 to else (false)
+		f.statements.add(new BranchStatementEQZ(elseLbl, r.getLast()));
+		
+		// compile in the true part
+		statement.compile(newTable, f, r);
+		// true part -> jump to end
+		f.statements.add(new JumpStatement(endLbl));
+		
+		// add in else label
+		f.statements.add(elseLbl);
+		// compile in the else part
 		if (elsePart != null) {
-			elsePart.resolveSymbols(newTable);
+			elsePart.compile(newTable, f, r);
 		}
+		
+		// add in end label
+		f.statements.add(endLbl);
 	}
 }

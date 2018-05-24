@@ -81,4 +81,11 @@ public class SymbolTable {
 		if (outer != null) return 1 + outer.numParents();
 		return 0;
 	}
+	
+	/**
+	 * Gets all the entries in the current scope only.
+	 */
+	public HashMap<String, String> getCurrentEntries() {
+		return entries;
+	}
 }

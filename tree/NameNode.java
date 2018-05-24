@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
 public class NameNode implements Node {
     public String primaryName;
@@ -46,11 +48,19 @@ public class NameNode implements Node {
 	}
 
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
-		this.scope = s.lookup(primaryName);
-		if (this.scope == -1) {
-			throw new CompileException("symbol: " + primaryName + " does not exist in the symbol table.");
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+		// nothing needed here
+		
+		/* The next step, compile will do something similar to this.
+		String nameToResolve = primaryName;
+		if (primaryName.contains(".")) { // example sc.nextInt();
+			// make sure everything before the . is in symbol table
+			nameToResolve = primaryName.substring(0, primaryName.indexOf('.'));
 		}
+		this.scope = s.lookup(nameToResolve);
+		if (this.scope == -1) {
+			throw new CompileException("symbol: " + nameToResolve + " does not exist in the symbol table.");
+		}*/
 	}
     
 	/** Holds one of the constants from the SymbolTable class. */

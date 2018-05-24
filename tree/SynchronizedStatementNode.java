@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
 /** synchronized (expression) block */
 public class SynchronizedStatementNode implements Node {
@@ -17,9 +19,11 @@ public class SynchronizedStatementNode implements Node {
 	}
 
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
-		expression.resolveSymbols(s);
-		block.resolveSymbols(s);
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+		throw new CompileException("Synchronized blocks not implemented yet.");
+		
+		/*expression.compile(s, f, r);
+		block.compile(s, f, r);*/
 	}
     
     

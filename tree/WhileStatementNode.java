@@ -4,6 +4,11 @@ import java.io.IOException;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.BranchStatementEQZ;
+import intermediate.InterFunction;
+import intermediate.JumpStatement;
+import intermediate.LabelStatement;
+import intermediate.RegisterAllocator;
 
 public class WhileStatementNode implements Node {
     public ExpressionNode expression;
@@ -16,8 +21,27 @@ public class WhileStatementNode implements Node {
 	}
 
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
-		expression.resolveSymbols(s);
-		statement.resolveSymbols(s);
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+		// label for expression
+		LabelStatement exprLbl = new LabelStatement("L_COND_" + r.getNum());
+		// label for ending
+		LabelStatement endLbl = new LabelStatement("L_END_" + r.getNum());
+		
+		// add in the label for expression
+		f.statements.add(exprLbl);
+		// compile in expression
+		expression.compile(s, f, r);
+		
+		// if false, goto end
+		f.statements.add(new BranchStatementEQZ(endLbl, r.getLast()));
+		
+		// compile in the block
+		statement.compile(s, f, r);
+		
+		// unconditional jump to the expression
+		f.statements.add(new JumpStatement(exprLbl));
+		
+		// add in the ending label
+		f.statements.add(endLbl);
 	}
 }

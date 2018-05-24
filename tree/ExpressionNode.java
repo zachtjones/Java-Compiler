@@ -5,7 +5,12 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import intermediate.InterStatement;
+import intermediate.GetLocalStatement;
+import intermediate.GetParamStatement;
+import intermediate.InterFunction;
+import intermediate.LoadLiteralStatement;
+import intermediate.PutLocalStatement;
+import intermediate.RegisterAllocator;
 
 public class ExpressionNode implements Node {
 
@@ -167,38 +172,51 @@ public class ExpressionNode implements Node {
 	}
 
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
-		// for simplicity, check all fields
-		if (op1 != null) op1.resolveSymbols(s);
-		if (op2 != null) op2.resolveSymbols(s);
-		if (op3 != null) op3.resolveSymbols(s);
-		if (ops != null) {
-			for (ExpressionNode e : ops) {
-				e.resolveSymbols(s);
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+		if (literalValue != null) {
+			// load the literal value into a register
+			f.statements.add(new LoadLiteralStatement(literalValue, r.getNum()));
+			
+		} else if (name != null) {
+			// look up symbol
+			int scope = s.lookup(name.primaryName);
+			if (scope == -1) {
+				throw new CompileException("Symbol: " + name.primaryName + " not defined.");
 			}
-		}
-		if (type1 != null) {
-			type1.resolveSymbols(s);
-		}
-		if (objectType != null) {
-			objectType.resolveSymbols(s);
-		}
-		if (name != null) {
-			name.resolveSymbols(s);
+			if (scope == SymbolTable.local) {
+				f.statements.add(new GetLocalStatement(r.getNum(), name.primaryName));
+			} else if (scope == SymbolTable.parameter) {
+				f.statements.add(new GetParamStatement(r.getNum(), name.primaryName));
+			} else {
+				throw new CompileException("Can't load class names yet.");
+			}
+		} else if (isAssign) {
+			// get the address from the left side, and put the right side value into it.
+			// op1 assignType op2
+			if (assignType == AssignmentOperator.ASSIGN) {
+				// compile the op2
+				op2.compile(s, f, r);
+				// store that result in op1
+				if (op1.isLocal(s)) {
+					f.statements.add(new PutLocalStatement(r.getLast(), op1.name.primaryName));
+				} else {
+					throw new CompileException("Only local variable assignment is supported so far.");
+				}
+			} else {
+				throw new CompileException("Only = assignment is supported so far.");
+			}
+		} else {
+			
+			// this type of expression not implemented yet.
+			// TODO the basics first
+		
+		
+			throw new CompileException("Expression compiling not implemented yet");
 		}
 	}
-
-	public ArrayList<InterStatement> compile() throws CompileException {
-		ArrayList<InterStatement> statements = new ArrayList<>();
-		
-		
-		
-		if (statements.isEmpty())
-			throw new CompileException("Expression compile not fully implemented yet.");
-		// TODO Auto-generated method stub
-		return statements;
+	
+	/** Returns true if the expression is just a local variable. */
+	private boolean isLocal(SymbolTable s) {
+		return (name != null && s.lookup(name.primaryName) == SymbolTable.local);
 	}
-
-
-
 }

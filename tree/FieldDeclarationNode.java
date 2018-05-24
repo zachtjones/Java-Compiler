@@ -6,9 +6,10 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
-import intermediate.InterStatement;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
-public class FieldDeclarationNode implements Node {
+public class FieldDeclarationNode {
     public boolean isPublic;
     public boolean isProtected;
     public boolean isPrivate;
@@ -20,7 +21,6 @@ public class FieldDeclarationNode implements Node {
     public TypeNode type;
     public ArrayList<VariableDecNode> variables = new ArrayList<>();
     
-	@Override
 	public void resolveImports(ClassLookup c) throws IOException {
 		type.resolveImports(c);
 	}
@@ -45,9 +45,10 @@ public class FieldDeclarationNode implements Node {
 			syms.putEntry(d.id.name, typeRep);
 			
 			// add the initial values if any
-			if (d.init.e != null) {
+			if (d.init != null && d.init.e != null) {
 				// construct the assignment to the expression
 				ExpressionNode e1 = new ExpressionNode();
+				e1.isAssign = true;
 				e1.assignType = AssignmentOperator.ASSIGN;
 				ExpressionNode id = new ExpressionNode();
 				id.name = new NameNode();
@@ -56,22 +57,14 @@ public class FieldDeclarationNode implements Node {
 				e1.op2 = d.init.e;
 				
 				// compile the created expression.
-				ArrayList<InterStatement> compiled = e1.compile();
-				for (InterStatement s : compiled) {
-					f.addInstanceInit(s);
-				}
-			} else {
-				// it's an array initializer (possibly nested)
-				throw new CompileException("Array init not implemented yet.");
+				InterFunction func = new InterFunction();
+				// add instance initializers
+				func.isInit = true;
+				func.isInstance = !isStatic;
+				RegisterAllocator r = new RegisterAllocator();
+				e1.compile(syms, func, r);
+				f.addFunction(func);
 			}
-		}
-	}
-
-	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
-		// put the new symbols into the table
-		for (VariableDecNode v : variables) {
-			s.putEntry(v.id.name, type.interRep());
 		}
 	}
 }

@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
 public class StatementNode implements Node {
 	// only one of these are not null / true
@@ -55,35 +57,35 @@ public class StatementNode implements Node {
 	}
 
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
 		if (statement != null) {
-			statement.resolveSymbols(s);
+			statement.compile(s, f, r);
 		} else if (labeled != null) {
-			labeled.resolveSymbols(s);
+			labeled.compile(s, f, r);
 		} else if (block != null) {
-			block.resolveSymbols(s);
+			block.compile(s, f, r);
 		} else if (switchNode != null) {
-			switchNode.resolveSymbols(s);
+			switchNode.compile(s, f, r);
 		} else if (ifNode != null) {
-			ifNode.resolveSymbols(s);
+			ifNode.compile(s, f, r);
 		} else if (whileNode != null) {
-			whileNode.resolveSymbols(s);
+			whileNode.compile(s, f, r);
 		} else if (doNode != null) {
-			doNode.resolveSymbols(s);
+			doNode.compile(s, f, r);
 		} else if (forNode != null) {
-			forNode.resolveSymbols(s);
+			forNode.compile(s, f, r);
 		} else if (breakNode != null) {
-			breakNode.resolveSymbols(s);
+			breakNode.compile(s, f, r);
 		} else if (continueNode != null) {
-			continueNode.resolveSymbols(s);
+			continueNode.compile(s, f, r);
 		} else if (returnNode != null) {
-			returnNode.resolveSymbols(s);
+			returnNode.compile(s, f, r);
 		} else if (throwNode != null) {
-			throwNode.resolveSymbols(s);
+			throwNode.compile(s, f, r);
 		} else if (synchNode != null) {
-			synchNode.resolveSymbols(s);
+			synchNode.compile(s, f, r);
 		} else if (tryNode != null) {
-			tryNode.resolveSymbols(s);
+			tryNode.compile(s, f, r);
 		}
 	}
 

@@ -6,14 +6,13 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
 
-public class TypeDecNode implements Node {
+public class TypeDecNode {
     // only one of these will not be null
     // if they are all null, then the code was just ';'
     public ClassNode c;
     public ClassNode i; // interfaces are treated as abstract classes in this
     public EnumNode e;
     
-	@Override
 	public void resolveImports(ClassLookup c1) throws IOException {
 		if (c != null) {
 			c.resolveImports(c1);
@@ -23,17 +22,6 @@ public class TypeDecNode implements Node {
 			e.resolveImports(c1);
 		}
 		
-	}
-	
-	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
-		if (c != null) {
-			c.resolveSymbols(s);
-		} else if (i != null) {
-			i.resolveSymbols(s);
-		} else if (e != null) {
-			e.resolveSymbols(s);
-		}
 	}
 
 	/**

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
 public class ForInitNode implements Node {
 	// either this, or the second
@@ -24,12 +26,12 @@ public class ForInitNode implements Node {
 	}
 
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
 		if (dec != null) {
-			dec.resolveSymbols(s);
+			dec.compile(s, f, r);
 		} else {
 			for (StatementExprNode s1 : items) {
-				s1.resolveSymbols(s);
+				s1.compile(s, f, r);
 			}
 		}
 		

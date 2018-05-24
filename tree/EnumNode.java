@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
 
 public class EnumNode implements Node {
     public String name;
@@ -17,8 +19,9 @@ public class EnumNode implements Node {
 	}
 	
 	@Override
-	public void resolveSymbols(SymbolTable s) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
 		// nothing needed either -- only simple enum's supported.
+		// this method should not be called, since you call the compile(String) one instead.
 	}
 
 	/**
