@@ -10,17 +10,17 @@ import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
 public class FieldDeclarationNode {
-    public boolean isPublic;
-    public boolean isProtected;
-    public boolean isPrivate;
-    public boolean isStatic;
-    public boolean isFinal;
-    public boolean isTransient;
-    public boolean isVolatile;
+	public boolean isPublic;
+	public boolean isProtected;
+	public boolean isPrivate;
+	public boolean isStatic;
+	public boolean isFinal;
+	public boolean isTransient;
+	public boolean isVolatile;
 
-    public TypeNode type;
-    public ArrayList<VariableDecNode> variables = new ArrayList<>();
-    
+	public TypeNode type;
+	public ArrayList<VariableDecNode> variables = new ArrayList<>();
+
 	public void resolveImports(ClassLookup c) throws IOException {
 		type.resolveImports(c);
 	}
@@ -43,26 +43,24 @@ public class FieldDeclarationNode {
 			}
 			f.addField(temp, d.id.name, isStatic);
 			syms.putEntry(d.id.name, typeRep);
-			
+
 			// add the initial values if any
 			if (d.init != null && d.init.e != null) {
 				// construct the assignment to the expression
-				ExpressionNode e1 = new ExpressionNode();
-				e1.isAssign = true;
-				e1.assignType = AssignmentOperator.ASSIGN;
-				ExpressionNode id = new ExpressionNode();
-				id.name = new NameNode();
-				id.name.primaryName = d.id.name;
-				e1.op1 = id;
-				e1.op2 = d.init.e;
-				
+				AssignmentNode a = new AssignmentNode();
+				NameNode n = new NameNode();
+				n.primaryName = d.id.name;
+				a.left = n;
+				a.type = AssignmentNode.ASSIGN;
+				a.right = d.init.e;
+
 				// compile the created expression.
 				InterFunction func = new InterFunction();
 				// add instance initializers
 				func.isInit = true;
 				func.isInstance = !isStatic;
 				RegisterAllocator r = new RegisterAllocator();
-				e1.compile(syms, func, r);
+				a.compile(syms, func, r);
 				f.addFunction(func);
 			}
 		}
