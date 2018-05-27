@@ -11,7 +11,7 @@ import intermediate.*;
 public class JavaCompiler {
 
 	public static void main(String[] args) {
-		if (args.length != 1) {
+		if (args.length < 1) {
 			usage();
 		}
 		String file = args[0];
@@ -23,7 +23,9 @@ public class JavaCompiler {
 			// resolve the imports
 			c.resolveImports(lookup);
 			
-			System.out.println("Symbol table: ");
+			if (SymbolTable.printOut) {
+				System.out.println("Symbol table: ");
+			}
 			
 			// next task - compile -- print out the table.
 			ArrayList<InterFile> files = c.compile();
