@@ -3,17 +3,17 @@ package intermediate;
 /** branch when register is equal to 0. */
 public class BranchStatementEQZ implements InterStatement {
 	LabelStatement destination;
-	int registerNum; // uses a byte register
+	Register r; // uses a byte register
 	
 	
 	/** Creates a branch statement (conditional jump) when registerNum == 0. */
-	public BranchStatementEQZ(LabelStatement destination, int registerNum) {
+	public BranchStatementEQZ(LabelStatement destination, Register r) {
 		this.destination = destination;
-		this.registerNum = registerNum;
+		this.r = r;
 	}
 	
 	@Override
 	public String toString() {
-		return "branch when " + registerNum + " == 0 to " + destination.name + ";";
+		return "branch when " + r.toString() + " == 0 to " + destination.name + ";";
 	}
 }

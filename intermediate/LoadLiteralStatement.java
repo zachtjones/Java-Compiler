@@ -15,36 +15,49 @@ public class LoadLiteralStatement implements InterStatement {
 	public int type;
 	public String value;
 	// 4 types of literals: char, String, long, double.
-	public int registerNum;
+	public Register r;
 	
 	public LoadLiteralStatement(String literalValue, int registerNum) throws CompileException {
+		value = literalValue; // or set to something else later.
 		if (literalValue.charAt(0) == '"') {
 			type = STRING;
+			r = new Register(registerNum, Register.REFERENCE);
 		} else if (literalValue.charAt(0) == '\'') {
 			type = CHAR;
+			r = new Register(registerNum, Register.SHORT); // character are 16-bit in Java
 		} else if (literalValue.equals("true")) {
 			type = BYTE;
 			value = "1";
+			r = new Register(registerNum, Register.BYTE);
 		} else if (literalValue.equals("false")) {
 			type = BYTE;
 			value = "0";
+			r = new Register(registerNum, Register.BYTE);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'f') {
 			type = FLOAT;
+			r = new Register(registerNum, Register.FLOAT);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'F') {
 			type = FLOAT;
+			r = new Register(registerNum, Register.FLOAT);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'd') {
 			type = DOUBLE;
+			r = new Register(registerNum, Register.DOUBLE);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'D') {
 			type = DOUBLE;
+			r = new Register(registerNum, Register.DOUBLE);
 		} else if (literalValue.contains(".")) {
 			type = DOUBLE; // default
+			r = new Register(registerNum, Register.DOUBLE);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'l') {
 			type = LONG;
+			r = new Register(registerNum, Register.LONG);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'L') {
 			type = LONG;
+			r = new Register(registerNum, Register.LONG);
 		} else {
 			// should be an int (bytes & shorts don't have literals)
 			type = INT;
+			r = new Register(registerNum, Register.INT);
 			try {
 				Integer.parseInt(literalValue);
 			} catch(NumberFormatException e) {
@@ -56,30 +69,6 @@ public class LoadLiteralStatement implements InterStatement {
 	
 	@Override
 	public String toString() {
-		char reg;
-		switch(type) {
-		case CHAR:
-			reg = 'c';
-			break;
-		case BYTE:
-			reg = 'b';
-			break;
-		case STRING:
-			reg = 'r';
-			break;
-		case INT:
-			reg = 'i';
-			break;
-		case LONG:
-			reg = 'l';
-			break;
-		case FLOAT:
-			reg = 'f';
-			break;
-		default: // double
-			reg = 'd';
-			break;
-		}
-		return "load " + value + " to %" + reg + registerNum + ";";
+		return "load " + value + " to " + r.toString() + ";";
 	}
 }

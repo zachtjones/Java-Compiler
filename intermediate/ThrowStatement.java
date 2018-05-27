@@ -2,14 +2,14 @@ package intermediate;
 
 /** throw REGISTER */
 public class ThrowStatement implements InterStatement {
-	int registerNum;
+	Register r;
 	
-	public ThrowStatement(int registerNum) {
-		this.registerNum = registerNum;
+	public ThrowStatement(Register r) {
+		this.r = r;
 	}
 	
 	@Override
 	public String toString() {
-		return "throw %" + registerNum + ";";
+		return "throw " + r.toString() + ";";
 	}
 }

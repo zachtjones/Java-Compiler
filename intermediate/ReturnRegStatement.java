@@ -2,14 +2,14 @@ package intermediate;
 
 /** return register; */
 public class ReturnRegStatement implements InterStatement {
-	int registerNum;
+	Register r;
 	
-	public ReturnRegStatement(int regNum) {
-		this.registerNum = regNum;
+	public ReturnRegStatement(Register regNum) {
+		this.r = regNum;
 	}
 	
 	@Override
 	public String toString() {
-		return "return %" + registerNum + ";";
+		return "return " + r + ";";
 	}
 }

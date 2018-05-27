@@ -2,7 +2,7 @@ package intermediate;
 
 /** getParam %register = name */
 public class GetParamStatement implements InterStatement {
-	int registerNum;
+	Register r;
 	String localName;
 	
 	/**
@@ -10,13 +10,13 @@ public class GetParamStatement implements InterStatement {
 	 * @param registerNum The register number to set
 	 * @param localName The parameter to get.
 	 */
-	public GetParamStatement(int registerNum, String localName) {
-		this.registerNum = registerNum;
+	public GetParamStatement(Register r, String localName) {
+		this.r = r;
 		this.localName = localName;
 	}
 	
 	@Override
 	public String toString() {
-		return "getParam %" + registerNum + " = " + localName + ";";
+		return "getParam %" + r.toString() + " = " + localName + ";";
 	}
 }
