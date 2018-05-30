@@ -1,6 +1,6 @@
 package tree;
 
 /** "this" */
-public class ThisExpressionNode implements ExpressionNode {
+public class ThisExpressionNode implements Expression {
 
 }

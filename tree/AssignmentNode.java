@@ -1,7 +1,14 @@
 package tree;
 
+import java.io.IOException;
+
+import helper.ClassLookup;
+import helper.CompileException;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
+
 /** left type right */
-public class AssignmentNode implements ExpressionNode {
+public class AssignmentNode implements Expression {
 	public final static int ASSIGN = 0;
 	public final static int STARASSIGN = 1;
 	public final static int SLASHASSIGN = 2;
@@ -15,7 +22,14 @@ public class AssignmentNode implements ExpressionNode {
 	public final static int XORASSIGN = 10;
 	public final static int ORASSIGN = 11;
 
-	public ExpressionNode left;
+	public Expression left;
 	public int type;
-	public ExpressionNode right;
+	public Expression right;
+	
+	@Override
+	public void resolveImports(ClassLookup c) throws IOException {
+		left.resolveImports(c);
+		right.resolveImports(c);
+	}
+	
 }

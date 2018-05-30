@@ -1,7 +1,7 @@
 package tree;
 
 /** left >>> right (0 filled) */
-public class RightShiftLogExpressionNode implements ExpressionNode {
-    public ExpressionNode left;
-    public ExpressionNode right;
+public class RightShiftLogExpressionNode implements Expression {
+    public Expression left;
+    public Expression right;
 }

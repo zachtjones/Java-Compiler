@@ -1,7 +1,7 @@
 package tree;
 
 /* left instanceof right */
-public class InstanceOfExpressionNode implements ExpressionNode {
-    public ExpressionNode left;
+public class InstanceOfExpressionNode implements Expression {
+    public Expression left;
     public TypeNode right;
 }

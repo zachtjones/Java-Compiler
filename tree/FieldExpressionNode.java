@@ -1,5 +1,5 @@
 package tree;
 
-public class FieldExpressionNode implements ExpressionNode {
+public class FieldExpressionNode implements Expression {
     public String identifier;
 }

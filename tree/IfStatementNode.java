@@ -11,7 +11,7 @@ import intermediate.LabelStatement;
 import intermediate.RegisterAllocator;
 
 public class IfStatementNode implements Node {
-    public ExpressionNode expression;
+    public Expression expression;
     public StatementNode statement;
     public StatementNode elsePart;
     
@@ -29,8 +29,8 @@ public class IfStatementNode implements Node {
 		// create new scope
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.local);
 		
-		LabelStatement elseLbl = new LabelStatement("L_ELSE" + r.getNum());
-		LabelStatement endLbl = new LabelStatement("L_END" + r.getNum());
+		LabelStatement elseLbl = new LabelStatement("L_ELSE" + r.getNextLabel());
+		LabelStatement endLbl = new LabelStatement("L_END" + r.getNextLabel());
 		
 		// if expression == 0, goto else
 		// start with the expression

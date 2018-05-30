@@ -9,7 +9,7 @@ import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
 public class SwitchStatementNode implements Node {
-    public ExpressionNode expression;
+    public Expression expression;
     // these next two are same length
     public ArrayList<SwitchLabelNode> labels;
     public ArrayList<ArrayList<BlockStatementNode> > statements;

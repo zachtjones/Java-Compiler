@@ -1,6 +1,6 @@
 package tree;
 
 /** ++ expr */
-public class PreIncrementExpressionNode implements ExpressionNode {
-    public ExpressionNode expr;
+public class PreIncrementExpressionNode implements Expression {
+    public Expression expr;
 }

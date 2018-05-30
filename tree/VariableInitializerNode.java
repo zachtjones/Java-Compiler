@@ -14,7 +14,7 @@ public class VariableInitializerNode implements Node {
     public ArrayList<VariableInitializerNode> nextLevel = new ArrayList<>();
 
     /** this is just a normal expression */
-    public ExpressionNode e;
+    public Expression e;
 
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

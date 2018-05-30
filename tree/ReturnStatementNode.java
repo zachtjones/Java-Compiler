@@ -11,7 +11,7 @@ import intermediate.ReturnVoidStatement;
 
 public class ReturnStatementNode implements Node {
     // could be null
-    public ExpressionNode expression;
+    public Expression expression;
 
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

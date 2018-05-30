@@ -8,7 +8,7 @@ import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
 public class SwitchLabelNode implements Node {
-    public ExpressionNode expression;
+    public Expression expression;
     public boolean isDefault; // if default, no expression
     
 	@Override

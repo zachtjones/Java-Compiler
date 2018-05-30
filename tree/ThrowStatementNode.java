@@ -9,7 +9,7 @@ import intermediate.RegisterAllocator;
 import intermediate.ThrowStatement;
 
 public class ThrowStatementNode implements Node {
-    public ExpressionNode expression;
+    public Expression expression;
 
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

@@ -1,7 +1,7 @@
 package tree;
 
 /** left % right */
-public class ModExpressionNode implements ExpressionNode {
-    public ExpressionNode left;
-    public ExpressionNode right;
+public class ModExpressionNode implements Expression {
+    public Expression left;
+    public Expression right;
 }

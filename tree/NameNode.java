@@ -8,7 +8,7 @@ import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
-public class NameNode implements Node, ExpressionNode {
+public class NameNode implements Node, Expression {
     public String primaryName;
     public NameNode extendsNode; // used in class / interface declarations
     public ArrayList<NameNode> generics;

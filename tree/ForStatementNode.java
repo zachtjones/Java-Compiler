@@ -13,7 +13,7 @@ import intermediate.RegisterAllocator;
 public class ForStatementNode implements Node {
     // these 3 are all optional, so could be null
     public ForInitNode init;
-    public ExpressionNode condition;
+    public Expression condition;
     public ArrayList<StatementExprNode> update;
     // the block of code
     public StatementNode block;
@@ -38,8 +38,8 @@ public class ForStatementNode implements Node {
 		
 		// label condition -> condition -> if false, branch end 
 		//   -> block -> jump condition -> label end
-		LabelStatement conditionLabel = new LabelStatement("L_COND_" + r.getNum());
-		LabelStatement endLabel = new LabelStatement("L_END_" + r.getNum());
+		LabelStatement conditionLabel = new LabelStatement("L_COND_" + r.getNextLabel());
+		LabelStatement endLabel = new LabelStatement("L_END_" + r.getNextLabel());
 		
 		// add in condition label
 		f.statements.add(conditionLabel);

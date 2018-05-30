@@ -9,7 +9,7 @@ import intermediate.RegisterAllocator;
 
 /** synchronized (expression) block */
 public class SynchronizedStatementNode implements Node {
-    public ExpressionNode expression;
+    public Expression expression;
     public BlockNode block;
     
 	@Override

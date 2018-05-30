@@ -1,6 +1,6 @@
 package tree;
 
 /** ! expr */
-public class LogicalNotExpressionNode implements ExpressionNode {
-    public ExpressionNode expr;
+public class LogicalNotExpressionNode implements Expression {
+    public Expression expr;
 }

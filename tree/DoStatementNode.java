@@ -12,7 +12,7 @@ import intermediate.RegisterAllocator;
 /** do { statement } while (expression); */
 public class DoStatementNode implements Node {
     public StatementNode statement;
-    public ExpressionNode expression;
+    public Expression expression;
     
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {
@@ -23,7 +23,7 @@ public class DoStatementNode implements Node {
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
 		// label at top of statement
-		LabelStatement l = new LabelStatement("L_L" + r.getNum());
+		LabelStatement l = new LabelStatement("L_L" + r.getNextLabel());
 		f.statements.add(l);
 		// then follows the statement
 		statement.compile(s, f, r);

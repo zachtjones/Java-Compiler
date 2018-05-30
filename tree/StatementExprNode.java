@@ -14,7 +14,7 @@ public class StatementExprNode implements Node {
 	public boolean isAssignment;
 
 	// this holds the expression of type from above
-	public ExpressionNode expression;
+	public Expression expression;
 
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {
