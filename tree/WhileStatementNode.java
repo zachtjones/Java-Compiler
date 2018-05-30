@@ -11,7 +11,7 @@ import intermediate.LabelStatement;
 import intermediate.RegisterAllocator;
 
 public class WhileStatementNode implements Node {
-    public ExpressionNode expression;
+    public Expression expression;
     public StatementNode statement;
     
 	@Override
@@ -23,9 +23,9 @@ public class WhileStatementNode implements Node {
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
 		// label for expression
-		LabelStatement exprLbl = new LabelStatement("L_COND_" + r.getNum());
+		LabelStatement exprLbl = new LabelStatement("L_COND_" + r.getNextLabel());
 		// label for ending
-		LabelStatement endLbl = new LabelStatement("L_END_" + r.getNum());
+		LabelStatement endLbl = new LabelStatement("L_END_" + r.getNextLabel());
 		
 		// add in the label for expression
 		f.statements.add(exprLbl);
