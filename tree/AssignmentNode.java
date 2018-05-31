@@ -4,8 +4,11 @@ import java.io.IOException;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.CopyStatement;
 import intermediate.InterFunction;
+import intermediate.Register;
 import intermediate.RegisterAllocator;
+import intermediate.StoreAddressStatement;
 
 /** left type right */
 public class AssignmentNode implements Expression {
@@ -30,6 +33,35 @@ public class AssignmentNode implements Expression {
 	public void resolveImports(ClassLookup c) throws IOException {
 		left.resolveImports(c);
 		right.resolveImports(c);
+	}
+
+	@Override
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+		if (type == ASSIGN) {
+			if (!(left instanceof LValue)) {
+				throw new CompileException("Error: left side of = expression not able to assign to.");
+			}
+			right.compile(s, f, r);
+			Register rightResult = r.getLast();
+			
+			LValue leftSide = (LValue)left;
+			leftSide.compileAddress(s, f, r);
+			Register leftAddress = r.getLast(); // a reference
+			
+			// store the result of the right side into the address
+			StoreAddressStatement store = new StoreAddressStatement(rightResult, leftAddress);
+			f.statements.add(store);
+			
+			// the result of an assign is the expression on the right
+			// this allows for x = y = 5;
+			Register result = r.getNext(rightResult.type);
+			f.statements.add(new CopyStatement(rightResult, result));
+		} else {
+			// TODO - make a new tree node
+			// x += 5 ->  x = x + 5;
+			throw new CompileException("Error: compound assignment not supported yet.");
+		}
+		
 	}
 	
 }
