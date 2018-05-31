@@ -3,6 +3,7 @@ package intermediate;
 /** dest = OP src2 */
 public class UnaryOpStatement implements InterStatement {
 	public static final char BITNOT = '~';
+	public static final char LOGNOT = '!';
 	
 	Register src1;
 	Register dest;
