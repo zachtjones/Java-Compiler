@@ -6,6 +6,7 @@ public class SetConditionStatement implements InterStatement {
 	public static final int LESSEQUAL = 2;
 	public static final int LESS = 3;
 	public static final int EQUAL = 4; // if they are equal, ==
+	public static final int NOTEQUAL = 5;
 	
 	int type;
 	Register left;
@@ -30,8 +31,10 @@ public class SetConditionStatement implements InterStatement {
 			return leftPart + " <= " + right.toString() + ";";
 		} else if (type == LESS){
 			return leftPart + " < " + right.toString() + ";";
-		} else {
+		} else if (type == EQUAL){
 			return leftPart + " == " + right.toString() + ";";
+		} else {
+			return leftPart + " != " + right.toString() + ";";
 		}
 	}
 }
