@@ -6,6 +6,7 @@ public class BinaryOpStatement implements InterStatement {
 	public static final char AND = '&';
 	public static final char OR = '|';
 	public static final char XOR = '^';
+	public static final char DIV = '/';
 	
 	Register src1;
 	Register src2;
