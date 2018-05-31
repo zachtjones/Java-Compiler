@@ -8,6 +8,7 @@ public class BinaryOpStatement implements InterStatement {
 	public static final char OR = '|';
 	public static final char XOR = '^';
 	public static final char DIV = '/';
+	public static final char MOD = '%';
 	public static final int LSHIFT = 0;
 	public static final int RSHIFTARITH = 1; // sign-filled
 	public static final int RSHIFTLOG = 2; // 0 filled.
