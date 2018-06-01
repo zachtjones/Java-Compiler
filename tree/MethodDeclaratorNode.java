@@ -23,6 +23,9 @@ public class MethodDeclaratorNode implements Node {
 
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+		// set the name
+		f.name = name;
+		
 		// s is for the parameters, place them in s
 		for (ParamNode p : params) {
 			s.putEntry(p.id.name, p.type.interRep());

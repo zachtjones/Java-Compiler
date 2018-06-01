@@ -48,6 +48,9 @@ public class MethodNode {
 			throw new CompileException("native methods not implemented yet.");
 		}
 		
+		func.isInstance = !isStatic;
+		func.returnType = resultType.toString();
+		
 		// TODO - final and synchronized, ... modifiers
 		
 		RegisterAllocator r = new RegisterAllocator();
