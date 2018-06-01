@@ -33,31 +33,35 @@ public class InterFunction {
 		} else {
 			sb.append("static ");
 		}
-		sb.append(name);
-		// parameters
-		sb.append(" (");
-		for (int i = 0; i < paramTypes.size(); i++) {
-			sb.append(paramNames.get(i));
-			sb.append('<');
-			sb.append(paramTypes.get(i));
-			sb.append('>');
-			sb.append(' ');
-		}
-		sb.append(')');
-		
-		sb.append(" returns ");
-		sb.append(returnType);
-		
-		// throws list
-		if (this.throwsList.size() != 0) {
-			sb.append(" throws(");
-			for (String s : throwsList) {
-				sb.append(s);
+		if (isInit) {
+			sb.append("init\n");
+		} else {
+			sb.append(name);
+			// parameters
+			sb.append(" (");
+			for (int i = 0; i < paramTypes.size(); i++) {
+				sb.append(paramNames.get(i));
+				sb.append('<');
+				sb.append(paramTypes.get(i));
+				sb.append('>');
 				sb.append(' ');
 			}
 			sb.append(')');
+
+			sb.append(" returns ");
+			sb.append(returnType);
+
+			// throws list
+			if (this.throwsList.size() != 0) {
+				sb.append(" throws(");
+				for (String s : throwsList) {
+					sb.append(s);
+					sb.append(' ');
+				}
+				sb.append(')');
+			}
+			sb.append('\n');
 		}
-		sb.append('\n');
 		
 		// body
 		for (InterStatement s : statements) {
