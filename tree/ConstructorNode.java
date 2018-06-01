@@ -47,6 +47,7 @@ public class ConstructorNode {
 	 * @throws CompileException If there is a compiling error.
 	 */
 	public void compile(InterFile f, SymbolTable s) throws CompileException {
+		System.out.println("Should handle parsing of Explicit super() or this() in constructor declarations.");
 		// name is <init>
 		InterFunction func = new InterFunction();
 		func.name = "<init>";
