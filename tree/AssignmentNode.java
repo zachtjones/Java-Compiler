@@ -39,7 +39,7 @@ public class AssignmentNode implements Expression {
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
 		if (type == ASSIGN) {
 			if (!(left instanceof LValue)) {
-				throw new CompileException("Error: left side of = expression not able to assign to.");
+				throw new CompileException("left side of = expression not able to assign to. " + left.toString());
 			}
 			right.compile(s, f, r);
 			Register rightResult = r.getLast();
@@ -59,7 +59,7 @@ public class AssignmentNode implements Expression {
 		} else {
 			// TODO - make a new tree node
 			// x += 5 ->  x = x + 5;
-			throw new CompileException("Error: compound assignment not supported yet.");
+			throw new CompileException("compound assignment not supported yet.");
 		}
 		
 	}
