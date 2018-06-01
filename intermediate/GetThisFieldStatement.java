@@ -16,6 +16,6 @@ public class GetThisFieldStatement implements InterStatement {
 	
 	@Override
 	public String toString() {
-		return "getThisField %" + r.toString() + " = " + fieldName + ";";
+		return "getThisField " + r.toString() + " = " + fieldName + ";";
 	}
 }
