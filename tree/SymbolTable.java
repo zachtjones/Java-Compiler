@@ -66,7 +66,7 @@ public class SymbolTable {
 	public String getType(String identifier) {
 		String result = entries.get(identifier);
 		if (result == null && outer != null) {
-			result = outer.entries.get(identifier);
+			result = outer.getType(identifier);
 		}
 		return result;
 	}
