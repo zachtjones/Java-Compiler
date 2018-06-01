@@ -5,8 +5,12 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.GetLocalAddressStatement;
 import intermediate.GetLocalStatement;
+import intermediate.GetParamAddressStatement;
 import intermediate.GetParamStatement;
+import intermediate.GetThisFieldAddressStatement;
+import intermediate.GetThisFieldStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.RegisterAllocator;
@@ -63,6 +67,8 @@ public class NameNode implements Node, Expression, LValue {
 			f.statements.add(new GetLocalStatement(result, primaryName));
 		} else if (tableLookup == SymbolTable.parameter) {
 			f.statements.add(new GetParamStatement(result, primaryName));
+		} else if (tableLookup == SymbolTable.className){
+			f.statements.add(new GetThisFieldStatement(result, primaryName));
 		} else {
 			throw new CompileException("don't know what to do for symbol: " + primaryName + " in NameNode.java");
 		}
@@ -75,7 +81,21 @@ public class NameNode implements Node, Expression, LValue {
 
 	@Override
 	public void compileAddress(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
-		// TODO Auto-generated method stub
-		
+		// on the right side, get the result
+		int tableLookup = s.lookup(primaryName);
+		if (tableLookup == -1) {
+			throw new CompileException("symbol: " + primaryName + " is not defined before use.");
+		}
+		String type = s.getType(primaryName);
+		Register result = r.getNext(type);
+		if (tableLookup == SymbolTable.local) {
+			f.statements.add(new GetLocalAddressStatement(result, primaryName));
+		} else if (tableLookup == SymbolTable.parameter) {
+			f.statements.add(new GetParamAddressStatement(result, primaryName));
+		} else if (tableLookup == SymbolTable.className){
+			f.statements.add(new GetThisFieldAddressStatement(result, primaryName));
+		} else {
+			throw new CompileException("don't know what to do for symbol: " + primaryName + " in NameNode.java");
+		}
 	}
 }
