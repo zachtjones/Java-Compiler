@@ -59,6 +59,19 @@ public class SymbolTable {
 	}
 	
 	/**
+	 * Gets the type of the identifier, or null if not found.
+	 * @param identifier The identifier to find the type of.
+	 * @return A string that is the intermediate file's representation of the type.
+	 */
+	public String getType(String identifier) {
+		String result = entries.get(identifier);
+		if (result == null && outer != null) {
+			result = outer.entries.get(identifier);
+		}
+		return result;
+	}
+	
+	/**
 	 * Places the entry into this symbol table
 	 * @param identifier The identifier to place
 	 * @param type The identifier's type.
