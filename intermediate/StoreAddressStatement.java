@@ -12,6 +12,6 @@ public class StoreAddressStatement implements InterStatement {
 	
 	@Override
 	public String toString() {
-		return "put " + src.toString() + " at " + addr.toString() + ";";
+		return "store " + src.toString() + " at " + addr.toString() + ";";
 	}
 }
