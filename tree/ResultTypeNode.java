@@ -20,4 +20,10 @@ public class ResultTypeNode implements Node {
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
 		// nothing to do here.
 	}
+	
+	@Override
+	public String toString() {
+		if (isVoid) { return "void"; }
+		return type.interRep();
+	}
 }
