@@ -17,6 +17,6 @@ public class GetParamStatement implements InterStatement {
 	
 	@Override
 	public String toString() {
-		return "getParam %" + r.toString() + " = " + localName + ";";
+		return "getParam " + r.toString() + " = " + localName + ";";
 	}
 }
