@@ -16,14 +16,11 @@ import intermediate.Register;
 import intermediate.RegisterAllocator;
 
 public class NameNode implements Node, Expression, LValue {
-    public String primaryName;
-    public NameNode extendsNode; // used in class / interface declarations
-    public ArrayList<NameNode> generics;
-    public NameNode secondaryName;
-    
-    /** holds the scope resolved from the symbol table*/
-    private int scope;
-    
+	public String primaryName;
+	public NameNode extendsNode; // used in class / interface declarations
+	public ArrayList<NameNode> generics;
+	public NameNode secondaryName;
+
 	/** Gets the simple name (like java.lang) for this name node, 
 	 * using the secondary name if needed.
 	 * Generics are not filled in */
@@ -72,11 +69,6 @@ public class NameNode implements Node, Expression, LValue {
 		} else {
 			throw new CompileException("don't know what to do for symbol: " + primaryName + " in NameNode.java");
 		}
-	}
-    
-	/** Holds one of the constants from the SymbolTable class. */
-	public int getScope() {
-		return scope;
 	}
 
 	@Override
