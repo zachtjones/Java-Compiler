@@ -6,7 +6,7 @@ public class GetParamStatement implements InterStatement {
 	String localName;
 	
 	/**
-	 * Creates a new put local variable statement.
+	 * Creates a new get parameter variable statement.
 	 * @param registerNum The register number to set
 	 * @param localName The parameter to get.
 	 */
