@@ -17,47 +17,47 @@ public class LoadLiteralStatement implements InterStatement {
 	// 4 types of literals: char, String, long, double.
 	public Register r;
 	
-	public LoadLiteralStatement(String literalValue, int registerNum) throws CompileException {
+	public LoadLiteralStatement(String literalValue, RegisterAllocator regAlloc) throws CompileException {
 		value = literalValue; // or set to something else later.
 		if (literalValue.charAt(0) == '"') {
 			type = STRING;
-			r = new Register(registerNum, Register.REFERENCE);
+			r = regAlloc.getNext(Register.REFERENCE);
 		} else if (literalValue.charAt(0) == '\'') {
 			type = CHAR;
-			r = new Register(registerNum, Register.SHORT); // character are 16-bit in Java
+			r = regAlloc.getNext(Register.SHORT); // chars are 16-bit
 		} else if (literalValue.equals("true")) {
 			type = BYTE;
 			value = "1";
-			r = new Register(registerNum, Register.BYTE);
+			r = regAlloc.getNext(Register.BYTE);
 		} else if (literalValue.equals("false")) {
 			type = BYTE;
 			value = "0";
-			r = new Register(registerNum, Register.BYTE);
+			r = regAlloc.getNext(Register.BYTE);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'f') {
 			type = FLOAT;
-			r = new Register(registerNum, Register.FLOAT);
+			r = regAlloc.getNext(Register.FLOAT);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'F') {
 			type = FLOAT;
-			r = new Register(registerNum, Register.FLOAT);
+			r = regAlloc.getNext(Register.FLOAT);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'd') {
 			type = DOUBLE;
-			r = new Register(registerNum, Register.DOUBLE);
+			r = regAlloc.getNext(Register.DOUBLE);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'D') {
 			type = DOUBLE;
-			r = new Register(registerNum, Register.DOUBLE);
+			r = regAlloc.getNext(Register.DOUBLE);
 		} else if (literalValue.contains(".")) {
 			type = DOUBLE; // default
-			r = new Register(registerNum, Register.DOUBLE);
+			r = regAlloc.getNext(Register.DOUBLE);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'l') {
 			type = LONG;
-			r = new Register(registerNum, Register.LONG);
+			r = regAlloc.getNext(Register.LONG);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'L') {
 			type = LONG;
-			r = new Register(registerNum, Register.LONG);
+			r = regAlloc.getNext(Register.LONG);
 		} else {
 			// should be an int (bytes & shorts don't have literals)
 			type = INT;
-			r = new Register(registerNum, Register.INT);
+			r = regAlloc.getNext(Register.INT);
 			try {
 				Integer.parseInt(literalValue);
 			} catch(NumberFormatException e) {

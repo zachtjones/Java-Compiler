@@ -20,7 +20,6 @@ public class LiteralExpressionNode implements Expression {
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
 		// the IL code does the work here
-		int number = r.getNextLabel();
-		f.statements.add(new LoadLiteralStatement(value, number));	
+		f.statements.add(new LoadLiteralStatement(value, r));	
 	}
 }
