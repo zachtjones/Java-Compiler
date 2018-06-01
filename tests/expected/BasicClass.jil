@@ -1,0 +1,43 @@
+// file: BasicClass.jil
+
+structure instance
+	int b;
+end structure
+
+structure static
+	int a;
+end structure
+
+function instance init
+	load 2 to %i1;
+	getThisFieldAddress %i2 = b;
+	store %i1 at %i2;
+	copy %i3 = %i1;
+end function
+function static init
+	load 1 to %i1;
+	getThisFieldAddress %i2 = a;
+	store %i1 at %i2;
+	copy %i3 = %i1;
+end function
+function instance setB (c<int> ) returns void
+	getParam %i1 = c;
+	getThisFieldAddress %i2 = b;
+	store %i1 at %i2;
+	copy %i3 = %i1;
+end function
+function instance getB () returns int
+	getThisField %i1 = b;
+	return %i1;
+end function
+function static setA (c<int> ) returns void
+	getParam %i1 = c;
+	getThisFieldAddress %i2 = a;
+	store %i1 at %i2;
+	copy %i3 = %i1;
+end function
+function static getA () returns void
+	getThisField %i1 = a;
+	return %i1;
+end function
+
