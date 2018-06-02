@@ -45,7 +45,7 @@ public class AssignmentNode implements Expression {
 			Register rightResult = r.getLast();
 			
 			LValue leftSide = (LValue)left;
-			leftSide.compileAddress(s, f, r);
+			leftSide.compileAddress(s, f, r, c);
 			Register leftAddress = r.getLast(); // a reference
 			
 			// store the result of the right side into the address
