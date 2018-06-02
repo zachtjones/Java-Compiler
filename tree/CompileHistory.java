@@ -6,5 +6,16 @@ package tree;
  * so if the next Node is (a+b, c), the compiler knows what to do.
  */
 public class CompileHistory {
+	
+	private boolean lastWasThis;
+	
+	/** Call if the last expression parsed was "this" */
+	public void setThis() {
+		lastWasThis = true;
+	}
+	
+	public boolean wasThisLast() {
+		return lastWasThis;
+	}
 
 }
