@@ -60,6 +60,7 @@ public class FieldDeclarationNode {
 				func.isInit = true;
 				func.isInstance = !isStatic;
 				RegisterAllocator r = new RegisterAllocator();
+				CompileHistory c = new CompileHistory();
 				a.compile(syms, func, r, c);
 				f.addFunction(func);
 			}
