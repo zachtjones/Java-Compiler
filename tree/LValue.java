@@ -13,7 +13,8 @@ public interface LValue extends Expression {
 	 * PrimaryExpression in the parser and rules that generate that can be LValue's.
      * @param s The symbol table reference to the innermost scope at 
      * that point. Only null going to the Compilation unit class. 
-     * @param f The intermediate function to add the code. 
-     * @param r The register allocator to get new numbers from. (also used for labels) */
-    public void compileAddress(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException;
+	 * @param f The intermediate function to add the code. 
+	 * @param r The register allocator to get new numbers from. (also used for labels) 
+	 * @param c This compile history object to use */
+    public void compileAddress(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException;
 }
