@@ -21,7 +21,7 @@ public class NameNode implements Node, Expression, LValue {
 	public ArrayList<NameNode> generics;
 	public NameNode secondaryName;
 
-	/** Gets the simple name (like java.lang) for this name node, 
+	/** Gets the simple name (like java.lang) for this name node,
 	 * using the secondary name if needed.
 	 * Generics are not filled in */
 	public String getSimpleName() {
@@ -73,7 +73,7 @@ public class NameNode implements Node, Expression, LValue {
 
 	@Override
 	public void compileAddress(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
-		// on the right side, get the result
+		// on the left side, get the address
 		int tableLookup = s.lookup(primaryName);
 		if (tableLookup == -1) {
 			throw new CompileException("symbol: " + primaryName + " is not defined before use.");
