@@ -76,6 +76,7 @@ public class ConstructorNode {
 		// TODO func.statements.add(new );
 		
 		// compile the block
+		CompileHistory c = new CompileHistory();
 		for (BlockStatementNode b : this.code) {
 			b.compile(newTable, func, r, c);
 		}
