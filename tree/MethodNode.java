@@ -54,6 +54,7 @@ public class MethodNode {
 		// TODO - final and synchronized, ... modifiers
 		
 		RegisterAllocator r = new RegisterAllocator();
+		CompileHistory c = new CompileHistory();
 		
 		// create new scope, use the declaratorNode to add to the new scope
 		SymbolTable paramTable = new SymbolTable(syms, SymbolTable.parameter);
