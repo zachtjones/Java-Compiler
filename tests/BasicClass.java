@@ -16,7 +16,7 @@ public class BasicClass {
 		a = c;
 	}
 
-	public static void getA() {
+	public static int getA() {
 		return a;
 	}
 }
