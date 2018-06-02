@@ -36,12 +36,12 @@ public class AssignmentNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		if (type == ASSIGN) {
 			if (!(left instanceof LValue)) {
 				throw new CompileException("left side of = expression not able to assign to. " + left.toString());
 			}
-			right.compile(s, f, r);
+			right.compile(s, f, r, c);
 			Register rightResult = r.getLast();
 			
 			LValue leftSide = (LValue)left;

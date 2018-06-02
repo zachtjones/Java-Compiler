@@ -17,7 +17,7 @@ public class VariableIdNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// nothing needed
 	}
 }

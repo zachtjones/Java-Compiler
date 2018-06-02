@@ -21,7 +21,7 @@ public class WhileStatementNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// label for expression
 		LabelStatement exprLbl = new LabelStatement("L_COND_" + r.getNextLabel());
 		// label for ending
@@ -30,13 +30,13 @@ public class WhileStatementNode implements Node {
 		// add in the label for expression
 		f.statements.add(exprLbl);
 		// compile in expression
-		expression.compile(s, f, r);
+		expression.compile(s, f, r, c);
 		
 		// if false, goto end
 		f.statements.add(new BranchStatementEQZ(endLbl, r.getLast()));
 		
 		// compile in the block
-		statement.compile(s, f, r);
+		statement.compile(s, f, r, c);
 		
 		// unconditional jump to the expression
 		f.statements.add(new JumpStatement(exprLbl));

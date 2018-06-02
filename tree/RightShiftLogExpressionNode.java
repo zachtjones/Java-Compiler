@@ -21,11 +21,11 @@ public class RightShiftLogExpressionNode implements Expression {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
-		left.compile(s, f, r);
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+		left.compile(s, f, r, c);
 		Register leftResult = r.getLast();
 		
-		right.compile(s, f, r);
+		right.compile(s, f, r, c);
 		Register rightResult = r.getLast();
 		
 		// result is of type left

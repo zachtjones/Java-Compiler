@@ -21,12 +21,12 @@ public class ModExpressionNode implements Expression {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// evaluate left
-		left.compile(s, f, r);
+		left.compile(s, f, r, c);
 		Register leftResult = r.getLast();
 		// evaluate right
-		right.compile(s, f, r);
+		right.compile(s, f, r, c);
 		Register rightResult = r.getLast();
 
 		// add them

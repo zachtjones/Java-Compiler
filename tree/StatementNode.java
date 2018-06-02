@@ -57,35 +57,35 @@ public class StatementNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		if (statement != null) {
-			statement.compile(s, f, r);
+			statement.compile(s, f, r, c);
 		} else if (labeled != null) {
-			labeled.compile(s, f, r);
+			labeled.compile(s, f, r, c);
 		} else if (block != null) {
-			block.compile(s, f, r);
+			block.compile(s, f, r, c);
 		} else if (switchNode != null) {
-			switchNode.compile(s, f, r);
+			switchNode.compile(s, f, r, c);
 		} else if (ifNode != null) {
-			ifNode.compile(s, f, r);
+			ifNode.compile(s, f, r, c);
 		} else if (whileNode != null) {
-			whileNode.compile(s, f, r);
+			whileNode.compile(s, f, r, c);
 		} else if (doNode != null) {
-			doNode.compile(s, f, r);
+			doNode.compile(s, f, r, c);
 		} else if (forNode != null) {
-			forNode.compile(s, f, r);
+			forNode.compile(s, f, r, c);
 		} else if (breakNode != null) {
-			breakNode.compile(s, f, r);
+			breakNode.compile(s, f, r, c);
 		} else if (continueNode != null) {
-			continueNode.compile(s, f, r);
+			continueNode.compile(s, f, r, c);
 		} else if (returnNode != null) {
-			returnNode.compile(s, f, r);
+			returnNode.compile(s, f, r, c);
 		} else if (throwNode != null) {
-			throwNode.compile(s, f, r);
+			throwNode.compile(s, f, r, c);
 		} else if (synchNode != null) {
-			synchNode.compile(s, f, r);
+			synchNode.compile(s, f, r, c);
 		} else if (tryNode != null) {
-			tryNode.compile(s, f, r);
+			tryNode.compile(s, f, r, c);
 		}
 	}
 

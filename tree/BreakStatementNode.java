@@ -14,7 +14,7 @@ public class BreakStatementNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// nothing needed, check if name is in symbol table for
 		//  the compile method if name != null.
 	}

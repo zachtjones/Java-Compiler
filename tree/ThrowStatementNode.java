@@ -17,9 +17,9 @@ public class ThrowStatementNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// compile in the expression
-		expression.compile(s, f, r);
+		expression.compile(s, f, r, c);
 		// throw the result of the expression.
 		ThrowStatement th = new ThrowStatement(r.getLast());
 		f.statements.add(th);

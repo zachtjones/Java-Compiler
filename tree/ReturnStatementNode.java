@@ -19,10 +19,10 @@ public class ReturnStatementNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// compile in the expression
 		if (expression != null) {
-			expression.compile(s, f, r);
+			expression.compile(s, f, r, c);
 			f.statements.add(new ReturnRegStatement(r.getLast()));
 		} else {
 			// just compile in the return statement.

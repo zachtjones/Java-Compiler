@@ -17,7 +17,7 @@ public class ParamNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// already dealt with in MethodNode or ConstructorNode.
 	}
 }

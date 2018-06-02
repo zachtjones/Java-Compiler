@@ -22,12 +22,12 @@ public class BlockNode implements Node {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// create new scope for variables
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.local);
 		// compile with this new table, placing declarations where needed.
 		for (BlockStatementNode b : statements) {
-			b.compile(newTable, f, r);
+			b.compile(newTable, f, r, c);
 		}
 		// remove all new symbols from the table
 		HashMap<String, String> entries = s.getCurrentEntries();

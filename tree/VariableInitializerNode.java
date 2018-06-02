@@ -28,9 +28,9 @@ public class VariableInitializerNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		if (e != null) {
-			e.compile(s, f, r);
+			e.compile(s, f, r, c);
 		} else {
 			throw new CompileException("array initializer expressions with items not implemented.");
 		}

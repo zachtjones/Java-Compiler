@@ -25,7 +25,7 @@ public class IfStatementNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// create new scope
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.local);
 		
@@ -34,12 +34,12 @@ public class IfStatementNode implements Node {
 		
 		// if expression == 0, goto else
 		// start with the expression
-		expression.compile(newTable, f, r);
+		expression.compile(newTable, f, r, c);
 		// branch if == 0 to else (false)
 		f.statements.add(new BranchStatementEQZ(elseLbl, r.getLast()));
 		
 		// compile in the true part
-		statement.compile(newTable, f, r);
+		statement.compile(newTable, f, r, c);
 		// true part -> jump to end
 		f.statements.add(new JumpStatement(endLbl));
 		
@@ -47,7 +47,7 @@ public class IfStatementNode implements Node {
 		f.statements.add(elseLbl);
 		// compile in the else part
 		if (elsePart != null) {
-			elsePart.compile(newTable, f, r);
+			elsePart.compile(newTable, f, r, c);
 		}
 		
 		// add in end label

@@ -19,7 +19,7 @@ public class SynchronizedStatementNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		throw new CompileException("Synchronized blocks not implemented yet.");
 		
 		/*expression.compile(s, f, r);

@@ -15,6 +15,7 @@ public interface Node {
      * @param s The symbol table reference to the innermost scope at 
      * that point. Only null going to the Compilation unit class. 
      * @param f The intermediate function to add the code. 
-     * @param r The register allocator to get new numbers from. (also used for labels) */
-    public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException;
+     * @param r The register allocator to get new numbers from. (also used for labels) 
+     * @param c The CompileHistory object to use for decision making. */
+    public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException;
 }

@@ -22,12 +22,12 @@ public class BlockStatementNode implements Node {
 	}
     
     @Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// pass down -- local variable declaration puts an entry
     	if (statement != null) {
-    		statement.compile(s, f, r);
+    		statement.compile(s, f, r, c);
     	} else {
-    		dec.compile(s, f, r);
+    		dec.compile(s, f, r, c);
     	}
 		
 	}

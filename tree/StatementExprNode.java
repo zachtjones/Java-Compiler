@@ -22,9 +22,9 @@ public class StatementExprNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// just pass down
-		expression.compile(s, f, r);
+		expression.compile(s, f, r, c);
 	}
 
 }

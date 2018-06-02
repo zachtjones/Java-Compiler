@@ -26,12 +26,12 @@ public class ForInitNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		if (dec != null) {
-			dec.compile(s, f, r);
+			dec.compile(s, f, r, c);
 		} else {
 			for (StatementExprNode s1 : items) {
-				s1.compile(s, f, r);
+				s1.compile(s, f, r, c);
 			}
 		}
 		

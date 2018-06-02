@@ -57,11 +57,11 @@ public class MethodNode {
 		
 		// create new scope, use the declaratorNode to add to the new scope
 		SymbolTable paramTable = new SymbolTable(syms, SymbolTable.parameter);
-		dec.compile(paramTable, func, r);
+		dec.compile(paramTable, func, r, c);
 		
 		// create new scope under the parameters for the code
 		SymbolTable codeTable = new SymbolTable(paramTable, SymbolTable.local);
-		code.compile(codeTable, func, r);
+		code.compile(codeTable, func, r, c);
 		f.addFunction(func);
 	}
 

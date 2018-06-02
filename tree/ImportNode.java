@@ -17,7 +17,7 @@ public class ImportNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// don't need to resolve imports any more, as they are already done.
 	}
 }

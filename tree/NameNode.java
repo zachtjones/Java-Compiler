@@ -52,7 +52,7 @@ public class NameNode implements Node, Expression, LValue {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// on the right side, get the result
 		int tableLookup = s.lookup(primaryName);
 		if (tableLookup == -1) {

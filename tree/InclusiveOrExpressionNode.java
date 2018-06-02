@@ -22,14 +22,14 @@ public class InclusiveOrExpressionNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// compile in the first one
-		expressions.get(0).compile(s, f, r);
+		expressions.get(0).compile(s, f, r, c);
 
 		// use its result in the next one
 		Register result = r.getLast();
 		for (int i = 1; i < expressions.size(); i++) {
-			expressions.get(i).compile(s, f, r);
+			expressions.get(i).compile(s, f, r, c);
 			// add in OR of the last two
 			Register current = result;
 			Register two = r.getLast();

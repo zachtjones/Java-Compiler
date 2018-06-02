@@ -21,14 +21,14 @@ public class DoStatementNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// label at top of statement
 		LabelStatement l = new LabelStatement("L_L" + r.getNextLabel());
 		f.statements.add(l);
 		// then follows the statement
-		statement.compile(s, f, r);
+		statement.compile(s, f, r, c);
 		// immediately followed by expression
-		expression.compile(s, f, r);
+		expression.compile(s, f, r, c);
 		// conditional jump to top of statement
 		f.statements.add(new BranchStatementNEZ(l, r.getLast()));
 	}

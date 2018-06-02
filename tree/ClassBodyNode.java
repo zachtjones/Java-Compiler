@@ -39,7 +39,7 @@ public class ClassBodyNode {
 		// pass down
 		if (staticInit != null) {
 			InterFunction func = new InterFunction();
-			staticInit.compile(syms, func, r);
+			staticInit.compile(syms, func, r, c);
 			f.addFunction(func);
 		} else if (constructor != null) {
 			constructor.compile(f, syms);
