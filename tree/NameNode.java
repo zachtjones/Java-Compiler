@@ -38,7 +38,11 @@ public class NameNode implements Node, Expression, LValue {
 		// only the first part - the primaryName could be not fully qualified
 		//   in the example: System.out.println
 		//System.out.print("Replace: " + this.getSimpleName());
-		String firstFull = c.getFullName(primaryName);
+		String firstFull = null;
+		try {
+			firstFull = c.getFullName(primaryName);
+		} catch (CompileException e) { /* will never happen */ }
+		
 		String total = firstFull;
 		if (secondaryName != null) {
 			String rest = secondaryName.getSimpleName();
@@ -53,41 +57,81 @@ public class NameNode implements Node, Expression, LValue {
 
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
-		// on the right side, get the result
-		int tableLookup = s.lookup(primaryName);
-		if (tableLookup == -1) {
-			throw new CompileException("symbol: " + primaryName + " is not defined before use.");
-		}
-		String type = s.getType(primaryName);
-		Register result = r.getNext(type);
-		if (tableLookup == SymbolTable.local) {
-			f.statements.add(new GetLocalStatement(result, primaryName));
-		} else if (tableLookup == SymbolTable.parameter) {
-			f.statements.add(new GetParamStatement(result, primaryName));
-		} else if (tableLookup == SymbolTable.className){
-			f.statements.add(new GetThisFieldStatement(result, primaryName));
+		if (!primaryName.contains(".")) {
+			// on the right side, get the result
+			int tableLookup = s.lookup(primaryName);
+			if (tableLookup == -1) {
+				throw new CompileException("symbol: " + primaryName + " is not defined before use.");
+			}
+			String type = s.getType(primaryName);
+			Register result = r.getNext(type);
+			if (tableLookup == SymbolTable.local) {
+				f.statements.add(new GetLocalStatement(result, primaryName));
+			} else if (tableLookup == SymbolTable.parameter) {
+				f.statements.add(new GetParamStatement(result, primaryName));
+			} else if (tableLookup == SymbolTable.className){
+				f.statements.add(new GetThisFieldStatement(result, primaryName));
+			} else {
+				throw new CompileException("don't know what to do for symbol: " + primaryName + " in NameNode.java");
+			}
 		} else {
-			throw new CompileException("don't know what to do for symbol: " + primaryName + " in NameNode.java");
+			// split it by the .
+			String[] split = primaryName.split("\\."); // split by the . character
+			// construct a primaryExpressionNode
+			PrimaryExpressionNode ex = new PrimaryExpressionNode();
+			// primary prefix is the first part
+			NameNode primary = new NameNode();
+			primary.primaryName = split[0];
+			ex.prefix = primary;
+			ex.suffixes = new ArrayList<Expression>();
+			// the rest are consecutive fieldAccesses
+			for (int i = 1; i < split.length; i++) {
+				FieldExpressionNode field = new FieldExpressionNode();
+				field.identifier = split[i];
+				ex.suffixes.add(field);
+			}
+			// compile the primaryExpressionNode
+			ex.compile(s, f, r, c);
 		}
 	}
 
 	@Override
 	public void compileAddress(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// on the left side, get the address
-		int tableLookup = s.lookup(primaryName);
-		if (tableLookup == -1) {
-			throw new CompileException("symbol: " + primaryName + " is not defined before use.");
-		}
-		String type = s.getType(primaryName);
-		Register result = r.getNext(type);
-		if (tableLookup == SymbolTable.local) {
-			f.statements.add(new GetLocalAddressStatement(result, primaryName));
-		} else if (tableLookup == SymbolTable.parameter) {
-			f.statements.add(new GetParamAddressStatement(result, primaryName));
-		} else if (tableLookup == SymbolTable.className){
-			f.statements.add(new GetThisFieldAddressStatement(result, primaryName));
+		if (!primaryName.contains(".")) {
+			int tableLookup = s.lookup(primaryName);
+			if (tableLookup == -1) {
+				throw new CompileException("symbol: " + primaryName + " is not defined before use.");
+			}
+			String type = s.getType(primaryName);
+			Register result = r.getNext(type);
+			if (tableLookup == SymbolTable.local) {
+				f.statements.add(new GetLocalAddressStatement(result, primaryName));
+			} else if (tableLookup == SymbolTable.parameter) {
+				f.statements.add(new GetParamAddressStatement(result, primaryName));
+			} else if (tableLookup == SymbolTable.className){
+				f.statements.add(new GetThisFieldAddressStatement(result, primaryName));
+			} else {
+				throw new CompileException("don't know what to do for symbol: " + primaryName + " in NameNode.java");
+			}
 		} else {
-			throw new CompileException("don't know what to do for symbol: " + primaryName + " in NameNode.java");
+			// split it by the .
+			String[] split = primaryName.split("\\."); // split by the . character
+			// construct a primaryExpressionNode
+			PrimaryExpressionNode ex = new PrimaryExpressionNode();
+			// primary prefix is the first part
+			NameNode primary = new NameNode();
+			primary.primaryName = split[0];
+			ex.prefix = primary;
+			ex.suffixes = new ArrayList<Expression>();
+			// the rest are consecutive fieldAccesses
+			for (int i = 1; i < split.length; i++) {
+				FieldExpressionNode field = new FieldExpressionNode();
+				field.identifier = split[i];
+				ex.suffixes.add(field);
+			}
+			// compile address the primaryExpressionNode
+			ex.compileAddress(s, f, r, c);
 		}
 	}
 }
