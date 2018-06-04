@@ -12,21 +12,26 @@ import java.util.Scanner;
 
 import tree.ImportNode;
 import tree.NameNode;
+import tree.SymbolTable;
 
 public class ClassLookup {
 	private static boolean lookedUpJava = false;
 	private static HashMap<String, String> items = new HashMap<String, String>();
 	private static HashMap<String, String> javaItems = new HashMap<String, String>();
 
+	private SymbolTable syms;
+	
 	/**
 	 * Loads the imports to reference the proper items.
 	 * @param fileName The filename of the file currently being parsed.
 	 * @param packageName The package name of the file currently being parsed,
 	 *  or null.
 	 * @param imports The ArrayList of ImportNodes that are declared in the final.
+	 * @param classLevel The class level symbol table (from imports)
 	 */
-	public ClassLookup(String fileName, String packageName, ArrayList<ImportNode> imports) {
-
+	public ClassLookup(String fileName, String packageName, ArrayList<ImportNode> imports, SymbolTable classLevel) {
+		syms = classLevel;
+		
 		File thisFile = new File(fileName);
 		// automatically import the files in the same directory / package
 		// if default package (null), fully qualified == short name
@@ -57,8 +62,9 @@ public class ClassLookup {
 	 * @throws IOException A network is used to lookup the java all 
 	 * classes for the first time.
 	 * If there is an issue with this lookup, this exception is thrown.
+	 * @throws CompileException If there is an error compiling.
 	 * */
-	public String getFullName(String shortName) throws IOException {
+	public String getFullName(String shortName) throws IOException, CompileException {
 		if (items.containsKey(shortName)) {
 			return items.get(shortName);
 		}
@@ -72,8 +78,9 @@ public class ClassLookup {
 
 	/** Looks up the java name. Note this might require a network connection,
 	 * and the java name could be java.util.* or javax.* or similar classes.
+	 * @throws CompileException If there is a compile exception.
 	 * */
-	private String lookupJavaName(String shortName) throws IOException {
+	private String lookupJavaName(String shortName) throws IOException, CompileException {
 		if (!lookedUpJava) {
 			File f = new File("javaLookup.txt");
 			// use the javadocs online to lookup the list and create it
@@ -99,6 +106,7 @@ public class ClassLookup {
 				// just the last part of the fully qualified name
 				String shortestName = line.replaceAll(".*/", "");
 				javaItems.put(shortestName, line);
+				syms.putEntry(line, "className");
 			}
 			lookedUpJava = true;
 		}

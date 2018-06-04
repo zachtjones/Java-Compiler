@@ -27,9 +27,10 @@ public class EnumNode implements Node {
 	/**
 	 * Generates an intermediate file for this enum node.
 	 * @param packageName The package's name, or null for default package.
+	 * @param classLevel The classLevel symbols (from imports)
 	 * @return A new intermediate file.
 	 */
-	public InterFile compile(String packageName) {
+	public InterFile compile(String packageName, SymbolTable classLevel) {
 		InterFile f;
 		if (packageName != null) {
 			f = new InterFile(packageName + "." + name);

@@ -19,8 +19,10 @@ public class JavaCompiler {
 			CompilationUnit c = JavaParser.parse(file);
 			// update the class lookup tables (short names to full names)
 			String packageName = c.packageName == null ? null : c.packageName.getSimpleName();
-			ClassLookup lookup = new ClassLookup(file, packageName, c.imports);
-			// resolve the imports
+			SymbolTable classLevel = new SymbolTable(null, SymbolTable.className);
+			ClassLookup lookup = new ClassLookup(file, packageName, c.imports, classLevel);
+			
+			// resolve the imports -- placing resolved names into the global symbol table
 			c.resolveImports(lookup);
 			
 			if (SymbolTable.printOut) {
@@ -28,7 +30,7 @@ public class JavaCompiler {
 			}
 			
 			// next task - compile -- print out the table.
-			ArrayList<InterFile> files = c.compile();
+			ArrayList<InterFile> files = c.compile(classLevel);
 			for (InterFile f : files) {
 				PrintWriter pw = new PrintWriter(f.getFileName());
 				pw.println(f.toString());

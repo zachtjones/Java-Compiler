@@ -31,11 +31,12 @@ public class CompilationUnit implements Node {
 
 	/**
 	 * Compiles the various types in this CompilationUnit
+	 * @param classLevel The class level symbol table (imported)
 	 * @return An ArrayList of the types converted to their 
 	 * intermediate representation.
 	 * @throws CompileException If there is an error compiling this.
 	 */
-	public ArrayList<InterFile> compile() throws CompileException {
+	public ArrayList<InterFile> compile(SymbolTable classLevel) throws CompileException {
 		ArrayList<InterFile> a = new ArrayList<InterFile>();
 		// names are already resolved, so there should be no need
 		//   to pass down the imports -- everything can be figured out
@@ -44,9 +45,9 @@ public class CompilationUnit implements Node {
 		
 		for (TypeDecNode t : types) {
 			if (packageName != null) {
-				a.add(t.compile(packageName.getSimpleName()));
+				a.add(t.compile(packageName.getSimpleName(), classLevel));
 			} else {
-				a.add(t.compile(null));
+				a.add(t.compile(null, classLevel));
 			}
 		}
 		

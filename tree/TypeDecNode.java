@@ -27,17 +27,18 @@ public class TypeDecNode {
 	/**
 	 * Passes down the compile job to the class/interface/enum
 	 * @param packageName the package's name, or null if default.
+	 * @param classLevel The class - level symbols (from imports)
 	 * @return The intermediate file node.
 	 * @throws CompileException If there is an error compiling 
 	 * this type declaration.
 	 */
-	public InterFile compile(String packageName) throws CompileException {
+	public InterFile compile(String packageName, SymbolTable classLevel) throws CompileException {
 		if (this.c != null) {
-			return c.compile(packageName);
+			return c.compile(packageName, classLevel);
 		} else if (this.i != null) {
-			return i.compile(packageName);
+			return i.compile(packageName, classLevel);
 		} else if (this.e != null){
-			return e.compile(packageName);
+			return e.compile(packageName, classLevel);
 		}
 		// empty type declaration (just ; ) , or not implemented yet.
 		return null;

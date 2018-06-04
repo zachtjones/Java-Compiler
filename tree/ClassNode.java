@@ -51,13 +51,16 @@ public class ClassNode implements Node {
 		// this method should not be called.
 	}
 
-	public InterFile compile(String packageName) throws CompileException {
+	public InterFile compile(String packageName, SymbolTable classLevel) throws CompileException {
 		InterFile f;
 		if (packageName != null) {
 			f = new InterFile(packageName + "." + name);
 		} else {
 			f = new InterFile(name);
 		}
+		
+		// place the class name in the symbol table (used for static fields)
+		classLevel.putEntry(name, "className");
 		
 		// define the super classes and interfaces
 		//   - treated the same way (kind of)
@@ -81,7 +84,7 @@ public class ClassNode implements Node {
 		});
 		
 		// fields / methods -- each one gets new register allocator and function.
-		SymbolTable syms = new SymbolTable(null, SymbolTable.className);
+		SymbolTable syms = new SymbolTable(classLevel, SymbolTable.className);
 		for (ClassBodyNode c : body) {
 			c.compile(f, syms);
 		}
