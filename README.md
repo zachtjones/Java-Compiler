@@ -10,6 +10,7 @@ This program is not complete, but does the following:
   - generates parse tree
   - resolves imports for class names.
   - resolves symbols (variables and fields)
+  - translates Java code to an intermediate language I designed (done for most nodes in the tree)
 
 ## Usage
 1. ```make```
