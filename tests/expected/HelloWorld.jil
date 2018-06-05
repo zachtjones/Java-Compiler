@@ -1,0 +1,8 @@
+// file: HelloWorld.jil
+
+function static main (args<reference(java/lang/String)> ) returns void
+	getStaticField out of java/lang/System to %r1;
+	load "Hello, World!" to %r3;
+	callVirtual %r1 println(%r3);
+end function
+

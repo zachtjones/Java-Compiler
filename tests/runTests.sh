@@ -7,6 +7,13 @@ if [ `echo $?` -eq "1" ] ; then
 	let numFailing=$numFailing+1
 fi
 rm -f BasicClass.jil
+java -cp "../" JavaCompiler BasicClassQualified.java
+diff BasicClassQualified.jil expected/BasicClassQualified.jil >> differences.txt
+if [ `echo $?` -eq "1" ] ; then
+	echo "BasicClassQualified.java failed!"
+	let numFailing=$numFailing+1
+fi
+rm -f BasicClassQualified.jil
 java -cp "../" JavaCompiler EnumTest.java
 diff EnumTest.jil expected/EnumTest.jil >> differences.txt
 if [ `echo $?` -eq "1" ] ; then
@@ -14,6 +21,13 @@ if [ `echo $?` -eq "1" ] ; then
 	let numFailing=$numFailing+1
 fi
 rm -f EnumTest.jil
-numTotal=2
+java -cp "../" JavaCompiler HelloWorld.java
+diff HelloWorld.jil expected/HelloWorld.jil >> differences.txt
+if [ `echo $?` -eq "1" ] ; then
+	echo "HelloWorld.java failed!"
+	let numFailing=$numFailing+1
+fi
+rm -f HelloWorld.jil
+numTotal=4
 let passed=$numTotal-$numFailing
 echo "$passed / $numTotal tests passed"
