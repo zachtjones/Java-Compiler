@@ -6,10 +6,9 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.GetInstanceFieldAddressStatement;
 import intermediate.GetInstanceFieldStatement;
+import intermediate.GetParamStatement;
 import intermediate.GetStaticFieldAddressStatement;
 import intermediate.GetStaticFieldStatement;
-import intermediate.GetThisFieldAddressStatement;
-import intermediate.GetThisFieldStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.RegisterAllocator;
@@ -33,8 +32,15 @@ public class FieldExpressionNode implements Expression, LValue {
 				throw new CompileException("symbol: " + identifier + " is not defined before use.");
 			}
 			String type = s.getType(identifier);
+			
+			// load 'this' pointer
+			Register thisPointer = r.getNext(Register.REFERENCE);
+			f.statements.add(new GetParamStatement(thisPointer, "this"));
+			
+			// load the field from 'this' pointer
 			Register result = r.getNext(type);
-			f.statements.add(new GetThisFieldStatement(result, identifier));
+			f.statements.add(new GetInstanceFieldStatement(thisPointer, identifier, result));
+			
 		} else if (c.getName() != null) {
 			int tableLookup = s.lookup(c.getName());
 			if (tableLookup == SymbolTable.className) {
@@ -66,8 +72,15 @@ public class FieldExpressionNode implements Expression, LValue {
 				throw new CompileException("symbol: " + identifier + " is not defined before use.");
 			}
 			String type = s.getType(identifier);
+			
+			// load 'this' pointer
+			Register thisPointer = r.getNext(Register.REFERENCE);
+			f.statements.add(new GetParamStatement(thisPointer, "this"));
+			
+			// load the field from 'this' pointer
 			Register result = r.getNext(type);
-			f.statements.add(new GetThisFieldAddressStatement(result, identifier));
+			f.statements.add(new GetInstanceFieldAddressStatement(thisPointer, identifier, result));
+			
 		} else if (c.getName() != null) {
 			int tableLookup = s.lookup(c.getName());
 			if (tableLookup == SymbolTable.className) {

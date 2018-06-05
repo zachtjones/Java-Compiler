@@ -5,12 +5,12 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.GetInstanceFieldAddressStatement;
+import intermediate.GetInstanceFieldStatement;
 import intermediate.GetLocalAddressStatement;
 import intermediate.GetLocalStatement;
 import intermediate.GetParamAddressStatement;
 import intermediate.GetParamStatement;
-import intermediate.GetThisFieldAddressStatement;
-import intermediate.GetThisFieldStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.RegisterAllocator;
@@ -64,13 +64,20 @@ public class NameNode implements Node, Expression, LValue {
 				throw new CompileException("symbol: " + primaryName + " is not defined before use.");
 			}
 			String type = s.getType(primaryName);
-			Register result = r.getNext(type);
 			if (tableLookup == SymbolTable.local) {
+				Register result = r.getNext(type);
 				f.statements.add(new GetLocalStatement(result, primaryName));
 			} else if (tableLookup == SymbolTable.parameter) {
+				Register result = r.getNext(type);
 				f.statements.add(new GetParamStatement(result, primaryName));
 			} else if (tableLookup == SymbolTable.className){
-				f.statements.add(new GetThisFieldStatement(result, primaryName));
+				// load 'this' pointer
+				Register thisPointer = r.getNext(Register.REFERENCE);
+				f.statements.add(new GetParamStatement(thisPointer, "this"));
+				
+				// load the field from 'this' pointer
+				Register result = r.getNext(type);
+				f.statements.add(new GetInstanceFieldStatement(thisPointer, primaryName, result));			
 			} else {
 				throw new CompileException("don't know what to do for symbol: " + primaryName + " in NameNode.java");
 			}
@@ -107,13 +114,20 @@ public class NameNode implements Node, Expression, LValue {
 				throw new CompileException("symbol: " + primaryName + " is not defined before use.");
 			}
 			String type = s.getType(primaryName);
-			Register result = r.getNext(type);
 			if (tableLookup == SymbolTable.local) {
+				Register result = r.getNext(type);
 				f.statements.add(new GetLocalAddressStatement(result, primaryName));
 			} else if (tableLookup == SymbolTable.parameter) {
+				Register result = r.getNext(type);
 				f.statements.add(new GetParamAddressStatement(result, primaryName));
 			} else if (tableLookup == SymbolTable.className){
-				f.statements.add(new GetThisFieldAddressStatement(result, primaryName));
+				// load 'this' pointer
+				Register thisPointer = r.getNext(Register.REFERENCE);
+				f.statements.add(new GetParamStatement(thisPointer, "this"));
+				
+				// load the field from 'this' pointer
+				Register result = r.getNext(type);
+				f.statements.add(new GetInstanceFieldAddressStatement(thisPointer, primaryName, result));
 			} else {
 				throw new CompileException("don't know what to do for symbol: " + primaryName + " in NameNode.java");
 			}
