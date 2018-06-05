@@ -60,10 +60,12 @@ public class NameNode implements Node, Expression, LValue {
 		if (!primaryName.contains(".")) {
 			// on the right side, get the result
 			int tableLookup = s.lookup(primaryName);
+			String type;
 			if (tableLookup == -1) {
-				throw new CompileException("symbol: " + primaryName + " is not defined before use.");
+				type = "unknown";
+			} else {
+				type = s.getType(primaryName);
 			}
-			String type = s.getType(primaryName);
 			if (tableLookup == SymbolTable.local) {
 				Register result = r.getNext(type);
 				f.statements.add(new GetLocalStatement(result, primaryName));
@@ -78,9 +80,8 @@ public class NameNode implements Node, Expression, LValue {
 				// load the field from 'this' pointer
 				Register result = r.getNext(type);
 				f.statements.add(new GetInstanceFieldStatement(thisPointer, primaryName, result));			
-			} else {
-				throw new CompileException("don't know what to do for symbol: " + primaryName + " in NameNode.java");
 			}
+			// don't have to do anything if not defined.
 		} else {
 			// split it by the .
 			String[] split = primaryName.split("\\."); // split by the . character
@@ -110,10 +111,12 @@ public class NameNode implements Node, Expression, LValue {
 		// on the left side, get the address
 		if (!primaryName.contains(".")) {
 			int tableLookup = s.lookup(primaryName);
+			String type;
 			if (tableLookup == -1) {
-				throw new CompileException("symbol: " + primaryName + " is not defined before use.");
-			}
-			String type = s.getType(primaryName);
+				type = "unknown";
+			} else {
+				type = s.getType(primaryName);
+			} 
 			if (tableLookup == SymbolTable.local) {
 				Register result = r.getNext(type);
 				f.statements.add(new GetLocalAddressStatement(result, primaryName));
@@ -128,9 +131,8 @@ public class NameNode implements Node, Expression, LValue {
 				// load the field from 'this' pointer
 				Register result = r.getNext(type);
 				f.statements.add(new GetInstanceFieldAddressStatement(thisPointer, primaryName, result));
-			} else {
-				throw new CompileException("don't know what to do for symbol: " + primaryName + " in NameNode.java");
 			}
+			// don't do anything
 		} else {
 			// split it by the .
 			String[] split = primaryName.split("\\."); // split by the . character
