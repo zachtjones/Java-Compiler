@@ -8,6 +8,7 @@ package tree;
 public class CompileHistory {
 	
 	private boolean lastWasThis;
+	private String lastName; // name last used
 	
 	/** Call if the last expression parsed was "this" */
 	public void setThis() {
@@ -18,4 +19,14 @@ public class CompileHistory {
 		return lastWasThis;
 	}
 
+	/** Call if the last expression was a name. */
+	public void setName(String name) {
+		lastName = name;
+		lastWasThis = false;
+	}
+	
+	/** Returns null, or the name last used. */
+	public String getName() {
+		return lastName;
+	}
 }
