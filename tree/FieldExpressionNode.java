@@ -4,6 +4,10 @@ import java.io.IOException;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.GetInstanceFieldAddressStatement;
+import intermediate.GetInstanceFieldStatement;
+import intermediate.GetStaticFieldAddressStatement;
+import intermediate.GetStaticFieldStatement;
 import intermediate.GetThisFieldAddressStatement;
 import intermediate.GetThisFieldStatement;
 import intermediate.InterFunction;
@@ -31,6 +35,21 @@ public class FieldExpressionNode implements Expression, LValue {
 			String type = s.getType(identifier);
 			Register result = r.getNext(type);
 			f.statements.add(new GetThisFieldStatement(result, identifier));
+		} else if (c.getName() != null) {
+			int tableLookup = s.lookup(c.getName());
+			if (tableLookup == SymbolTable.className) {
+				// static lookup
+				f.statements.add(new GetStaticFieldStatement(c.getName(), identifier, r.getNext("unknown")));
+			} else {
+				// instance field of symbol name
+				// get the address of the object
+				NameNode n = new NameNode();
+				n.primaryName = c.getName();
+				n.compileAddress(s, f, r, c);
+				Register name = r.getLast();
+				f.statements.add(new GetInstanceFieldStatement(name, identifier, r.getNext("unknown")));
+			}
+			c.setName(identifier);
 		} else {
 			throw new CompileException("Expression compilation of object.FIELD not done yet.");
 		}
@@ -49,6 +68,21 @@ public class FieldExpressionNode implements Expression, LValue {
 			String type = s.getType(identifier);
 			Register result = r.getNext(type);
 			f.statements.add(new GetThisFieldAddressStatement(result, identifier));
+		} else if (c.getName() != null) {
+			int tableLookup = s.lookup(c.getName());
+			if (tableLookup == SymbolTable.className) {
+				// static lookup
+				f.statements.add(new GetStaticFieldAddressStatement(c.getName(), identifier, r.getNext("unknown")));
+			} else {
+				// instance field of symbol name
+				// get the address of the object
+				NameNode n = new NameNode();
+				n.primaryName = c.getName();
+				n.compileAddress(s, f, r, c);
+				Register name = r.getLast();
+				f.statements.add(new GetInstanceFieldAddressStatement(name, identifier, r.getNext("unknown")));
+			}
+			c.setName(identifier);
 		} else {
 			throw new CompileException("Expression compilation of object.FIELD not done yet.");
 		}
