@@ -77,12 +77,13 @@ public class NameNode implements Node, Expression, LValue {
 		} else {
 			// split it by the .
 			String[] split = primaryName.split("\\."); // split by the . character
+			
 			// construct a primaryExpressionNode
 			PrimaryExpressionNode ex = new PrimaryExpressionNode();
-			// primary prefix is the first part
-			NameNode primary = new NameNode();
-			primary.primaryName = split[0];
-			ex.prefix = primary;
+			
+			// set the name - use NoOp since you need something as the prefix.
+			c.setName(split[0]);
+			ex.prefix = new NoOp();
 			ex.suffixes = new ArrayList<Expression>();
 			// the rest are consecutive fieldAccesses
 			for (int i = 1; i < split.length; i++) {
@@ -90,6 +91,7 @@ public class NameNode implements Node, Expression, LValue {
 				field.identifier = split[i];
 				ex.suffixes.add(field);
 			}
+			
 			// compile the primaryExpressionNode
 			ex.compile(s, f, r, c);
 		}
@@ -97,6 +99,7 @@ public class NameNode implements Node, Expression, LValue {
 
 	@Override
 	public void compileAddress(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+		c.setName(primaryName);
 		// on the left side, get the address
 		if (!primaryName.contains(".")) {
 			int tableLookup = s.lookup(primaryName);
@@ -117,12 +120,13 @@ public class NameNode implements Node, Expression, LValue {
 		} else {
 			// split it by the .
 			String[] split = primaryName.split("\\."); // split by the . character
+
 			// construct a primaryExpressionNode
 			PrimaryExpressionNode ex = new PrimaryExpressionNode();
-			// primary prefix is the first part
-			NameNode primary = new NameNode();
-			primary.primaryName = split[0];
-			ex.prefix = primary;
+
+			// set the name - use NoOp since you need something as the prefix.
+			c.setName(split[0]);
+			ex.prefix = new NoOp();
 			ex.suffixes = new ArrayList<Expression>();
 			// the rest are consecutive fieldAccesses
 			for (int i = 1; i < split.length; i++) {
@@ -130,6 +134,7 @@ public class NameNode implements Node, Expression, LValue {
 				field.identifier = split[i];
 				ex.suffixes.add(field);
 			}
+			
 			// compile address the primaryExpressionNode
 			ex.compileAddress(s, f, r, c);
 		}
