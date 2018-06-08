@@ -10,34 +10,40 @@ end structure
 
 function instance init
 	load 2 to %i1;
-	getThisFieldAddress %i2 = b;
-	store %i1 at %i2;
-	copy %i3 = %i1;
+	getParam %r2 = this;
+	getInstanceFieldAddress b of %r2 to %i3;
+	store %i1 at %i3;
+	copy %i4 = %i1;
 end function
 function static init
 	load 1 to %i1;
-	getThisFieldAddress %i2 = a;
-	store %i1 at %i2;
-	copy %i3 = %i1;
+	getParam %r2 = this;
+	getInstanceFieldAddress a of %r2 to %i3;
+	store %i1 at %i3;
+	copy %i4 = %i1;
 end function
 function instance setB (c<int> ) returns void
 	getParam %i1 = c;
-	getThisFieldAddress %i2 = b;
-	store %i1 at %i2;
-	copy %i3 = %i1;
+	getParam %r2 = this;
+	getInstanceFieldAddress b of %r2 to %i3;
+	store %i1 at %i3;
+	copy %i4 = %i1;
 end function
 function instance getB () returns int
-	getThisField %i1 = b;
-	return %i1;
+	getParam %r1 = this;
+	getInstanceField b of %r1 to %i2;
+	return %i2;
 end function
 function static setA (c<int> ) returns void
 	getParam %i1 = c;
-	getThisFieldAddress %i2 = a;
-	store %i1 at %i2;
-	copy %i3 = %i1;
+	getParam %r2 = this;
+	getInstanceFieldAddress a of %r2 to %i3;
+	store %i1 at %i3;
+	copy %i4 = %i1;
 end function
-function static getA () returns void
-	getThisField %i1 = a;
-	return %i1;
+function static getA () returns int
+	getParam %r1 = this;
+	getInstanceField a of %r1 to %i2;
+	return %i2;
 end function
 
