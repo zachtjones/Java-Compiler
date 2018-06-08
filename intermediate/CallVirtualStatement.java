@@ -6,17 +6,17 @@ import java.util.Arrays;
 public class CallVirtualStatement implements InterStatement {
 	Register obj;
 	String name;
-	Register[] result;
+	Register[] args;
 	
-	public CallVirtualStatement(Register obj, String name, Register[] result) {
+	public CallVirtualStatement(Register obj, String name, Register[] args) {
 		this.obj = obj;
 		this.name = name;
-		this.result = result;
+		this.args = args;
 	}
 
 	@Override
 	public String toString() {
 		// use the Arrays.toString and remove '[' and ']'
-		return "callVirtual " + obj + " " + name + "(" + Arrays.toString(result).replaceAll("\\[|\\]", "") + ");";
+		return "callVirtual " + obj + " " + name + "(" + Arrays.toString(args).replaceAll("\\[|\\]", "") + ");";
 	}
 }
