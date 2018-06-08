@@ -56,10 +56,129 @@ public class AssignmentNode implements Expression {
 			// this allows for x = y = 5;
 			Register result = r.getNext(rightResult.type);
 			f.statements.add(new CopyStatement(rightResult, result));
-		} else {
-			// TODO - make a new tree node
+		} else if (type == STARASSIGN) {
+			// x *= 5 ->  x = x * 5;
+			AssignmentNode assign = new AssignmentNode();
+			assign.left = left;
+			TimesExpressionNode mult = new TimesExpressionNode();
+			mult.left = left;
+			mult.right = right;
+			assign.right = mult;
+			
+			// compile the new node created
+			assign.compile(s, f, r, c);
+
+		} else if (type == SLASHASSIGN) {
+			// x /= 5 ->  x = x / 5;
+			AssignmentNode assign = new AssignmentNode();
+			assign.left = left;
+			DivideExpressionNode div = new DivideExpressionNode();
+			div.left = left;
+			div.right = right;
+			assign.right = div;
+
+			// compile the new node created
+			assign.compile(s, f, r, c);
+
+		} else if (type == REMASSIGN) {
+			// x %= 5 ->  x = x % 5;
+			AssignmentNode assign = new AssignmentNode();
+			assign.left = left;
+			ModExpressionNode mod = new ModExpressionNode();
+			mod.left = left;
+			mod.right = right;
+			assign.right = mod;
+
+			// compile the new node created
+			assign.compile(s, f, r, c);
+			
+		} else if (type == PLUSASSIGN) {
 			// x += 5 ->  x = x + 5;
-			throw new CompileException("compound assignment not supported yet.");
+			AssignmentNode assign = new AssignmentNode();
+			assign.left = left;
+			AddExpressionNode add = new AddExpressionNode();
+			add.left = left;
+			add.right = right;
+			assign.right = add;
+			
+			// compile the new node created
+			assign.compile(s, f, r, c);
+			
+		} else if (type == MINUSASSIGN) {
+			// x -= 5 ->  x = x - 5;
+			AssignmentNode assign = new AssignmentNode();
+			assign.left = left;
+			SubtractExpressionNode sub = new SubtractExpressionNode();
+			sub.left = left;
+			sub.right = right;
+			assign.right = sub;
+			
+			// compile the new node created
+			assign.compile(s, f, r, c);
+			
+		} else if (type == LSHIFTASSIGN) {
+			// x -= 5 ->  x = x << 5;
+			AssignmentNode assign = new AssignmentNode();
+			assign.left = left;
+			LeftShiftExpressionNode lefts = new LeftShiftExpressionNode();
+			lefts.left = left;
+			lefts.right = right;
+			assign.right = lefts;
+
+			// compile the new node created
+			assign.compile(s, f, r, c);
+
+		} else if (type == RSIGNEDSHIFTASSIGN) {
+			// x -= 5 ->  x = x >> 5;
+			AssignmentNode assign = new AssignmentNode();
+			assign.left = left;
+			RightShiftArithExpressionNode rights = new RightShiftArithExpressionNode();
+			rights.left = left;
+			rights.right = right;
+			assign.right = rights;
+
+			// compile the new node created
+			assign.compile(s, f, r, c);
+			
+		} else if (type == RUNSIGNEDSHIFTASSIGN) {
+			// x -= 5 ->  x = x >> 5;
+			AssignmentNode assign = new AssignmentNode();
+			assign.left = left;
+			RightShiftLogExpressionNode rights = new RightShiftLogExpressionNode();
+			rights.left = left;
+			rights.right = right;
+			assign.right = rights;
+
+			// compile the new node created
+			assign.compile(s, f, r, c);
+			
+		} else if (type == ANDASSIGN) {
+			// x -= 5 ->  x = x >> 5;
+			AssignmentNode assign = new AssignmentNode();
+			assign.left = left;
+			AndExpressionNode and = new AndExpressionNode();
+			and.expressions.add(left);
+			and.expressions.add(right);
+			assign.right = and;
+
+			// compile the new node created
+			assign.compile(s, f, r, c);
+
+		} else if (type == ORASSIGN) {
+			// x -= 5 ->  x = x >> 5;
+			AssignmentNode assign = new AssignmentNode();
+			assign.left = left;
+			AndExpressionNode and = new AndExpressionNode();
+			and.expressions.add(left);
+			and.expressions.add(right);
+			assign.right = and;
+
+			// compile the new node created
+			assign.compile(s, f, r, c);
+			
+		} else {
+			// unknown type of assignment.
+			throw new CompileException("unknown type of Assignment: " + type);
 		}
 		
 	}
