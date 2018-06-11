@@ -17,15 +17,17 @@ import tree.SymbolTable;
  */
 public class Register implements Expression {
 	
-	public static final int BYTE = 0;
-	public static final int SHORT = 1;
-	public static final int INT = 2;
-	public static final int LONG = 3;
-	public static final int FLOAT = 4;
-	public static final int DOUBLE = 5;
-	public static final int REFERENCE = 6;
+	public static final int BOOLEAN = 0;
+	public static final int BYTE = 1;
+	public static final int CHAR = 2;
+	public static final int SHORT = 3;
+	public static final int INT = 4;
+	public static final int LONG = 5;
+	public static final int FLOAT = 6;
+	public static final int DOUBLE = 7;
+	public static final int REFERENCE = 8;
 	
-	public static final int LABEL = 7;
+	public static final int LABEL = 9;
 	
 	public int num;
 	public int type;

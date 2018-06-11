@@ -28,7 +28,7 @@ public class LessThanEqualExpressionNode implements Expression {
 		Register rightResult = r.getLast();
 		
 		// add in the condition
-		Register result = r.getNext(Register.BYTE);
+		Register result = r.getNext(Register.BOOLEAN);
 		f.statements.add(new SetConditionStatement(
 			SetConditionStatement.LESSEQUAL, leftResult, 
 				rightResult, result));

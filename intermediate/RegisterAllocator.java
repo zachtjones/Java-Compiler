@@ -18,8 +18,8 @@ public class RegisterAllocator {
 	 */
 	public Register getNext(String type) {
 		switch(type) {
-		case "bool": return getNext(Register.BYTE);
-		case "char": return getNext(Register.SHORT);
+		case "bool": return getNext(Register.BOOLEAN);
+		case "char": return getNext(Register.CHAR);
 		case "byte": return getNext(Register.BYTE);
 		case "short": return getNext(Register.SHORT);
 		case "int": return getNext(Register.INT);
