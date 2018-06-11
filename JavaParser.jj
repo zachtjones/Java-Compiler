@@ -700,18 +700,21 @@ Expression ConditionalExpression() :
 
 Expression ConditionalOrExpression() :
 {
-    ConditionalOrExpressionNode e = new ConditionalOrExpressionNode();
-    Expression temp;
+    /* Build up a binary tree */
+    Expression one;
+    Expression two;
 }
 {
-    temp=ConditionalAndExpression() { e.expressions.add(temp); }
-    ( "||" temp=ConditionalAndExpression() { e.expressions.add(temp); } )*
+    one=ConditionalAndExpression()
+    ( "||" two=ConditionalAndExpression()
     {
-        if (e.expressions.size() == 1) { // not actually OR of any terms
-            return temp; // just return the item
-        } else {
-            return e; // return the list
-        }
+        ConditionalOrExpressionNode e = new ConditionalOrExpressionNode();
+        e.left = one;
+        e.right = two;
+        one = e;
+    } )*
+    {
+        return one;
     }
 }
 
