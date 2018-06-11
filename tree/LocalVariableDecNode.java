@@ -17,6 +17,11 @@ public class LocalVariableDecNode implements Node {
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {
 		type.resolveImports(c);
+		for (VariableDecNode d : declarators) {
+			if (d.init != null) {
+				d.init.resolveImports(c);
+			}
+		}
 	}
 
 	@Override
@@ -25,10 +30,12 @@ public class LocalVariableDecNode implements Node {
 		for (VariableDecNode d : declarators) {
 			s.putEntry(d.id.name, type.interRep());
 			f.statements.add(new StartScopeStatement(d.id.name, type.interRep()));
-			// put in the code to compute initial value.
-			d.init.compile(s, f, r, c);
-			// store the initial value into the local variable.
-			f.statements.add(new PutLocalStatement(r.getLast(), d.id.name));
+			if (d.init != null) {
+				// put in the code to compute initial value.
+				d.init.compile(s, f, r, c);
+				// store the initial value into the local variable.
+				f.statements.add(new PutLocalStatement(r.getLast(), d.id.name));
+			}
 		}
 	}
 }

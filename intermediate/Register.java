@@ -40,7 +40,9 @@ public class Register implements Expression {
 	@Override
 	public String toString() {
 		switch(type) {
+		case BOOLEAN: return "%t" + num;
 		case BYTE: return "%b" + num;
+		case CHAR: return "%c" + num;
 		case SHORT: return "%s" + num;
 		case INT: return "%i" + num;
 		case LONG: return "%l" + num;

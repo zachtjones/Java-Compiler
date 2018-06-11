@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.AllocateClassMemoryStatement;
+import intermediate.CallVirtualStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.RegisterAllocator;
@@ -24,14 +25,19 @@ public class ConstructorCallNode implements Expression {
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		Register result = r.getNext(name.primaryName);
+
+		ArrayList<Expression> expressions = args.expressions;
+		// compile in the args
+		Register[] results = new Register[expressions.size()];
+		for(int i = 0; i < expressions.size(); i++) {
+			expressions.get(i).compile(s, f, r, c);
+			results[i] = r.getLast();
+		}
+		
 		// allocate memory
 		f.statements.add(new AllocateClassMemoryStatement(name.primaryName, result));
 		
-		// call the init function -- add in "this" pointer first
-		ArgumentExpressionNode call = new ArgumentExpressionNode();
-		call.expressions = new ArrayList<Expression>();
-		call.expressions.add(result);
-		call.expressions.addAll(args.expressions);
-		call.compile(s, f, r, c);
+		// add in the call virtual statement
+		f.statements.add(new CallVirtualStatement(result, "<init>", results));
 	}
 }
