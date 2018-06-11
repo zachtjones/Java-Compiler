@@ -2,6 +2,7 @@ package tree;
 
 import java.io.IOException;
 
+import helper.ArrayDimensions;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
@@ -31,9 +32,9 @@ public class TypeNode implements Node {
 	 */
 	public String interRep() {
 		if (primitive != null) {
-			return primitive.interRep();
+			return primitive.interRep() + ArrayDimensions.get(arrayDims);
 		}
-		return "reference(" + name.primaryName + ")";
+		return "reference(" + name.primaryName + ")" + ArrayDimensions.get(arrayDims);
 	}
 
 	
