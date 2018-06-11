@@ -717,18 +717,21 @@ Expression ConditionalOrExpression() :
 
 Expression ConditionalAndExpression() :
 {
-    ConditionalAndExpressionNode e = new ConditionalAndExpressionNode();
-    Expression temp;
+    /* Build up a binary tree */
+    Expression one;
+    Expression two;
 }
 {
-    temp=InclusiveOrExpression() { e.expressions.add(temp); }
-    ( "&&" temp=InclusiveOrExpression() { e.expressions.add(temp); } )*
+    one=InclusiveOrExpression()
+    ( "&&" two=InclusiveOrExpression()
     {
-        if (e.expressions.size() == 1) { // not actually AND of any terms
-            return temp;
-        } else {
-            return e;
-        }
+        ConditionalAndExpressionNode e = new ConditionalAndExpressionNode();
+        e.left = one;
+        e.right = two;
+        one = e;
+    } )*
+    {
+        return one;
     }
 }
 
