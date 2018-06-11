@@ -51,7 +51,7 @@ public class FieldExpressionNode implements Expression, LValue {
 				// get the address of the object
 				NameNode n = new NameNode();
 				n.primaryName = c.getName();
-				n.compileAddress(s, f, r, c);
+				n.compile(s, f, r, c);
 				Register name = r.getLast();
 				f.statements.add(new GetInstanceFieldStatement(name, identifier, r.getNext("unknown")));
 			}

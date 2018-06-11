@@ -7,6 +7,7 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.AllocateClassMemoryStatement;
 import intermediate.CallVirtualStatement;
+import intermediate.CopyStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.RegisterAllocator;
@@ -37,7 +38,14 @@ public class ConstructorCallNode implements Expression {
 		// allocate memory
 		f.statements.add(new AllocateClassMemoryStatement(name.primaryName, result));
 		
+		// copy
+		Register finalResult = r.getNext(result.type);
+		
 		// add in the call virtual statement
 		f.statements.add(new CallVirtualStatement(result, "<init>", results));
+		
+		// result is the finalResult
+		f.statements.add(new CopyStatement(result, finalResult));
+		
 	}
 }
