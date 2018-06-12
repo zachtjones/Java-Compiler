@@ -72,16 +72,16 @@ public class NameNode implements Node, Expression, LValue {
 			} else if (tableLookup == SymbolTable.parameter) {
 				Register result = r.getNext(type);
 				f.statements.add(new GetParamStatement(result, primaryName));
-			} else if (tableLookup == SymbolTable.className){
+			} else { // assume static/instance field / method
 				// load 'this' pointer
 				Register thisPointer = r.getNext(Register.REFERENCE);
 				f.statements.add(new GetParamStatement(thisPointer, "this"));
 				
 				// load the field from 'this' pointer
 				Register result = r.getNext(type);
-				f.statements.add(new GetInstanceFieldStatement(thisPointer, primaryName, result));			
+				f.statements.add(new GetInstanceFieldStatement(thisPointer, primaryName, result));
+				c.setName(primaryName);
 			}
-			// don't have to do anything if not defined.
 		} else {
 			// split it by the .
 			String[] split = primaryName.split("\\."); // split by the . character
