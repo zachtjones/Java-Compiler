@@ -11,6 +11,7 @@ import intermediate.GetLocalAddressStatement;
 import intermediate.GetLocalStatement;
 import intermediate.GetParamAddressStatement;
 import intermediate.GetParamStatement;
+import intermediate.GetStaticFieldStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.RegisterAllocator;
@@ -85,23 +86,34 @@ public class NameNode implements Node, Expression, LValue {
 		} else {
 			// split it by the .
 			String[] split = primaryName.split("\\."); // split by the . character
-			
-			// construct a primaryExpressionNode
-			PrimaryExpressionNode ex = new PrimaryExpressionNode();
-			
-			// set the name - use NoOp since you need something as the prefix.
-			c.setName(split[0]);
-			ex.prefix = new NoOp();
-			ex.suffixes = new ArrayList<Expression>();
-			// the rest are consecutive fieldAccesses
-			for (int i = 1; i < split.length; i++) {
-				FieldExpressionNode field = new FieldExpressionNode();
-				field.identifier = split[i];
-				ex.suffixes.add(field);
+			int tableLookup = s.lookup(split[0]);
+			if (tableLookup == SymbolTable.className) {
+				// get the static field, then do the chain of instance fields
+				Register result = r.getNext(Register.REFERENCE);
+				f.statements.add(new GetStaticFieldStatement(split[0], split[1], result));
+				c.setName(split[1]);
+				for (int i = 2; i < split.length; i++) {
+					Register temp3 = r.getNext(Register.REFERENCE);
+					c.setName(split[i]);
+					f.statements.add(new GetInstanceFieldStatement(result, split[i], temp3));
+					result = temp3;
+				}
+				
+			} else {
+				// instance fields of the parameter
+				NameNode temp = new NameNode();
+				temp.primaryName = split[0];
+				
+				temp.compile(s, f, r, c);
+				Register result = r.getLast();
+				
+				for (int i = 1; i < split.length; i++) {
+					Register temp3 = r.getNext(Register.REFERENCE);
+					c.setName(split[i]);
+					f.statements.add(new GetInstanceFieldStatement(result, split[i], temp3));
+					result = temp3;
+				}
 			}
-			
-			// compile the primaryExpressionNode
-			ex.compile(s, f, r, c);
 		}
 	}
 
