@@ -116,4 +116,20 @@ public class Register implements Expression {
 		Register result = r.getNext(type);
 		f.statements.add(new CopyStatement(this, result));
 	}
+	
+	@Override
+	public int hashCode() {
+		// xor of num and typeFull
+		return num ^ typeFull.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof Register) {
+			Register o = (Register) other;
+			return o.num == this.num && o.type == this.type;
+		} else {
+			return false;
+		}
+	}
 }
