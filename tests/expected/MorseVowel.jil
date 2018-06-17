@@ -54,7 +54,7 @@ function static main (args<reference(java/lang/String)[]> ) returns void
 	EndScope i;
 	getLocal %i42 = i;
 	load 1 to %i43;
-	%i44 = %i42 43 %i43;
+	%i44 = %i42 + %i43;
 	getLocalAddress %i45 = i;
 	store %i44 at %i45;
 	copy %i46 = %i44;
@@ -69,7 +69,7 @@ function static combos () returns long
 	getParam %r1 = this;
 	getInstanceField n of %r1 to %i2;
 	load 1 to %i3;
-	%i4 = %i2 43 %i3;
+	%i4 = %i2 + %i3;
 	intermediate.CreateArrayStatement@19dfb72a
 	PutLocal results = %r5;
 	load 1 to %i6;
@@ -92,7 +92,7 @@ function static combos () returns long
 	getParam %r23 = this;
 	getInstanceField n of %r23 to %i24;
 	getLocal %i25 = i;
-	%i26 = %i25 45 %i24;
+	%i26 = %i25 - %i24;
 	callVirtual %r20 matches(%c22, %i26) -> %r27;
 	branch when %r27 == 0 to L_ELSE18;
 	getLocal %r28 = results;
@@ -101,9 +101,9 @@ function static combos () returns long
 	getLocal %r31 = results;
 	getLocal %i32 = i;
 	load 1 to %i33;
-	%i34 = %i33 45 %i32;
+	%i34 = %i33 - %i32;
 	getArrayValue %r35 = %r31 @ %i34;
-	%r36 = %r30 43 %r35;
+	%r36 = %r30 + %r35;
 	getLocal %r37 = results;
 	getLocal %i38 = i;
 	getArrayValue %r39 = %r37 @ %i38;
@@ -121,7 +121,7 @@ function static combos () returns long
 	getParam %r51 = this;
 	getInstanceField n of %r51 to %i52;
 	getLocal %i53 = i;
-	%i54 = %i53 45 %i52;
+	%i54 = %i53 - %i52;
 	callVirtual %r48 matches(%c50, %i54) -> %r55;
 	branch when %r55 == 0 to L_ELSE46;
 	getLocal %r56 = results;
@@ -130,9 +130,9 @@ function static combos () returns long
 	getLocal %r59 = results;
 	getLocal %i60 = i;
 	load 2 to %i61;
-	%i62 = %i61 45 %i60;
+	%i62 = %i61 - %i60;
 	getArrayValue %r63 = %r59 @ %i62;
-	%r64 = %r58 43 %r63;
+	%r64 = %r58 + %r63;
 	getLocal %r65 = results;
 	getLocal %i66 = i;
 	getArrayValue %r67 = %r65 @ %i66;
@@ -146,7 +146,7 @@ function static combos () returns long
 	getParam %r74 = this;
 	getInstanceField n of %r74 to %i75;
 	getLocal %i76 = i;
-	%i77 = %i76 45 %i75;
+	%i77 = %i76 - %i75;
 	callVirtual %r71 matches(%c73, %i77) -> %r78;
 	branch when %r78 == 0 to L_ELSE69;
 	getLocal %r79 = results;
@@ -155,9 +155,9 @@ function static combos () returns long
 	getLocal %r82 = results;
 	getLocal %i83 = i;
 	load 2 to %i84;
-	%i85 = %i84 45 %i83;
+	%i85 = %i84 - %i83;
 	getArrayValue %r86 = %r82 @ %i85;
-	%r87 = %r81 43 %r86;
+	%r87 = %r81 + %r86;
 	getLocal %r88 = results;
 	getLocal %i89 = i;
 	getArrayValue %r90 = %r88 @ %i89;
@@ -178,7 +178,7 @@ function static combos () returns long
 	getParam %r102 = this;
 	getInstanceField n of %r102 to %i103;
 	getLocal %i104 = i;
-	%i105 = %i104 45 %i103;
+	%i105 = %i104 - %i103;
 	callVirtual %r99 matches(%c101, %i105) -> %r106;
 	branch when %r106 == 0 to L_ELSE97;
 	getLocal %r107 = results;
@@ -187,9 +187,9 @@ function static combos () returns long
 	getLocal %r110 = results;
 	getLocal %i111 = i;
 	load 3 to %i112;
-	%i113 = %i112 45 %i111;
+	%i113 = %i112 - %i111;
 	getArrayValue %r114 = %r110 @ %i113;
-	%r115 = %r109 43 %r114;
+	%r115 = %r109 + %r114;
 	getLocal %r116 = results;
 	getLocal %i117 = i;
 	getArrayValue %r118 = %r116 @ %i117;
@@ -203,7 +203,7 @@ function static combos () returns long
 	getParam %r125 = this;
 	getInstanceField n of %r125 to %i126;
 	getLocal %i127 = i;
-	%i128 = %i127 45 %i126;
+	%i128 = %i127 - %i126;
 	callVirtual %r122 matches(%c124, %i128) -> %r129;
 	branch when %r129 == 0 to L_ELSE120;
 	getLocal %r130 = results;
@@ -212,9 +212,9 @@ function static combos () returns long
 	getLocal %r133 = results;
 	getLocal %i134 = i;
 	load 3 to %i135;
-	%i136 = %i135 45 %i134;
+	%i136 = %i135 - %i134;
 	getArrayValue %r137 = %r133 @ %i136;
-	%r138 = %r132 43 %r137;
+	%r138 = %r132 + %r137;
 	getLocal %r139 = results;
 	getLocal %i140 = i;
 	getArrayValue %r141 = %r139 @ %i140;
@@ -229,7 +229,7 @@ function static combos () returns long
 	EndScope i;
 	getLocal %i143 = i;
 	load 1 to %i144;
-	%i145 = %i143 43 %i144;
+	%i145 = %i143 + %i144;
 	getLocalAddress %i146 = i;
 	store %i145 at %i146;
 	copy %i147 = %i145;
@@ -255,7 +255,7 @@ function static matches (value<char> offset<int> ) returns bool
 	getInstanceField contents of %r13 to %r14;
 	getParam %i15 = offset;
 	load 1 to %i16;
-	%i17 = %i15 43 %i16;
+	%i17 = %i15 + %i16;
 	getArrayValue %r18 = %r14 @ %i17;
 	load '-' to %c19;
 	setCondition %b20 = %r18 == %c19;
@@ -292,7 +292,7 @@ function static matches (value<char> offset<int> ) returns bool
 	getInstanceField contents of %r45 to %r46;
 	getParam %i47 = offset;
 	load 1 to %i48;
-	%i49 = %i47 43 %i48;
+	%i49 = %i47 + %i48;
 	getArrayValue %r50 = %r46 @ %i49;
 	load '.' to %c51;
 	setCondition %b52 = %r50 == %c51;
@@ -316,7 +316,7 @@ function static matches (value<char> offset<int> ) returns bool
 	getInstanceField contents of %r66 to %r67;
 	getParam %i68 = offset;
 	load 1 to %i69;
-	%i70 = %i68 43 %i69;
+	%i70 = %i68 + %i69;
 	getArrayValue %r71 = %r67 @ %i70;
 	load '-' to %c72;
 	setCondition %b73 = %r71 == %c72;
@@ -327,7 +327,7 @@ function static matches (value<char> offset<int> ) returns bool
 	getInstanceField contents of %r76 to %r77;
 	getParam %i78 = offset;
 	load 2 to %i79;
-	%i80 = %i78 43 %i79;
+	%i80 = %i78 + %i79;
 	getArrayValue %r81 = %r77 @ %i80;
 	load '-' to %c82;
 	setCondition %b83 = %r81 == %c82;
@@ -351,7 +351,7 @@ function static matches (value<char> offset<int> ) returns bool
 	getInstanceField contents of %r97 to %r98;
 	getParam %i99 = offset;
 	load 1 to %i100;
-	%i101 = %i99 43 %i100;
+	%i101 = %i99 + %i100;
 	getArrayValue %r102 = %r98 @ %i101;
 	load '.' to %c103;
 	setCondition %b104 = %r102 == %c103;
@@ -362,7 +362,7 @@ function static matches (value<char> offset<int> ) returns bool
 	getInstanceField contents of %r107 to %r108;
 	getParam %i109 = offset;
 	load 2 to %i110;
-	%i111 = %i109 43 %i110;
+	%i111 = %i109 + %i110;
 	getArrayValue %r112 = %r108 @ %i111;
 	load '-' to %c113;
 	setCondition %b114 = %r112 == %c113;
@@ -378,7 +378,7 @@ function static matches (value<char> offset<int> ) returns bool
 	L_END2: ;
 	load "Char: " to %r117;
 	getParam %c118 = value;
-	%b119 = %r117 43 %c118;
+	%b119 = %r117 + %c118;
 	allocateType %r116 = java/lang/IllegalArgumentException;
 	callVirtual %r116 <init>(%b119) -> %r121;
 	copy %r120 = %r116;

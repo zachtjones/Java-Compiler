@@ -28,6 +28,20 @@ if [ `echo $?` -eq "1" ] ; then
 	let numFailing=$numFailing+1
 fi
 rm -f HelloWorld.jil
-numTotal=4
+java -cp "../" JavaCompiler MorseVowel.java
+diff MorseVowel.jil expected/MorseVowel.jil >> differences.txt
+if [ `echo $?` -eq "1" ] ; then
+	echo "MorseVowel.java failed!"
+	let numFailing=$numFailing+1
+fi
+rm -f MorseVowel.jil
+java -cp "../" JavaCompiler OpOrderTest.java
+diff OpOrderTest.jil expected/OpOrderTest.jil >> differences.txt
+if [ `echo $?` -eq "1" ] ; then
+	echo "OpOrderTest.java failed!"
+	let numFailing=$numFailing+1
+fi
+rm -f OpOrderTest.jil
+numTotal=6
 let passed=$numTotal-$numFailing
 echo "$passed / $numTotal tests passed"
