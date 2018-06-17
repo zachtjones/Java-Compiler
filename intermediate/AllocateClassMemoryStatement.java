@@ -1,5 +1,7 @@
 package intermediate;
 
+import java.util.HashMap;
+
 public class AllocateClassMemoryStatement implements InterStatement {
 
 	String type;
@@ -18,6 +20,13 @@ public class AllocateClassMemoryStatement implements InterStatement {
 	@Override
 	public String toString() {
 		return "allocateType " + result + " = " +  type + ";";
+	}
+
+	@Override
+	public void typeCheck(HashMap<Register, String> regs) {
+		result.type = Register.REFERENCE;
+		result.typeFull = type;
+		regs.put(result, type);
 	}
 
 }
