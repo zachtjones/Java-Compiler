@@ -74,4 +74,11 @@ public class InterFunction {
 		
 		return sb.toString();
 	}
+
+	/** Type checks all the statements. */
+	public void typeCheck() {
+		for (InterStatement i : statements) {
+			i.typeCheck();
+		}		
+	}
 }
