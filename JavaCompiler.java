@@ -29,14 +29,23 @@ public class JavaCompiler {
 				System.out.println("Symbol table: ");
 			}
 			
-			// next task - compile -- print out the table.
+			// compile to IL
 			ArrayList<InterFile> files = c.compile(classLevel);
+			
+			
+			// resolve types of the IL functions to do type checking.
+			for (InterFile f : files) {
+				f.typeCheck();
+			}
+			
+			// print out the resulting IL
 			for (InterFile f : files) {
 				PrintWriter pw = new PrintWriter(f.getFileName());
 				pw.println(f.toString());
 				pw.flush();
 				pw.close();
 			}
+			
 		} catch (ParseException e) {
             System.out.print("Syntax error at line ");
             System.out.print(e.currentToken.next.beginLine);

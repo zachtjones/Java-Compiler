@@ -158,5 +158,12 @@ public class InterFile {
 		}
 	}
 
+	/** Type checks all the functions */
+	public void typeCheck() {
+		for (InterFunction f : functions) {
+			f.typeCheck();
+		}		
+	}
+
 
 }
