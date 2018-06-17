@@ -38,7 +38,8 @@ public class BinaryOpStatement implements InterStatement {
 				return dest.toString() + " = " + src1.toString() + " >>> " + src2.toString() + ";";
 			}
 		} else { // single char representation
-			return dest.toString() + " = " + src1.toString() + " " + type + " " + src2.toString() + ";";
+			return dest.toString() + " = " + src1.toString() + " " 
+				+ Character.toString( (char)type ) + " " + src2.toString() + ";";
 
 		}
 	}
