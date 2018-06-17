@@ -3,6 +3,7 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.UsageCheck;
 
 /** dest = src1 OP src2 */
 public class BinaryOpStatement implements InterStatement {
@@ -52,14 +53,8 @@ public class BinaryOpStatement implements InterStatement {
 	@Override
 	public void typeCheck(HashMap<Register, String> regs) throws CompileException {
 		// make sure both sides are in the map
-		String typeLeft = regs.get(src1);
-		if (typeLeft == null) {
-			throw new CompileException(src1 + " was used before assigned to.");
-		}
-		String typeRight = regs.get(src2);
-		if (typeRight == null) {
-			throw new CompileException(src1 + " was used before assigned to.");
-		}
+		UsageCheck.verifyDefined(src1, regs);
+		UsageCheck.verifyDefined(src2, regs);
 		
 		// both sides are in the map, get the resulting type
 		// the only op allowed on reference types is +, which should 
