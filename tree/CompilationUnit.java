@@ -44,11 +44,13 @@ public class CompilationUnit implements Node {
 		//   of b
 		
 		for (TypeDecNode t : types) {
+			InterFile i;
 			if (packageName != null) {
-				a.add(t.compile(packageName.getSimpleName(), classLevel));
+				i = t.compile(packageName.getSimpleName(), classLevel);
 			} else {
-				a.add(t.compile(null, classLevel));
+				i = t.compile(null, classLevel);
 			}
+			a.add(i);
 		}
 		
 		return a;

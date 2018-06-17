@@ -120,5 +120,43 @@ public class InterFile {
 		this.functions.add(func);
 	}
 
+	/**
+	 * Generates the default constructor if needed.
+	 */
+	public void generateDefaultConstructor() {
+		boolean hasOne = false;
+		for (InterFunction i : functions) {
+			if (i.name.equals("<init>")) {
+				hasOne = true;
+			}
+		}
+		if (!hasOne) {
+			InterFunction d = new InterFunction();
+			// add the name and return type
+			d.name = "<init>";
+			d.isInstance = true;
+			d.returnType = fileName.replace(".jil", "");
+			
+			// add the only statement, super();
+			d.statements = new ArrayList<InterStatement>();
+			CallActualStatement c;
+			Register[] args = new Register[0];
+			
+			// load this pointer (call super on this)
+			RegisterAllocator ra = new RegisterAllocator();
+			Register thisPointer = ra.getNext(Register.REFERENCE);
+			d.statements.add(new GetParamStatement(thisPointer, "this"));
+			//  superclass of this object.
+			if (superNode != null) {
+				// add in the call to it's init
+				c = new CallActualStatement(thisPointer, superNode.primaryName, "<init>", args, null);
+			} else {
+				c = new CallActualStatement(thisPointer, "java/lang/Object", "<init>", args, null);
+			}
+			d.statements.add(c);
+			functions.add(d);
+		}
+	}
+
 
 }

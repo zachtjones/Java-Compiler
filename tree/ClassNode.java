@@ -69,10 +69,7 @@ public class ClassNode implements Node {
 		} else {
 			f.setExtends(this.superclass);
 			f.setImplements(this.interfaces);
-			if (!isAbstract) {
-				// potentially generate default constructor
-				System.out.println("Should generate default constructor.");
-			}
+			
 		}
 		
 		// place fields first -- used in symbol table
@@ -87,6 +84,11 @@ public class ClassNode implements Node {
 		SymbolTable syms = new SymbolTable(classLevel, SymbolTable.className);
 		for (ClassBodyNode c : body) {
 			c.compile(f, syms);
+		}
+		
+		if (!isAbstract && !isInterface) {
+			// generate default <init> if needed only.
+			f.generateDefaultConstructor();
 		}
 		
 		// TODO stuff with the isAbstract, isFinal optimizations
