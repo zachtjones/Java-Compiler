@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import intermediate.BranchStatementNEZ;
+import intermediate.BranchStatementTrue;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
 import intermediate.RegisterAllocator;
@@ -30,6 +30,6 @@ public class DoStatementNode implements Node {
 		// immediately followed by expression
 		expression.compile(s, f, r, c);
 		// conditional jump to top of statement
-		f.statements.add(new BranchStatementNEZ(l, r.getLast()));
+		f.statements.add(new BranchStatementTrue(l, r.getLast()));
 	}
 }
