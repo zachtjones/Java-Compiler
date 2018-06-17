@@ -3,7 +3,7 @@ package tree;
 import java.io.IOException;
 import helper.ClassLookup;
 import helper.CompileException;
-import intermediate.BranchStatementEQZ;
+import intermediate.BranchStatmentFalse;
 import intermediate.ChooseStatement;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
@@ -27,7 +27,7 @@ public class ConditionalAndExpressionNode implements Expression {
 		LabelStatement end = new LabelStatement("L_" + r.getNextLabel());
 		Register leftResult = r.getLast();
 		// if left is false, jump to end
-		f.statements.add(new BranchStatementEQZ(end, leftResult));
+		f.statements.add(new BranchStatmentFalse(end, leftResult));
 		
 		// compile in right half
 		right.compile(s, f, r, c);

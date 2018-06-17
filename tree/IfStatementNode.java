@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import intermediate.BranchStatementEQZ;
+import intermediate.BranchStatmentFalse;
 import intermediate.InterFunction;
 import intermediate.JumpStatement;
 import intermediate.LabelStatement;
@@ -36,7 +36,7 @@ public class IfStatementNode implements Node {
 		// start with the expression
 		expression.compile(newTable, f, r, c);
 		// branch if == 0 to else (false)
-		f.statements.add(new BranchStatementEQZ(elseLbl, r.getLast()));
+		f.statements.add(new BranchStatmentFalse(elseLbl, r.getLast()));
 		
 		// compile in the true part
 		statement.compile(newTable, f, r, c);

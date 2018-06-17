@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import intermediate.BranchStatementEQZ;
+import intermediate.BranchStatmentFalse;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
 import intermediate.RegisterAllocator;
@@ -49,7 +49,7 @@ public class ForStatementNode implements Node {
 		
 		// conditional branch to end
 		// if false (zero) take the branch.
-		f.statements.add(new BranchStatementEQZ(endLabel, r.getLast()));
+		f.statements.add(new BranchStatmentFalse(endLabel, r.getLast()));
 		
 		// compile in the body
 		block.compile(newTable, f, r, c);

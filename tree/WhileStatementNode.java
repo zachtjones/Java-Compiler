@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import intermediate.BranchStatementEQZ;
+import intermediate.BranchStatmentFalse;
 import intermediate.InterFunction;
 import intermediate.JumpStatement;
 import intermediate.LabelStatement;
@@ -33,7 +33,7 @@ public class WhileStatementNode implements Node {
 		expression.compile(s, f, r, c);
 		
 		// if false, goto end
-		f.statements.add(new BranchStatementEQZ(endLbl, r.getLast()));
+		f.statements.add(new BranchStatmentFalse(endLbl, r.getLast()));
 		
 		// compile in the block
 		statement.compile(s, f, r, c);
