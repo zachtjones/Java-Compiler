@@ -1,5 +1,9 @@
 package intermediate;
 
+import java.util.HashMap;
+
+import helper.CompileException;
+
 /** dest = src1 OP src2 */
 public class BinaryOpStatement implements InterStatement {
 	public static final char ADD = '+';
@@ -13,6 +17,7 @@ public class BinaryOpStatement implements InterStatement {
 	public static final int LSHIFT = 0;
 	public static final int RSHIFTARITH = 1; // sign-filled
 	public static final int RSHIFTLOG = 2; // 0 filled.
+	public static final int CONCAT = 3; // String + anything.
 	
 	Register src1;
 	Register src2;
@@ -42,5 +47,30 @@ public class BinaryOpStatement implements InterStatement {
 				+ Character.toString( (char)type ) + " " + src2.toString() + ";";
 
 		}
+	}
+
+	@Override
+	public void typeCheck(HashMap<Register, String> regs) throws CompileException {
+		// make sure both sides are in the map
+		String typeLeft = regs.get(src1);
+		if (typeLeft == null) {
+			throw new CompileException(src1 + " was used before assigned to.");
+		}
+		String typeRight = regs.get(src2);
+		if (typeRight == null) {
+			throw new CompileException(src1 + " was used before assigned to.");
+		}
+		
+		// both sides are in the map, get the resulting type
+		// the only op allowed on reference types is +, which should 
+		//   be converted to concatenation --- result is String
+		if (!src1.isPrimitive() || !src2.isPrimitive()) {
+			type = CONCAT;
+			dest.type = Register.REFERENCE;
+			dest.typeFull = "java/lang/String";
+		} else {
+			dest.setPrimitiveName(); // should already be set earlier when allocated
+		}
+		regs.put(dest, dest.typeFull);
 	}
 }
