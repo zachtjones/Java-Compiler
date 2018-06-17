@@ -1,0 +1,11 @@
+// file: OpOrderTest.jil
+
+function instance test (a<int> b<int> c<int> ) returns int
+	getParam %i1 = a;
+	getParam %i2 = b;
+	getParam %i3 = c;
+	%i4 = %i2 * %i3;
+	%i5 = %i1 + %i4;
+	return %i5;
+end function
+
