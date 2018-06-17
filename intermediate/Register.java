@@ -32,6 +32,9 @@ public class Register implements Expression {
 	public int num;
 	public int type;
 	
+	/** The type's fully qualified name, set on type checking. */
+	public String typeFull;
+	
 	public Register(int num, int type) {
 		this.num = num;
 		this.type = type;
@@ -68,6 +71,38 @@ public class Register implements Expression {
 		if (first == INT || second == INT) return INT;
 		if (first == SHORT || second == SHORT) return SHORT;
 		return BYTE;
+	}
+	
+	/** Helper function if this register holds a primitive value. */
+	public boolean isPrimitive() {
+		return type != REFERENCE;
+	}
+	
+	/** Fills in the typeFull for primitive types. */
+	public void setPrimitiveName() {
+		switch(type) {
+		case BOOLEAN: 
+			typeFull = "boolean";
+			break;
+		case BYTE: 
+			typeFull = "byte";
+			break;
+		case CHAR:
+			typeFull = "char";
+			break;
+		case SHORT:
+			typeFull = "short";
+			break;
+		case INT:
+			typeFull = "int";
+			break;
+		case LONG:
+			typeFull = "long";
+			break;
+		case DOUBLE:
+			typeFull = "double";
+			break;
+		}
 	}
 
 	@Override
