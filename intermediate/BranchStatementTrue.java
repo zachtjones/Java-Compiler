@@ -19,7 +19,7 @@ public class BranchStatementTrue implements InterStatement {
 	
 	@Override
 	public String toString() {
-		return "branch when " + r.toString() + " != 0 to " + destination.name + ";";
+		return "branch when " + r.toString() + " is true to " + destination.name + ";";
 	}
 
 	@Override
