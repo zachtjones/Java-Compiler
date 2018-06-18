@@ -10,7 +10,7 @@ public class ReturnVoidStatement implements InterStatement {
 	
 	@Override
 	public String toString() {
-		return "return;";
+		return "returnVoid ;";
 	}
 
 	@Override
