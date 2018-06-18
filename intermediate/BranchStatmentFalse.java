@@ -3,6 +3,7 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.UsageCheck;
 
 /** branch when register is equal to 0. */
 public class BranchStatmentFalse implements InterStatement {
@@ -22,7 +23,11 @@ public class BranchStatmentFalse implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs) throws CompileException {
+	public void typeCheck(HashMap<Register, String> regs, 
+			HashMap<String, String> locals, HashMap<String, String> params,
+			InterFunction func) throws CompileException {
+		
+		UsageCheck.verifyDefined(r, regs);
 		if (r.type != Register.BOOLEAN) {
 			throw new CompileException("cannot convert from: " + r.typeFull + " to boolean.");
 		}

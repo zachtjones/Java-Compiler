@@ -1,5 +1,7 @@
 package intermediate;
 
+import java.util.HashMap;
+
 import helper.CompileException;
 
 /** load 10 into %i12; load "hello, world" into %r4, ... */
@@ -49,5 +51,16 @@ public class LoadLiteralStatement implements InterStatement {
 	@Override
 	public String toString() {
 		return "load " + value + " to " + r.toString() + ";";
+	}
+
+
+	@Override
+	public void typeCheck(HashMap<Register, String> regs) throws CompileException {
+		if (!r.isPrimitive()) {
+			r.typeFull = "java/lang/String";
+		} else {
+			r.setPrimitiveName();
+		}
+		regs.put(r, r.typeFull);
 	}
 }

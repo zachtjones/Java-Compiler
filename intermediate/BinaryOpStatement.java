@@ -51,7 +51,10 @@ public class BinaryOpStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs) throws CompileException {
+	public void typeCheck(HashMap<Register, String> regs, 
+			HashMap<String, String> locals, HashMap<String, String> params, 
+			InterFunction func) throws CompileException {
+		
 		// make sure both sides are in the map
 		UsageCheck.verifyDefined(src1, regs);
 		UsageCheck.verifyDefined(src2, regs);

@@ -17,9 +17,11 @@ public class CreateArrayStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs) throws CompileException {
-		regs.put(result, type + "[]");
+	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
+			HashMap<String, String> params, InterFunction func) throws CompileException {
 		
+		result.typeFull = type + "[]";
+		regs.put(result, type + "[]");
 	}
 
 }

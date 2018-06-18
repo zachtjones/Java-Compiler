@@ -82,8 +82,14 @@ public class InterFunction {
 	 * @throws CompileException If there is an error with type checking.*/
 	public void typeCheck() throws CompileException {
 		HashMap<Register, String> definitions = new HashMap<Register, String>();
+		HashMap<String, String> locals = new HashMap<String, String>();
+		// define parameters and fill it in.
+		HashMap<String, String> params = new HashMap<String, String>();
+		for (int i = 0; i < paramTypes.size(); i++) {
+			params.put(paramNames.get(i), paramTypes.get(i));
+		}
 		for (InterStatement i : statements) {
-			i.typeCheck(definitions);
+			i.typeCheck(definitions, locals, params, this);
 		}		
 	}
 }

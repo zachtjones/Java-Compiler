@@ -23,7 +23,9 @@ public class AllocateClassMemoryStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs) {
+	public void typeCheck(HashMap<Register, String> regs, 
+			HashMap<String, String> locals, HashMap<String, String> params, InterFunction func) {
+		
 		result.type = Register.REFERENCE;
 		result.typeFull = type;
 		regs.put(result, type);

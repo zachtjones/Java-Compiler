@@ -1,5 +1,10 @@
 package intermediate;
 
+import java.util.HashMap;
+
+import helper.CompileException;
+import helper.UsageCheck;
+
 /** dest = OP src2 */
 public class UnaryOpStatement implements InterStatement {
 	public static final char BITNOT = '~';
@@ -20,5 +25,20 @@ public class UnaryOpStatement implements InterStatement {
 	@Override
 	public String toString() {
 		return dest.toString() + " = " + type + " " + src1.toString() + ";";
+	}
+
+	@Override
+	public void typeCheck(HashMap<Register, String> regs) throws CompileException {
+		UsageCheck.verifyDefined(src1, regs);
+		
+		// check primitives
+		if (!src1.isPrimitive()) {
+			throw new CompileException("operator: " + type + " is only defined for primitives, but saw: " + src1);
+		}
+		if (type == '!' && src1.type != Register.BOOLEAN) {
+			throw new CompileException("operator: ! is only defined for booleans, but saw: " + src1);
+		}
+		dest.typeFull = src1.typeFull;
+		regs.put(dest, dest.typeFull);
 	}
 }

@@ -1,5 +1,11 @@
 package intermediate;
 
+import java.util.HashMap;
+
+import helper.CompileException;
+import helper.TypeChecker;
+import helper.UsageCheck;
+
 /** store %src at %addr */
 public class StoreAddressStatement implements InterStatement {
 	Register src;
@@ -13,5 +19,13 @@ public class StoreAddressStatement implements InterStatement {
 	@Override
 	public String toString() {
 		return "store " + src.toString() + " at " + addr.toString() + ";";
+	}
+
+	@Override
+	public void typeCheck(HashMap<Register, String> regs) throws CompileException {
+		UsageCheck.verifyDefined(addr, regs);
+		UsageCheck.verifyDefined(src, regs);
+		
+		TypeChecker.checkAssign(src, addr);
 	}
 }

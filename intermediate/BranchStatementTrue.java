@@ -23,10 +23,13 @@ public class BranchStatementTrue implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs) throws CompileException {
+	public void typeCheck(HashMap<Register, String> regs, 
+			HashMap<String, String> locals, HashMap<String, String> params,
+			InterFunction func) throws CompileException {
+		
+		UsageCheck.verifyDefined(r, regs);
 		if (r.type != Register.BOOLEAN) {
 			throw new CompileException("cannot convert from: " + r.typeFull + " to boolean.");
 		}
-		UsageCheck.verifyDefined(r, regs);
 	}
 }
