@@ -42,18 +42,22 @@ public class Register implements Expression {
 	
 	@Override
 	public String toString() {
-		switch(type) {
-		case BOOLEAN: return "%t" + num;
-		case BYTE: return "%b" + num;
-		case CHAR: return "%c" + num;
-		case SHORT: return "%s" + num;
-		case INT: return "%i" + num;
-		case LONG: return "%l" + num;
-		case FLOAT: return "%f" + num;
-		case DOUBLE: return "%d" + num;
-		case REFERENCE: return "%r" + num;
+		if (typeFull == null) {
+			switch(type) {
+			case BOOLEAN: return "%t" + num;
+			case BYTE: return "%b" + num;
+			case CHAR: return "%c" + num;
+			case SHORT: return "%s" + num;
+			case INT: return "%i" + num;
+			case LONG: return "%l" + num;
+			case FLOAT: return "%f" + num;
+			case DOUBLE: return "%d" + num;
+			case REFERENCE: return "%r" + num;
+			}
+			return "unknown register type: " + type;
+		} else {
+			return "%" + num + "<" + typeFull + ">";
 		}
-		return "unknown register type: " + type;
 	}
 
 	/**
