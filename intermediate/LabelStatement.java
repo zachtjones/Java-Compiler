@@ -1,5 +1,9 @@
 package intermediate;
 
+import java.util.HashMap;
+
+import helper.CompileException;
+
 public class LabelStatement implements InterStatement {
 	String name;
 	
@@ -9,5 +13,10 @@ public class LabelStatement implements InterStatement {
 	
 	public String toString() {
 		return name + ": ;";
+	}
+
+	@Override
+	public void typeCheck(HashMap<Register, String> regs) throws CompileException {
+		// nothing needed.
 	}
 }
