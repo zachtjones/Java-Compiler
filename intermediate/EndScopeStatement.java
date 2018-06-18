@@ -22,7 +22,10 @@ public class EndScopeStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs) throws CompileException {
-		// nothing needed
+	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
+			HashMap<String, String> params, InterFunction func) throws CompileException {
+		
+		// remove name from the locally defined variables
+		locals.remove(name);
 	}
 }
