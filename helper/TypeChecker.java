@@ -8,12 +8,13 @@ public class TypeChecker {
 	 * Verifies that subclassName is a subclass or the same as className.
 	 * @throws CompileException if subclassName is not the same as className or a subclass of it.
 	 */
-	public static boolean subclassOrEqual(String className, String subclassName) throws CompileException {
+	public static void subclassOrEqual(String className, String subclassName) throws CompileException {
 		if (className.equals(subclassName)) {
-			return true;
+			return;
 		}
 		// TODO use the file system and perform lookups and such
-		return false;
+
+		throw new CompileException("can't convert: " + subclassName + " to: " + className);
 	}
 	
 	/***
@@ -45,8 +46,6 @@ public class TypeChecker {
 		}
 		
 		// both are reference types, check subclass or equal
-		if (!subclassOrEqual(pointerType, dataType.typeFull)) {
-			throw new CompileException(dataType.typeFull + " can't be converted to: " + pointerType);
-		}
+		subclassOrEqual(pointerType, dataType.typeFull);
 	}
 }

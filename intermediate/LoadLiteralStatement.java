@@ -53,9 +53,10 @@ public class LoadLiteralStatement implements InterStatement {
 		return "load " + value + " to " + r.toString() + ";";
 	}
 
-
 	@Override
-	public void typeCheck(HashMap<Register, String> regs) throws CompileException {
+	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
+			HashMap<String, String> params, InterFunction func) throws CompileException {
+
 		if (!r.isPrimitive()) {
 			r.typeFull = "java/lang/String";
 		} else {
