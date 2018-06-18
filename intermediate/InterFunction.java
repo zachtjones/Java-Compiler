@@ -1,6 +1,9 @@
 package intermediate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import helper.CompileException;
 
 public class InterFunction {
 	
@@ -75,10 +78,12 @@ public class InterFunction {
 		return sb.toString();
 	}
 
-	/** Type checks all the statements. */
-	public void typeCheck() {
+	/** Type checks all the statements. 
+	 * @throws CompileException If there is an error with type checking.*/
+	public void typeCheck() throws CompileException {
+		HashMap<Register, String> definitions = new HashMap<Register, String>();
 		for (InterStatement i : statements) {
-			i.typeCheck();
+			i.typeCheck(definitions);
 		}		
 	}
 }

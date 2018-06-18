@@ -2,6 +2,7 @@ package intermediate;
 
 import java.util.ArrayList;
 
+import helper.CompileException;
 import tree.NameNode;
 
 public class InterFile {
@@ -158,8 +159,9 @@ public class InterFile {
 		}
 	}
 
-	/** Type checks all the functions */
-	public void typeCheck() {
+	/** Type checks all the functions 
+	 * @throws CompileException If there is an error with type checking.*/
+	public void typeCheck() throws CompileException {
 		for (InterFunction f : functions) {
 			f.typeCheck();
 		}		
