@@ -25,7 +25,9 @@ public class ChooseStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs) throws CompileException {
+	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
+			HashMap<String, String> params, InterFunction func) throws CompileException {
+		
 		// TODO left and right have to have common superclass, and the result
 		//   is that common superclass
 		// primitive types should already be done
