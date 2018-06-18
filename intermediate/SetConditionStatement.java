@@ -1,5 +1,9 @@
 package intermediate;
 
+import java.util.HashMap;
+
+import helper.CompileException;
+
 public class SetConditionStatement implements InterStatement {
 	public static final int GREATEREQUAL = 0;
 	public static final int GREATER = 1;
@@ -36,5 +40,19 @@ public class SetConditionStatement implements InterStatement {
 		} else {
 			return leftPart + " != " + right.toString() + ";";
 		}
+	}
+
+	@Override
+	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
+			HashMap<String, String> params, InterFunction func) throws CompileException {
+		
+		if (type != NOTEQUAL && type != EQUAL) { // == and != can be used with objects
+			// type is a relational only defined on primitives
+			if (!left.isPrimitive() || !right.isPrimitive()) {
+				throw new CompileException("Relational operators other than == and != are only defined on primitves.");
+			}
+		}
+		result.typeFull = "boolean";
+		regs.put(result, result.typeFull);
 	}
 }
