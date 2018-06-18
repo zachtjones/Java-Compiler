@@ -1,5 +1,9 @@
 package intermediate;
 
+import java.util.HashMap;
+
+import helper.CompileException;
+
 /** Represents the starting of a scope of a local variable. */
 public class StartScopeStatement implements InterStatement {
 	String name;
@@ -18,5 +22,14 @@ public class StartScopeStatement implements InterStatement {
 	@Override
 	public String toString() {
 		return "StartScope " + name + " - " + type + ";";
+	}
+
+	@Override
+	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
+			HashMap<String, String> params, InterFunction func) throws CompileException {
+		
+		// checking if it is already defined is not necessary since this is done
+		//  at high level code (AST -> Compile)
+		locals.put(name, type);
 	}
 }
