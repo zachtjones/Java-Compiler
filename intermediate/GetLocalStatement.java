@@ -1,5 +1,10 @@
 package intermediate;
 
+import java.util.HashMap;
+
+import helper.CompileException;
+import helper.TypeChecker;
+
 /** getLocal %register = name */
 public class GetLocalStatement implements InterStatement {
 	Register r;
@@ -18,5 +23,19 @@ public class GetLocalStatement implements InterStatement {
 	@Override
 	public String toString() {
 		return "getLocal " + r.toString() + " = " + localName + ";";
+	}
+
+	@Override
+	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
+			HashMap<String, String> params, InterFunction func) throws CompileException {
+		
+		if (!locals.containsKey(localName)) {
+			throw new CompileException("local variable: " + localName + " is not defined.");
+		}
+		TypeChecker.subclassOrEqual(locals.get(localName), r.typeFull);
+		
+		// define the register
+		r.typeFull = locals.get(localName);
+		regs.put(r, r.typeFull);
 	}
 }
