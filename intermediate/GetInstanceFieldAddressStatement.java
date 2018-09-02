@@ -1,5 +1,9 @@
 package intermediate;
 
+import java.util.HashMap;
+
+import helper.CompileException;
+
 public class GetInstanceFieldAddressStatement implements InterStatement {
 	Register instance;
 	String fieldName;
@@ -21,5 +25,12 @@ public class GetInstanceFieldAddressStatement implements InterStatement {
 	public String toString() {
 		return "getInstanceFieldAddress " + fieldName + " of " + instance.toString() 
 			+ " to " + result.toString() + ";";
+	}
+
+	@Override
+	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
+			HashMap<String, String> params, InterFunction func) throws CompileException {
+		
+
 	}
 }

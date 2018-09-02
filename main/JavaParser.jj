@@ -10,6 +10,8 @@ options {
 }
 
 PARSER_BEGIN(JavaParser)
+package main;
+
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import tree.*;

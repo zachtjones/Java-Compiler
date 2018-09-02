@@ -1,12 +1,12 @@
 *.class
 lib/*
-JavaParser.java
-JavaParserConstants.java
-JavaParserTokenManager.java
-ParseException.java
-SimpleCharStream.java
-Token.java
-TokenMgrError.java
+main/JavaParser.java
+main/JavaParserConstants.java
+main/JavaParserTokenManager.java
+main/ParseException.java
+main/SimpleCharStream.java
+main/Token.java
+main/TokenMgrError.java
 
 .classpath
 .project
