@@ -1,5 +1,11 @@
 package intermediate;
 
+import java.util.HashMap;
+
+import helper.CompileException;
+import helper.UsageCheck;
+import main.JavaCompiler;
+
 public class GetInstanceFieldStatement implements InterStatement {
 	Register instance;
 	String fieldName;
@@ -21,5 +27,19 @@ public class GetInstanceFieldStatement implements InterStatement {
 	public String toString() {
 		return "getInstanceField " + fieldName + " of " + instance.toString() 
 			+ " to " + result.toString() + ";";
+	}
+
+	@Override
+	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
+			HashMap<String, String> params, InterFunction func) throws CompileException {
+
+		UsageCheck.verifyDefined(instance, regs);
+		// the type of the object
+		String type = instance.typeFull;
+		
+		InterFile object = JavaCompiler.parseAndCompile(type);
+		String resultType = object.getInstFieldType(fieldName);
+		
+		regs.put(result, resultType);
 	}
 }

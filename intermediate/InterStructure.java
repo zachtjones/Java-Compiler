@@ -2,6 +2,8 @@ package intermediate;
 
 import java.util.ArrayList;
 
+import helper.CompileException;
+
 public class InterStructure {
 	
 	private boolean isInstance;
@@ -56,6 +58,16 @@ public class InterStructure {
 		result.append("end structure\n\n");
 		
 		return result.toString();
+	}
+
+	/** Gets the type for the structure field, throwing a compile exception if problem. */
+	public String getFieldType(String fieldName) throws CompileException {
+		for (int i = 0; i < names.size(); i++) {
+			if (fieldName.equals(names.get(i))) {
+				return types.get(i);
+			}
+		}
+		throw new CompileException("Field " + fieldName + " not present in structure.");
 	}
 	
 }

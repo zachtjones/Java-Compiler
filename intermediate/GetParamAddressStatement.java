@@ -1,5 +1,9 @@
 package intermediate;
 
+import java.util.HashMap;
+
+import helper.CompileException;
+
 /** getLocalAddress %register = name */
 public class GetParamAddressStatement implements InterStatement {
 	Register r;
@@ -18,5 +22,16 @@ public class GetParamAddressStatement implements InterStatement {
 	@Override
 	public String toString() {
 		return "getParamAddress " + r.toString() + " = " + localName + ";";
+	}
+
+	@Override
+	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
+			HashMap<String, String> params, InterFunction func) throws CompileException {
+		
+		if (!params.containsKey(localName)) {
+			throw new CompileException("Error: " + localName + " not a parameter.");
+		}
+		
+		regs.put(r, params.get(localName) + "*");		
 	}
 }

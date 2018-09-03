@@ -167,5 +167,25 @@ public class InterFile {
 		}		
 	}
 
+	/**
+	 * Gets the type of the field for this structure
+	 * @param fieldName The field's name
+	 * @return The JIL representation of the type
+	 * @throws CompileException if the field doesn't exist, or there is a problem checking it.
+	 */
+	public String getInstFieldType(String fieldName) throws CompileException {
+		return instancePart.getFieldType(fieldName);
+	}
+
+	/**
+	 * Gets the type of the field for this class static field.
+	 * @param fieldName The field's name
+	 * @return The JIL representation of the type
+	 * @throws CompileException if the field doesn't exist, or there is a problem checking it.
+	 */
+	public String getStatFieldType(String fieldName) throws CompileException {
+		return staticPart.getFieldType(fieldName);
+	}
+
 
 }
