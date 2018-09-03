@@ -13,6 +13,23 @@ public class MethodDeclaratorNode implements Node {
     public ArrayList<ParamNode> params;
     public int arrayDims; // 0 for non array
     // arrayDims is for the return type
+    public String fileName;
+    public int line;
+    
+    public MethodDeclaratorNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
     
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

@@ -18,4 +18,10 @@ public interface Node {
      * @param r The register allocator to get new numbers from. (also used for labels) 
      * @param c The CompileHistory object to use for decision making. */
     public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException;
+    
+    /** Gets the file name for this node */
+    public String getFileName();
+   
+    /** Gets the line number this node starts on */
+    public int getLine();
 }

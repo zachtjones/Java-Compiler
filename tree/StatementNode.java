@@ -24,6 +24,23 @@ public class StatementNode implements Node {
 	public ThrowStatementNode throwNode;
 	public SynchronizedStatementNode synchNode;
 	public TryStatementNode tryNode;
+	public String fileName;
+    public int line;
+    
+    public StatementNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
 
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

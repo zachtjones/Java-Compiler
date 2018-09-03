@@ -10,6 +10,23 @@ import intermediate.RegisterAllocator;
 public class LabeledStatementNode implements Node {
     public String name;
     public StatementNode statement;
+    public String fileName;
+    public int line;
+    
+    public LabeledStatementNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
     
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

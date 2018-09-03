@@ -12,6 +12,23 @@ import intermediate.UnaryOpStatement;
 /** - expr */
 public class UnaryMinusExpressionNode implements Expression {
     public Expression expr;
+    public String fileName;
+    public int line;
+    
+    public UnaryMinusExpressionNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
 
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

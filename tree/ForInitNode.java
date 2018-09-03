@@ -13,6 +13,23 @@ public class ForInitNode implements Node {
 	public LocalVariableDecNode dec;
 	// or this:
 	public ArrayList<StatementExprNode> items;
+	public String fileName;
+    public int line;
+    
+    public ForInitNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
 
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

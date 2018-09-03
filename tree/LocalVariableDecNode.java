@@ -13,6 +13,23 @@ import intermediate.StartScopeStatement;
 public class LocalVariableDecNode implements Node {
     public TypeNode type;
     public ArrayList<VariableDecNode> declarators;
+    public String fileName;
+    public int line;
+    
+    public LocalVariableDecNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
     
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

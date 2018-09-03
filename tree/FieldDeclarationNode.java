@@ -9,7 +9,7 @@ import intermediate.InterFile;
 import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
-public class FieldDeclarationNode {
+public class FieldDeclarationNode implements Node {
 	public boolean isPublic;
 	public boolean isProtected;
 	public boolean isPrivate;
@@ -20,6 +20,23 @@ public class FieldDeclarationNode {
 
 	public TypeNode type;
 	public ArrayList<VariableDecNode> variables = new ArrayList<>();
+	public String fileName;
+    public int line;
+    
+    public FieldDeclarationNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
 
 	public void resolveImports(ClassLookup c) throws IOException {
 		type.resolveImports(c);
@@ -65,5 +82,10 @@ public class FieldDeclarationNode {
 				f.addFunction(func);
 			}
 		}
+	}
+
+	@Override
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+		/* Nothing to do here*/
 	}
 }

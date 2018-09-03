@@ -14,6 +14,23 @@ import intermediate.RegisterAllocator;
 public class PrimitiveArrayAllocationNode implements Expression {
     public PrimitiveTypeNode type;
     public ArrayList<Expression> expressions; // never empty list, but can have null in the list
+    public String fileName;
+    public int line;
+    
+    public PrimitiveArrayAllocationNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
 	
     @Override
 	public void resolveImports(ClassLookup c) throws IOException {

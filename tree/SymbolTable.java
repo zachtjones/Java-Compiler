@@ -79,8 +79,8 @@ public class SymbolTable {
 	 */
 	public void putEntry(String identifier, String type) throws CompileException {
 		if (lookup(identifier) != -1) {
-			throw new CompileException("the symbol: " + identifier 
-					+ " is already defined in an outer scope.");
+			throw new CompileException("the symbol: '" + identifier 
+					+ "' is already defined in an outer scope.");
 		}
 		entries.put(identifier, type);
 		

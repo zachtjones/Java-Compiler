@@ -12,6 +12,23 @@ import intermediate.RegisterAllocator;
 
 public class BlockNode implements Node {
     public ArrayList<BlockStatementNode> statements;
+    public String fileName;
+    public int line;
+    
+    public BlockNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
 
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

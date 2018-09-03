@@ -12,6 +12,23 @@ public class ConditionalExpressionNode implements Expression {
     public Expression condition;
     public Expression truePart;
     public Expression falsePart;
+    public String fileName;
+    public int line;
+    
+    public ConditionalExpressionNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
     
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

@@ -24,6 +24,23 @@ public class ClassNode implements Node {
     public ArrayList<NameNode> interfaces;
     public ArrayList<ClassBodyNode> body = new ArrayList<>();
     public ArrayList<NameNode> typeParams;
+    public String fileName;
+    public int line;
+    
+    public ClassNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
 
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

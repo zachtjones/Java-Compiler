@@ -10,6 +10,23 @@ public class BlockStatementNode implements Node {
     // only one of these is not null
     public StatementNode statement;
     public LocalVariableDecNode dec;
+    public String fileName;
+    public int line;
+    
+    public BlockStatementNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
     
     @Override
 	public void resolveImports(ClassLookup c) throws IOException {

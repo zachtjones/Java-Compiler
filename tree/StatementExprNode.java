@@ -12,6 +12,23 @@ public class StatementExprNode implements Node {
 	public boolean isPreDecrement;
 	public boolean isPostfixExpression;
 	public boolean isAssignment;
+	public String fileName;
+    public int line;
+    
+    public StatementExprNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
 
 	// this holds the expression of type from above
 	public Expression expression;

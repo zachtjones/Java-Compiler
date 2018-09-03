@@ -11,6 +11,23 @@ import intermediate.RegisterAllocator;
 public class SynchronizedStatementNode implements Node {
     public Expression expression;
     public BlockNode block;
+    public String fileName;
+    public int line;
+    
+    public SynchronizedStatementNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
     
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

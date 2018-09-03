@@ -19,6 +19,23 @@ public class PrimitiveTypeNode implements Node {
     public static final int DOUBLE = 7;
 
     public int type; // holds value 0-7 inclusive
+    public String fileName;
+    public int line;
+    
+    public PrimitiveTypeNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
 
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

@@ -12,6 +12,23 @@ import intermediate.ReturnVoidStatement;
 public class ReturnStatementNode implements Node {
     // could be null
     public Expression expression;
+    public String fileName;
+    public int line;
+    
+    public ReturnStatementNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
 
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

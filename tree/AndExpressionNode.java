@@ -13,6 +13,23 @@ import intermediate.RegisterAllocator;
 /** Chain of & of the operands (not short-circuiting, aka bitwise)*/
 public class AndExpressionNode implements Expression {
     public ArrayList<Expression> expressions = new ArrayList<Expression>();
+    public String fileName;
+    public int line;
+    
+    public AndExpressionNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
 
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

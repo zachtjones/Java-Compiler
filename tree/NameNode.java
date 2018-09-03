@@ -21,6 +21,23 @@ public class NameNode implements Node, Expression, LValue {
 	public NameNode extendsNode; // used in class / interface declarations
 	public ArrayList<NameNode> generics;
 	public NameNode secondaryName;
+	public String fileName;
+    public int line;
+    
+    public NameNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
 
 	/** Gets the simple name (like java.lang) for this name node,
 	 * using the secondary name if needed.

@@ -16,6 +16,23 @@ import intermediate.RegisterAllocator;
 /** Represents accessing a field of an object. */
 public class FieldExpressionNode implements Expression, LValue {
     public String identifier;
+    public String fileName;
+    public int line;
+    
+    public FieldExpressionNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
 
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

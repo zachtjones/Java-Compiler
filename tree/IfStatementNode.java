@@ -14,6 +14,23 @@ public class IfStatementNode implements Node {
     public Expression expression;
     public StatementNode statement;
     public StatementNode elsePart;
+    public String fileName;
+    public int line;
+    
+    public IfStatementNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
+    
+    @Override
+    public String getFileName() {
+    	return fileName;
+    }
+    
+    @Override
+    public int getLine() {
+    	return line;
+    }
     
 	@Override
 	public void resolveImports(ClassLookup c) throws IOException {

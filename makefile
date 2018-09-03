@@ -1,15 +1,16 @@
 all:
-	javacc JavaParser.jj
-	javac JavaCompiler.java
+	cd main; javacc JavaParser.jj
+	javac main/JavaCompiler.java
 
 clean:
-	rm -f JavaParserConstants.java
-	rm -f JavaParserTokenManager.java
-	rm -f JavaParser.java
-	rm -f ParseException.java
-	rm -f SimpleCharStream.java
-	rm -f Token.java
-	rm -f TokenMgrError.java
-	rm -f *.class
+	rm -f main/JavaParserConstants.java
+	rm -f main/JavaParserTokenManager.java
+	rm -f main/JavaParser.java
+	rm -f main/ParseException.java
+	rm -f main/SimpleCharStream.java
+	rm -f main/Token.java
+	rm -f main/TokenMgrError.java
+	rm -f main/*.class
 	rm -f tree/*.class
-
+	rm -f helper/*.class
+	rm -f intermediate/*.class
