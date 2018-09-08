@@ -43,7 +43,7 @@ public class GetInstanceFieldAddressStatement implements InterStatement {
 		// the type of the object
 		String type = instance.typeFull;
 		
-		InterFile object = JavaCompiler.parseAndCompile(type);
+		InterFile object = JavaCompiler.parseAndCompile(type, fileName, line);
 		String resultType = object.getInstFieldType(fieldName, fileName, line);
 		
 		regs.put(result, resultType + "*"); // address is a pointer type

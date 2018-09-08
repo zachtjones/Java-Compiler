@@ -39,6 +39,15 @@ public class TypeNode implements Node {
 		}
 	}
 	
+	/** Returns the intermediate language representation of this */
+	public String getILRep() {
+		if (name != null) {
+			return name.primaryName;
+		} else {
+			return primitive.interRep();
+		}
+	}
+	
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// this is already done in higher nodes.

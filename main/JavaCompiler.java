@@ -27,7 +27,7 @@ public class JavaCompiler {
 	 * @param fullyQualifiedName The java class name (ex: java.lang.String)
 	 * @return The Intermediate file representation.
 	 */
-	public static InterFile parseAndCompile(String fullyQualifiedName)
+	public static InterFile parseAndCompile(String fullyQualifiedName, String fileName, int line)
 			throws CompileException {
 
 		// use the cache to save compile time
@@ -35,21 +35,21 @@ public class JavaCompiler {
 			return cache.get(fullyQualifiedName);
 		}
 
-		String filename;
+		String newFileName;
 		if (fullyQualifiedName.startsWith("java/")) {
-			filename = javaDir + fullyQualifiedName;
+			newFileName = javaDir + fullyQualifiedName;
 		} else {
-			filename = rootDir + fullyQualifiedName;
+			newFileName = rootDir + fullyQualifiedName;
 		}
-		filename += ".java";
+		newFileName += ".java";
 
 		try {
-			CompilationUnit c = JavaParser.parse(filename);
+			CompilationUnit c = JavaParser.parse(newFileName);
 
 			// update the class lookup tables (short names to full names)
 			String packageName = c.packageName == null ? null : c.packageName.getSimpleName();
 			SymbolTable classLevel = new SymbolTable(null, SymbolTable.className);
-			ClassLookup lookup = new ClassLookup(filename, packageName, c.imports, classLevel);
+			ClassLookup lookup = new ClassLookup(newFileName, packageName, c.imports, classLevel);
 
 			// resolve the imports -- placing resolved names into the global symbol table
 			c.resolveImports(lookup);
@@ -68,13 +68,15 @@ public class JavaCompiler {
 			}
 
 		} catch (FileNotFoundException e) {
-			throw new CompileException("File not found for " + fullyQualifiedName, e, filename, -1);
+			throw new CompileException(fullyQualifiedName + " not found while compiling",
+					e, fileName, line);
+			
 		} catch (ParseException e) {
-			throw new CompileException("Could not parse " + fullyQualifiedName, e, 
-					filename, e.currentToken.beginLine);
+			throw new CompileException(fullyQualifiedName + " not able to be parsed, error at: " 
+					+ newFileName + ":" + e.currentToken.beginLine, e, fileName, line);
 		} catch (IOException e) {
-			throw new CompileException("I/O exception while processing " + fullyQualifiedName, 
-					e, filename, -1);
+			throw new CompileException("I/O exception while processing " + fullyQualifiedName
+					+ ", referenced at", e, newFileName, -1);
 		}
 
 		// none were found

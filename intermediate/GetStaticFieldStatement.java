@@ -40,7 +40,7 @@ public class GetStaticFieldStatement implements InterStatement {
 			HashMap<String, String> params, InterFunction func) throws CompileException {
 		
 		// get the field type for the static field.
-		InterFile object = JavaCompiler.parseAndCompile(className);
+		InterFile object = JavaCompiler.parseAndCompile(className, fileName, line);
 		String type = object.getStatFieldType(fieldName, fileName, line);
 		
 		regs.put(result, type);
