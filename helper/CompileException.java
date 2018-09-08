@@ -21,6 +21,6 @@ public class CompileException extends Exception {
 	
 	@Override
 	public String getMessage() {
-		return super.getMessage() + " @ " + line + " of file: " + file;
+		return super.getMessage() + " @ " + file + ":" + line;
 	}
 }
