@@ -45,13 +45,13 @@ public class LocalVariableDecNode implements Node {
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// place in symbol table and add intermediate code
 		for (VariableDecNode d : declarators) {
-			s.putEntry(d.id.name, type.interRep());
+			s.putEntry(d.id.name, type.interRep(), fileName, line);
 			f.statements.add(new StartScopeStatement(d.id.name, type.interRep()));
 			if (d.init != null) {
 				// put in the code to compute initial value.
 				d.init.compile(s, f, r, c);
 				// store the initial value into the local variable.
-				f.statements.add(new PutLocalStatement(r.getLast(), d.id.name));
+				f.statements.add(new PutLocalStatement(r.getLast(), d.id.name, fileName, line));
 			}
 		}
 	}

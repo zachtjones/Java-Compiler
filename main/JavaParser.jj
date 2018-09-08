@@ -529,7 +529,7 @@ ParamNode FormalParameter() :
 
 ConstructorNode ConstructorDeclaration() :
 {
-    ConstructorNode c = new ConstructorNode();
+    ConstructorNode c = new ConstructorNode(fileName, token.beginLine);
     Token t;
     BlockStatementNode b;
 }

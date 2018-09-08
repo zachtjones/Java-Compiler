@@ -52,7 +52,7 @@ public class ExclusiveOrExpressionNode implements Expression {
 			Register two = r.getLast();
 			result = r.getNext(Register.getLarger(current.type, two.type));
 			// add the XOR statement
-			f.statements.add(new BinaryOpStatement(current, two, result, '^'));
+			f.statements.add(new BinaryOpStatement(current, two, result, '^', fileName, line));
 		}
 	}
 }

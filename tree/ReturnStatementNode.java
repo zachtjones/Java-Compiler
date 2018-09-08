@@ -40,10 +40,10 @@ public class ReturnStatementNode implements Node {
 		// compile in the expression
 		if (expression != null) {
 			expression.compile(s, f, r, c);
-			f.statements.add(new ReturnRegStatement(r.getLast()));
+			f.statements.add(new ReturnRegStatement(r.getLast(), fileName, line));
 		} else {
 			// just compile in the return statement.
-			f.statements.add(new ReturnVoidStatement());
+			f.statements.add(new ReturnVoidStatement(fileName, line));
 		}
 	}
 }

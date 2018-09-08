@@ -48,7 +48,7 @@ public class TryStatementNode implements Node {
 
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
-		throw new CompileException("try statements not implemented yet.");
+		throw new CompileException("try statements not implemented yet.", fileName, line);
 		// TODO
 	}
     

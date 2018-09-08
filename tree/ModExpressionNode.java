@@ -38,7 +38,9 @@ public class ModExpressionNode implements Expression {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) 
+			throws CompileException {
+		
 		// evaluate left
 		left.compile(s, f, r, c);
 		Register leftResult = r.getLast();
@@ -48,6 +50,6 @@ public class ModExpressionNode implements Expression {
 
 		// add them
 		Register destination = r.getNext(Register.getLarger(leftResult.type, rightResult.type));
-		f.statements.add(new BinaryOpStatement(leftResult, rightResult, destination, '%'));
+		f.statements.add(new BinaryOpStatement(leftResult, rightResult, destination, '%', fileName, line));
 	}
 }

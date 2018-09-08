@@ -68,11 +68,13 @@ public class JavaCompiler {
 			}
 
 		} catch (FileNotFoundException e) {
-			throw new CompileException("File not found for " + fullyQualifiedName, e);
+			throw new CompileException("File not found for " + fullyQualifiedName, e, filename, -1);
 		} catch (ParseException e) {
-			throw new CompileException("Could not parse " + fullyQualifiedName, e);
+			throw new CompileException("Could not parse " + fullyQualifiedName, e, 
+					filename, e.currentToken.beginLine);
 		} catch (IOException e) {
-			throw new CompileException("I/O exception while processing " + fullyQualifiedName, e);
+			throw new CompileException("I/O exception while processing " + fullyQualifiedName, 
+					e, filename, -1);
 		}
 
 		// none were found

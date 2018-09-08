@@ -53,10 +53,13 @@ public class AssignmentNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) 
+			throws CompileException {
+		
 		if (type == ASSIGN) {
 			if (!(left instanceof LValue)) {
-				throw new CompileException("left side of = expression not able to assign to. " + left.toString());
+				throw new CompileException("left side of = expression not able to assign to. " 
+							+ left.toString(), fileName, line);
 			}
 			right.compile(s, f, r, c);
 			Register rightResult = r.getLast();
@@ -66,13 +69,15 @@ public class AssignmentNode implements Expression {
 			Register leftAddress = r.getLast(); // a reference
 			
 			// store the result of the right side into the address
-			StoreAddressStatement store = new StoreAddressStatement(rightResult, leftAddress);
+			StoreAddressStatement store = new StoreAddressStatement(rightResult, leftAddress,
+					fileName, line);
+			
 			f.statements.add(store);
 			
 			// the result of an assign is the expression on the right
 			// this allows for x = y = 5;
 			Register result = r.getNext(rightResult.type);
-			f.statements.add(new CopyStatement(rightResult, result));
+			f.statements.add(new CopyStatement(rightResult, result, fileName, line));
 		} else if (type == STARASSIGN) {
 			// x *= 5 ->  x = x * 5;
 			AssignmentNode assign = new AssignmentNode(fileName, line);
@@ -195,7 +200,7 @@ public class AssignmentNode implements Expression {
 			
 		} else {
 			// unknown type of assignment.
-			throw new CompileException("unknown type of Assignment: " + type);
+			throw new CompileException("unknown type of Assignment: " + type, fileName, line);
 		}
 		
 	}

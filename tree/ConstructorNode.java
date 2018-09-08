@@ -25,6 +25,13 @@ public class ConstructorNode {
     
     // the statements that make up the rest of the block
     public ArrayList<BlockStatementNode> code = new ArrayList<>();
+	private String fileName;
+	private int line;
+    
+    public ConstructorNode(String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
+    }
 
 	public void resolveImports(ClassLookup c) throws IOException {
 		for (ParamNode p : params) {
@@ -63,7 +70,7 @@ public class ConstructorNode {
 		for (ParamNode p : this.params) {
 			func.paramTypes.add(p.type.interRep());
 			func.paramNames.add(p.id.name);
-			newTable.putEntry(p.id.name, p.type.interRep());
+			newTable.putEntry(p.id.name, p.type.interRep(), fileName, line);
 		}
 		
 		// throws the throws list

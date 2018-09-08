@@ -6,7 +6,14 @@ import helper.CompileException;
 
 /** return; */
 public class ReturnVoidStatement implements InterStatement {
-	public ReturnVoidStatement() {}
+	
+	private final String fileName;
+	private final int line;
+	
+	public ReturnVoidStatement(String fileName, int line) {
+		this.fileName = fileName;
+		this.line = line;
+	}
 	
 	@Override
 	public String toString() {
@@ -19,7 +26,7 @@ public class ReturnVoidStatement implements InterStatement {
 			InterFunction func) throws CompileException {
 		
 		if (func.returnType != null) {
-			throw new CompileException("can't return void on non-void function");
+			throw new CompileException("can't return void on non-void function", fileName, line);
 		}
 	}
 }

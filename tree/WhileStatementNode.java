@@ -50,7 +50,7 @@ public class WhileStatementNode implements Node {
 		expression.compile(s, f, r, c);
 		
 		// if false, goto end
-		f.statements.add(new BranchStatmentFalse(endLbl, r.getLast()));
+		f.statements.add(new BranchStatmentFalse(endLbl, r.getLast(), fileName, line));
 		
 		// compile in the block
 		statement.compile(s, f, r, c);

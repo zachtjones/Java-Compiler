@@ -44,7 +44,9 @@ public class PrimitiveArrayAllocationNode implements Expression {
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		if (expressions.get(0) == null) {
-			throw new CompileException("The first dimension of an array has to have a size given at the constructor.");
+			throw new CompileException(
+				"The first dimension of an array has to have a size given at the constructor.",
+				fileName, line);
 		}
 		if (expressions.size() == 1) {
 			expressions.get(0).compile(s, f, r, c);
@@ -53,7 +55,7 @@ public class PrimitiveArrayAllocationNode implements Expression {
 			f.statements.add(new CreateArrayStatement(size, type.toString(), result));
 		} else {
 			// TODO handle multi-dimensional arrays.
-			throw new CompileException("Multi-dimensional array creation not done yet.");
+			throw new CompileException("Multi-dimensional array creation not done yet.", "", -1);
 		}
 	}
 }

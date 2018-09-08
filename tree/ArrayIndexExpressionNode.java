@@ -43,7 +43,7 @@ public class ArrayIndexExpressionNode implements Expression, LValue {
 		Register index = r.getLast();
 		// load the memory at the address
 		Register result = r.getNext("unknown");
-		f.statements.add(new GetArrayValueStatement(array, index, result));
+		f.statements.add(new GetArrayValueStatement(array, index, result, fileName, line));
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class ArrayIndexExpressionNode implements Expression, LValue {
 		Register index = r.getLast();
 		// load the memory at the address
 		Register result = r.getNext("unknown");
-		f.statements.add(new GetArrayValueStatement(array, index, result));
+		f.statements.add(new GetArrayValueStatement(array, index, result, fileName, line));
 	}
 
 	

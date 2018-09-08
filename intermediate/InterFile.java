@@ -124,7 +124,7 @@ public class InterFile {
 	/**
 	 * Generates the default constructor if needed.
 	 */
-	public void generateDefaultConstructor() {
+	public void generateDefaultConstructor(String fileName, int line) {
 		boolean hasOne = false;
 		for (InterFunction i : functions) {
 			if (i.name.equals("<init>")) {
@@ -146,13 +146,15 @@ public class InterFile {
 			// load this pointer (call super on this)
 			RegisterAllocator ra = new RegisterAllocator();
 			Register thisPointer = ra.getNext(Register.REFERENCE);
-			d.statements.add(new GetParamStatement(thisPointer, "this"));
+			d.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
 			//  superclass of this object.
 			if (superNode != null) {
 				// add in the call to it's init
-				c = new CallActualStatement(thisPointer, superNode.primaryName, "<init>", args, null);
+				c = new CallActualStatement(thisPointer, superNode.primaryName, "<init>", args, null,
+						fileName, line);
 			} else {
-				c = new CallActualStatement(thisPointer, "java/lang/Object", "<init>", args, null);
+				c = new CallActualStatement(thisPointer, "java/lang/Object", "<init>", args, null,
+						fileName, line);
 			}
 			d.statements.add(c);
 			functions.add(d);
@@ -173,8 +175,8 @@ public class InterFile {
 	 * @return The JIL representation of the type
 	 * @throws CompileException if the field doesn't exist, or there is a problem checking it.
 	 */
-	public String getInstFieldType(String fieldName) throws CompileException {
-		return instancePart.getFieldType(fieldName);
+	public String getInstFieldType(String fieldName, String fileName, int line) throws CompileException {
+		return instancePart.getFieldType(fieldName, fileName, line);
 	}
 
 	/**
@@ -183,8 +185,8 @@ public class InterFile {
 	 * @return The JIL representation of the type
 	 * @throws CompileException if the field doesn't exist, or there is a problem checking it.
 	 */
-	public String getStatFieldType(String fieldName) throws CompileException {
-		return staticPart.getFieldType(fieldName);
+	public String getStatFieldType(String fieldName, String fileName, int line) throws CompileException {
+		return staticPart.getFieldType(fieldName, fileName, line);
 	}
 
 

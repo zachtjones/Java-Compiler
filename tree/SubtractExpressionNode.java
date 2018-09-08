@@ -45,6 +45,6 @@ public class SubtractExpressionNode implements Expression {
 		Register leftResult = r.getLast();
 		
 		Register result = r.getNext(Register.getLarger(leftResult.type, rightResult.type));
-		f.statements.add(new BinaryOpStatement(leftResult, rightResult, result, '-'));
+		f.statements.add(new BinaryOpStatement(leftResult, rightResult, result, '-', fileName, line));
 	}
 }

@@ -75,12 +75,16 @@ public class SymbolTable {
 	 * Places the entry into this symbol table
 	 * @param identifier The identifier to place
 	 * @param type The identifier's type.
+	 * @param fileName The file name of the currently compiled expression
+	 * @param line The line number of the currently compiled expression
 	 * @throws CompileException If the symbol is already defined
 	 */
-	public void putEntry(String identifier, String type) throws CompileException {
+	public void putEntry(String identifier, String type, String fileName, int line)
+			throws CompileException {
+		
 		if (lookup(identifier) != -1) {
 			throw new CompileException("the symbol: '" + identifier 
-					+ "' is already defined in an outer scope.");
+					+ "' is already defined in an outer scope.", fileName, line);
 		}
 		entries.put(identifier, type);
 		

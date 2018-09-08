@@ -59,7 +59,8 @@ public class ArgumentExpressionNode implements Expression {
 		}
 		
 		// add in the call virtual statement
-		f.statements.add(new CallVirtualStatement(obj, name, result, r.getNext(Register.REFERENCE)));
+		f.statements.add(new CallVirtualStatement(obj, name, result, 
+				r.getNext(Register.REFERENCE), fileName, line));
 	}
 
 }

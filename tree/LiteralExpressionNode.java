@@ -37,6 +37,6 @@ public class LiteralExpressionNode implements Expression {
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// the IL code does the work here
-		f.statements.add(new LoadLiteralStatement(value, r));	
+		f.statements.add(new LoadLiteralStatement(value, r, fileName, line));	
 	}
 }

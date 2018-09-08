@@ -38,7 +38,7 @@ public class ThrowStatementNode implements Node {
 		// compile in the expression
 		expression.compile(s, f, r, c);
 		// throw the result of the expression.
-		ThrowStatement th = new ThrowStatement(r.getLast());
+		ThrowStatement th = new ThrowStatement(r.getLast(), fileName, line);
 		f.statements.add(th);
 	}
 }

@@ -47,7 +47,6 @@ public class RightShiftArithExpressionNode implements Expression {
 		// result is of type left
 		Register result = r.getNext(leftResult.type);
 		f.statements.add(new BinaryOpStatement(
-				leftResult, rightResult, result, 
-				(char)BinaryOpStatement.RSHIFTARITH));
+				leftResult, rightResult, result, (char)BinaryOpStatement.RSHIFTARITH, fileName, line));
 	}
 }

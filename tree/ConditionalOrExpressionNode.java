@@ -39,12 +39,14 @@ public class ConditionalOrExpressionNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c)
+			throws CompileException {
+		
 		left.compile(s, f, r, c);
 		LabelStatement end = new LabelStatement("L_" + r.getNextLabel());
 		Register leftResult = r.getLast();
 		// if left is true, jump to end
-		f.statements.add(new BranchStatementTrue(end, leftResult));
+		f.statements.add(new BranchStatementTrue(end, leftResult, fileName, line));
 		
 		// compile in right half
 		right.compile(s, f, r, c);
@@ -54,7 +56,7 @@ public class ConditionalOrExpressionNode implements Expression {
 
 		// keep in SSA, need choose statement
 		Register newReg = r.getNext(Register.BOOLEAN); // result is boolean
-		f.statements.add(new ChooseStatement(leftResult, rightResult, newReg));
+		f.statements.add(new ChooseStatement(leftResult, rightResult, newReg, fileName, line));
 	}
 
 }

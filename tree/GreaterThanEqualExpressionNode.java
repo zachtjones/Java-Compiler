@@ -47,7 +47,6 @@ public class GreaterThanEqualExpressionNode implements Expression {
 		// add in the condition
 		Register result = r.getNext(Register.BOOLEAN);
 		f.statements.add(new SetConditionStatement(
-			SetConditionStatement.GREATEREQUAL, leftResult, 
-				rightResult, result));
+			SetConditionStatement.GREATEREQUAL, leftResult, rightResult, result, fileName, line));
 	}
 }

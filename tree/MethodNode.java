@@ -45,7 +45,7 @@ public class MethodNode {
 	public void compile(InterFile f, SymbolTable syms) throws CompileException {
 		InterFunction func = new InterFunction();
 		if (isNative) {
-			throw new CompileException("native methods not implemented yet.");
+			throw new CompileException("native methods not implemented yet.", "", -1);
 		}
 		
 		func.isInstance = !isStatic;

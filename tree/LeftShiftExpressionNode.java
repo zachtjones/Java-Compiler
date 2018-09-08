@@ -48,7 +48,6 @@ public class LeftShiftExpressionNode implements Expression {
 		// result is of type left
 		Register result = r.getNext(leftResult.type);
 		f.statements.add(new BinaryOpStatement(
-				leftResult, rightResult, result, 
-				(char)BinaryOpStatement.LSHIFT));
+				leftResult, rightResult, result, (char)BinaryOpStatement.LSHIFT, fileName, line));
 	}
 }

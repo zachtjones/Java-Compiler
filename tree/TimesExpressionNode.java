@@ -48,6 +48,6 @@ public class TimesExpressionNode implements Expression {
 
 		// * them
 		Register destination = r.getNext(Register.getLarger(leftResult.type, rightResult.type));
-		f.statements.add(new BinaryOpStatement(leftResult, rightResult, destination, '*'));
+		f.statements.add(new BinaryOpStatement(leftResult, rightResult, destination, '*', fileName, line));
 	}
 }

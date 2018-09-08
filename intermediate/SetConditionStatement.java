@@ -17,11 +17,17 @@ public class SetConditionStatement implements InterStatement {
 	Register right;
 	Register result;
 	
-	public SetConditionStatement(int type, Register left, Register right, Register result) {
+	private final String fileName;
+	private final int line;
+	
+	public SetConditionStatement(int type, Register left, Register right, Register result,
+			String fileName, int line) {
 		this.type = type;
 		this.left = left;
 		this.right = right;
 		this.result = result;
+		this.fileName = fileName;
+		this.line = line;
 	}
 	
 	@Override
@@ -49,7 +55,8 @@ public class SetConditionStatement implements InterStatement {
 		if (type != NOTEQUAL && type != EQUAL) { // == and != can be used with objects
 			// type is a relational only defined on primitives
 			if (!left.isPrimitive() || !right.isPrimitive()) {
-				throw new CompileException("Relational operators other than == and != are only defined on primitves.");
+				throw new CompileException("Relational operators other than == and"
+						+ " != are only defined on primitves.", fileName, line);
 			}
 		}
 		result.typeFull = "boolean";

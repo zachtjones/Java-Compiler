@@ -10,8 +10,13 @@ import helper.UsageCheck;
 public class ReturnRegStatement implements InterStatement {
 	Register r;
 	
-	public ReturnRegStatement(Register regNum) {
+	private final String fileName;
+	private final int line;
+	
+	public ReturnRegStatement(Register regNum, String fileName, int line) {
 		this.r = regNum;
+		this.fileName = fileName;
+		this.line = line;
 	}
 	
 	@Override
@@ -24,9 +29,9 @@ public class ReturnRegStatement implements InterStatement {
 			HashMap<String, String> params, InterFunction func) throws CompileException {
 		
 		if (func.returnType == null) {
-			throw new CompileException("Can't return an expression from void function.");
+			throw new CompileException("Can't return an expression from void function.", fileName, line);
 		}
-		UsageCheck.verifyDefined(r, regs);
-		TypeChecker.subclassOrEqual(func.returnType, r.typeFull);
+		UsageCheck.verifyDefined(r, regs, fileName, line);
+		TypeChecker.subclassOrEqual(func.returnType, r.typeFull, fileName, line);
 	}
 }

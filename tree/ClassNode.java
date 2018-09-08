@@ -77,7 +77,7 @@ public class ClassNode implements Node {
 		}
 		
 		// place the class name in the symbol table (used for static fields)
-		classLevel.putEntry(name, "className");
+		classLevel.putEntry(name, "className", fileName, line);
 		
 		// define the super classes and interfaces
 		//   - treated the same way (kind of)
@@ -105,7 +105,7 @@ public class ClassNode implements Node {
 		
 		if (!isAbstract && !isInterface) {
 			// generate default <init> if needed only.
-			f.generateDefaultConstructor();
+			f.generateDefaultConstructor(fileName, line);
 		}
 		
 		// TODO stuff with the isAbstract, isFinal optimizations

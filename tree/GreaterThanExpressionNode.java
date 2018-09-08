@@ -47,7 +47,6 @@ public class GreaterThanExpressionNode implements Expression {
 		// add in the condition
 		Register result = r.getNext(Register.BOOLEAN);
 		f.statements.add(new SetConditionStatement(
-			SetConditionStatement.GREATER, leftResult, 
-				rightResult, result));
+			SetConditionStatement.GREATER, leftResult, rightResult, result, fileName, line));
 	}
 }

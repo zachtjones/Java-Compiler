@@ -36,5 +36,13 @@ public class ConditionalExpressionNode implements Expression {
 		truePart.resolveImports(c);
 		falsePart.resolveImports(c);
 	}
+
+	@Override
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) 
+			throws CompileException {
+		
+		// TODO
+		throw new CompileException("conditional ternary not implemented yet", fileName, line);		
+	}
 	
 }

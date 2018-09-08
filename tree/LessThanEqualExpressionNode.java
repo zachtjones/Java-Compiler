@@ -47,7 +47,6 @@ public class LessThanEqualExpressionNode implements Expression {
 		// add in the condition
 		Register result = r.getNext(Register.BOOLEAN);
 		f.statements.add(new SetConditionStatement(
-			SetConditionStatement.LESSEQUAL, leftResult, 
-				rightResult, result));
+			SetConditionStatement.LESSEQUAL, leftResult, rightResult, result, fileName, line));
 	}
 }

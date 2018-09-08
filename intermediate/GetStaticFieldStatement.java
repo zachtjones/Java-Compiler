@@ -10,16 +10,23 @@ public class GetStaticFieldStatement implements InterStatement {
 	String fieldName;
 	Register result;
 	
+	private final String fileName;
+	private final int line;
+	
 	/**
 	 * Creates a new get static field statement. 
 	 * @param className The class's name.
 	 * @param fieldName The field's name.
 	 * @param register The result register.
 	 */
-	public GetStaticFieldStatement(String className, String fieldName, Register register) {
+	public GetStaticFieldStatement(String className, String fieldName, Register register,
+			String fileName, int line) {
+		
 		this.className = className;
 		this.fieldName = fieldName;
 		this.result = register;
+		this.fileName = fileName;
+		this.line = line;
 	}
 	
 	@Override
@@ -34,7 +41,7 @@ public class GetStaticFieldStatement implements InterStatement {
 		
 		// get the field type for the static field.
 		InterFile object = JavaCompiler.parseAndCompile(className);
-		String type = object.getStatFieldType(fieldName);
+		String type = object.getStatFieldType(fieldName, fileName, line);
 		
 		regs.put(result, type);
 	}

@@ -10,11 +10,17 @@ public class BranchStatmentFalse implements InterStatement {
 	LabelStatement destination;
 	Register r; // uses a byte register
 	
+	private final String fileName;
+	private final int line;
+	
 	
 	/** Creates a branch statement (conditional jump) when registerNum == 0. */
-	public BranchStatmentFalse(LabelStatement destination, Register r) {
+	public BranchStatmentFalse(LabelStatement destination, Register r,
+			String fileName, int line) {
 		this.destination = destination;
 		this.r = r;
+		this.fileName = fileName;
+		this.line = line;
 	}
 	
 	@Override
@@ -27,9 +33,10 @@ public class BranchStatmentFalse implements InterStatement {
 			HashMap<String, String> locals, HashMap<String, String> params,
 			InterFunction func) throws CompileException {
 		
-		UsageCheck.verifyDefined(r, regs);
+		UsageCheck.verifyDefined(r, regs, fileName, line);
 		if (r.type != Register.BOOLEAN) {
-			throw new CompileException("cannot convert from: " + r.typeFull + " to boolean.");
+			throw new CompileException("cannot convert from: " + r.typeFull + " to boolean.",
+					this.fileName, this.line);
 		}
 	}
 }

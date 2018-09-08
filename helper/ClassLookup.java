@@ -64,12 +64,14 @@ public class ClassLookup {
 	 * If there is an issue with this lookup, this exception is thrown.
 	 * @throws CompileException If there is an error compiling.
 	 * */
-	public String getFullName(String shortName) throws IOException, CompileException {
+	public String getFullName(String shortName, String fileName, int line)
+			throws IOException, CompileException {
+		
 		if (items.containsKey(shortName)) {
 			return items.get(shortName);
 		}
 		// check the java.*** stuff for it
-		String javaLookup = lookupJavaName(shortName);
+		String javaLookup = lookupJavaName(shortName, fileName, line);
 		if (javaLookup != null) return javaLookup;
 		
 		// return the short name, assume default package;
@@ -78,9 +80,13 @@ public class ClassLookup {
 
 	/** Looks up the java name. Note this might require a network connection,
 	 * and the java name could be java.util.* or javax.* or similar classes.
+	 * @param fileName The name of the file being compiled.
+	 * @param fileLine The line of the current expression being compiled.
 	 * @throws CompileException If there is a compile exception.
 	 * */
-	private String lookupJavaName(String shortName) throws IOException, CompileException {
+	private String lookupJavaName(String shortName, String fileName, int fileLine)
+			throws IOException, CompileException {
+		
 		if (!lookedUpJava) {
 			File f = new File("javaLookup.txt");
 			// use the javadocs online to lookup the list and create it
@@ -106,7 +112,7 @@ public class ClassLookup {
 				// just the last part of the fully qualified name
 				String shortestName = line.replaceAll(".*/", "");
 				javaItems.put(shortestName, line);
-				syms.putEntry(line, "className");
+				syms.putEntry(line, "className", fileName, fileLine);
 			}
 			lookedUpJava = true;
 		}

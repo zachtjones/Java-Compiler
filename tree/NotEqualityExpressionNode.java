@@ -49,6 +49,6 @@ public class NotEqualityExpressionNode implements Expression {
 		
 		// do a compare
 		f.statements.add(new SetConditionStatement(
-				SetConditionStatement.NOTEQUAL, leftResult, rightResult, result));
+				SetConditionStatement.NOTEQUAL, leftResult, rightResult, result, fileName, line));
 	}
 }

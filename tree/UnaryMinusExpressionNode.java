@@ -40,6 +40,6 @@ public class UnaryMinusExpressionNode implements Expression {
 		expr.compile(s, f, r, c);
 		Register exprResult = r.getLast();
 		Register result = r.getNext(exprResult.type);
-		f.statements.add(new UnaryOpStatement(exprResult, result, '-'));
+		f.statements.add(new UnaryOpStatement(exprResult, result, '-', fileName, line));
 	}
 }

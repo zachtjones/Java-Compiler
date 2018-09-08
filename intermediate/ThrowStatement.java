@@ -9,8 +9,13 @@ import helper.UsageCheck;
 public class ThrowStatement implements InterStatement {
 	Register r;
 	
-	public ThrowStatement(Register r) {
+	private final String fileName;
+	private final int line;
+	
+	public ThrowStatement(Register r, String fileName, int line) {
 		this.r = r;
+		this.fileName = fileName;
+		this.line = line;
 	}
 	
 	@Override
@@ -21,6 +26,6 @@ public class ThrowStatement implements InterStatement {
 	@Override
 	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
 			HashMap<String, String> params, InterFunction func) throws CompileException {
-		UsageCheck.verifyDefined(r, regs);
+		UsageCheck.verifyDefined(r, regs, fileName, line);
 	}
 }

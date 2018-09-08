@@ -38,9 +38,7 @@ public class LogicalNotExpressionNode implements Expression {
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		expr.compile(s, f, r, c);
-		f.statements.add(new UnaryOpStatement(
-				r.getLast(), 
-				r.getNext(Register.BYTE), 
-				UnaryOpStatement.LOGNOT));
+		f.statements.add(new UnaryOpStatement(r.getLast(), 
+				r.getNext(Register.BYTE), UnaryOpStatement.LOGNOT, fileName, line));
 	}
 }

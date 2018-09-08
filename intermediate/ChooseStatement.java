@@ -13,10 +13,17 @@ import helper.CompileException;
 public class ChooseStatement implements InterStatement {
 	Register src1, src2, result;
 	
-	public ChooseStatement(Register src1, Register src2, Register result) {
+	private final String fileName;
+	private final int line;
+	
+	public ChooseStatement(Register src1, Register src2, Register result,
+			String fileName, int line) {
+		
 		this.src1 = src1;
 		this.src2 = src2;
 		this.result = result;
+		this.fileName = fileName;
+		this.line = line;
 	}
 
 	@Override
@@ -36,7 +43,8 @@ public class ChooseStatement implements InterStatement {
 			System.out.println("Choose statements type checking not complete for reference types");
 		}
 		if ( ! src1.typeFull.equals(src2.typeFull)) {
-			throw new CompileException("in the choose statement, the types were different. Add code to see if they are convertible.");
+			throw new CompileException("in the choose statement, the types were different. "
+					+ "Add code to see if they are convertible.", fileName, line);
 		}
 		result.typeFull = src1.typeFull;
 		regs.put(result, result.typeFull);

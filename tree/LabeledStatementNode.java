@@ -36,10 +36,10 @@ public class LabeledStatementNode implements Node {
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// put the label into the table
-		s.putEntry(name, "Label");
+		s.putEntry(name, "Label", fileName, line);
 		
 		// java doesn't have goto, so the only jumping of labeled statements is
 		//  in break or continue statements.
-		throw new CompileException("Labeled statements are not supported (yet).");
+		throw new CompileException("Labeled statements are not supported (yet).", fileName, line);
 	}
 }

@@ -61,13 +61,13 @@ public class InterStructure {
 	}
 
 	/** Gets the type for the structure field, throwing a compile exception if problem. */
-	public String getFieldType(String fieldName) throws CompileException {
+	public String getFieldType(String fieldName, String fileName, int line) throws CompileException {
 		for (int i = 0; i < names.size(); i++) {
 			if (fieldName.equals(names.get(i))) {
 				return types.get(i);
 			}
 		}
-		throw new CompileException("Field " + fieldName + " not present in structure.");
+		throw new CompileException("Field " + fieldName + " not present in structure.", fileName, line);
 	}
 	
 }

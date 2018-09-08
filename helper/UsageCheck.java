@@ -6,9 +6,11 @@ import intermediate.Register;
 
 public class UsageCheck {
 
-	public static void verifyDefined(Register r, HashMap<Register, String> regs) throws CompileException {
+	public static void verifyDefined(Register r, HashMap<Register, String> regs, String fileName, int line)
+			throws CompileException {
+		
 		if (!regs.containsKey(r)) {
-			throw new CompileException(r + " is used before assigned to.");
+			throw new CompileException(r + " is used before assigned to.", fileName, line);
 		}
 	}
 

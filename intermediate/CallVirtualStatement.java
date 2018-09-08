@@ -13,11 +13,18 @@ public class CallVirtualStatement implements InterStatement {
 	Register[] args;
 	Register returnVal;
 	
-	public CallVirtualStatement(Register obj, String name, Register[] args, Register returnVal) {
+	private final String fileName;
+	private final int line;
+	
+	public CallVirtualStatement(Register obj, String name, Register[] args, Register returnVal,
+			String fileName, int line) {
+		
 		this.obj = obj;
 		this.name = name;
 		this.args = args;
 		this.returnVal = returnVal;
+		this.fileName = fileName;
+		this.line = line;
 	}
 
 	@Override
@@ -31,7 +38,7 @@ public class CallVirtualStatement implements InterStatement {
 			HashMap<String, String> params, InterFunction func) throws CompileException {
 		
 		for (Register r : args) {
-			UsageCheck.verifyDefined(r, regs);
+			UsageCheck.verifyDefined(r, regs, fileName, line);
 		}
 		System.out.println("check for definition of method: " + name + " in class: " + obj.typeFull);
 		

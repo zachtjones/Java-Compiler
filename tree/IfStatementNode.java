@@ -53,7 +53,7 @@ public class IfStatementNode implements Node {
 		// start with the expression
 		expression.compile(newTable, f, r, c);
 		// branch if == 0 to else (false)
-		f.statements.add(new BranchStatmentFalse(elseLbl, r.getLast()));
+		f.statements.add(new BranchStatmentFalse(elseLbl, r.getLast(), fileName, line));
 		
 		// compile in the true part
 		statement.compile(newTable, f, r, c);

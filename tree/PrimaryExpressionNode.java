@@ -55,7 +55,8 @@ public class PrimaryExpressionNode implements Expression, LValue {
 				if (suffixes.get(i) instanceof LValue) {
 					( (LValue) suffixes.get(i) ).compileAddress(s, f, r, c);
 				} else {
-					throw new CompileException("left side of = expression not able to assign to. " + suffixes.get(i));
+					throw new CompileException("left side of = expression not able to assign to. " 
+						+ suffixes.get(i), fileName, line);
 				}
 			} else {
 				suffixes.get(i).compile(s, f, r, c);

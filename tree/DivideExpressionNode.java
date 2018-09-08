@@ -47,7 +47,7 @@ public class DivideExpressionNode implements Expression {
 		
 		// get the result
 		Register result = r.getNext(Register.getLarger(leftResult.type, rightResult.type));
-		f.statements.add(new BinaryOpStatement(leftResult, rightResult, result, '/'));
+		f.statements.add(new BinaryOpStatement(leftResult, rightResult, result, '/', fileName, line));
 		
 	}
 }

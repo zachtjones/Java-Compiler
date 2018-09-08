@@ -1,14 +1,14 @@
 package intermediate;
 
 public class RegisterAllocator {
-	private Register curr = new Register(0, 0);
-	private Register before = new Register(0, 0);
+	private Register curr = new Register(0, 0, "", -1);
+	private Register before = new Register(0, 0, "", -1);
 	
 	/** Gets the next register (of the type specified)
 	 * @param type One of the constants of the Register class. */
 	public Register getNext(int type) {
 		before = curr;
-		curr = new Register(curr.num + 1, type);
+		curr = new Register(curr.num + 1, type, "", -1); // this one won't get Compile called on
 		return curr;
 	}
 	
@@ -32,7 +32,7 @@ public class RegisterAllocator {
 	
 	/** Makes the current register a new label one, and returns it's number. */
 	public int getNextLabel() {
-		curr = new Register(curr.num + 1, Register.LABEL);
+		curr = new Register(curr.num + 1, Register.LABEL, "", -1); // won't get filename and line called
 		return curr.num;
 	}
 	

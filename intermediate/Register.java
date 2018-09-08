@@ -35,9 +35,14 @@ public class Register implements Expression {
 	/** The type's fully qualified name, set on type checking. */
 	public String typeFull;
 	
-	public Register(int num, int type) {
+	private final String fileName;
+	private final int line;
+	
+	public Register(int num, int type, String fileName, int line) {
 		this.num = num;
 		this.type = type;
+		this.fileName = fileName;
+		this.line = line;
 	}
 	
 	@Override
@@ -118,7 +123,7 @@ public class Register implements Expression {
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// make a copy statement so the result can be gotten with r.getLast()
 		Register result = r.getNext(type);
-		f.statements.add(new CopyStatement(this, result));
+		f.statements.add(new CopyStatement(this, result, fileName, line));
 	}
 	
 	@Override

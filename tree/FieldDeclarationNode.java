@@ -59,7 +59,7 @@ public class FieldDeclarationNode implements Node {
 				temp += "[]";
 			}
 			f.addField(temp, d.id.name, isStatic);
-			syms.putEntry(d.id.name, typeRep);
+			syms.putEntry(d.id.name, typeRep, fileName, line);
 
 			// add the initial values if any
 			if (d.init != null && d.init.e != null) {

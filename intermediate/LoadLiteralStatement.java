@@ -11,7 +11,9 @@ public class LoadLiteralStatement implements InterStatement {
 	// 4 types of literals: char, String, long, double.
 	public Register r;
 	
-	public LoadLiteralStatement(String literalValue, RegisterAllocator regAlloc) throws CompileException {
+	public LoadLiteralStatement(String literalValue, RegisterAllocator regAlloc,
+			String fileName, int line) throws CompileException {
+
 		value = literalValue; // or set to something else later.
 		if (literalValue.charAt(0) == '"') {
 			r = regAlloc.getNext(Register.REFERENCE);
@@ -42,7 +44,8 @@ public class LoadLiteralStatement implements InterStatement {
 			try {
 				Integer.parseInt(literalValue);
 			} catch(NumberFormatException e) {
-				throw new CompileException("The literal: " + literalValue + " is not a valid literal.");
+				throw new CompileException("The literal: " + literalValue + " is not a valid literal.",
+						fileName, line);
 			}
 		}
 	}

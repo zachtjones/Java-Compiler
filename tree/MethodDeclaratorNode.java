@@ -45,7 +45,7 @@ public class MethodDeclaratorNode implements Node {
 		
 		// s is for the parameters, place them in s
 		for (ParamNode p : params) {
-			s.putEntry(p.id.name, p.type.interRep());
+			s.putEntry(p.id.name, p.type.interRep(), fileName, line);
 			f.paramTypes.add(p.type.interRep());
 			f.paramNames.add(p.id.name);
 		}

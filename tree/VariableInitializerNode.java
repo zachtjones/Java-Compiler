@@ -50,7 +50,9 @@ public class VariableInitializerNode implements Node {
 		if (e != null) {
 			e.compile(s, f, r, c);
 		} else {
-			throw new CompileException("array initializer expressions with items not implemented.");
+			// TODO
+			throw new CompileException("array initializer expressions with items not implemented.",
+					fileName, line);
 		}
 	}
     

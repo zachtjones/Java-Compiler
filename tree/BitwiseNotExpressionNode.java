@@ -38,6 +38,7 @@ public class BitwiseNotExpressionNode implements Expression {
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		expr.compile(s, f, r, c);
 		// take bitwise not of the result.
-		f.statements.add(new UnaryOpStatement(r.getLast(), r.getNext(r.getLast().type), '~'));
+		f.statements.add(new UnaryOpStatement(r.getLast(), r.getNext(r.getLast().type), '~', 
+				fileName, line));
 	}
 }

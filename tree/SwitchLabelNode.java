@@ -36,7 +36,7 @@ public class SwitchLabelNode implements Node {
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// TODO - check if the expression is a constant
-		throw new CompileException("Switch statements not implemented yet.");
+		throw new CompileException("Switch statements not implemented yet.", fileName, line);
 		//if (expression != null) expression.compile(s, 0, null);
 	}
 }

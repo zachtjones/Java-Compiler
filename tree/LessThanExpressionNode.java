@@ -48,7 +48,6 @@ public class LessThanExpressionNode implements Expression {
 		// add in the condition
 		Register result = r.getNext(Register.BOOLEAN);
 		f.statements.add(new SetConditionStatement(
-			SetConditionStatement.LESS, leftResult, 
-				rightResult, result));
+			SetConditionStatement.LESS, leftResult, rightResult, result, fileName, line));
 	}
 }

@@ -49,6 +49,6 @@ public class EqualityExpressionNode implements Expression {
 		
 		// do a compare
 		f.statements.add(new SetConditionStatement(
-				SetConditionStatement.EQUAL, leftResult, rightResult, result));
+				SetConditionStatement.EQUAL, leftResult, rightResult, result, fileName, line));
 	}
 }

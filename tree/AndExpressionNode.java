@@ -52,7 +52,7 @@ public class AndExpressionNode implements Expression {
 			Register two = r.getLast();
 			result = r.getNext(Register.getLarger(current.type, two.type));
 			// add the AND statement
-			f.statements.add(new BinaryOpStatement(current, two, result, '&'));
+			f.statements.add(new BinaryOpStatement(current, two, result, '&', fileName, line));
 		}
 	}
 

@@ -43,8 +43,10 @@ public class SwitchStatementNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
-		throw new CompileException("Switch statement compiling not implemented yet.");
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) 
+			throws CompileException {
+		
+		throw new CompileException("Switch statement compiling not implemented yet.", fileName, line);
 		
 		/*expression.compile(s, 0, null);
 		for (int i = 0; i < labels.size(); i++) {

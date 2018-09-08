@@ -58,7 +58,7 @@ public class NameNode implements Node, Expression, LValue {
 		//System.out.print("Replace: " + this.getSimpleName());
 		String firstFull = null;
 		try {
-			firstFull = c.getFullName(primaryName);
+			firstFull = c.getFullName(primaryName, fileName, line);
 		} catch (CompileException e) { /* will never happen */ }
 		
 		String total = firstFull;
@@ -86,18 +86,20 @@ public class NameNode implements Node, Expression, LValue {
 			}
 			if (tableLookup == SymbolTable.local) {
 				Register result = r.getNext(type);
-				f.statements.add(new GetLocalStatement(result, primaryName));
+				f.statements.add(new GetLocalStatement(result, primaryName, fileName, line));
 			} else if (tableLookup == SymbolTable.parameter) {
 				Register result = r.getNext(type);
-				f.statements.add(new GetParamStatement(result, primaryName));
+				f.statements.add(new GetParamStatement(result, primaryName, fileName, line));
 			} else { // assume static/instance field / method
 				// load 'this' pointer
 				Register thisPointer = r.getNext(Register.REFERENCE);
-				f.statements.add(new GetParamStatement(thisPointer, "this"));
+				f.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
 				
 				// load the field from 'this' pointer
 				Register result = r.getNext(type);
-				f.statements.add(new GetInstanceFieldStatement(thisPointer, primaryName, result));
+				f.statements.add(new GetInstanceFieldStatement(thisPointer, primaryName, result,
+						fileName, line));
+				
 				c.setName(primaryName);
 			}
 		} else {
@@ -107,12 +109,13 @@ public class NameNode implements Node, Expression, LValue {
 			if (tableLookup == SymbolTable.className) {
 				// get the static field, then do the chain of instance fields
 				Register result = r.getNext(Register.REFERENCE);
-				f.statements.add(new GetStaticFieldStatement(split[0], split[1], result));
+				f.statements.add(new GetStaticFieldStatement(split[0], split[1], result, fileName, line));
 				c.setName(split[1]);
 				for (int i = 2; i < split.length; i++) {
 					Register temp3 = r.getNext(Register.REFERENCE);
 					c.setName(split[i]);
-					f.statements.add(new GetInstanceFieldStatement(result, split[i], temp3));
+					f.statements.add(new GetInstanceFieldStatement(result, split[i], temp3,
+							fileName, line));
 					result = temp3;
 				}
 				
@@ -127,7 +130,9 @@ public class NameNode implements Node, Expression, LValue {
 				for (int i = 1; i < split.length; i++) {
 					Register temp3 = r.getNext(Register.REFERENCE);
 					c.setName(split[i]);
-					f.statements.add(new GetInstanceFieldStatement(result, split[i], temp3));
+					f.statements.add(new GetInstanceFieldStatement(result, split[i], temp3,
+							fileName, line));
+					
 					result = temp3;
 				}
 			}
@@ -148,18 +153,19 @@ public class NameNode implements Node, Expression, LValue {
 			} 
 			if (tableLookup == SymbolTable.local) {
 				Register result = r.getNext(type);
-				f.statements.add(new GetLocalAddressStatement(result, primaryName));
+				f.statements.add(new GetLocalAddressStatement(result, primaryName, fileName, line));
 			} else if (tableLookup == SymbolTable.parameter) {
 				Register result = r.getNext(type);
-				f.statements.add(new GetParamAddressStatement(result, primaryName));
+				f.statements.add(new GetParamAddressStatement(result, primaryName, fileName, line));
 			} else if (tableLookup == SymbolTable.className){
 				// load 'this' pointer
 				Register thisPointer = r.getNext(Register.REFERENCE);
-				f.statements.add(new GetParamStatement(thisPointer, "this"));
+				f.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
 				
 				// load the field from 'this' pointer
 				Register result = r.getNext(type);
-				f.statements.add(new GetInstanceFieldAddressStatement(thisPointer, primaryName, result));
+				f.statements.add(new GetInstanceFieldAddressStatement(thisPointer, primaryName, result,
+						fileName, line));
 			}
 			// don't do anything
 		} else {

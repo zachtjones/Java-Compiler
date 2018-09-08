@@ -47,6 +47,6 @@ public class DoStatementNode implements Node {
 		// immediately followed by expression
 		expression.compile(s, f, r, c);
 		// conditional jump to top of statement
-		f.statements.add(new BranchStatementTrue(l, r.getLast()));
+		f.statements.add(new BranchStatementTrue(l, r.getLast(), fileName, line));
 	}
 }
