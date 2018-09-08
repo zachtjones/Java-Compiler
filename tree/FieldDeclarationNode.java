@@ -64,8 +64,8 @@ public class FieldDeclarationNode implements Node {
 			// add the initial values if any
 			if (d.init != null && d.init.e != null) {
 				// construct the assignment to the expression
-				AssignmentNode a = new AssignmentNode();
-				NameNode n = new NameNode();
+				AssignmentNode a = new AssignmentNode(fileName, line);
+				NameNode n = new NameNode(fileName, line);
 				n.primaryName = d.id.name;
 				a.left = n;
 				a.type = AssignmentNode.ASSIGN;

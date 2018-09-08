@@ -19,7 +19,7 @@ public class TryStatementNode implements Node {
     public String fileName;
     public int line;
     
-    public AddExpressionNode(String fileName, int line) {
+    public TryStatementNode(String fileName, int line) {
     	this.fileName = fileName;
     	this.line = line;
     }

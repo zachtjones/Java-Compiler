@@ -136,4 +136,15 @@ public class Register implements Expression {
 			return false;
 		}
 	}
+
+	@Override
+	public String getFileName() { // required by Expression, but not needed here
+		return "";
+	}
+
+	@Override
+	public int getLine() {
+		// return -1, line doesn't exist
+		return -1;
+	}
 }

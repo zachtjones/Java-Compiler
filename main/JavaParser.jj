@@ -21,8 +21,11 @@ import java.util.ArrayList;
 @SuppressWarnings("unused")
 public class JavaParser {
 
+    public String fileName;
+
     public static CompilationUnit parse(String file) throws FileNotFoundException, ParseException {
         JavaParser parser = new JavaParser(new FileInputStream(file));
+        parser.fileName = file;
         return parser.CompilationUnit(file);
     }
 
@@ -215,7 +218,7 @@ TOKEN : /* OPERATORS */
 // the whole file is a compilation unit
 CompilationUnit CompilationUnit(String filename) :
 {
-    CompilationUnit c = new CompilationUnit();
+    CompilationUnit c = new CompilationUnit(fileName, token.beginLine);
     ImportNode temp;
     TypeDecNode temp2;
 }
@@ -242,7 +245,7 @@ NameNode PackageDeclaration() :
 
 ImportNode ImportDeclaration() :
 {
-    ImportNode n = new ImportNode();
+    ImportNode n = new ImportNode(fileName, token.beginLine);
 }
 {
     <IMPORT> n.name=Name()
@@ -280,7 +283,7 @@ TypeDecNode TypeDeclaration() :
 
 ClassNode ClassDeclaration() :
 {
-    ClassNode c = new ClassNode();
+    ClassNode c = new ClassNode(fileName, token.beginLine);
     Token t;
     ClassBodyNode b;
 }
@@ -351,7 +354,7 @@ void MethodDeclarationLookahead() :
 
 ClassNode InterfaceDeclaration() :
 {
-    ClassNode c = new ClassNode();
+    ClassNode c = new ClassNode(fileName, token.beginLine);
     ClassBodyNode b;
     Token t;
 }
@@ -388,7 +391,7 @@ ClassBodyNode InterfaceMemberDeclaration() :
 
 EnumNode EnumDeclaration() :
 {
-    EnumNode e = new EnumNode();
+    EnumNode e = new EnumNode(fileName, token.beginLine);
     Token t;
 }
 {
@@ -414,7 +417,7 @@ ArrayList<String> EnumBody() :
 
 FieldDeclarationNode FieldDeclaration() :
 {
-    FieldDeclarationNode f = new FieldDeclarationNode();
+    FieldDeclarationNode f = new FieldDeclarationNode(fileName, token.beginLine);
     VariableDecNode v;
 }
 {
@@ -431,7 +434,7 @@ FieldDeclarationNode FieldDeclaration() :
 
 VariableDecNode VariableDeclarator() :
 {
-    VariableDecNode v = new VariableDecNode();
+    VariableDecNode v = new VariableDecNode(fileName, token.beginLine);
 }
 {
     v.id=VariableDeclaratorId() [ "=" v.init=VariableInitializer() ]
@@ -442,7 +445,7 @@ VariableDecNode VariableDeclarator() :
 
 VariableIdNode VariableDeclaratorId() :
 {
-    VariableIdNode v = new VariableIdNode();
+    VariableIdNode v = new VariableIdNode(fileName, token.beginLine);
     Token t;
 }
 {
@@ -455,7 +458,7 @@ VariableIdNode VariableDeclaratorId() :
 
 VariableInitializerNode VariableInitializer() :
 {
-    VariableInitializerNode n = new VariableInitializerNode();
+    VariableInitializerNode n = new VariableInitializerNode(fileName, token.beginLine);
     VariableInitializerNode temp;
 }
 {
@@ -489,7 +492,7 @@ MethodNode MethodDeclaration() :
 
 MethodDeclaratorNode MethodDeclarator() :
 {
-    MethodDeclaratorNode m = new MethodDeclaratorNode();
+    MethodDeclaratorNode m = new MethodDeclaratorNode(fileName, token.beginLine);
     Token t;
 }
 {
@@ -515,7 +518,7 @@ ArrayList<ParamNode> FormalParameters() :
 
 ParamNode FormalParameter() :
 {
-    ParamNode p = new ParamNode();
+    ParamNode p = new ParamNode(fileName, token.beginLine);
 }
 {
     p.type=Type() p.id=VariableDeclaratorId()
@@ -567,7 +570,7 @@ BlockNode StaticInitializer() :
 
 TypeNode Type() :
 {
-    TypeNode t = new TypeNode();
+    TypeNode t = new TypeNode(fileName, token.beginLine);
 }
 {
     ( t.primitive=PrimitiveType() | t.name=Name() )
@@ -577,7 +580,7 @@ TypeNode Type() :
 
 PrimitiveTypeNode PrimitiveType() :
 {
-    PrimitiveTypeNode t = new PrimitiveTypeNode();
+    PrimitiveTypeNode t = new PrimitiveTypeNode(fileName, token.beginLine);
 }
 {
     <BOOLEAN> { t.type = PrimitiveTypeNode.BOOLEAN; return t; }
@@ -592,7 +595,7 @@ PrimitiveTypeNode PrimitiveType() :
 
 ResultTypeNode ResultType() :
 {
-    ResultTypeNode r = new ResultTypeNode();
+    ResultTypeNode r = new ResultTypeNode(fileName, token.beginLine);
 }
 {
   <VOID> { r.isVoid = true; return r; }
@@ -607,7 +610,7 @@ NameNode Name() :
  * Also support generics, making this require even more lookahead
  */
 {
-    NameNode n = new NameNode();
+    NameNode n = new NameNode(fileName, token.beginLine);
     Token t;
 }
 {
@@ -652,7 +655,7 @@ Expression Expression() :
 
 AssignmentNode Assignment() :
 {
-    AssignmentNode e = new AssignmentNode();
+    AssignmentNode e = new AssignmentNode(fileName, token.beginLine);
 }
 {
     e.left = PrimaryExpression()
@@ -684,7 +687,7 @@ int AssignmentOperator() :
 *  ConditionalExpression or the next level down */
 Expression ConditionalExpression() :
 {
-    ConditionalExpressionNode e = new ConditionalExpressionNode();
+    ConditionalExpressionNode e = new ConditionalExpressionNode(fileName, token.beginLine);
     Expression temp;
 }
 {
@@ -710,7 +713,7 @@ Expression ConditionalOrExpression() :
     one=ConditionalAndExpression()
     ( "||" two=ConditionalAndExpression()
     {
-        ConditionalOrExpressionNode e = new ConditionalOrExpressionNode();
+        ConditionalOrExpressionNode e = new ConditionalOrExpressionNode(fileName, token.beginLine);
         e.left = one;
         e.right = two;
         one = e;
@@ -730,7 +733,7 @@ Expression ConditionalAndExpression() :
     one=InclusiveOrExpression()
     ( "&&" two=InclusiveOrExpression()
     {
-        ConditionalAndExpressionNode e = new ConditionalAndExpressionNode();
+        ConditionalAndExpressionNode e = new ConditionalAndExpressionNode(fileName, token.beginLine);
         e.left = one;
         e.right = two;
         one = e;
@@ -742,7 +745,7 @@ Expression ConditionalAndExpression() :
 
 Expression InclusiveOrExpression() :
 {
-    InclusiveOrExpressionNode e = new InclusiveOrExpressionNode();
+    InclusiveOrExpressionNode e = new InclusiveOrExpressionNode(fileName, token.beginLine);
     Expression temp;
 }
 {
@@ -759,7 +762,7 @@ Expression InclusiveOrExpression() :
 
 Expression ExclusiveOrExpression() :
 {
-    ExclusiveOrExpressionNode e = new ExclusiveOrExpressionNode();
+    ExclusiveOrExpressionNode e = new ExclusiveOrExpressionNode(fileName, token.beginLine);
     Expression temp;
 }
 {
@@ -776,7 +779,7 @@ Expression ExclusiveOrExpression() :
 
 Expression AndExpression() :
 {
-    AndExpressionNode e = new AndExpressionNode();
+    AndExpressionNode e = new AndExpressionNode(fileName, token.beginLine);
     Expression temp;
 }
 {
@@ -808,12 +811,12 @@ Expression EqualityExpression() :
     two=InstanceOfExpression()
     {
         if (isEqual) {
-            EqualityExpressionNode eq = new EqualityExpressionNode();
+            EqualityExpressionNode eq = new EqualityExpressionNode(fileName, token.beginLine);
             eq.left = one;
             eq.right = two;
             one = eq; // base for next tree element
         } else {
-            NotEqualityExpressionNode neq = new NotEqualityExpressionNode();
+            NotEqualityExpressionNode neq = new NotEqualityExpressionNode(fileName, token.beginLine);
             neq.left = one;
             neq.right = two;
             one = neq; // base for next tree element
@@ -827,7 +830,7 @@ Expression EqualityExpression() :
 
 Expression InstanceOfExpression() :
 {
-    InstanceOfExpressionNode e = new InstanceOfExpressionNode();
+    InstanceOfExpressionNode e = new InstanceOfExpressionNode(fileName, token.beginLine);
     Expression temp;
     TypeNode t;
 }
@@ -864,22 +867,22 @@ Expression RelationalExpression() :
         two=ShiftExpression()
         {
             if (type == 0) {
-                LessThanExpressionNode lt = new LessThanExpressionNode();
+                LessThanExpressionNode lt = new LessThanExpressionNode(fileName, token.beginLine);
                 lt.left = one;
                 lt.right = two;
                 one = lt;
             } else if (type == 1) {
-                GreaterThanExpressionNode gt = new GreaterThanExpressionNode();
+                GreaterThanExpressionNode gt = new GreaterThanExpressionNode(fileName, token.beginLine);
                 gt.left = one;
                 gt.right = two;
                 one = gt;
             } else if (type == 2) {
-                LessThanEqualExpressionNode lte = new LessThanEqualExpressionNode();
+                LessThanEqualExpressionNode lte = new LessThanEqualExpressionNode(fileName, token.beginLine);
                 lte.left = one;
                 lte.right = two;
                 one = lte;
             } else {
-                GreaterThanEqualExpressionNode gte = new GreaterThanEqualExpressionNode();
+                GreaterThanEqualExpressionNode gte = new GreaterThanEqualExpressionNode(fileName, token.beginLine);
                 gte.left = one;
                 gte.right = two;
                 one = gte;
@@ -905,17 +908,17 @@ Expression ShiftExpression() :
     two=AdditiveExpression()
     {
         if (type == 0) {
-            LeftShiftExpressionNode ls = new LeftShiftExpressionNode();
+            LeftShiftExpressionNode ls = new LeftShiftExpressionNode(fileName, token.beginLine);
             ls.left = one;
             ls.right = two;
             one = ls;
         } else if (type == 1) {
-            RightShiftArithExpressionNode rs = new RightShiftArithExpressionNode();
+            RightShiftArithExpressionNode rs = new RightShiftArithExpressionNode(fileName, token.beginLine);
             rs.left = one;
             rs.right = two;
             one = rs;
         } else {
-            RightShiftLogExpressionNode rss = new RightShiftLogExpressionNode();
+            RightShiftLogExpressionNode rss = new RightShiftLogExpressionNode(fileName, token.beginLine);
             rss.left = one;
             rss.right = two;
             one = rss;
@@ -939,12 +942,12 @@ Expression AdditiveExpression() :
     two=MultiplicativeExpression()
     {
         if (type == 0) {
-            AddExpressionNode add = new AddExpressionNode();
+            AddExpressionNode add = new AddExpressionNode(fileName, token.beginLine);
             add.left = one;
             add.right = two;
             one = add;
         } else {
-            SubtractExpressionNode sub = new SubtractExpressionNode();
+            SubtractExpressionNode sub = new SubtractExpressionNode(fileName, token.beginLine);
             sub.left = one;
             sub.right = two;
             one = sub;
@@ -969,17 +972,17 @@ Expression MultiplicativeExpression() :
     two=UnaryExpression()
     {
         if (type == 0) {
-            TimesExpressionNode t = new TimesExpressionNode();
+            TimesExpressionNode t = new TimesExpressionNode(fileName, token.beginLine);
             t.left = one;
             t.right = two;
             one = t;
         } else if (type == 1) {
-            DivideExpressionNode d = new DivideExpressionNode();
+            DivideExpressionNode d = new DivideExpressionNode(fileName, token.beginLine);
             d.left = one;
             d.right = two;
             one = d;
         } else {
-            ModExpressionNode m = new ModExpressionNode();
+            ModExpressionNode m = new ModExpressionNode(fileName, token.beginLine);
             m.left = one;
             m.right = two;
             one = m;
@@ -1000,7 +1003,7 @@ Expression UnaryExpression() :
     e=UnaryExpression()
     {
         if (temp) { // unary -
-            UnaryMinusExpressionNode u = new UnaryMinusExpressionNode();
+            UnaryMinusExpressionNode u = new UnaryMinusExpressionNode(fileName, token.beginLine);
             u.expr = e;
             return u;
         } else { // unary +, no meaning
@@ -1026,7 +1029,7 @@ Expression UnaryExpression() :
 
 PreIncrementExpressionNode PreIncrementExpression() :
 {
-    PreIncrementExpressionNode e = new PreIncrementExpressionNode();
+    PreIncrementExpressionNode e = new PreIncrementExpressionNode(fileName, token.beginLine);
 }
 {
     "++" e.expr=PrimaryExpression()
@@ -1037,7 +1040,7 @@ PreIncrementExpressionNode PreIncrementExpression() :
 
 PreDecrementExpressionNode PreDecrementExpression() :
 {
-    PreDecrementExpressionNode e = new PreDecrementExpressionNode();
+    PreDecrementExpressionNode e = new PreDecrementExpressionNode(fileName, token.beginLine);
 }
 {
     "--" e.expr=PrimaryExpression()
@@ -1057,11 +1060,11 @@ Expression UnaryExpressionNotPlusMinus() :
     e=UnaryExpression()
     {
         if (type == 0) {
-            BitwiseNotExpressionNode b = new BitwiseNotExpressionNode();
+            BitwiseNotExpressionNode b = new BitwiseNotExpressionNode(fileName, token.beginLine);
             b.expr = e;
             return b;
         } else {
-            LogicalNotExpressionNode l = new LogicalNotExpressionNode();
+            LogicalNotExpressionNode l = new LogicalNotExpressionNode(fileName, token.beginLine);
             l.expr = e;
             return l;
         }
@@ -1106,11 +1109,11 @@ Expression PostfixExpression() :
         if (type == 0) {
             return e;
         } else if (type == 1) {
-            PostIncrementExpressionNode p = new PostIncrementExpressionNode();
+            PostIncrementExpressionNode p = new PostIncrementExpressionNode(fileName, token.beginLine);
             p.expr = e;
             return p;
         } else {
-            PostDecrementExpressionNode p = new PostDecrementExpressionNode();
+            PostDecrementExpressionNode p = new PostDecrementExpressionNode(fileName, token.beginLine);
             p.expr = e;
             return p;
         }
@@ -1119,8 +1122,8 @@ Expression PostfixExpression() :
 
 Expression CastExpression() :
 {
-    PrimitiveCastExpressionNode p = new PrimitiveCastExpressionNode();
-    ObjectCastExpressionNode o = new ObjectCastExpressionNode();
+    PrimitiveCastExpressionNode p = new PrimitiveCastExpressionNode(fileName, token.beginLine);
+    ObjectCastExpressionNode o = new ObjectCastExpressionNode(fileName, token.beginLine);
 }
 {
     LOOKAHEAD(2)
@@ -1141,7 +1144,7 @@ Expression CastExpression() :
 
 Expression PrimaryExpression() :
 {
-    PrimaryExpressionNode p = new PrimaryExpressionNode();
+    PrimaryExpressionNode p = new PrimaryExpressionNode(fileName, token.beginLine);
     Expression temp;
 }
 {
@@ -1173,12 +1176,12 @@ Expression PrimaryPrefix() :
 |
     "this"
     {
-        return new ThisExpressionNode();
+        return new ThisExpressionNode(fileName, token.beginLine);
     }
 |
     "super" "." t=<IDENTIFIER>
     {
-        SuperFieldExpressionNode s = new SuperFieldExpressionNode();
+        SuperFieldExpressionNode s = new SuperFieldExpressionNode(fileName, token.beginLine);
         s.fieldName = t.image;
         return s;
     }
@@ -1204,14 +1207,14 @@ Expression PrimarySuffix() :
 {
     "[" temp=Expression() "]"
     {
-        ArrayIndexExpressionNode a = new ArrayIndexExpressionNode();
+        ArrayIndexExpressionNode a = new ArrayIndexExpressionNode(fileName, token.beginLine);
         a.expr = temp;
         return a;
     }
 |
     "." t=<IDENTIFIER>
     {
-        FieldExpressionNode f = new FieldExpressionNode();
+        FieldExpressionNode f = new FieldExpressionNode(fileName, token.beginLine);
         f.identifier = t.image;
         return f;
     }
@@ -1225,7 +1228,7 @@ Expression PrimarySuffix() :
 LiteralExpressionNode Literal() :
 {
     Token t;
-    LiteralExpressionNode l = new LiteralExpressionNode();
+    LiteralExpressionNode l = new LiteralExpressionNode(fileName, token.beginLine);
 }
 {
     t=<INTEGER_LITERAL> { l.value = t.image; return l; }
@@ -1239,7 +1242,7 @@ LiteralExpressionNode Literal() :
 
 ArgumentExpressionNode Arguments() :
 {
-    ArgumentExpressionNode e = new ArgumentExpressionNode();
+    ArgumentExpressionNode e = new ArgumentExpressionNode(fileName, token.beginLine);
 }
 {
     "(" [ e.expressions=ArgumentList() ] ")"
@@ -1273,7 +1276,7 @@ Expression AllocationExpression() :
     LOOKAHEAD(2)
     "new" p=PrimitiveType() list=ArrayDimensions()
     {
-        PrimitiveArrayAllocationNode a = new PrimitiveArrayAllocationNode();
+        PrimitiveArrayAllocationNode a = new PrimitiveArrayAllocationNode(fileName, token.beginLine);
         a.type = p;
         a.expressions = list;
         return a;
@@ -1282,14 +1285,14 @@ Expression AllocationExpression() :
     "new" n=Name()
     ( args=Arguments()
         {
-            ConstructorCallNode c = new ConstructorCallNode();
+            ConstructorCallNode c = new ConstructorCallNode(fileName, token.beginLine);
             c.name = n;
             c.args = args;
             return c;
         }
     | list=ArrayDimensions()
     {
-        ObjectArrayAllocationNode o = new ObjectArrayAllocationNode();
+        ObjectArrayAllocationNode o = new ObjectArrayAllocationNode(fileName, token.beginLine);
         o.type = n;
         o.expressions = list;
         return o;
@@ -1320,7 +1323,7 @@ ArrayList<Expression> ArrayDimensions() :
 
 StatementNode Statement() :
 {
-    StatementNode s = new StatementNode();
+    StatementNode s = new StatementNode(fileName, token.beginLine);
 }
 {
     LOOKAHEAD(2)
@@ -1403,7 +1406,7 @@ StatementNode Statement() :
 
 LabeledStatementNode LabeledStatement() :
 {
-    LabeledStatementNode l = new LabeledStatementNode();
+    LabeledStatementNode l = new LabeledStatementNode(fileName, token.beginLine);
     Token t;
 }
 {
@@ -1415,7 +1418,7 @@ LabeledStatementNode LabeledStatement() :
 
 BlockNode Block() :
 {
-    BlockNode b = new BlockNode();
+    BlockNode b = new BlockNode(fileName, token.beginLine);
     b.statements = new ArrayList<BlockStatementNode>();
     BlockStatementNode s;
 }
@@ -1429,7 +1432,7 @@ BlockNode Block() :
 
 BlockStatementNode BlockStatement() :
 {
-    BlockStatementNode b = new BlockStatementNode();
+    BlockStatementNode b = new BlockStatementNode(fileName, token.beginLine);
 }
 {
     LOOKAHEAD(Type() <IDENTIFIER>)
@@ -1446,7 +1449,7 @@ BlockStatementNode BlockStatement() :
 
 LocalVariableDecNode LocalVariableDeclaration() :
 {
-    LocalVariableDecNode d = new LocalVariableDecNode();
+    LocalVariableDecNode d = new LocalVariableDecNode(fileName, token.beginLine);
     d.declarators = new ArrayList<VariableDecNode>();
     VariableDecNode temp;
 }
@@ -1471,7 +1474,7 @@ StatementExprNode StatementExpression() :
  * Java expansions for StatementExpression.
  */
 {
-    StatementExprNode e = new StatementExprNode();
+    StatementExprNode e = new StatementExprNode(fileName, token.beginLine);
 }
 {
     e.expression=PreIncrementExpression()
@@ -1502,7 +1505,7 @@ StatementExprNode StatementExpression() :
 
 SwitchStatementNode SwitchStatement() :
 {
-    SwitchStatementNode s = new SwitchStatementNode();
+    SwitchStatementNode s = new SwitchStatementNode(fileName, token.beginLine);
     s.labels = new ArrayList<SwitchLabelNode>();
     s.statements = new ArrayList<ArrayList<BlockStatementNode>>();
     SwitchLabelNode temp;
@@ -1528,7 +1531,7 @@ SwitchStatementNode SwitchStatement() :
 
 SwitchLabelNode SwitchLabel() :
 {
-    SwitchLabelNode s = new SwitchLabelNode();
+    SwitchLabelNode s = new SwitchLabelNode(fileName, token.beginLine);
 }
 {
   <CASE> s.expression=Expression() <COLON> { return s; }
@@ -1545,7 +1548,7 @@ IfStatementNode IfStatement() :
  * as the second if is part of the last expression thing.
  */
 {
-    IfStatementNode i = new IfStatementNode();
+    IfStatementNode i = new IfStatementNode(fileName, token.beginLine);
 }
 {
     <IF> <LPAREN> i.expression=Expression() <RPAREN>
@@ -1557,7 +1560,7 @@ IfStatementNode IfStatement() :
 
 WhileStatementNode WhileStatement() :
 {
-    WhileStatementNode w = new WhileStatementNode();
+    WhileStatementNode w = new WhileStatementNode(fileName, token.beginLine);
 }
 {
     <WHILE> <LPAREN> w.expression=Expression() <RPAREN>
@@ -1569,7 +1572,7 @@ WhileStatementNode WhileStatement() :
 
 DoStatementNode DoStatement() :
 {
-    DoStatementNode d = new DoStatementNode();
+    DoStatementNode d = new DoStatementNode(fileName, token.beginLine);
 }
 {
     <DO> d.statement=Statement() <WHILE> <LPAREN>
@@ -1581,7 +1584,7 @@ DoStatementNode DoStatement() :
 
 ForStatementNode ForStatement() :
 {
-    ForStatementNode f = new ForStatementNode();
+    ForStatementNode f = new ForStatementNode(fileName, token.beginLine);
 }
 {
     <FOR> <LPAREN> [ f.init=ForInit() ] <SEMICOLON>
@@ -1594,7 +1597,7 @@ ForStatementNode ForStatement() :
 
 ForInitNode ForInit() :
 {
-    ForInitNode f = new ForInitNode();
+    ForInitNode f = new ForInitNode(fileName, token.beginLine);
 }
 {
     LOOKAHEAD( Type() <IDENTIFIER> )
@@ -1636,7 +1639,7 @@ ArrayList<StatementExprNode> ForUpdate() :
 
 BreakStatementNode BreakStatement() :
 {
-    BreakStatementNode b = new BreakStatementNode();
+    BreakStatementNode b = new BreakStatementNode(fileName, token.beginLine);
     Token t;
 }
 {
@@ -1648,7 +1651,7 @@ BreakStatementNode BreakStatement() :
 
 ContinueStatementNode ContinueStatement() :
 {
-    ContinueStatementNode c = new ContinueStatementNode();
+    ContinueStatementNode c = new ContinueStatementNode(fileName, token.beginLine);
     Token t;
 }
 {
@@ -1660,7 +1663,7 @@ ContinueStatementNode ContinueStatement() :
 
 ReturnStatementNode ReturnStatement() :
 {
-    ReturnStatementNode r =  new ReturnStatementNode();
+    ReturnStatementNode r =  new ReturnStatementNode(fileName, token.beginLine);
 }
 {
     <RETURN> [ r.expression=Expression() ] <SEMICOLON>
@@ -1671,7 +1674,7 @@ ReturnStatementNode ReturnStatement() :
 
 ThrowStatementNode ThrowStatement() :
 {
-    ThrowStatementNode t = new ThrowStatementNode();
+    ThrowStatementNode t = new ThrowStatementNode(fileName, token.beginLine);
 }
 {
     <THROW> t.expression=Expression() <SEMICOLON>
@@ -1682,7 +1685,7 @@ ThrowStatementNode ThrowStatement() :
 
 SynchronizedStatementNode SynchronizedStatement() :
 {
-    SynchronizedStatementNode s = new SynchronizedStatementNode();
+    SynchronizedStatementNode s = new SynchronizedStatementNode(fileName, token.beginLine);
 }
 {
     <SYNCHRONIZED> <LPAREN> s.expression=Expression()
@@ -1698,7 +1701,7 @@ TryStatementNode TryStatement() :
  * finally/catch is present.
  */
 {
-    TryStatementNode t = new TryStatementNode();
+    TryStatementNode t = new TryStatementNode(fileName, token.beginLine);
     t.catchParams = new ArrayList<ParamNode>();
     ParamNode temp;
     BlockNode temp2;

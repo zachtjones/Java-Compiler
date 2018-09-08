@@ -36,10 +36,10 @@ public class PostIncrementExpressionNode implements Expression {
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// construct an AssignmentNode:  expr += 1;
-		AssignmentNode n = new AssignmentNode();
+		AssignmentNode n = new AssignmentNode(fileName, line);
 		n.left = expr;
 		n.type = AssignmentNode.PLUSASSIGN;
-		LiteralExpressionNode literal = new LiteralExpressionNode();
+		LiteralExpressionNode literal = new LiteralExpressionNode(fileName, line);
 		literal.value = "1";
 		n.right = literal;
 		

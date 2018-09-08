@@ -66,7 +66,7 @@ public class FieldExpressionNode implements Expression, LValue {
 			} else {
 				// instance field of symbol name
 				// get the address of the object
-				NameNode n = new NameNode();
+				NameNode n = new NameNode(fileName, line);
 				n.primaryName = c.getName();
 				n.compile(s, f, r, c);
 				Register name = r.getLast();
@@ -106,7 +106,7 @@ public class FieldExpressionNode implements Expression, LValue {
 			} else {
 				// instance field of symbol name
 				// get the address of the object
-				NameNode n = new NameNode();
+				NameNode n = new NameNode(fileName, line);
 				n.primaryName = c.getName();
 				n.compileAddress(s, f, r, c);
 				Register name = r.getLast();

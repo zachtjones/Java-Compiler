@@ -118,7 +118,7 @@ public class NameNode implements Node, Expression, LValue {
 				
 			} else {
 				// instance fields of the parameter
-				NameNode temp = new NameNode();
+				NameNode temp = new NameNode(this.fileName, this.line);
 				temp.primaryName = split[0];
 				
 				temp.compile(s, f, r, c);
@@ -167,15 +167,15 @@ public class NameNode implements Node, Expression, LValue {
 			String[] split = primaryName.split("\\."); // split by the . character
 
 			// construct a primaryExpressionNode
-			PrimaryExpressionNode ex = new PrimaryExpressionNode();
+			PrimaryExpressionNode ex = new PrimaryExpressionNode(this.fileName, this.line);
 
 			// set the name - use NoOp since you need something as the prefix.
 			c.setName(split[0]);
-			ex.prefix = new NoOp();
+			ex.prefix = new NoOp(this.fileName, this.line);
 			ex.suffixes = new ArrayList<Expression>();
 			// the rest are consecutive fieldAccesses
 			for (int i = 1; i < split.length; i++) {
-				FieldExpressionNode field = new FieldExpressionNode();
+				FieldExpressionNode field = new FieldExpressionNode(this.fileName, this.line);
 				field.identifier = split[i];
 				ex.suffixes.add(field);
 			}
