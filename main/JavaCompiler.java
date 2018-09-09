@@ -112,8 +112,8 @@ public class JavaCompiler {
 			}
 
 			// print out the resulting IL
-			for (InterFile f : files) {
-				PrintWriter pw = new PrintWriter(f.getName());
+			for (InterFile f : cache.values()) {
+				PrintWriter pw = new PrintWriter("temp/" + f.getName() + ".jil");
 				pw.println(f.toString());
 				pw.flush();
 				pw.close();

@@ -43,6 +43,7 @@ public class GetStaticFieldStatement implements InterStatement {
 		InterFile object = JavaCompiler.parseAndCompile(className, fileName, line);
 		String type = object.getStatFieldType(fieldName, fileName, line);
 		
+		result.typeFull = type;
 		regs.put(result, type);
 	}
 }
