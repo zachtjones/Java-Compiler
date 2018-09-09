@@ -10,7 +10,5 @@ clean:
 	rm -f main/SimpleCharStream.java
 	rm -f main/Token.java
 	rm -f main/TokenMgrError.java
-	rm -f main/*.class
-	rm -f tree/*.class
-	rm -f helper/*.class
-	rm -f intermediate/*.class
+	find . -name "*.class" -type f -delete
+
