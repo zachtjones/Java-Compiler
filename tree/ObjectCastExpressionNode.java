@@ -1,5 +1,12 @@
 package tree;
 
+import java.io.IOException;
+
+import helper.ClassLookup;
+import helper.CompileException;
+import intermediate.InterFunction;
+import intermediate.RegisterAllocator;
+
 /** (type[]...)expr */
 public class ObjectCastExpressionNode implements Expression {
     public Expression expr;
@@ -22,5 +29,17 @@ public class ObjectCastExpressionNode implements Expression {
     public int getLine() {
     	return line;
     }
+
+	@Override
+	public void resolveImports(ClassLookup c) throws IOException {
+		expr.resolveImports(c);
+		type.resolveImports(c);
+	}
+
+	@Override
+	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+		// TODO
+		throw new CompileException("Object cast not implemented yet.", fileName, line);
+	}
 
 }
