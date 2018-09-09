@@ -128,8 +128,8 @@ public class Register implements Expression {
 	
 	@Override
 	public int hashCode() {
-		// xor of num and typeFull
-		return num ^ typeFull.hashCode();
+		// the register number
+		return num;
 	}
 	
 	@Override

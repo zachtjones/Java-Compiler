@@ -24,8 +24,8 @@ public class JavaCompiler {
 
 	/**
 	 * Will parse and compile the file, using the cache if already done.
-	 * @param fullyQualifiedName The java class name (ex: java.lang.String)
-	 * @return The Intermediate file representation.
+	 * @param fullyQualifiedName The java class name (ex: java/lang/String)
+	 * @return The Intermediate file representation, or null 
 	 */
 	public static InterFile parseAndCompile(String fullyQualifiedName, String fileName, int line)
 			throws CompileException {
@@ -57,30 +57,24 @@ public class JavaCompiler {
 			// compile and put all in the cache
 			ArrayList<InterFile> files = c.compile(classLevel);
 			for (int i = 0; i < files.size(); i++) {
-				cache.put(files.get(i).getFileName(), files.get(i));
+				System.out.println(files.get(i).getName());
+				cache.put(files.get(i).getName(), files.get(i)); 
 			}
-
-			// find the one to return
-			for (int i = 0; i < files.size(); i++) {
-				if (files.get(i).getFileName().equals(fullyQualifiedName)) {
-					return files.get(i);
-				}
-			}
-
+			// return the one that was in the cache
+			return cache.get(fullyQualifiedName);
+			
 		} catch (FileNotFoundException e) {
 			throw new CompileException(fullyQualifiedName + " not found while compiling",
 					e, fileName, line);
 			
 		} catch (ParseException e) {
 			throw new CompileException(fullyQualifiedName + " not able to be parsed, error at: " 
-					+ newFileName + ":" + e.currentToken.beginLine, e, fileName, line);
+					+ newFileName + ":" + e.currentToken.beginLine
+					+ "\n\treferenced", e, fileName, line);
 		} catch (IOException e) {
 			throw new CompileException("I/O exception while processing " + fullyQualifiedName
 					+ ", referenced at", e, newFileName, -1);
 		}
-
-		// none were found
-		return null;
 	}
 
 	public static void main(String[] args) {
@@ -109,7 +103,7 @@ public class JavaCompiler {
 			// compile to IL & put in cache
 			ArrayList<InterFile> files = c.compile(classLevel);
 			for (InterFile f : files) {
-				cache.put(f.getFileName(), f);
+				cache.put(f.getName(), f);
 			}
 
 			// resolve types of the IL functions to do type checking.
@@ -119,7 +113,7 @@ public class JavaCompiler {
 
 			// print out the resulting IL
 			for (InterFile f : files) {
-				PrintWriter pw = new PrintWriter(f.getFileName());
+				PrintWriter pw = new PrintWriter(f.getName());
 				pw.println(f.toString());
 				pw.flush();
 				pw.close();

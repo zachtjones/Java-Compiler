@@ -16,8 +16,8 @@ import intermediate.RegisterAllocator;
 /** Represents accessing a field of an object. */
 public class FieldExpressionNode implements Expression, LValue {
     public String identifier;
-    public String fileName;
-    public int line;
+    private final String fileName;
+    private final int line;
     
     public FieldExpressionNode(String fileName, int line) {
     	this.fileName = fileName;

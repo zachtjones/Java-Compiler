@@ -71,7 +71,7 @@ public class ClassNode implements Node {
 	public InterFile compile(String packageName, SymbolTable classLevel) throws CompileException {
 		InterFile f;
 		if (packageName != null) {
-			f = new InterFile(packageName + "." + name);
+			f = new InterFile(packageName + "/" + name);
 		} else {
 			f = new InterFile(name);
 		}

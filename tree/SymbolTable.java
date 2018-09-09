@@ -82,10 +82,19 @@ public class SymbolTable {
 	public void putEntry(String identifier, String type, String fileName, int line)
 			throws CompileException {
 		
-		if (lookup(identifier) != -1) {
-			throw new CompileException("the symbol: '" + identifier 
-					+ "' is already defined in an outer scope.", fileName, line);
+		// can't have two variables with same name in same scope
+		if (lookup(identifier) == scopeLevel) {
+			throw new CompileException("duplicate variable, '" + identifier
+					+ "' reference in same scope", fileName, line);
 		}
+				
+		// also can't have parameter declared for local
+		if (scopeLevel == local && lookup(identifier) == parameter) {
+			throw new CompileException("variable, '" + identifier + "' is also a parameter",
+					fileName, line);
+		}
+		
+		// good, the variable can be defined here
 		entries.put(identifier, type);
 		
 		if (printOut) {

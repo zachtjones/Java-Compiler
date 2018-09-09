@@ -6,7 +6,7 @@ import helper.CompileException;
 import tree.NameNode;
 
 public class InterFile {
-	private String fileName;
+	private String name;
 	private InterStructure staticPart;
 	private InterStructure instancePart;
 	private ArrayList<InterFunction> functions;
@@ -15,11 +15,11 @@ public class InterFile {
 	private NameNode superNode;
 
 	/**
-	 * Creates an intermediate file, given the file's name
-	 * @param fileName The name, such as java.util.Scanner
+	 * Creates an intermediate file, given the name
+	 * @param fileName The name, such as java/util/Scanner
 	 */
-	public InterFile(String fileName) {
-		this.fileName = fileName;
+	public InterFile(String name) {
+		this.name = name;
 		this.staticPart = new InterStructure(false);
 		this.instancePart = new InterStructure(true);
 		this.functions = new ArrayList<InterFunction>();
@@ -52,16 +52,16 @@ public class InterFile {
 		}
 	}
 
-	/** Gets the file's name (no path part) as a String.
+	/** Gets the file's name (with package, using '/') as a String.
 	 */
-	public String getFileName() {
-		return fileName + ".jil";
+	public String getName() {
+		return name;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder("// file: ");
-		result.append(fileName);
+		result.append(name);
 		result.append(".jil\n\n");
 
 		// super class
@@ -166,7 +166,7 @@ public class InterFile {
 	public void typeCheck() throws CompileException {
 		for (InterFunction f : functions) {
 			f.typeCheck();
-		}		
+		}
 	}
 
 	/**
@@ -189,5 +189,27 @@ public class InterFile {
 		return staticPart.getFieldType(fieldName, fileName, line);
 	}
 
-
+	/**
+	 * Finds the method with the signature given, and returns the type of the return object
+	 * @param name The method's name.
+	 * @param args The array of arguments.
+	 * @return The return object type, or null if there's no method with that signature
+	 */
+	public String getReturnType(String name, Register[] args) {
+		for (InterFunction f : functions) {
+			if (f.name.equals(name) && f.paramTypes.size() == args.length) {
+				boolean matchedAll = true;
+				for (int i = 0; i < args.length; i++) {
+					if (!args[i].typeFull.equals(f.paramTypes.get(i))) {
+						matchedAll = false;
+					}
+				}
+				if (matchedAll) {
+					return f.returnType;
+				}
+			}
+			// TODO the ... on args and inheritance
+		}
+		return null;
+	}
 }
