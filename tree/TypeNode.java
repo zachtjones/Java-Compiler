@@ -60,7 +60,7 @@ public class TypeNode implements Node {
 		if (primitive != null) {
 			return primitive.interRep() + ArrayDimensions.get(arrayDims);
 		}
-		return "reference(" + name.primaryName + ")" + ArrayDimensions.get(arrayDims);
+		return name.primaryName + ArrayDimensions.get(arrayDims);
 	}
 
 	

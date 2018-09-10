@@ -3,7 +3,6 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
-import helper.TypeChecker;
 
 /** getLocal %register = name */
 public class GetLocalStatement implements InterStatement {
@@ -38,7 +37,6 @@ public class GetLocalStatement implements InterStatement {
 			throw new CompileException("local variable: " + localName + " is not defined.",
 					fileName, line);
 		}
-		TypeChecker.subclassOrEqual(locals.get(localName), r.typeFull, fileName, line);
 		
 		// define the register
 		r.typeFull = locals.get(localName);

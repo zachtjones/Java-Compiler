@@ -6,8 +6,8 @@ import helper.CompileException;
 
 /** Represents the starting of a scope of a local variable. */
 public class StartScopeStatement implements InterStatement {
-	String name;
-	String type;
+	private final String name;
+	private final String type;
 	
 	/**
 	 * Constructs a local variable scope starting statement.

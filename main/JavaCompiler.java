@@ -17,10 +17,10 @@ public class JavaCompiler {
 	private static HashMap<String, InterFile> cache = new HashMap<>();
 
 	/** the root src folder, ending with '/' */
-	private static String rootDir;
+	public static String rootDir;
 
 	/** the java library source folder for *.java or *.jil files */
-	private static final String javaDir = "lib/"; 
+	public static final String javaDir = "lib/"; 
 
 	/**
 	 * Will parse and compile the file, using the cache if already done.

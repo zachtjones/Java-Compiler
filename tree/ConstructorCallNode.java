@@ -59,8 +59,7 @@ public class ConstructorCallNode implements Expression {
 		Register finalResult = r.getNext(result.type);
 		
 		// add in the call virtual statement
-		f.statements.add(new CallVirtualStatement(result, "<init>", results, r.getNext(Register.REFERENCE),
-				fileName, line));
+		f.statements.add(new CallVirtualStatement(result, "<init>", results, null, fileName, line));
 		
 		// result is the finalResult
 		f.statements.add(new CopyStatement(result, finalResult, fileName, line));
