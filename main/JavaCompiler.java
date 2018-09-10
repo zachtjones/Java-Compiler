@@ -1,7 +1,6 @@
 package main;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,9 +70,6 @@ public class JavaCompiler {
 			throw new CompileException(fullyQualifiedName + " not able to be parsed, error at: " 
 					+ newFileName + ":" + e.currentToken.beginLine
 					+ "\n\treferenced", e, fileName, line);
-		} catch (IOException e) {
-			throw new CompileException("I/O exception while processing " + fullyQualifiedName
-					+ ", referenced at", e, newFileName, -1);
 		}
 	}
 
@@ -127,8 +123,6 @@ public class JavaCompiler {
 			System.out.println(e.currentToken.next.image + "\"");
 		} catch (FileNotFoundException e) {
 			System.out.println("Error: the input file was not found.");
-		} catch (IOException e) {
-			System.out.println("Error: " + e.getMessage());
 		} catch (CompileException e) {
 			System.out.println("Error: " + e.getMessage());
 			e.printStackTrace();

@@ -1,7 +1,5 @@
 package tree;
 
-import java.io.IOException;
-
 import helper.ArrayDimensions;
 import helper.ClassLookup;
 import helper.CompileException;
@@ -33,7 +31,7 @@ public class TypeNode implements Node {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		if (name != null) {
 			name.resolveImports(c);
 		}

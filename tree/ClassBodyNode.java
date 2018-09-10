@@ -1,6 +1,5 @@
 package tree;
 
-import java.io.IOException;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
@@ -14,7 +13,7 @@ public class ClassBodyNode {
     public MethodNode method;
     public FieldDeclarationNode field;
 
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		// pass down
 		if (staticInit != null) {
 			staticInit.resolveImports(c);

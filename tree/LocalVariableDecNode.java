@@ -1,6 +1,5 @@
 package tree;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
@@ -32,7 +31,7 @@ public class LocalVariableDecNode implements Node {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		type.resolveImports(c);
 		for (VariableDecNode d : declarators) {
 			if (d.init != null) {

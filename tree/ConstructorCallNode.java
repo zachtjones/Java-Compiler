@@ -1,6 +1,5 @@
 package tree;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
@@ -35,7 +34,7 @@ public class ConstructorCallNode implements Expression {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		name.resolveImports(c);
 		args.resolveImports(c);
 	}

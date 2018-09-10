@@ -1,6 +1,5 @@
 package tree;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
@@ -38,7 +37,7 @@ public class FieldDeclarationNode implements Node {
     	return line;
     }
 
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		type.resolveImports(c);
 	}
 

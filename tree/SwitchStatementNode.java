@@ -1,6 +1,5 @@
 package tree;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
@@ -32,7 +31,7 @@ public class SwitchStatementNode implements Node {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		expression.resolveImports(c);
 		for (int i = 0; i < labels.size(); i++) {
 			labels.get(i).resolveImports(c);

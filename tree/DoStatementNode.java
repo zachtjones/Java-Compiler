@@ -1,7 +1,5 @@
 package tree;
 
-import java.io.IOException;
-
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.BranchStatementTrue;
@@ -32,7 +30,7 @@ public class DoStatementNode implements Node {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		statement.resolveImports(c);
 		expression.resolveImports(c);
 	}

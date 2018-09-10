@@ -1,7 +1,5 @@
 package tree;
 
-import java.io.IOException;
-
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
@@ -13,7 +11,7 @@ public class TypeDecNode {
     public ClassNode i; // interfaces are treated as abstract classes in this
     public EnumNode e;
     
-	public void resolveImports(ClassLookup c1) throws IOException {
+	public void resolveImports(ClassLookup c1) throws CompileException {
 		if (c != null) {
 			c.resolveImports(c1);
 		} else if (i != null) {

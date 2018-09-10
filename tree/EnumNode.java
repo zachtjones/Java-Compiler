@@ -1,6 +1,5 @@
 package tree;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
@@ -31,7 +30,7 @@ public class EnumNode implements Node {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		// nothing needed
 	}
 	

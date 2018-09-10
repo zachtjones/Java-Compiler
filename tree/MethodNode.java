@@ -1,6 +1,5 @@
 package tree;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
@@ -25,7 +24,7 @@ public class MethodNode {
     public BlockNode code;
     
 	
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		resultType.resolveImports(c);
 		dec.resolveImports(c);
 		if (throwsList != null) {

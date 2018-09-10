@@ -1,7 +1,5 @@
 package tree;
 
-import java.io.IOException;
-
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
@@ -32,7 +30,7 @@ public class LessThanEqualExpressionNode implements Expression {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		left.resolveImports(c);
 		right.resolveImports(c);
 	}

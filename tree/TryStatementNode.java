@@ -1,6 +1,5 @@
 package tree;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
@@ -35,7 +34,7 @@ public class TryStatementNode implements Node {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		block.resolveImports(c);
 		for (int i = 0; i < catchParams.size(); i++) {
 			catchParams.get(i).resolveImports(c);

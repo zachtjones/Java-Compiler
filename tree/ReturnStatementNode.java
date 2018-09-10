@@ -1,7 +1,5 @@
 package tree;
 
-import java.io.IOException;
-
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
@@ -31,7 +29,7 @@ public class ReturnStatementNode implements Node {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		if (expression != null) expression.resolveImports(c);
 	}
 

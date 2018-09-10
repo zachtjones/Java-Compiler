@@ -1,7 +1,5 @@
 package tree;
 
-import java.io.IOException;
-
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
@@ -29,7 +27,7 @@ public class VariableDecNode implements Node {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		// nothing needed with id, as it doesn't have a name node
 		init.resolveImports(c);
 	}

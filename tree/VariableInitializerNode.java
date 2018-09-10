@@ -1,6 +1,5 @@
 package tree;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
@@ -35,7 +34,7 @@ public class VariableInitializerNode implements Node {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		if (e != null) {
 			e.resolveImports(c);
 		} else {

@@ -1,6 +1,5 @@
 package tree;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
@@ -36,7 +35,7 @@ public class ForStatementNode implements Node {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		init.resolveImports(c);
 		condition.resolveImports(c);
 		for (StatementExprNode s : update) {

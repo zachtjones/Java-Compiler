@@ -1,7 +1,5 @@
 package tree;
 
-import java.io.IOException;
-
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.BranchStatmentFalse;
@@ -33,7 +31,7 @@ public class IfStatementNode implements Node {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		expression.resolveImports(c);
 		statement.resolveImports(c);
 		if (elsePart != null) {

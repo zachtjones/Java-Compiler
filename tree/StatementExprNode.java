@@ -1,7 +1,5 @@
 package tree;
 
-import java.io.IOException;
-
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
@@ -34,7 +32,7 @@ public class StatementExprNode implements Node {
 	public Expression expression;
 
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		expression.resolveImports(c);
 	}
 

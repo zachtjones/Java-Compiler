@@ -1,6 +1,5 @@
 package tree;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
@@ -30,7 +29,7 @@ public class PrimaryExpressionNode implements Expression, LValue {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		prefix.resolveImports(c);
 		for (Expression e : suffixes) {
 			e.resolveImports(c);

@@ -65,7 +65,7 @@ public class ClassLookup {
 	 * @throws CompileException If there is an error compiling.
 	 * */
 	public String getFullName(String shortName, String fileName, int line)
-			throws IOException, CompileException {
+			throws CompileException {
 		
 		if (items.containsKey(shortName)) {
 			return items.get(shortName);
@@ -85,36 +85,40 @@ public class ClassLookup {
 	 * @throws CompileException If there is a compile exception.
 	 * */
 	private String lookupJavaName(String shortName, String fileName, int fileLine)
-			throws IOException, CompileException {
+			throws CompileException {
 		
 		if (!lookedUpJava) {
-			File f = new File("javaLookup.txt");
-			// use the javadocs online to lookup the list and create it
-			if (!f.exists()) {
-				URL url = new URL("https://docs.oracle.com/javase/8/docs/api/allclasses-noframe.html");
-				Scanner sc = new Scanner(url.openStream());
-				PrintWriter pw = new PrintWriter("javaLookup.txt");
-				while (sc.hasNextLine()) {
-					String line = sc.nextLine();
-					if (line.matches("<li><a href=\".*")) {
-						String name = line.replaceAll("<li><a href=\"", "");
-						name = name.replaceAll("\\.html.*", "");
-						pw.println(name);
+			try {
+				File f = new File("javaLookup.txt");
+				// use the javadocs online to lookup the list and create it
+				if (!f.exists()) {
+					URL url = new URL("https://docs.oracle.com/javase/8/docs/api/allclasses-noframe.html");
+					Scanner sc = new Scanner(url.openStream());
+					PrintWriter pw = new PrintWriter("javaLookup.txt");
+					while (sc.hasNextLine()) {
+						String line = sc.nextLine();
+						if (line.matches("<li><a href=\".*")) {
+							String name = line.replaceAll("<li><a href=\"", "");
+							name = name.replaceAll("\\.html.*", "");
+							pw.println(name.replace('.', '/'));
+						}
 					}
+					sc.close();
+					pw.flush();
+					pw.close();
 				}
-				sc.close();
-				pw.flush();
-				pw.close();
+				// read from the list
+				List<String> lines = Files.readAllLines(f.toPath());
+				for (String line : lines) {
+					// just the last part of the fully qualified name
+					String shortestName = line.replaceAll(".*/", "");
+					javaItems.put(shortestName, line);
+					syms.putEntry(line, "className", fileName, fileLine);
+				}
+				lookedUpJava = true;
+			} catch(IOException e) {
+				throw new CompileException(e.getMessage(), fileName, fileLine);
 			}
-			// read from the list
-			List<String> lines = Files.readAllLines(f.toPath());
-			for (String line : lines) {
-				// just the last part of the fully qualified name
-				String shortestName = line.replaceAll(".*/", "");
-				javaItems.put(shortestName, line);
-				syms.putEntry(line, "className", fileName, fileLine);
-			}
-			lookedUpJava = true;
 		}
 		// now we know javaItems has the reference
 		return javaItems.get(shortName);

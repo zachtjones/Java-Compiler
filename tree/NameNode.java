@@ -1,6 +1,5 @@
 package tree;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import helper.ClassLookup;
@@ -52,14 +51,11 @@ public class NameNode implements Node, Expression, LValue {
 	}
 
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		// only the first part - the primaryName could be not fully qualified
 		//   in the example: System.out.println
 		//System.out.print("Replace: " + this.getSimpleName());
-		String firstFull = null;
-		try {
-			firstFull = c.getFullName(primaryName, fileName, line);
-		} catch (CompileException e) { /* will never happen */ }
+		String firstFull = c.getFullName(primaryName, fileName, line);
 		
 		String total = firstFull;
 		if (secondaryName != null) {
