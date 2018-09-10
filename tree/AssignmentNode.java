@@ -9,7 +9,7 @@ import intermediate.RegisterAllocator;
 import intermediate.StoreAddressStatement;
 
 /** left type right */
-public class AssignmentNode implements Expression {
+public class AssignmentNode implements StatementExprNode, Expression {
 	public final static int ASSIGN = 0;
 	public final static int STARASSIGN = 1;
 	public final static int SLASHASSIGN = 2;

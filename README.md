@@ -28,13 +28,6 @@ This program is not complete, but does the following:
   - classes: tree/\*.java - method resolveSymbols()
 4. Compile to intermediate language (IL) code. (hopefully pass 4 only)
 
-## Refactoring needed
-- Convert StatementNode to interface
-- Convert StatementExprNode to interface
-- Convert TypeDecNode to interface
-- Break up ExpressionNode into several classes
-  - too complicated code to compile the expression.
-
 ## Optimizations (done)
 The key to most of these optimizations is to keep the IL in SSA form.
 SSA - Single static assignment - in function, only assign to register once.

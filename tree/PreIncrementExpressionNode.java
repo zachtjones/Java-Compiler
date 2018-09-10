@@ -10,7 +10,7 @@ import intermediate.Register;
 import intermediate.RegisterAllocator;
 
 /** ++ expr */
-public class PreIncrementExpressionNode implements Expression {
+public class PreIncrementExpressionNode implements StatementExprNode, Expression {
     public Expression expr;
     public String fileName;
     public int line;

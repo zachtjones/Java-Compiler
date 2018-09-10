@@ -1473,31 +1473,27 @@ StatementExprNode StatementExpression() :
  * Java expansions for StatementExpression.
  */
 {
-    StatementExprNode e = new StatementExprNode(fileName, token.beginLine);
+    StatementExprNode e;
 }
 {
-    e.expression=PreIncrementExpression()
+    e=PreIncrementExpression()
     {
-        e.isPreIncrement = true;
         return e;
     }
 |
-    e.expression=PreDecrementExpression()
+    e=PreDecrementExpression()
     {
-        e.isPreDecrement = true;
         return e;
     }
 |
     LOOKAHEAD( PrimaryExpression() AssignmentOperator() )
-    e.expression=Assignment()
+    e=Assignment()
     {
-        e.isAssignment = true;
         return e;
     }
 |
-    e.expression=PostfixExpression()
+    e=PostfixExpression()
     {
-        e.isPostfixExpression = true;
         return e;
     }
 }

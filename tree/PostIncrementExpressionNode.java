@@ -6,7 +6,7 @@ import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
 /** expr ++ */
-public class PostIncrementExpressionNode implements Expression {
+public class PostIncrementExpressionNode implements StatementExprNode, Expression {
     public Expression expr;
     public String fileName;
     public int line;
