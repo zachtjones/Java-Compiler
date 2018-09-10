@@ -258,22 +258,22 @@ ImportNode ImportDeclaration() :
 
 TypeDecNode TypeDeclaration() :
 {
-    TypeDecNode t = new TypeDecNode();
+    TypeDecNode t;
 }
 {
     LOOKAHEAD( ( "abstract" | "final" | "public" )* "class" )
-    t.c=ClassDeclaration()
+    t=ClassDeclaration()
     { return t; }
 
 |   LOOKAHEAD( ( "abstract" | "public")* "interface" )
-    t.i=ClassDeclaration()
+    t=ClassDeclaration()
     { return t; }
 
-|   t.e=EnumDeclaration()
+|   t=EnumDeclaration()
     { return t; }
 
 |   <SEMICOLON>
-    { return t; }
+    { return new NoOp(fileName, token.beginLine); }
 }
 
 

@@ -2,11 +2,12 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import intermediate.InterFile;
 import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
 /** Represents a do-nothing operation*/
-public class NoOp implements Node, Expression, StatementNode {
+public class NoOp implements Node, Expression, StatementNode, TypeDecNode {
 	public String fileName;
     public int line;
     
@@ -31,5 +32,10 @@ public class NoOp implements Node, Expression, StatementNode {
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, 
 			CompileHistory c) throws CompileException {}
+
+	@Override
+	public InterFile compile(String packageName, SymbolTable classLevel) throws CompileException {
+		return null;
+	}
 
 }

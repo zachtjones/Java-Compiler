@@ -8,7 +8,7 @@ import intermediate.InterFile;
 import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
-public class EnumNode implements Node {
+public class EnumNode implements TypeDecNode {
     public String name;
     public ArrayList<String> values;
     public String fileName;

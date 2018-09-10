@@ -11,7 +11,7 @@ import intermediate.RegisterAllocator;
 /** This represents a class in the tree
 * @author Zach Jones
 */
-public class ClassNode implements Node {
+public class ClassNode implements TypeDecNode {
     public boolean isAbstract;
     public boolean isFinal;
     public boolean isPublic;
