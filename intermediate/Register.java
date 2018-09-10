@@ -1,7 +1,5 @@
 package intermediate;
 
-import java.io.IOException;
-
 import helper.ClassLookup;
 import helper.CompileException;
 import tree.CompileHistory;
@@ -115,7 +113,7 @@ public class Register implements Expression {
 	}
 
 	@Override
-	public void resolveImports(ClassLookup c) throws IOException {
+	public void resolveImports(ClassLookup c) throws CompileException {
 		// nothing needed
 	}
 
