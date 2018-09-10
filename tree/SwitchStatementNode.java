@@ -7,7 +7,7 @@ import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
-public class SwitchStatementNode implements Node {
+public class SwitchStatementNode implements StatementNode {
     public Expression expression;
     // these next two are same length
     public ArrayList<SwitchLabelNode> labels;

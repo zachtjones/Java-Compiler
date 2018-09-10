@@ -7,7 +7,7 @@ import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
-public class TryStatementNode implements Node {
+public class TryStatementNode implements StatementNode {
 	
     public BlockNode block;
     // these two are same size;

@@ -6,7 +6,7 @@ import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 import intermediate.ThrowStatement;
 
-public class ThrowStatementNode implements Node {
+public class ThrowStatementNode implements StatementNode {
     public Expression expression;
     public String fileName;
     public int line;

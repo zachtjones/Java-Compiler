@@ -5,7 +5,7 @@ import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
-public class ContinueStatementNode implements Node {
+public class ContinueStatementNode implements StatementNode {
     // could be null, name of loop to continue
     public String name;
     public String fileName;

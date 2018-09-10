@@ -5,7 +5,7 @@ import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
-public class StatementExprNode implements Node {
+public class StatementExprNode implements StatementNode {
 	public boolean isPreIncrement;
 	public boolean isPreDecrement;
 	public boolean isPostfixExpression;

@@ -6,7 +6,7 @@ import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
 /** Represents a do-nothing operation*/
-public class NoOp implements Node, Expression {
+public class NoOp implements Node, Expression, StatementNode {
 	public String fileName;
     public int line;
     

@@ -9,7 +9,7 @@ import intermediate.EndScopeStatement;
 import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
-public class BlockNode implements Node {
+public class BlockNode implements StatementNode {
     public ArrayList<BlockStatementNode> statements;
     public String fileName;
     public int line;

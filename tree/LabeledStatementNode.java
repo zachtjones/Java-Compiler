@@ -5,7 +5,7 @@ import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
-public class LabeledStatementNode implements Node {
+public class LabeledStatementNode implements StatementNode {
     public String name;
     public StatementNode statement;
     public String fileName;

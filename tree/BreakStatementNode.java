@@ -5,7 +5,7 @@ import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
-public class BreakStatementNode implements Node {
+public class BreakStatementNode implements StatementNode {
     public String name; // could be null - label to break
     public String fileName;
     public int line;

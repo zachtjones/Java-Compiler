@@ -1323,82 +1323,81 @@ ArrayList<Expression> ArrayDimensions() :
 
 StatementNode Statement() :
 {
-    StatementNode s = new StatementNode(fileName, token.beginLine);
+    StatementNode s;
 }
 {
     LOOKAHEAD(2)
-    s.labeled=LabeledStatement()
+    s=LabeledStatement()
     {
         return s;
     }
 |
-    s.block=Block()
+    s=Block()
     {
         return s;
     }
 |
     EmptyStatement()
     {
-        s.isEmpty = false;
-        return s;
+        return new NoOp(fileName, token.beginLine);
     }
 |
-    s.statement=StatementExpression() <SEMICOLON>
+    s=StatementExpression() <SEMICOLON>
     {
         return s;
     }
 |
-    s.switchNode=SwitchStatement()
+    s=SwitchStatement()
     {
         return s;
     }
 |
-    s.ifNode=IfStatement()
+    s=IfStatement()
     {
         return s;
     }
 |
-    s.whileNode=WhileStatement()
+    s=WhileStatement()
     {
         return s;
     }
 |
-    s.doNode=DoStatement()
+    s=DoStatement()
     {
         return s;
     }
 |
-    s.forNode=ForStatement()
+    s=ForStatement()
     {
         return s;
     }
 |
-    s.breakNode=BreakStatement()
+    s=BreakStatement()
     {
         return s;
     }
 |
-    s.continueNode=ContinueStatement()
+    s=ContinueStatement()
     {
         return s;
     }
 |
-    s.returnNode=ReturnStatement()
+    s=ReturnStatement()
     {
         return s;
     }
 |
-    s.throwNode=ThrowStatement()
+    s=ThrowStatement()
     {
         return s;
     }
 |
-    s.synchNode=SynchronizedStatement()
+    s=SynchronizedStatement()
     {
         return s;
     }
 |
-    s.tryNode=TryStatement()
+    s=TryStatement()
     {
         return s;
     }

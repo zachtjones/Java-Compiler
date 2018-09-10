@@ -6,7 +6,7 @@ import intermediate.InterFunction;
 import intermediate.RegisterAllocator;
 
 /** synchronized (expression) block */
-public class SynchronizedStatementNode implements Node {
+public class SynchronizedStatementNode implements StatementNode {
     public Expression expression;
     public BlockNode block;
     public String fileName;

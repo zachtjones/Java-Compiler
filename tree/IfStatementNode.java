@@ -8,7 +8,7 @@ import intermediate.JumpStatement;
 import intermediate.LabelStatement;
 import intermediate.RegisterAllocator;
 
-public class IfStatementNode implements Node {
+public class IfStatementNode implements StatementNode {
     public Expression expression;
     public StatementNode statement;
     public StatementNode elsePart;

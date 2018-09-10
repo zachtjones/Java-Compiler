@@ -9,7 +9,7 @@ import intermediate.InterFunction;
 import intermediate.LabelStatement;
 import intermediate.RegisterAllocator;
 
-public class ForStatementNode implements Node {
+public class ForStatementNode implements StatementNode {
     // these 3 are all optional, so could be null
     public ForInitNode init;
     public Expression condition;

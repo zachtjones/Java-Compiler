@@ -8,7 +8,7 @@ import intermediate.JumpStatement;
 import intermediate.LabelStatement;
 import intermediate.RegisterAllocator;
 
-public class WhileStatementNode implements Node {
+public class WhileStatementNode implements StatementNode {
     public Expression expression;
     public StatementNode statement;
     public String fileName;

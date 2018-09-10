@@ -7,7 +7,7 @@ import intermediate.RegisterAllocator;
 import intermediate.ReturnRegStatement;
 import intermediate.ReturnVoidStatement;
 
-public class ReturnStatementNode implements Node {
+public class ReturnStatementNode implements StatementNode {
     // could be null
     public Expression expression;
     public String fileName;
