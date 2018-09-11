@@ -55,13 +55,9 @@ public class NameNode implements Node, Expression, LValue {
 		// only the first part - the primaryName could be not fully qualified
 		//   in the example: System.out.println
 		//System.out.print("Replace: " + this.getSimpleName());
-		String firstFull = c.getFullName(primaryName, fileName, line);
+		String all = this.getSimpleName();
+		String total = c.getFullName(all, fileName, line);
 		
-		String total = firstFull;
-		if (secondaryName != null) {
-			String rest = secondaryName.getSimpleName();
-			total += '.' + rest;
-		}
 		// have resolved it all
 		this.primaryName = total;
 		this.secondaryName = null;

@@ -15,9 +15,7 @@ import tree.NameNode;
 import tree.SymbolTable;
 
 public class ClassLookup {
-	private static boolean lookedUpJava = false;
-	private static HashMap<String, String> items = new HashMap<String, String>();
-	private static HashMap<String, String> javaItems = new HashMap<String, String>();
+	private HashMap<String, String> items = new HashMap<String, String>();
 
 	private SymbolTable syms;
 	
@@ -28,8 +26,11 @@ public class ClassLookup {
 	 *  or null.
 	 * @param imports The ArrayList of ImportNodes that are declared in the final.
 	 * @param classLevel The class level symbol table (from imports)
+	 * @throws CompileException If there is an issue resolving creating this object.
 	 */
-	public ClassLookup(String fileName, String packageName, ArrayList<ImportNode> imports, SymbolTable classLevel) {
+	public ClassLookup(String fileName, String packageName, ArrayList<ImportNode> imports,
+			SymbolTable classLevel) throws CompileException {
+		
 		syms = classLevel;
 		
 		File thisFile = new File(fileName);
@@ -54,6 +55,40 @@ public class ClassLookup {
 		javaLang.isAll = true;
 		javaLang.name = new NameNode(fileName, -1);
 		javaLang.name.primaryName = "java.lang";
+		
+		// add in the java files
+		try {
+			File f = new File("javaLookup.txt");
+			// use the javadocs online to lookup the list and create it
+			if (!f.exists()) {
+				URL url = new URL("https://docs.oracle.com/javase/8/docs/api/allclasses-noframe.html");
+				Scanner sc = new Scanner(url.openStream());
+				PrintWriter pw = new PrintWriter("javaLookup.txt");
+				while (sc.hasNextLine()) {
+					String line = sc.nextLine();
+					if (line.matches("<li><a href=\".*")) {
+						String name = line.replaceAll("<li><a href=\"", "");
+						name = name.replaceAll("\\.html.*", "");
+						pw.println(name.replace('.', '/'));
+					}
+				}
+				sc.close();
+				pw.flush();
+				pw.close();
+			}
+			// read from the list
+			List<String> lines = Files.readAllLines(f.toPath());
+			for (String line : lines) {
+				// just the last part of the fully qualified name
+				String shortestName = line.replaceAll(".*/", "");
+				items.put(shortestName, line);
+				items.put(line, line);
+				items.put(line.replace('/', '.'), line);
+				syms.putEntry(line, "className", fileName, -1);
+			}
+		} catch(IOException e) {
+			throw new CompileException(e.getMessage(), fileName, -1);
+		}
 
 	}
 
@@ -67,60 +102,23 @@ public class ClassLookup {
 	public String getFullName(String shortName, String fileName, int line)
 			throws CompileException {
 		
+		// handle Object -> java/lang/Object, 
+		//   java.lang.Object -> java/lang/Object, 
+		//   java/lang/Object -> java/lang/Object
 		if (items.containsKey(shortName)) {
-			return items.get(shortName);
+			return items.get(shortName).replace('.', '/');
 		}
-		// check the java.*** stuff for it
-		String javaLookup = lookupJavaName(shortName, fileName, line);
-		if (javaLookup != null) return javaLookup;
+		
+		// handle System.in -> java/lang/System.in
+		if (shortName.contains(".")) {
+			String firstPart = shortName.substring(0, shortName.indexOf("."));
+			String rest = shortName.substring(shortName.indexOf(".") + 1);
+			if (items.containsKey(firstPart)) {
+				return items.get(firstPart) + "." + rest;
+			}
+		}
 		
 		// return the short name, assume default package;
 		return shortName;
-	}
-
-	/** Looks up the java name. Note this might require a network connection,
-	 * and the java name could be java.util.* or javax.* or similar classes.
-	 * @param fileName The name of the file being compiled.
-	 * @param fileLine The line of the current expression being compiled.
-	 * @throws CompileException If there is a compile exception.
-	 * */
-	private String lookupJavaName(String shortName, String fileName, int fileLine)
-			throws CompileException {
-		
-		if (!lookedUpJava) {
-			try {
-				File f = new File("javaLookup.txt");
-				// use the javadocs online to lookup the list and create it
-				if (!f.exists()) {
-					URL url = new URL("https://docs.oracle.com/javase/8/docs/api/allclasses-noframe.html");
-					Scanner sc = new Scanner(url.openStream());
-					PrintWriter pw = new PrintWriter("javaLookup.txt");
-					while (sc.hasNextLine()) {
-						String line = sc.nextLine();
-						if (line.matches("<li><a href=\".*")) {
-							String name = line.replaceAll("<li><a href=\"", "");
-							name = name.replaceAll("\\.html.*", "");
-							pw.println(name.replace('.', '/'));
-						}
-					}
-					sc.close();
-					pw.flush();
-					pw.close();
-				}
-				// read from the list
-				List<String> lines = Files.readAllLines(f.toPath());
-				for (String line : lines) {
-					// just the last part of the fully qualified name
-					String shortestName = line.replaceAll(".*/", "");
-					javaItems.put(shortestName, line);
-					syms.putEntry(line, "className", fileName, fileLine);
-				}
-				lookedUpJava = true;
-			} catch(IOException e) {
-				throw new CompileException(e.getMessage(), fileName, fileLine);
-			}
-		}
-		// now we know javaItems has the reference
-		return javaItems.get(shortName);
 	}
 }
