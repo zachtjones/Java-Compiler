@@ -211,6 +211,7 @@ TOKEN : /* OPERATORS */
 | < LSHIFTASSIGN: "<<=" >
 | < RSIGNEDSHIFTASSIGN: ">>=" >
 | < RUNSIGNEDSHIFTASSIGN: ">>>=" >
+| < ELLIPSIS: "..." >
 }
 
 
@@ -521,7 +522,7 @@ ParamNode FormalParameter() :
     ParamNode p = new ParamNode(fileName, token.beginLine);
 }
 {
-    p.type=Type() p.id=VariableDeclaratorId()
+    p.type=Type() [<ELLIPSIS> { p.isVarargs=true; }] p.id=VariableDeclaratorId()
     {
         return p;
     }
@@ -612,17 +613,63 @@ NameNode Name() :
 {
     NameNode n = new NameNode(fileName, token.beginLine);
     Token t;
+    NameNode temp;
 }
 {
-    // could be X<Y extends Z>
+    // need to make this so that NameNode isn't recursively defined, so that
+    //  we can make another method for the bounds, since you can have a list
+    //  of them using super and extends, list is separated with '&'
     t=<IDENTIFIER> { n.primaryName = t.image; }
-    ( LOOKAHEAD(<EXTENDS> Name()) <EXTENDS> n.extendsNode=Name())?
-    ( LOOKAHEAD(<LT> NameList() <GT>) <LT> n.generics=NameList() <GT>)?
-    ( LOOKAHEAD(2) "." n.secondaryName=Name()  )*
+    ( LOOKAHEAD(2) "." t=<IDENTIFIER> {
+        n.primaryName += "." + t.image;
+    } )*
+    ( LOOKAHEAD(<LT> GenericList() <GT>) <LT> n.generics=GenericList() <GT>)?
     {
         return n;
     }
 }
+
+ArrayList<GenericNode> GenericList() :
+{
+    ArrayList<GenericNode> n = new ArrayList<GenericNode>();
+    GenericNode temp;
+}
+{
+    temp=Generic(){ n.add(temp); }
+    ( <COMMA> temp=Generic() { n.add(temp); } )*
+    {
+        return n;
+    }
+}
+
+GenericNode Generic():
+{
+    GenericNode g = new GenericNode(fileName, token.beginLine);
+    NameNode temp;
+}
+{
+    (( g.extends1=Name() [<EXTENDS> g.extends2=Name()] )
+    |
+    ( <HOOK> (<EXTENDS> g.hookExtends=BoundList()) | (<SUPER> g.hookSuper=BoundList()) ))
+    {
+        return g;
+    }
+}
+
+ArrayList<NameNode> BoundList() :
+{
+    ArrayList<NameNode> n = new ArrayList<NameNode>();
+    NameNode temp;
+}
+{
+    temp=Name(){ n.add(temp); }
+    // choice conflict since name could go to '&' somehow -- TODO
+    ( <BIT_AND> temp=Name() { n.add(temp); } )*
+    {
+        return n;
+    }
+}
+
 
 ArrayList<NameNode> NameList() :
 {

@@ -14,6 +14,7 @@ public class InterFunction {
 	
 	public ArrayList<String> paramTypes;
 	public ArrayList<String> paramNames;
+	public boolean lastArgVarargs;
 	
 	public ArrayList<String> throwsList;
 	
@@ -35,6 +36,9 @@ public class InterFunction {
 			sb.append("instance ");
 		} else {
 			sb.append("static ");
+		}
+		if (lastArgVarargs) {
+			sb.append("varargs ");
 		}
 		if (isInit) {
 			sb.append("init\n");

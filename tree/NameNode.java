@@ -17,9 +17,8 @@ import intermediate.RegisterAllocator;
 
 public class NameNode implements Node, Expression, LValue {
 	public String primaryName;
-	public NameNode extendsNode; // used in class / interface declarations
-	public ArrayList<NameNode> generics;
-	public NameNode secondaryName;
+	public ArrayList<GenericNode> generics;
+	
 	public String fileName;
     public int line;
     
@@ -38,35 +37,30 @@ public class NameNode implements Node, Expression, LValue {
     	return line;
     }
 
-	/** Gets the simple name (like java.lang) for this name node,
-	 * using the secondary name if needed.
-	 * Generics are not filled in */
-	public String getSimpleName() {
-		StringBuilder result = new StringBuilder(primaryName);
-		if (secondaryName != null) {
-			result.append('.');
-			result.append(secondaryName.getSimpleName());
-		}
-		return result.toString();
-	}
-
 	@Override
 	public void resolveImports(ClassLookup c) throws CompileException {
-		// only the first part - the primaryName could be not fully qualified
-		//   in the example: System.out.println
-		//System.out.print("Replace: " + this.getSimpleName());
-		String all = this.getSimpleName();
-		String total = c.getFullName(all, fileName, line);
+		//System.out.print("Replace: " + primaryName);
+		if (primaryName != null)
+			primaryName = c.getFullName(primaryName, fileName, line);
+		// don't have to check if one of primaryName or bounds is set, as this is handled by the parser
 		
-		// have resolved it all
-		this.primaryName = total;
-		this.secondaryName = null;
-		//System.out.println(" -> " + total);
-		// TODO handle generics and the ? extends / super thing
+		// resolve the nested structures as well
+		if (generics != null) {
+			for (GenericNode n : generics) {
+				n.resolveImports(c);
+			}
+		}
+		
+		//System.out.println(" -> " + primaryName);
 	}
 
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+		if (generics != null) {
+			throw new CompileException("Generics compiling not supported yet.", fileName, line);
+			// TODO
+		}
+		
 		if (!primaryName.contains(".")) {
 			// on the right side, get the result
 			int tableLookup = s.lookup(primaryName);

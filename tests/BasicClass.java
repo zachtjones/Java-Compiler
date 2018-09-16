@@ -19,4 +19,14 @@ public class BasicClass {
 	public static int getA() {
 		return a;
 	}
+
+
+	public static void main(String[] args) {
+		BasicClass temp = new BasicClass();
+		temp.setB(5);
+		BasicClass.setA(1);
+
+		System.out.println("b is: " + temp.getB());
+		System.out.println("a is: " + BasicClass.getA());
+	}
 }

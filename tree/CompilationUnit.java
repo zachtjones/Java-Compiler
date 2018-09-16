@@ -62,7 +62,7 @@ public class CompilationUnit implements Node {
 		for (TypeDecNode t : types) {
 			InterFile i;
 			if (packageName != null) {
-				i = t.compile(packageName.getSimpleName().replace('.', '/'), classLevel);
+				i = t.compile(packageName.primaryName.replace('.', '/'), classLevel);
 			} else {
 				i = t.compile(null, classLevel);
 			}

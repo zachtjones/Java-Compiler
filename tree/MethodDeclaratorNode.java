@@ -47,6 +47,19 @@ public class MethodDeclaratorNode implements Node {
 			s.putEntry(p.id.name, p.type.interRep(), fileName, line);
 			f.paramTypes.add(p.type.interRep());
 			f.paramNames.add(p.id.name);
+			if (p.isVarargs) {
+				if (f.lastArgVarargs) { // can only have one argument varargs, and as to be last
+					throw new CompileException(
+							"the variable arguments can only be used on the last parameter.",
+							fileName, line);
+				}
+				f.lastArgVarargs = true;
+			} else {
+				if (f.lastArgVarargs)
+					// make sure that a previous argument was not ...
+					throw new CompileException("the variable arguments can onlybe on the last paramter.",
+						fileName, line);
+			}
 		}
 	}
 }

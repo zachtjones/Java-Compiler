@@ -8,8 +8,10 @@ import intermediate.RegisterAllocator;
 public class ParamNode implements Node {
     public TypeNode type;
     public VariableIdNode id;
-    public String fileName;
-    public int line;
+    public boolean isVarargs; // if it is the ...
+    
+    private final String fileName;
+    private final int line;
     
     public ParamNode(String fileName, int line) {
     	this.fileName = fileName;
@@ -34,5 +36,8 @@ public class ParamNode implements Node {
 	@Override
 	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
 		// already dealt with in MethodNode or ConstructorNode.
+		if (this.isVarargs) {
+			throw new CompileException("Error: varargs not implemented yet.", fileName, line);
+		}
 	}
 }

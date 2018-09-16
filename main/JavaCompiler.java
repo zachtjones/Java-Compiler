@@ -46,7 +46,7 @@ public class JavaCompiler {
 			CompilationUnit c = JavaParser.parse(newFileName);
 
 			// update the class lookup tables (short names to full names)
-			String packageName = c.packageName == null ? null : c.packageName.getSimpleName();
+			String packageName = c.packageName == null ? null : c.packageName.primaryName;
 			SymbolTable classLevel = new SymbolTable(null, SymbolTable.className);
 			ClassLookup lookup = new ClassLookup(newFileName, packageName, c.imports, classLevel);
 
@@ -56,7 +56,6 @@ public class JavaCompiler {
 			// compile and put all in the cache
 			ArrayList<InterFile> files = c.compile(classLevel);
 			for (int i = 0; i < files.size(); i++) {
-				System.out.println(files.get(i).getName());
 				cache.put(files.get(i).getName(), files.get(i)); 
 			}
 			// return the one that was in the cache
@@ -84,12 +83,12 @@ public class JavaCompiler {
 				// get the folder that the file is in
 				rootDir = new File(file).getParent() + "/";
 			} else {
-				String packageFile = c.packageName.getSimpleName().replace('.', '/');
+				String packageFile = c.packageName.primaryName.replace('.', '/');
 				rootDir = new File(file).getParent().replace(packageFile, "");
 			}
 
 			// update the class lookup tables (short names to full names)
-			String packageName = c.packageName == null ? null : c.packageName.getSimpleName();
+			String packageName = c.packageName == null ? null : c.packageName.primaryName;
 			SymbolTable classLevel = new SymbolTable(null, SymbolTable.className);
 			ClassLookup lookup = new ClassLookup(file, packageName, c.imports, classLevel);
 

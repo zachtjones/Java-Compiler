@@ -53,7 +53,7 @@ public class ConstructorNode {
 	 * @throws CompileException If there is a compiling error.
 	 */
 	public void compile(InterFile f, SymbolTable s) throws CompileException {
-		System.out.println("Should handle parsing of Explicit super() or this() in constructor declarations.");
+		// TODO, handle super(...) or this(...)   (Issue #16)
 		// name is <init>
 		InterFunction func = new InterFunction();
 		func.name = "<init>";
@@ -69,6 +69,19 @@ public class ConstructorNode {
 		for (ParamNode p : this.params) {
 			func.paramTypes.add(p.type.interRep());
 			func.paramNames.add(p.id.name);
+			if (p.isVarargs) {
+				if (func.lastArgVarargs) { // can only have one argument varargs, and as to be last
+					throw new CompileException(
+							"the variable arguments can only be used on the last parameter.",
+							fileName, line);
+				}
+				func.lastArgVarargs = true;
+			} else {
+				if (func.lastArgVarargs)
+					// make sure that a previous argument was not ...
+					throw new CompileException("the variable arguments can onlybe on the last paramter.",
+						fileName, line);
+			}
 			newTable.putEntry(p.id.name, p.type.interRep(), fileName, line);
 		}
 		
