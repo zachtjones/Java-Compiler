@@ -40,6 +40,6 @@ public class PutLocalStatement implements InterStatement {
 			throw new CompileException("local variable: " + localName + " is not defined.",
 					fileName, line);
 		}
-		TypeChecker.subclassOrEqual(locals.get(localName), r.typeFull, fileName, line);
+		TypeChecker.canAssign(locals.get(localName), r.typeFull, fileName, line);
 	}
 }

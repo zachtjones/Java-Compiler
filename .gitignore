@@ -7,7 +7,7 @@ main/ParseException.java
 main/SimpleCharStream.java
 main/Token.java
 main/TokenMgrError.java
-
+temp/*
 .classpath
 .project
 

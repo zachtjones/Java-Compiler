@@ -34,7 +34,7 @@ public class GetParamStatement implements InterStatement {
 			HashMap<String, String> params, InterFunction func) throws CompileException {
 		
 		if (!params.containsKey(localName)) {
-			throw new CompileException("Error: " + localName + " not a parameter.", fileName, line);
+			throw new CompileException("'" + localName + "' not a parameter.", fileName, line);
 		}
 		
 		regs.put(r, params.get(localName));

@@ -23,6 +23,8 @@ public class LoadLiteralStatement implements InterStatement {
 			r = regAlloc.getNext(Register.BOOLEAN);
 		} else if (literalValue.equals("false")) {
 			r = regAlloc.getNext(Register.BOOLEAN);
+		} else if (literalValue.equals("null")) {
+			r = regAlloc.getNext(Register.NULL);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'f') {
 			r = regAlloc.getNext(Register.FLOAT);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'F') {

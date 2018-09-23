@@ -83,8 +83,9 @@ public class InterFunction {
 	}
 
 	/** Type checks all the statements. 
+	 * @param className	The fully qualified name for the InterFile. 
 	 * @throws CompileException If there is an error with type checking.*/
-	public void typeCheck() throws CompileException {
+	public void typeCheck(String className) throws CompileException {
 		HashMap<Register, String> definitions = new HashMap<Register, String>();
 		HashMap<String, String> locals = new HashMap<String, String>();
 		// define parameters and fill it in.
@@ -92,6 +93,11 @@ public class InterFunction {
 		for (int i = 0; i < paramTypes.size(); i++) {
 			params.put(paramNames.get(i), paramTypes.get(i));
 		}
+		// instance functions have access to 'this'
+		if (this.isInstance) {
+			params.put("this", className);
+		}
+		
 		for (InterStatement i : statements) {
 			i.typeCheck(definitions, locals, params, this);
 		}		

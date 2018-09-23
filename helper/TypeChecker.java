@@ -5,18 +5,24 @@ import intermediate.Register;
 public class TypeChecker {
 	
 	/**
-	 * Verifies that subclassName is a subclass or the same as className.
+	 * Verifies that you can assign source to target.
 	 * @throws CompileException if subclassName is not the same as className or a subclass of it.
 	 */
-	public static void subclassOrEqual(String className, String subclassName, String fileName, int line)
+	public static void canAssign(String target, String source, String fileName, int line)
 			throws CompileException {
 		
-		if (className.equals(subclassName)) {
+		if (target.equals(source)) {
 			return;
 		}
+		// null can be assigned to any reference type
+		if (source.equals("null") && !isPrimitive(target)) {
+			return;
+		}
+		
+		
 		// TODO use the file system and perform lookups and such
 
-		throw new CompileException("can't convert: " + subclassName + " to: " + className, fileName, line);
+		throw new CompileException("can't convert: " + source + " to: " + target, fileName, line);
 	}
 	
 	/***
@@ -50,6 +56,23 @@ public class TypeChecker {
 		}
 		
 		// both are reference types, check subclass or equal
-		subclassOrEqual(pointerType, dataType.typeFull, fileName, line);
+		canAssign(pointerType, dataType.typeFull, fileName, line);
+	}
+	
+	/** Returns true if the value is a primitive type. */
+	private static boolean isPrimitive(String value) {
+		switch(value) {
+		case "boolean":
+		case "byte":
+		case "char":
+		case "short":
+		case "int":
+		case "long":
+		case "float":
+		case "double":
+			return true;
+		default:
+			return false;
+		}
 	}
 }

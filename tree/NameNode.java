@@ -61,12 +61,14 @@ public class NameNode implements Node, Expression, LValue {
 			// TODO
 		}
 		
+		System.out.println(primaryName); //TODO
 		if (!primaryName.contains(".")) {
 			// on the right side, get the result
 			int tableLookup = s.lookup(primaryName);
 			String type;
 			if (tableLookup == -1) {
-				type = "unknown";
+				throw new CompileException("symbol: '" + primaryName + "' not found.",
+						fileName, line);
 			} else {
 				type = s.getType(primaryName);
 			}
@@ -126,17 +128,25 @@ public class NameNode implements Node, Expression, LValue {
 	}
 
 	@Override
-	public void compileAddress(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compileAddress(SymbolTable s, InterFunction f, RegisterAllocator r, 
+			CompileHistory c) throws CompileException {
+		
+		if (generics != null) {
+			throw new CompileException("Generics compiling not supported yet.", fileName, line);
+			// TODO
+		}
+		
+		System.out.println(primaryName); // TODO
 		c.setName(primaryName);
 		// on the left side, get the address
 		if (!primaryName.contains(".")) {
 			int tableLookup = s.lookup(primaryName);
-			String type;
 			if (tableLookup == -1) {
-				type = "unknown";
-			} else {
-				type = s.getType(primaryName);
-			} 
+				throw new CompileException("symbol: '" + primaryName + "' not defined.",
+						fileName, line);
+			}
+			String type = s.getType(primaryName);
+			 
 			if (tableLookup == SymbolTable.local) {
 				Register result = r.getNext(type);
 				f.statements.add(new GetLocalAddressStatement(result, primaryName, fileName, line));

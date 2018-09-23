@@ -164,8 +164,9 @@ public class InterFile {
 	/** Type checks all the functions 
 	 * @throws CompileException If there is an error with type checking.*/
 	public void typeCheck() throws CompileException {
+		
 		for (InterFunction f : functions) {
-			f.typeCheck();
+			f.typeCheck(name);
 		}
 	}
 

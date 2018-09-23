@@ -28,6 +28,8 @@ public class JavaCompiler {
 	 */
 	public static InterFile parseAndCompile(String fullyQualifiedName, String fileName, int line)
 			throws CompileException {
+		
+		fullyQualifiedName = fullyQualifiedName.replace('.', '/');
 
 		// use the cache to save compile time
 		if (cache.containsKey(fullyQualifiedName)) {
@@ -56,6 +58,7 @@ public class JavaCompiler {
 			// compile and put all in the cache
 			ArrayList<InterFile> files = c.compile(classLevel);
 			for (int i = 0; i < files.size(); i++) {
+				files.get(i).typeCheck();
 				cache.put(files.get(i).getName(), files.get(i)); 
 			}
 			// return the one that was in the cache
@@ -108,6 +111,9 @@ public class JavaCompiler {
 
 			// print out the resulting IL
 			for (InterFile f : cache.values()) {
+				String folder = "temp/" + f.getName();
+				folder = folder.substring(0, folder.lastIndexOf('/'));
+				new File(folder).mkdirs();
 				PrintWriter pw = new PrintWriter("temp/" + f.getName() + ".jil");
 				pw.println(f.toString());
 				pw.flush();
@@ -121,7 +127,7 @@ public class JavaCompiler {
 			System.out.print("Check near: \"");
 			System.out.println(e.currentToken.next.image + "\"");
 		} catch (FileNotFoundException e) {
-			System.out.println("Error: the input file was not found.");
+			System.out.println("Error: the file: " + e.getMessage() + " was not found.");
 		} catch (CompileException e) {
 			System.out.println("Error: " + e.getMessage());
 			e.printStackTrace();

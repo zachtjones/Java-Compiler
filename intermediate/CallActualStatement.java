@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.UsageCheck;
+import main.JavaCompiler;
 
 /** Represents a function call without a lookup. */
 public class CallActualStatement implements InterStatement {
@@ -43,10 +44,27 @@ public class CallActualStatement implements InterStatement {
 		for (Register r : args) {
 			UsageCheck.verifyDefined(r, regs, fileName, line);
 		}
-		System.out.println("check for definition of method: " + name + " in class: " + className);
 		
-		// TODO -- use the file system, probably create helper class
-		returnVal.typeFull = "unknown"; // TODO
-		regs.put(returnVal, returnVal.typeFull);
+		if (returnVal != null) {
+			// fill in the return type
+			InterFile e = JavaCompiler.parseAndCompile(obj.typeFull, fileName, line);
+			String returnType = e.getReturnType(name, args);
+
+			if (returnType == null) {
+				StringBuilder signature = new StringBuilder(name + "(");
+				for (int i = 0; i < args.length; i++) {
+					signature.append(args[i].typeFull);
+					if (i != args.length - 1) {
+						signature.append(',');
+					}
+				}
+				signature.append(")");
+				throw new CompileException("no method found with signature, " + signature.toString()
+				+ ", referenced", fileName, line);
+			}
+
+			returnVal.typeFull = returnType;
+			regs.put(returnVal, returnVal.typeFull);
+		}
 	}
 }

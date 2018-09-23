@@ -24,8 +24,8 @@ public class Register implements Expression {
 	public static final int FLOAT = 6;
 	public static final int DOUBLE = 7;
 	public static final int REFERENCE = 8;
-	
-	public static final int LABEL = 9;
+	public static final int NULL = 9;
+	public static final int LABEL = 10;
 	
 	public int num;
 	public int type;
@@ -108,6 +108,9 @@ public class Register implements Expression {
 			break;
 		case DOUBLE:
 			typeFull = "double";
+			break;
+		case NULL:
+			typeFull = "null";
 			break;
 		}
 	}
