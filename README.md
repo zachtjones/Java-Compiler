@@ -1,7 +1,9 @@
 # Java Compiler
-This is a java program used to compile Java files, outputting native x86-64 code instead
-of .class files. This compiler is far from implementing all of java, and requires
-an implementation of all the java.* library to fully work.
+This is a Java program used to compile Java files into native code.
+Instead of using a complete java library implementation, this uses the Java Native Interface for calling
+Java library methods.
+
+The supported output languages are planned to be x86-64 and AMD64.
 
 ## Introduction
 This program is written in Java, with the use of JavaCC as the parser.
@@ -24,11 +26,10 @@ This program is not complete, but does the following:
  - Implementing many of these features may change the structure of this program drastically, I'm not sure
 
 ## Usage
-1. ```make```
-  - builds the source files
-2. ```java JavaCompiler <main source file>```
-  - invokes the compiler on the main source file
-  - this compiles the file, and all files that it depends on
+1. Install Java 8+ and Apache Maven
+2. Run `mvn clean package`
+3. Invoke the jar on your main source file: `java -jar target/*.jar <your java file>`
+   - This will compile your java files, starting from the references from the main java class.
 
 ## Compiler passes
 1. Parses the language, and builds the resulting tree from the context-free grammar.
