@@ -59,9 +59,9 @@ public class JavaCompiler {
 
 			// compile and put all in the cache
 			ArrayList<InterFile> files = c.compile(classLevel);
-			for (int i = 0; i < files.size(); i++) {
-				files.get(i).typeCheck();
-				cache.put(files.get(i).getName(), files.get(i)); 
+			for (InterFile file : files) {
+				file.typeCheck();
+				cache.put(file.getName(), file);
 			}
 			// return the one that was in the cache
 			return cache.get(fullyQualifiedName);
