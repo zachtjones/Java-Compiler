@@ -1,4 +1,5 @@
 package main;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -7,6 +8,7 @@ import java.util.HashMap;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import main.JavaParser;
 import tree.*;
 import intermediate.*;
 
