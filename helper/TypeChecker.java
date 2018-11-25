@@ -19,6 +19,56 @@ public class TypeChecker {
 			return;
 		}
 		
+		// do the java widening conversions
+		if (isPrimitive(source) && isPrimitive(target)) {
+			switch(source) {
+			case "byte":
+				switch(target) {
+				case "short":
+				case "int":
+				case "long":
+				case "float":
+				case "double":
+					return;
+				}
+			case "short":
+				switch(target) {
+				case "int":
+				case "long":
+				case "float":
+				case "double":
+					return;
+				}
+			case "char":
+				switch(target) {
+				case "int":
+				case "long":
+				case "float":
+				case "double":
+					return;
+				}
+			case "int":
+				switch(target) {
+				case "long":
+				case "float":
+				case "double":
+					return;
+				}
+			case "long":
+				switch(target) {
+				case "float":
+				case "double":
+					return;
+				}
+			case "float":
+				switch(target) {
+				case "double":
+					return;
+				}
+			}
+		}
+		
+		// handle boxing / un-boxing
 		
 		// TODO use the file system and perform lookups and such
 

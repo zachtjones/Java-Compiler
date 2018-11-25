@@ -5,12 +5,23 @@ an implementation of all the java.* library to fully work.
 
 ## Introduction
 This program is written in Java, with the use of JavaCC as the parser.
+The purpose of this project is not to replace the JVM, but instead demonstrate an
+understanding of how a high level language can actually run on hardware.
 This program is not complete, but does the following:
-  - Checks syntax
-  - generates parse tree
-  - resolves imports for class names.
-  - resolves symbols (variables and fields)
-  - translates Java code to an intermediate language I designed (done for most nodes in the tree)
+  1. Parses java code
+  2. Converts the AST to a register-based intermediate language
+     - this language was designed to be a high level abstraction of common assembly languages
+  3. Type checks the resulting intermediate language
+  4. Prints out the intermediate language
+
+## Contributing
+ - GitHub issues are being used for features & bugs that are planned to be implemented
+ - The idea for progress is as follows:
+   1. Get a Hello, World program to compile to x86 assembly, invoke the GCC as to assemble & link.
+   2. Make lots of test classes for basic java syntax & how it works
+   3. Do some optimizations (and create issues from the list that I want to do next)
+   4. Implement a bunch more of the java library (writing test classes as I go)
+ - Implementing many of these features may change the structure of this program drastically, I'm not sure
 
 ## Usage
 1. ```make```
@@ -69,12 +80,12 @@ This makes some optimizations work in linear time that wouldn't work otherwise.
 - instruction scheduling to avoid pipeline stalls
 - minimize cache misses (might need to be done on high level code & involve benchmarks)
 
+
 ## Tests
-- ```cd tests```
-- ```./makeScript.sh```
-  - this script writes the runTests.sh script
-- ```./runTests.sh```
-  - this script runs the JavaCompiler program on the inputs.
+- Currently the only 'test' is the HelloWorld.java in tests/
+- plans are to compare the javac and java ClassName vs java JavaCompiler & ./ClassName output to be compared
+- this is really the only way to test the features, especially as optimizations become more prevalent
+
 
 ## Java Features not implemented (parsing phase)
 You may get really strange error messages if you use any of these.
