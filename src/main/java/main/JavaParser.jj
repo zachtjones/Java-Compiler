@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import tree.*;
 import java.util.ArrayList;
+import java.nio.charset.Charset;
 
 // hide the warnings from dead code -- there's no way to block it
 @SuppressWarnings("unused")
@@ -24,7 +25,7 @@ public class JavaParser {
     public String fileName;
 
     public static CompilationUnit parse(String file) throws FileNotFoundException, ParseException {
-        JavaParser parser = new JavaParser(new FileInputStream(file));
+        JavaParser parser = new JavaParser(new FileInputStream(file), Charset.defaultCharset());
         parser.fileName = file;
         return parser.CompilationUnit(file);
     }
@@ -1745,6 +1746,7 @@ TryStatementNode TryStatement() :
 {
     TryStatementNode t = new TryStatementNode(fileName, token.beginLine);
     t.catchParams = new ArrayList<ParamNode>();
+    t.catchBlocks = new ArrayList<BlockNode>();
     ParamNode temp;
     BlockNode temp2;
 }
