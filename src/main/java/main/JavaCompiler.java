@@ -2,15 +2,15 @@ package main;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import main.JavaParser;
 import tree.*;
 import intermediate.*;
+import x86.X86_64File;
 
 public class JavaCompiler {
 
@@ -18,7 +18,7 @@ public class JavaCompiler {
 	private static HashMap<String, InterFile> cache = new HashMap<>();
 
 	/** the root src folder, ending with '/' */
-	public static String rootDir;
+	private static String rootDir;
 
 	/** the java library source folder for *.java or *.jil files */
 	public static final String javaDir = "lib/"; 
@@ -111,16 +111,44 @@ public class JavaCompiler {
 				f.typeCheck();
 			}
 
-			// print out the resulting IL
-			for (InterFile f : cache.values()) {
-				String folder = "temp/" + f.getName();
-				folder = folder.substring(0, folder.lastIndexOf('/'));
-				new File(folder).mkdirs();
-				PrintWriter pw = new PrintWriter("temp/" + f.getName() + ".jil");
-				pw.println(f.toString());
-				pw.flush();
-				pw.close();
+			InterFile mainClass = null;
+			final Register argsArray = new Register(0, Register.REFERENCE, "auto-generated", -1);
+			argsArray.typeFull = "java/lang/String[]";
+			for (InterFile f : files) {
+				if (f.getReturnType("main", new Register[]{argsArray}) != null) {
+					mainClass = f;
+				}
 			}
+
+			// enforce there is a `static void main(String[] args)`
+			if (mainClass == null) {
+				throw new CompileException("There is not a main method in the files given.", c.fileName, 0);
+			}
+
+			// compile to the native code
+			final JavaCompiledMain entryCode = new JavaCompiledMain();
+			entryCode.compile();
+
+			// step 1: compile the code down to assembly files
+			if (System.getProperty("os.arch").equals("x86_64")) {
+				X86_64File compiledMain = entryCode.compileX86_64();
+				System.out.println(compiledMain);
+				for (InterFile f : files) {
+					X86_64File compiled = f.compileX86_64();
+					System.out.println(compiled);
+				}
+			} else if (System.getProperty("os.arch").equals("amd64")) {
+				throw new CompileException("AMD 64 compiling not implemented yet", "", -1);
+			} else {
+				throw new CompileException(
+						"Unsupported computer architecture. Currently only supports x86_64 & amd64.", "", -1);
+			}
+
+			// step 2: prepare the java wrapper class
+			new JavaCompiledMain().compile();
+
+			System.out.println("Done, results are in the temp folder.");
+			System.out.println("Invoke the program: `java -Djava.library.path=. Main` from the temp folder");
 
 		} catch (ParseException e) {
 			System.out.print("Syntax error at line ");
@@ -132,6 +160,12 @@ public class JavaCompiler {
 			System.out.println("Error: the file: " + e.getMessage() + " was not found.");
 		} catch (CompileException e) {
 			System.out.println("Error: " + e.getMessage());
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			System.out.println("Error: interrupted while running");
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("Error: I/O exception happened while compiling.");
 			e.printStackTrace();
 		}
 	}

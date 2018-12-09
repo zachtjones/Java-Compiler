@@ -2,8 +2,10 @@ package intermediate;
 
 import java.util.ArrayList;
 
+import amd64.AMD64File;
 import helper.CompileException;
 import tree.NameNode;
+import x86.X86_64File;
 
 public class InterFile {
 	private String name;
@@ -212,5 +214,13 @@ public class InterFile {
 			// TODO the ... on args and inheritance
 		}
 		return null;
+	}
+
+	public X86_64File compileX86_64() throws CompileException {
+		throw new CompileException("x86-64 assembly not implemented yet", this.toString(), -1);
+	}
+
+	public AMD64File compileAMD64() throws CompileException {
+		throw new CompileException("AMD 64 assembly not implemented yet", this.toString(), -1);
 	}
 }
