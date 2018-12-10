@@ -8,6 +8,9 @@
 #  this is simply another wrapper layer of main(String[] args), with this layer convering java String [] to the x64
 #  representation.
 
+# You can't cache the JNIEnv*, since it changes based on threading.
+# However, we only use it here to convert the String[] to the char*[]
+
 	.text
 	.global	_Java_Main_mainMethod
 	.balign 16, 0x90
@@ -16,12 +19,11 @@
 
 _Java_Main_mainMethod: # (JNIEnv *, jclass, jobjectArray) -> int
 
-    # rbx is the javaEnv *, r12 is the args.length, r13 is the counter, r14 is the array
+    pushq   %rbx                        # javaEnv
+    pushq   %r12                        # args.length
+    pushq   %r13                        # counter
+    pushq   %r14                        # args param
 
-    pushq   %rbx
-    pushq   %r12
-    pushq   %r13
-    pushq   %r14
 
     movq    %rdi, %rbx                  # save java environment
     movq    %rdx, %r14                  # save args array
@@ -29,22 +31,32 @@ _Java_Main_mainMethod: # (JNIEnv *, jclass, jobjectArray) -> int
 	movq	_javaEnv@GOTPCREL(%rip), %rax   # tempAddress = PC-relative javaEnv label
 	movq	%rdi, (%rax)                # move arg1 to the address just computed
 
-	# %rax is the java environment pointer to the function table
-	movq	(%rdi), %rax
-
-	# convert the Java String[] to int, String*
 
 	# get the length, call: int GetArrayLength(JNIEnv *, array) : index 171 or JavaEnv*
+	movq	(%rbx), %rax
 	movq    1368(%rax), %rcx                 # rcx = JavaEnv -> 171 * pointer size
 
-    # arg1 = javaEnv
-    movq    %rbx, %rdi
+    # arg1 = javaEnv, which is already there
     # arg2 = array
     movq    %r14, %rsi
 
     callq   *%rcx                       # call the JavaEnv -> 171 * 8 (javaEnv*, array)
 
-    # eax is the length, want to return that from here too
+    # return value is the length, store it as upper bound
+    movq    %rax, %r12
+    movq    $0, %r13                   # counter = 0
+start_while_loop:
+    # condition
+    cmpq   %r13, %r12                 # FLAGS = conditions(counter, length)
+    je      end_while_loop
+
+    # body: get the string @ index, convert it to null terminated char*
+
+
+    # increment & goto top
+    incq    %r13
+    jmp     start_while_loop
+end_while_loop:
 
 	# callq	_main if we were actually calling the main function, for now let's just return the length
 
