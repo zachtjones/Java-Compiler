@@ -23,7 +23,7 @@ _Java_Main_mainMethod: # (JNIEnv *, jclass, jobjectArray) -> int
     pushq   %r12                        # args.length
     pushq   %r13                        # counter
     pushq   %r14                        # args param
-
+    pushq   %r8                         # padding for 16-byte alignment
 
     movq    %rdi, %rbx                  # save java environment
     movq    %rdx, %r14                  # save args array
@@ -34,7 +34,7 @@ _Java_Main_mainMethod: # (JNIEnv *, jclass, jobjectArray) -> int
 
 	# get the length, call: int GetArrayLength(JNIEnv *, array) : index 171 or JavaEnv*
 	movq	(%rbx), %rax
-	movq    1368(%rax), %rcx                 # rcx = JavaEnv -> 171 * pointer size
+	movq    1368(%rax), %rcx            # rcx = JavaEnv -> 171 * pointer size
 
     # arg1 = javaEnv, which is already there
     # arg2 = array
@@ -44,14 +44,45 @@ _Java_Main_mainMethod: # (JNIEnv *, jclass, jobjectArray) -> int
 
     # return value is the length, store it as upper bound
     movq    %rax, %r12
-    movq    $0, %r13                   # counter = 0
+    movq    $0, %r13                    # counter = 0
 start_while_loop:
     # condition
-    cmpq   %r13, %r12                 # FLAGS = conditions(counter, length)
+    cmpq   %r13, %r12                   # FLAGS = conditions(counter, length)
     je      end_while_loop
 
-    # body: get the string @ index, convert it to null terminated char*
+    # body: get the string @ index, then convert to char*
 
+    # get the string @ index
+    # index 173, jobject GetObjectArrayElement(JNIEnv *env, jobjectArray array, jsize index);
+
+    movq    (%rbx), %rax
+    movq    1384(%rax), %rcx
+
+    movq    %rbx, %rdi                  # arg1 = javaEnv
+    movq    %r14, %rsi                  # arg2 = args java array
+    movq    %r13, %rdx                  # index = counter
+
+    callq   *%rcx                       # call to JNI -> rax is the java/lang/String
+
+    # store returned value in r9
+    movq    %rax, %r9
+
+
+    # convert it to null terminated char*
+    # index 169, char* GetStringUTFChars(JNIEnv *env, jstring string, jboolean *isCopy);
+
+    movq    (%rbx), %rax
+    movq    1352(%rax), %rcx
+
+    movq    %rbx, %rdi                  # arg1 = javaEnv
+    movq    %r9, %rsi                  # arg2 = returned string from getArrayValue
+    movq    $0, %rdx                    # arg3 = NULL for don't copy
+
+    callq   *%rcx                       # call to JNI -> rax is the char*
+
+    movq    %rax, %rdi
+
+    call    _puts
 
     # increment & goto top
     incq    %r13
@@ -60,6 +91,7 @@ end_while_loop:
 
 	# callq	_main if we were actually calling the main function, for now let's just return the length
 
+    popq    %r8
     popq    %r14
     popq    %r13
 	popq    %r12
