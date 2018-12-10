@@ -22,15 +22,11 @@ _Java_Main_mainMethod: # (JNIEnv *, jclass, jobjectArray) -> int
     pushq   %rbx                        # javaEnv
     pushq   %r12                        # args.length
     pushq   %r13                        # counter
-    pushq   %r14                        # args param
-    pushq   %r8                         # padding for 16-byte alignment
+    pushq   %r14                        # args java/lang/String[]
+    pushq   %r15                         # args char*[]
 
     movq    %rdi, %rbx                  # save java environment
     movq    %rdx, %r14                  # save args array
-
-	movq	_javaEnv@GOTPCREL(%rip), %rax   # tempAddress = PC-relative javaEnv label
-	movq	%rdi, (%rax)                # move arg1 to the address just computed
-
 
 	# get the length, call: int GetArrayLength(JNIEnv *, array) : index 171 or JavaEnv*
 	movq	(%rbx), %rax
@@ -44,6 +40,13 @@ _Java_Main_mainMethod: # (JNIEnv *, jclass, jobjectArray) -> int
 
     # return value is the length, store it as upper bound
     movq    %rax, %r12
+
+    # r15 = malloc(length * 8)
+    movq    %rax, %rdi
+    salq    $3, %rdi                    # arg1 = length << 3 (same as length * 8)
+    call    _malloc
+    movq    %rax, %r15                  # r15 = new char*[length]
+
     movq    $0, %r13                    # counter = 0
 start_while_loop:
     # condition
@@ -75,14 +78,13 @@ start_while_loop:
     movq    1352(%rax), %rcx
 
     movq    %rbx, %rdi                  # arg1 = javaEnv
-    movq    %r9, %rsi                  # arg2 = returned string from getArrayValue
+    movq    %r9, %rsi                   # arg2 = returned string from getArrayValue
     movq    $0, %rdx                    # arg3 = NULL for don't copy
 
     callq   *%rcx                       # call to JNI -> rax is the char*
 
-    movq    %rax, %rdi
-
-    call    _puts
+    # store rax @ r15 + counter * 8
+    movq    %rax, (%r15, %r13, 8)
 
     # increment & goto top
     incq    %r13
@@ -91,12 +93,10 @@ end_while_loop:
 
 	# callq	_main if we were actually calling the main function, for now let's just return the length
 
-    popq    %r8
+    popq    %r15
     popq    %r14
     popq    %r13
 	popq    %r12
 	popq    %rbx
 	retq
 
-    # common variable, _javaEnv, of size 8 bytes (pointer), aligned to 2 to the power of 3
-	.comm	_javaEnv,8,3
