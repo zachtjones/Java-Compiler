@@ -13,7 +13,7 @@ public class JavaCompiledMain {
     private final String content;
 
     JavaCompiledMain() {
-        content = readResourcesFile("javaMain.java");
+        content = readResourcesFile("Main.java");
     }
 
     /** Compiles the Main class for java, saving it to the temp folder. */

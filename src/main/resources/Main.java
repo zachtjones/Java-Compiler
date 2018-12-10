@@ -1,9 +1,9 @@
 public class Main {
     static { System.loadLibrary("Main"); }
     
-    static native void mainMethod(String[] args);
+    static native int mainMethod(String[] args);
 
     public static void main(String[] args){
-        mainMethod(args);
+        System.out.println(mainMethod(args));
     }
 }
