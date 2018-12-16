@@ -26,6 +26,15 @@ public class JavaCompiledMain {
         Process p = Runtime.getRuntime().exec("javac" , new String[]{"Main.java"}, new File("temp"));
         p.waitFor();
 
+        // copy the appropriate assembly bridge file
+        PrintWriter assemblyBridge = new PrintWriter("temp/Main.s");
+        if (System.getProperty("os.arch").equals("x86_64")) {
+            assemblyBridge.println(readResourcesFile("Main-x86_64.s"));
+        }
+        // TODO other architectures
+        pw.flush();
+        pw.close();
+
         // Signature for the main method defined in the program
         // JNIEXPORT void JNICALL Java_Main_mainMethod(JNIEnv *, jclass, jobjectArray);
 
@@ -42,12 +51,6 @@ public class JavaCompiledMain {
         // System.getProperty("os.arch") -> "x86_64" or "amd64"
         // System.getProperty("os.name") -> "Mac OS X"
         // System.getProperty("os.version") -> "10.14"
-
-        /*typedef struct {
-            char *name;
-            char *signature;
-            void *fnPtr;
-        } JNINativeMethod;*/
 
     }
 
