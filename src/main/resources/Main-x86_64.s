@@ -23,7 +23,7 @@ _Java_Main_mainMethod: # (JNIEnv *, jclass, jobjectArray) -> int
     pushq   %r12                        # args.length
     pushq   %r13                        # counter
     pushq   %r14                        # args java/lang/String[]
-    pushq   %r15                         # args char*[]
+    pushq   %r15                        # args char*[]
 
     movq    %rdi, %rbx                  # save java environment
     movq    %rdx, %r14                  # save args array
@@ -91,7 +91,12 @@ start_while_loop:
     jmp     start_while_loop
 end_while_loop:
 
-	# callq	_main if we were actually calling the main function, for now let's just return the length
+    # int main(int argc, char*[] argv)
+    movq    %r12, %rdi                  # arg1 = args.length
+    movq    %r15, %rsi
+	callq	_main
+
+	# return value is held there, return to Java
 
     popq    %r15
     popq    %r14
