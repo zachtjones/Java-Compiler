@@ -41,7 +41,7 @@ public class NameNode implements Node, Expression, LValue {
 	public void resolveImports(ClassLookup c) throws CompileException {
 		//System.out.print("Replace: " + primaryName);
 		if (primaryName != null)
-			primaryName = c.getFullName(primaryName, fileName, line);
+			primaryName = c.getFullName(primaryName);
 		// don't have to check if one of primaryName or bounds is set, as this is handled by the parser
 		
 		// resolve the nested structures as well
