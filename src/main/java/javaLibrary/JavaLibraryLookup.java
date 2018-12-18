@@ -1,5 +1,7 @@
 package javaLibrary;
 
+import intermediate.InterFile;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,5 +26,11 @@ public class JavaLibraryLookup {
         return Arrays.stream(lines)
                 .filter(line -> line.startsWith(packageName))
                 .collect(Collectors.toList());
+    }
+
+    public static InterFile getLibraryFile(String fullyQualified) {
+        // downloads the file if not already in the output dir for the java library
+        // then parses and compiles it if not already in the cache
+        // 
     }
 }

@@ -20,9 +20,6 @@ public class JavaCompiler {
 	/** the root src folder, ending with '/' */
 	private static String rootDir;
 
-	/** the java library source folder for *.java or *.jil files */
-	public static final String javaDir = "lib/"; 
-
 	/**
 	 * Will parse and compile the file, using the cache if already done.
 	 * @param fullyQualifiedName The java class name (ex: java/lang/String)
@@ -38,13 +35,18 @@ public class JavaCompiler {
 			return cache.get(fullyQualifiedName);
 		}
 
-		String newFileName;
+		final String newFileName;
 		if (fullyQualifiedName.startsWith("java/")) {
-			newFileName = javaDir + fullyQualifiedName;
+
+			// this is the temporary directory to house the file
+			newFileName = OutputDirs.JAVA_LIBRARY + fullyQualifiedName + ".java";
+
+			// create method in JavaLibraryLookup to get the Java source, parse it, compile it,
+			// then use for reference
+
 		} else {
-			newFileName = rootDir + fullyQualifiedName;
+			newFileName = rootDir + fullyQualifiedName + ".java";
 		}
-		newFileName += ".java";
 
 		try {
 			CompilationUnit c = JavaParser.parse(newFileName);

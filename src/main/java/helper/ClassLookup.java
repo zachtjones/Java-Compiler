@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javaLibrary.JavaLibraryLookup;
-import main.JavaCompiler;
 import tree.ImportNode;
 import tree.NameNode;
 import tree.SymbolTable;
