@@ -22,6 +22,7 @@ public class JavaLibraryLookup {
     private static final Map<String, InterFile> javaCache = new HashMap<>();
 
     private static final Pattern urlAndNamePattern = Pattern.compile("<a href=\"(.*?)\" title=\".*?\">.*?</a> (.*?)");
+    private static final Pattern urlPattern = Pattern.compile("<a href=\"(.*?)\" title=\".*?\">.*?</a>");
 
     static {
         for (int i = 0; i < lines.length; i++) {
@@ -62,7 +63,7 @@ public class JavaLibraryLookup {
         final int startAccessModifiers = contents.indexOf("<pre>") + 5;
         final int endAccessModifiers = contents.indexOf("<span", startAccessModifiers);
         String[] classModifiers = contents.substring(startAccessModifiers, endAccessModifiers).split(" ");
-        System.out.println("Modifiers: " + Arrays.toString(classModifiers));
+        //System.out.println("Modifiers: " + Arrays.toString(classModifiers));
 
         // TODO parse the extends / implements documentation
 
@@ -100,40 +101,82 @@ public class JavaLibraryLookup {
 
                 final InterFunction function = new InterFunction();
                 function.returnType = split[1];
+                boolean isStatic = Arrays.asList(modifiers).contains("static");
+                function.isInstance = !isStatic;
 
-                // get a sub-array, removing the first 2 entries to just show the arguments and throws list
-                final String rest = String.join(" ", Arrays.copyOfRange(split, 2, split.length));
+                final String rest;
 
-                if (!rest.contains("(")) { // this means it's a constructor, the type has the ( in it
-                    System.out.println("Error: rest doesn't have (");
-                    System.out.println(rest);
+                if (split[1].contains("(")) { // constructor, return type is the fully qualified name
+                    rest = String.join(" ", Arrays.copyOfRange(split, 1, split.length));
+
+                    // return type is the class, name <init>
+                    function.returnType = fullyQualified;
+                    function.name = "<init>";
+
+                } else {
+                    // get a sub-array, removing the first 2 entries to just show the arguments and throws list
+                    rest = String.join(" ", Arrays.copyOfRange(split, 2, split.length));
+
+                    // name is up to the first (
+                    function.name = rest.substring(0, rest.indexOf('('));
                 }
 
-                // name is up to the first (
-                function.name = rest.substring(0, rest.indexOf('('));
+                addArgumentsToFunction(function, rest);
 
-                final String args = rest.substring(rest.indexOf('(') + 1, rest.indexOf(')'));
-
-                for (String arg : args.split(",")) {
-
-                    Matcher matcher = urlAndNamePattern.matcher(arg.trim());
-                    if (matcher.matches()) {
-                        final String url = matcher.group(1);
-                        final String type = url.replace(".html", "")
-                                .replace("../", "");
-
-                        final String name = matcher.group(2);
-                        function.paramTypes.add(type);
-                        function.paramNames.add(name);
-                        boolean isStatic = Arrays.asList(modifiers).contains("static");
-                        function.isInstance = !isStatic;
-                    }
-                }
+                addThrowsListToFunction(function, rest);
 
                 f.addFunction(function);
             }
         }
         return f;
+    }
+
+    /**
+     * Adds the function's throws list to the intermediate function.
+     * If there is no throws list, this will not affect the function.
+     * @param function The function to add the list to.
+     * @param rest The string which represents the javadoc to convert to this list
+     */
+    private static void addThrowsListToFunction(InterFunction function, String rest) {
+        final String throwsList = rest
+                .substring(rest.indexOf(')') + 1)
+                .trim()
+                .replace("throws ", "");
+
+        for (String throwingName : throwsList.split(",")) {
+            Matcher matcher = urlPattern.matcher(throwingName);
+            if (matcher.matches()) {
+                final String url = matcher.group(1);
+                final String type = url.replace(".html", "")
+                        .replace("../", "");
+
+                function.throwsList.add(type);
+            }
+        }
+    }
+
+    /**
+     * Adds the function's arguments list to the intermediate function.
+     * If there is no arguments, this will not affect the function.
+     * @param function The function to add the list to.
+     * @param rest The string which represents the javadoc to convert to this list
+     */
+    private static void addArgumentsToFunction(InterFunction function, String rest) {
+        final String args = rest.substring(rest.indexOf('(') + 1, rest.indexOf(')'));
+
+        for (String arg : args.split(",")) {
+
+            Matcher matcher = urlAndNamePattern.matcher(arg.trim());
+            if (matcher.matches()) {
+                final String url = matcher.group(1);
+                final String type = url.replace(".html", "")
+                        .replace("../", "");
+
+                final String name = matcher.group(2);
+                function.paramTypes.add(type);
+                function.paramNames.add(name);
+            }
+        }
     }
 
     /**
