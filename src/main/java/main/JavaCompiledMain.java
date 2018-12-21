@@ -1,13 +1,12 @@
 package main;
 
 import helper.CompileException;
-import x64.X64File;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import static main.FileReader.readResourcesFile;
+import static main.FileWriter.writeToOutput;
 
 public class JavaCompiledMain {
     private final String content;
@@ -19,23 +18,18 @@ public class JavaCompiledMain {
     /** Compiles the Main class for java, saving it to the temp folder. */
     public void compile() throws IOException, InterruptedException, CompileException {
 
-        OutputDirs.ASSEMBLED.createDir();
+        // copy out the Main.java to the assembled location
         final String outputMainJava = OutputDirs.ASSEMBLED.location + "Main.java";
-        PrintWriter pw = new PrintWriter(outputMainJava);
-        pw.println(content);
+        writeToOutput(OutputDirs.ASSEMBLED, outputMainJava, content);
 
         // `javac Main.java`
-        Process p = Runtime.getRuntime().exec("javac",
-                new String[]{outputMainJava}, new File(OutputDirs.ASSEMBLED.location));
+        Process p = Runtime.getRuntime().exec("javac Main.java",
+                new String[]{}, new File(OutputDirs.ASSEMBLED.location));
         p.waitFor();
+        System.out.println("javac Main.java -> " + p.exitValue());
 
         // copy the assembly bridge file
-        OutputDirs.ASSEMBLY.createDir();
-        PrintWriter assemblyBridge = new PrintWriter(OutputDirs.ASSEMBLY.location + "Main.s");
-        assemblyBridge.println(readResourcesFile("Main-x86_64.s"));
-
-        pw.flush();
-        pw.close();
+        writeToOutput(OutputDirs.ASSEMBLY, "Main.s", readResourcesFile("Main-x86_64.s"));
 
         // Signature for the main method defined in the program
         // JNIEXPORT void JNICALL Java_Main_mainMethod(JNIEnv *, jclass, jobjectArray);
