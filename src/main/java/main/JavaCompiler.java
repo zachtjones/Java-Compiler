@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import javaLibrary.JavaLibraryLookup;
 import tree.*;
 import intermediate.*;
 import x86.X86_64File;
@@ -35,18 +36,11 @@ public class JavaCompiler {
 			return cache.get(fullyQualifiedName);
 		}
 
-		final String newFileName;
 		if (fullyQualifiedName.startsWith("java/")) {
-
-			// this is the temporary directory to house the file
-			newFileName = OutputDirs.JAVA_LIBRARY + fullyQualifiedName + ".java";
-
-			// create method in JavaLibraryLookup to get the Java source, parse it, compile it,
-			// then use for reference
-
-		} else {
-			newFileName = rootDir + fullyQualifiedName + ".java";
+			return JavaLibraryLookup.getLibraryFile(fullyQualifiedName);
 		}
+
+		final String newFileName = rootDir + fullyQualifiedName + ".java";
 
 		try {
 			CompilationUnit c = JavaParser.parse(newFileName);
@@ -151,6 +145,8 @@ public class JavaCompiler {
 
 			System.out.println("Done, results are in the temp folder.");
 			System.out.println("Invoke the program: `java -Djava.library.path=. Main` from the temp folder");
+
+			// gcc *.s -dynamiclib -o libMain.dylib -- command to compile all the assembly files
 
 		} catch (ParseException e) {
 			System.out.print("Syntax error at line ");
