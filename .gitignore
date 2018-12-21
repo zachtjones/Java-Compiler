@@ -10,8 +10,6 @@ temp/*
 .classpath
 .project
 
-javaLookup.txt
-
 differences.txt
 .idea/
 target/
