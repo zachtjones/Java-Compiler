@@ -215,7 +215,20 @@ public class InterFile {
 		return null;
 	}
 
-	public X64File compileX86_64() throws CompileException {
-		throw new CompileException("x86-64 assembly not implemented yet", this.toString(), -1);
+	/**
+	 * Creates an X64 file representing this intermediate file.
+	 * @return The X64 assembly file.
+	 * @throws CompileException If there is a problem converting the IL to the assembly.
+	 */
+	public X64File compileX64() throws CompileException {
+
+		// TODO use the inheritance to build to function tables
+
+		X64File compiled = new X64File(this.name);
+		for (InterFunction function : functions) {
+			function.compile(compiled);
+		}
+
+		return compiled;
 	}
 }

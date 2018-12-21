@@ -136,11 +136,12 @@ public class JavaCompiler {
 						"Unsupported computer architecture. Currently only supports x86_64 & amd64.", "", -1);
 			}
 
-			X64File compiledMain = entryCode.compileX86_64();
-			System.out.println(compiledMain);
+			String assemblyMain = FileReader.readResourcesFile("Main-x86_64.s");
+			FileWriter.writeToOutput(OutputDirs.ASSEMBLY, "main.s", assemblyMain);
+
 			for (InterFile f : cache.values()) {
-				X64File compiled = f.compileX86_64();
-				System.out.println(compiled);
+				X64File compiled = f.compileX64();
+				FileWriter.writeToOutput(OutputDirs.ASSEMBLY, compiled.getFileName(), compiled.toString());
 			}
 
 			System.out.println("Done, results are in the temp folder.");

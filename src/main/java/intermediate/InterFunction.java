@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import helper.CompileException;
+import x64.X64File;
 
 public class InterFunction {
 	
@@ -102,4 +103,13 @@ public class InterFunction {
 			i.typeCheck(definitions, locals, params, this);
 		}		
 	}
+
+	/**
+	 * Compiles down to the assembly.
+	 * Note the x64 assembly has unlimited registers until it goes to the next step.
+	 * @param assemblyFile The assembly file to add instructions to.
+	 */
+    public void compile(X64File assemblyFile) {
+    	// TODO - add some instructions
+    }
 }

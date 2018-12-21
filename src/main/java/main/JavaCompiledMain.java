@@ -20,11 +20,13 @@ public class JavaCompiledMain {
     public void compile() throws IOException, InterruptedException, CompileException {
 
         OutputDirs.ASSEMBLED.createDir();
-        PrintWriter pw = new PrintWriter(OutputDirs.ASSEMBLED.location + "Main.java");
+        final String outputMainJava = OutputDirs.ASSEMBLED.location + "Main.java";
+        PrintWriter pw = new PrintWriter(outputMainJava);
         pw.println(content);
 
         // `javac Main.java`
-        Process p = Runtime.getRuntime().exec("javac" , new String[]{"Main.java"}, new File("temp"));
+        Process p = Runtime.getRuntime().exec("javac",
+                new String[]{outputMainJava}, new File(OutputDirs.ASSEMBLED.location));
         p.waitFor();
 
         // copy the assembly bridge file
@@ -52,9 +54,5 @@ public class JavaCompiledMain {
         // System.getProperty("os.name") -> "Mac OS X"
         // System.getProperty("os.version") -> "10.14"
 
-    }
-
-    public X64File compileX86_64() throws CompileException {
-        return new X64File();
     }
 }
