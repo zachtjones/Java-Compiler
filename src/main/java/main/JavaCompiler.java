@@ -156,6 +156,7 @@ public class JavaCompiler {
 			System.out.println(e.currentToken.next.image + "\"");
 		} catch (FileNotFoundException e) {
 			System.out.println("Error: the file: " + e.getMessage() + " was not found.");
+			e.printStackTrace();
 		} catch (CompileException e) {
 			System.out.println("Error: " + e.getMessage());
 			e.printStackTrace();

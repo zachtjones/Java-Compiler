@@ -17,9 +17,10 @@ public class JavaCompiledMain {
     }
 
     /** Compiles the Main class for java, saving it to the temp folder. */
-    public void compile() throws IOException, InterruptedException {
+    public void compile() throws IOException, InterruptedException, CompileException {
 
-        PrintWriter pw = new PrintWriter("temp/Main.java");
+        OutputDirs.ASSEMBLED.createDir();
+        PrintWriter pw = new PrintWriter(OutputDirs.ASSEMBLED.location +"Main.java");
         pw.println(content);
 
         // `javac Main.java`
