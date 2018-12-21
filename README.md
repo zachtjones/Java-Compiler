@@ -7,6 +7,7 @@ The supported output languages are planned to be x86-64 and AMD64.
 
 ## Introduction
 This program is written in Java, with the use of JavaCC as the parser.
+If using Intellij, install the JavaCC plugin,
 The purpose of this project is not to replace the JVM, but instead demonstrate an
 understanding of how a high level language can actually run on hardware.
 This program is not complete, but does the following:

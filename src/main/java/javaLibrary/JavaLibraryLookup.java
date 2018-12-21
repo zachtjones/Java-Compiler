@@ -2,13 +2,13 @@ package javaLibrary;
 
 import helper.CompileException;
 import intermediate.InterFile;
+import intermediate.InterFunction;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static main.FileReader.readResourcesFile;
@@ -20,6 +20,8 @@ public class JavaLibraryLookup {
 
     private static final String[] lines = readResourcesFile("javaLookup.txt").split("\n");
     private static final Map<String, InterFile> javaCache = new HashMap<>();
+
+    private static final Pattern urlAndNamePattern = Pattern.compile("<a href=\"(.*?)\" title=\".*?\">.*?</a> (.*?)");
 
     static {
         for (int i = 0; i < lines.length; i++) {
@@ -56,19 +58,13 @@ public class JavaLibraryLookup {
 
         System.out.println("Parsing javadoc: " + fullyQualified);
 
-        //print the access modifier(s), the extends and implements as fully qualified names
-        int start = contents.indexOf("<pre>") + 5;
-        int end = contents.indexOf("</pre>");
-        String declaration = contents.substring(start, end);
-        System.out.println(declaration);
-        declaration = declaration.replace("<span class=\"typeNameLabel\">", "");
-        declaration = declaration.replace("</span>", "");
-        declaration = declaration.replace("\n", " ").replace("</a>", "").replace("../", "");
-        declaration = declaration.replaceAll(" title=\".*?\">", " ");
-        declaration = declaration.replace("<a href=\"", "").replace('/', '.');
-        declaration = declaration.replace("&lt;", "<").replace("&gt;", ">");
-        declaration = declaration.replaceAll("\\.\\w*\\.html\" ", ".");
-        System.out.println(declaration + " {\n");
+        // TODO - use the access modifiers, currently not part of IL
+        final int startAccessModifiers = contents.indexOf("<pre>") + 5;
+        final int endAccessModifiers = contents.indexOf("<span", startAccessModifiers);
+        String[] classModifiers = contents.substring(startAccessModifiers, endAccessModifiers).split(" ");
+        System.out.println("Modifiers: " + Arrays.toString(classModifiers));
+
+        // TODO parse the extends / implements documentation
 
         int fieldsConsFuncsStart = contents.indexOf("<h3>Field Detail</h3>");
         for (int currIndex = contents.indexOf("<h4>", fieldsConsFuncsStart);
@@ -83,38 +79,60 @@ public class JavaLibraryLookup {
             if (!total.contains("<pre>")) {
                 continue;
             }
-            String tempDec = total.substring(total.indexOf("<pre>") + 5, total.indexOf("</pre>"));
-            tempDec = tempDec.replace("&nbsp;", " ").replace("../", "");
-            tempDec = tempDec.replaceAll("title=\".*?\">\\w*</a>", "");
-            tempDec = tempDec.replace("<a href=\"", "").replace(".html\"", "").replace('/', '.');
-            tempDec = tempDec.replace("&lt;", "<").replace("&gt;", ">");
-            tempDec = tempDec.replaceAll("\\s+", " ");//replace multiple white-spaces out
-            if (tempDec.contains("Deprecated")) {
-                continue; //skip methods, constructors, and fields that are deprecated.
-            }
-            // the declaration is now done, parse the text to show in the comments
-            //  (useful for implementation details)
-            if (!total.contains("<div")) {
-                System.out.println("Error: " + fullyQualified + ": docs invalid for: " + tempDec);
-                continue;
-            }
-            String tempDocs = total.substring(total.indexOf("<div"));
-            tempDocs = tempDocs.replaceAll("<.*?>", "");
-            // make tempDocs into the doc strings
-            tempDocs = "\t/** " + tempDocs.replace("\n", "\n\t*") + " */";
 
-            System.out.println(tempDocs);
-            System.out.print('\t' + tempDec);
-            if (tempDec.contains("(") && !tempDec.contains("abstract")) {
-                // method or constructor, has {}
-                System.out.println("{}");
+            final String fieldOrMethod = total.substring(total.indexOf("<pre>") + 5, total.indexOf("</pre>"));
+            // non-breaking space between modifiers and type name(args)
+            final String[] split = fieldOrMethod.split("&nbsp;");
+            final String[] modifiers = split[0].split(" ");
+
+            if (split.length == 2) { // is a field
+                Matcher matcher = urlAndNamePattern.matcher(split[1]);
+                if (matcher.matches()) {
+                    final String url = matcher.group(1);
+                    final String type = url.replace(".html", "")
+                            .replace("../", "");
+
+                    final String name = matcher.group(2);
+                    boolean isStatic = Arrays.asList(modifiers).contains("static");
+                    f.addField(type, name, isStatic);
+                }
             } else {
-                System.out.println(';');
-            }
-            System.out.println();
-        }
 
-        System.out.println('}');
+                final InterFunction function = new InterFunction();
+                function.returnType = split[1];
+
+                // get a sub-array, removing the first 2 entries to just show the arguments and throws list
+                final String rest = String.join(" ", Arrays.copyOfRange(split, 2, split.length));
+
+                if (!rest.contains("(")) { // this means it's a constructor, the type has the ( in it
+                    System.out.println("Error: rest doesn't have (");
+                    System.out.println(rest);
+                }
+
+                // name is up to the first (
+                function.name = rest.substring(0, rest.indexOf('('));
+
+                final String args = rest.substring(rest.indexOf('(') + 1, rest.indexOf(')'));
+
+                for (String arg : args.split(",")) {
+
+                    Matcher matcher = urlAndNamePattern.matcher(arg.trim());
+                    if (matcher.matches()) {
+                        final String url = matcher.group(1);
+                        final String type = url.replace(".html", "")
+                                .replace("../", "");
+
+                        final String name = matcher.group(2);
+                        function.paramTypes.add(type);
+                        function.paramNames.add(name);
+                        boolean isStatic = Arrays.asList(modifiers).contains("static");
+                        function.isInstance = !isStatic;
+                    }
+                }
+
+                f.addFunction(function);
+            }
+        }
         return f;
     }
 
