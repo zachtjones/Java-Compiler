@@ -219,8 +219,4 @@ public class InterFile {
 	public X86_64File compileX86_64() throws CompileException {
 		throw new CompileException("x86-64 assembly not implemented yet", this.toString(), -1);
 	}
-
-	public AMD64File compileAMD64() throws CompileException {
-		throw new CompileException("AMD 64 assembly not implemented yet", this.toString(), -1);
-	}
 }

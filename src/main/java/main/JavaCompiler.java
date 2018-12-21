@@ -122,16 +122,15 @@ public class JavaCompiler {
 				throw new CompileException("There is not a main method in the files given.", c.fileName, 0);
 			}
 
-			// compile to the native code
+			// compile to the native code - starting with the java -> native class
 			final JavaCompiledMain entryCode = new JavaCompiledMain();
 			entryCode.compile();
 
 			// step 1: compile the code down to assembly files
-			final String arch = System.getProperty("os.arch");
-
 			// the 2 supported architectures are basically the same, with almost identical assembly,
 			//  if there are any differences between them, the java library probably handles most of that difference
 			//  meaning very little assembly code will be different
+			final String arch = System.getProperty("os.arch");
 			if (!Arrays.asList("x86_64", "amd64").contains(arch)) {
 				throw new CompileException(
 						"Unsupported computer architecture. Currently only supports x86_64 & amd64.", "", -1);
@@ -139,13 +138,10 @@ public class JavaCompiler {
 
 			X86_64File compiledMain = entryCode.compileX86_64();
 			System.out.println(compiledMain);
-			for (InterFile f : files) {
+			for (InterFile f : cache.values()) {
 				X86_64File compiled = f.compileX86_64();
 				System.out.println(compiled);
 			}
-
-			// step 2: prepare the java wrapper class
-			new JavaCompiledMain().compile();
 
 			System.out.println("Done, results are in the temp folder.");
 			System.out.println("Invoke the program: `java -Djava.library.path=. Main` from the temp folder");
