@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import helper.ClassLookup;
@@ -126,18 +127,21 @@ public class JavaCompiler {
 			entryCode.compile();
 
 			// step 1: compile the code down to assembly files
-			if (System.getProperty("os.arch").equals("x86_64")) {
-				X86_64File compiledMain = entryCode.compileX86_64();
-				System.out.println(compiledMain);
-				for (InterFile f : files) {
-					X86_64File compiled = f.compileX86_64();
-					System.out.println(compiled);
-				}
-			} else if (System.getProperty("os.arch").equals("amd64")) {
-				throw new CompileException("AMD 64 compiling not implemented yet", "", -1);
-			} else {
+			final String arch = System.getProperty("os.arch");
+
+			// the 2 supported architectures are basically the same, with almost identical assembly,
+			//  if there are any differences between them, the java library probably handles most of that difference
+			//  meaning very little assembly code will be different
+			if (!Arrays.asList("x86_64", "amd64").contains(arch)) {
 				throw new CompileException(
 						"Unsupported computer architecture. Currently only supports x86_64 & amd64.", "", -1);
+			}
+
+			X86_64File compiledMain = entryCode.compileX86_64();
+			System.out.println(compiledMain);
+			for (InterFile f : files) {
+				X86_64File compiled = f.compileX86_64();
+				System.out.println(compiled);
 			}
 
 			// step 2: prepare the java wrapper class
