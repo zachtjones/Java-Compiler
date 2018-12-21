@@ -20,19 +20,18 @@ public class JavaCompiledMain {
     public void compile() throws IOException, InterruptedException, CompileException {
 
         OutputDirs.ASSEMBLED.createDir();
-        PrintWriter pw = new PrintWriter(OutputDirs.ASSEMBLED.location +"Main.java");
+        PrintWriter pw = new PrintWriter(OutputDirs.ASSEMBLED.location + "Main.java");
         pw.println(content);
 
         // `javac Main.java`
         Process p = Runtime.getRuntime().exec("javac" , new String[]{"Main.java"}, new File("temp"));
         p.waitFor();
 
-        // copy the appropriate assembly bridge file
-        PrintWriter assemblyBridge = new PrintWriter("temp/Main.s");
-        if (System.getProperty("os.arch").equals("x86_64")) {
-            assemblyBridge.println(readResourcesFile("Main-x86_64.s"));
-        }
-        // TODO other architectures
+        // copy the assembly bridge file
+        OutputDirs.ASSEMBLY.createDir();
+        PrintWriter assemblyBridge = new PrintWriter(OutputDirs.ASSEMBLY.location + "Main.s");
+        assemblyBridge.println(readResourcesFile("Main-x86_64.s"));
+
         pw.flush();
         pw.close();
 
