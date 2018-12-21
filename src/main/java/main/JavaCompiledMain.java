@@ -19,8 +19,7 @@ public class JavaCompiledMain {
     public void compile() throws IOException, InterruptedException, CompileException {
 
         // copy out the Main.java to the assembled location
-        final String outputMainJava = OutputDirs.ASSEMBLED.location + "Main.java";
-        writeToOutput(OutputDirs.ASSEMBLED, outputMainJava, content);
+        writeToOutput(OutputDirs.ASSEMBLED, "Main.java", content);
 
         // `javac Main.java`
         Process p = Runtime.getRuntime().exec("javac Main.java",
