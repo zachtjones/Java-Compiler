@@ -12,7 +12,7 @@ import helper.CompileException;
 import javaLibrary.JavaLibraryLookup;
 import tree.*;
 import intermediate.*;
-import x86.X86_64File;
+import x64.X64File;
 
 public class JavaCompiler {
 
@@ -136,10 +136,10 @@ public class JavaCompiler {
 						"Unsupported computer architecture. Currently only supports x86_64 & amd64.", "", -1);
 			}
 
-			X86_64File compiledMain = entryCode.compileX86_64();
+			X64File compiledMain = entryCode.compileX86_64();
 			System.out.println(compiledMain);
 			for (InterFile f : cache.values()) {
-				X86_64File compiled = f.compileX86_64();
+				X64File compiled = f.compileX86_64();
 				System.out.println(compiled);
 			}
 

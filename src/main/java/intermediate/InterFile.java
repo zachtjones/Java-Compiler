@@ -2,10 +2,9 @@ package intermediate;
 
 import java.util.ArrayList;
 
-import amd64.AMD64File;
 import helper.CompileException;
 import tree.NameNode;
-import x86.X86_64File;
+import x64.X64File;
 
 public class InterFile {
 	private String name;
@@ -18,13 +17,13 @@ public class InterFile {
 
 	/**
 	 * Creates an intermediate file, given the name
-	 * @param fileName The name, such as java/util/Scanner
+	 * @param name The name, such as java/util/Scanner
 	 */
 	public InterFile(String name) {
 		this.name = name;
 		this.staticPart = new InterStructure(false);
 		this.instancePart = new InterStructure(true);
-		this.functions = new ArrayList<InterFunction>();
+		this.functions = new ArrayList<>();
 	}
 
 	/**
@@ -141,7 +140,7 @@ public class InterFile {
 			d.returnType = fileName.replace(".jil", "");
 			
 			// add the only statement, super();
-			d.statements = new ArrayList<InterStatement>();
+			d.statements = new ArrayList<>();
 			CallActualStatement c;
 			Register[] args = new Register[0];
 			
@@ -216,7 +215,7 @@ public class InterFile {
 		return null;
 	}
 
-	public X86_64File compileX86_64() throws CompileException {
+	public X64File compileX86_64() throws CompileException {
 		throw new CompileException("x86-64 assembly not implemented yet", this.toString(), -1);
 	}
 }

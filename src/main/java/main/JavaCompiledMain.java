@@ -1,7 +1,7 @@
 package main;
 
 import helper.CompileException;
-import x86.X86_64File;
+import x64.X64File;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class JavaCompiledMain {
 
     }
 
-    public X86_64File compileX86_64() throws CompileException {
-        return new X86_64File();
+    public X64File compileX86_64() throws CompileException {
+        return new X64File();
     }
 }
