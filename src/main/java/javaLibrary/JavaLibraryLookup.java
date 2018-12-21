@@ -31,6 +31,6 @@ public class JavaLibraryLookup {
     public static InterFile getLibraryFile(String fullyQualified) {
         // downloads the file if not already in the output dir for the java library
         // then parses and compiles it if not already in the cache
-        // 
+        // gcc *.s -dynamiclib -o libMain.dylib -- command to compile all the assembly files
     }
 }
