@@ -3,6 +3,7 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import x64.X64Context;
 import x64.X64File;
 
 public interface InterStatement {
@@ -18,11 +19,13 @@ public interface InterStatement {
 
 	/**
 	 * Compiles this statement down to the assembly level for x64
+	 *
+	 * @param context The x64 context to use for more information about the file being compiled.
 	 * @param assemblyFile The assembly file to add the instructions to.
 	 * @throws CompileException If there is an error compiling, note that this should only happen for statements
 	 * not implemented yet.
 	 */
-	default void compile(X64File assemblyFile) throws CompileException {
+	default void compile(X64Context context, X64File assemblyFile) throws CompileException {
 		throw new CompileException("compiling to x64 not done for " + this, "", -1);
 	}
 }

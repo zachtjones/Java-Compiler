@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import helper.CompileException;
+import x64.SymbolNames;
+import x64.X64Context;
 import x64.X64File;
 import x64.directives.ByteAlignment;
 import x64.directives.GlobalSymbol;
@@ -28,10 +30,10 @@ public class InterFunction {
 	
 	
 	public InterFunction() {
-		this.paramTypes = new ArrayList<String>();
-		this.paramNames = new ArrayList<String>();
-		this.throwsList = new ArrayList<String>();
-		this.statements = new ArrayList<InterStatement>();
+		this.paramTypes = new ArrayList<>();
+		this.paramNames = new ArrayList<>();
+		this.throwsList = new ArrayList<>();
+		this.statements = new ArrayList<>();
 	}
 	
 	@Override
@@ -92,10 +94,10 @@ public class InterFunction {
 	 * @param className	The fully qualified name for the InterFile. 
 	 * @throws CompileException If there is an error with type checking.*/
 	public void typeCheck(String className) throws CompileException {
-		HashMap<Register, String> definitions = new HashMap<Register, String>();
-		HashMap<String, String> locals = new HashMap<String, String>();
+		HashMap<Register, String> definitions = new HashMap<>();
+		HashMap<String, String> locals = new HashMap<>();
 		// define parameters and fill it in.
-		HashMap<String, String> params = new HashMap<String, String>();
+		HashMap<String, String> params = new HashMap<>();
 		for (int i = 0; i < paramTypes.size(); i++) {
 			params.put(paramNames.get(i), paramTypes.get(i));
 		}
@@ -112,21 +114,22 @@ public class InterFunction {
 	/**
 	 * Compiles down to the assembly.
 	 * Note the x64 assembly has unlimited registers until it goes to the next step.
-	 * @param assemblyFile The assembly file to add instructions to.
-	 */
-    public void compile(X64File assemblyFile) throws CompileException {
+     * @param context The x64 context that holds relevant information
+     * @param assemblyFile The assembly file to add instructions to.
+     */
+    public void compile(X64Context context, X64File assemblyFile) throws CompileException {
 
         // TODO the java_class_name.method_name_args
         assemblyFile.instructions.add(new SegmentChange(SegmentChange.TEXT));
-        assemblyFile.instructions.add(new GlobalSymbol(name));
+        final String symbolName = SymbolNames.getMethodName(context.javaName, this.name);
+        assemblyFile.instructions.add(new GlobalSymbol(symbolName));
         assemblyFile.instructions.add(new ByteAlignment(16));
-        assemblyFile.instructions.add(new LabelInstruction(name));
+        assemblyFile.instructions.add(new LabelInstruction(symbolName));
 
-        // TODO - add some instructions
+        // add the instructions for the statements -> x64
         for (InterStatement statement : statements) {
-            statement.compile(assemblyFile);
+            statement.compile(context, assemblyFile);
         }
-
 
         assemblyFile.instructions.add(new ReturnInstruction());
 
