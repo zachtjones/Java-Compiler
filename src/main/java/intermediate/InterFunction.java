@@ -5,6 +5,11 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import x64.X64File;
+import x64.directives.ByteAlignment;
+import x64.directives.GlobalSymbol;
+import x64.directives.LabelInstruction;
+import x64.directives.SegmentChange;
+import x64.instructions.ReturnInstruction;
 
 public class InterFunction {
 	
@@ -109,7 +114,22 @@ public class InterFunction {
 	 * Note the x64 assembly has unlimited registers until it goes to the next step.
 	 * @param assemblyFile The assembly file to add instructions to.
 	 */
-    public void compile(X64File assemblyFile) {
-    	// TODO - add some instructions
+    public void compile(X64File assemblyFile) throws CompileException {
+
+        // TODO the java_class_name.method_name_args
+        assemblyFile.instructions.add(new SegmentChange(SegmentChange.TEXT));
+        assemblyFile.instructions.add(new GlobalSymbol(name));
+        assemblyFile.instructions.add(new ByteAlignment(16));
+        assemblyFile.instructions.add(new LabelInstruction(name));
+
+        // TODO - add some instructions
+        for (InterStatement statement : statements) {
+            statement.compile(assemblyFile);
+        }
+
+
+        assemblyFile.instructions.add(new ReturnInstruction());
+
+
     }
 }
