@@ -1,4 +1,8 @@
-package x64;
+package x64.instructions;
+
+import x64.DestinationOperand;
+import x64.Instruction;
+import x64.SourceOperand;
 
 public abstract class BinaryInstruction implements Instruction {
 

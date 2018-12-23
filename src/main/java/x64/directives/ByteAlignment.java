@@ -2,7 +2,7 @@ package x64.directives;
 
 import x64.Instruction;
 
-public class ByteAlignment extends Instruction {
+public class ByteAlignment implements Instruction {
 
     private final int alignment;
 

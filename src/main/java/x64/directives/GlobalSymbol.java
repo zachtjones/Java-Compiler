@@ -3,7 +3,7 @@ package x64.directives;
 import x64.Instruction;
 
 /** Represents the .global NAME directive, useful for imports and exports. */
-public class GlobalSymbol extends Instruction {
+public class GlobalSymbol implements Instruction {
     private final String name;
 
     public GlobalSymbol(String name) {
