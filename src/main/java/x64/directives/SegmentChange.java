@@ -2,7 +2,7 @@ package x64.directives;
 
 import x64.Instruction;
 
-public class SegmentChange implements Instruction {
+public class SegmentChange extends Instruction {
 
     public static final String TEXT = "text";
     public static final String DATA = "data";

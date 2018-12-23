@@ -25,7 +25,7 @@ public class X64File {
     @Override
     public String toString() {
         return instructions.stream()
-                .map(Object::toString)
+                .map(Instruction::toString)
                 .collect(Collectors.joining("\n"));
     }
 }
