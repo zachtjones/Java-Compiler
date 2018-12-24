@@ -121,7 +121,7 @@ public class InterFunction {
 
         // TODO the java_class_name.method_name_args
         assemblyFile.instructions.add(new SegmentChange(SegmentChange.TEXT));
-        final String symbolName = SymbolNames.getMethodName(context.javaName, this.name);
+        final String symbolName = SymbolNames.getFieldName(context.javaName, this.name);
         assemblyFile.instructions.add(new GlobalSymbol(symbolName));
         assemblyFile.instructions.add(new ByteAlignment(16));
         assemblyFile.instructions.add(new LabelInstruction(symbolName));

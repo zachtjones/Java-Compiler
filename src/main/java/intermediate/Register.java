@@ -5,6 +5,7 @@ import helper.CompileException;
 import tree.CompileHistory;
 import tree.Expression;
 import tree.SymbolTable;
+import x64.Instruction;
 
 /**
  * Represents an abstraction of a hardware Register.
@@ -153,4 +154,31 @@ public class Register implements Expression {
 		// return -1, line doesn't exist
 		return -1;
 	}
+
+	/** Returns the instruction size that is suitable for this instruction, for the x64 architecture */
+	public Instruction.Size x64Type() {
+		switch(type) {
+			case BOOLEAN:
+			case BYTE:
+				return Instruction.Size.BYTE;
+
+			case CHAR:
+			case SHORT:
+				return Instruction.Size.WORD;
+
+			case INT:
+				return Instruction.Size.LONG;
+
+			case LONG:
+				return Instruction.Size.QUAD;
+
+			case FLOAT:
+				return Instruction.Size.SINGLE;
+
+			case DOUBLE:
+				return Instruction.Size.DOUBLE;
+		}
+		// this line shouldn't be reached
+		return Instruction.Size.QUAD;
+    }
 }

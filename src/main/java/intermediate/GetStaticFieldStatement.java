@@ -4,10 +4,12 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import main.JavaCompiler;
+import x64.*;
+import x64.instructions.MoveInstruction;
 
 public class GetStaticFieldStatement implements InterStatement {
-	String className;
-	String fieldName;
+	private final String className;
+	private final String fieldName;
 	Register result;
 	
 	private final String fileName;
@@ -45,5 +47,18 @@ public class GetStaticFieldStatement implements InterStatement {
 		
 		result.typeFull = type;
 		regs.put(result, type);
+	}
+
+	@Override
+	public void compile(X64Context context, X64File assemblyFile) throws CompileException {
+		if (className.startsWith("java/")) {
+
+		} else {
+			// mov CLASS_NAME_FIELD_NAME(%rip), %destination
+			SourceOperand src = PCRelativeData.fromField(className, fieldName, result);
+			DestinationOperand dest = X64Register.fromILRegister(result);
+			assemblyFile.instructions.add(new MoveInstruction(src, dest));
+		}
+
 	}
 }
