@@ -4,6 +4,7 @@ import x64.directives.ByteAlignment;
 import x64.directives.GlobalSymbol;
 import x64.directives.LabelInstruction;
 import x64.directives.SegmentChange;
+import x64.instructions.MoveInstruction;
 import x64.instructions.ReturnInstruction;
 
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ public class X64Function {
 
 	private int nextFreeRegister;
 
+	public final X64Register javaEnvPointer;
+
 	public X64Function(String javaClass, String javaMethod, int nextFreeRegister) {
 
 		prologue.add(new SegmentChange(SegmentChange.TEXT));
@@ -26,9 +29,14 @@ public class X64Function {
 		prologue.add(new ByteAlignment(16));
 		prologue.add(new LabelInstruction(symbolName));
 
+		javaEnvPointer = new X64Register(getNextFreeRegister(), X64Register.TEMPORARY, Instruction.Size.QUAD);
+
+		prologue.add(new MoveInstruction(X64NativeRegister.RDI, javaEnvPointer));
+
 		epilogue.add(new ReturnInstruction());
 
 		this.nextFreeRegister = nextFreeRegister;
+
 	}
 
 	/** Adds an instruction to this function */
