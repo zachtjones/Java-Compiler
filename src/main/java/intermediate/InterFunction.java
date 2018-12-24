@@ -126,7 +126,7 @@ public class InterFunction {
     public void compile(X64File assemblyFile) throws CompileException {
 
         // TODO the name mangled args to allow for method overloading
-		X64Function function = new X64Function(assemblyFile.getJavaName(), name);
+		X64Function function = new X64Function(assemblyFile.getJavaName(), name, allocator.getNextLabel());
 
         // add the instructions for the statements -> x64
         for (InterStatement statement : statements) {
