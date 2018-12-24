@@ -1,5 +1,7 @@
 package x64;
 
+import intermediate.Register;
+
 /** This is an abstraction of a hardware register, broken into 3 types */
 public class X64Register implements SourceOperand, DestinationOperand {
 
@@ -14,6 +16,11 @@ public class X64Register implements SourceOperand, DestinationOperand {
         this.number = number;
         this.type = type;
         this.size = size;
+    }
+
+    /** Helper method to convert from an intermediate register to a x64 one. */
+    public static X64Register fromILRegister(Register intermediate) {
+        return new X64Register(intermediate.num, X64Register.TEMPORARY, intermediate.x64Type());
     }
 
     @Override
