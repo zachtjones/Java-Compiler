@@ -60,6 +60,16 @@ public class GetStaticFieldStatement implements InterStatement {
 			//  for java types intrinsic to the JVM.
 			// When we call methods on the JVM type, will also have to do the split logic, similar to here
 
+			// Steps:
+			// 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
+			//    - name is like: java/lang/String for java.lang.String or [Ljava/lang/Object; for java.lang.Object[]
+
+			// 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
+			//    - use the class param just obtained, name is the field name, sig is the field type signature
+
+			// 3. result = javaEnv -> GetStatic<Type>Field(JNIEnv *env, class, fieldID)
+			//    - use the class param obtained, as well as the field id just obtained
+
 
 		} else {
 			// mov CLASS_NAME_FIELD_NAME(%rip), %destination

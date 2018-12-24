@@ -31,6 +31,7 @@ public class X64Function {
 
 		javaEnvPointer = new X64Register(getNextFreeRegister(), X64Register.TEMPORARY, Instruction.Size.QUAD);
 
+		// save the first argument, the java environment pointer to a dedicated virtual register.
 		prologue.add(new MoveInstruction(X64NativeRegister.RDI, javaEnvPointer));
 
 		epilogue.add(new ReturnInstruction());
