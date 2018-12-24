@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import x64.SymbolNames;
-import x64.X64Context;
 import x64.X64File;
 import x64.directives.ByteAlignment;
 import x64.directives.GlobalSymbol;
@@ -114,21 +113,20 @@ public class InterFunction {
 	/**
 	 * Compiles down to the assembly.
 	 * Note the x64 assembly has unlimited registers until it goes to the next step.
-     * @param context The x64 context that holds relevant information
-     * @param assemblyFile The assembly file to add instructions to.
-     */
-    public void compile(X64Context context, X64File assemblyFile) throws CompileException {
+	 * @param assemblyFile The assembly file to add instructions to.
+	 */
+    public void compile(X64File assemblyFile) throws CompileException {
 
         // TODO the java_class_name.method_name_args
         assemblyFile.instructions.add(new SegmentChange(SegmentChange.TEXT));
-        final String symbolName = SymbolNames.getFieldName(context.javaName, this.name);
+        final String symbolName = SymbolNames.getFieldName(assemblyFile.getJavaName(), this.name);
         assemblyFile.instructions.add(new GlobalSymbol(symbolName));
         assemblyFile.instructions.add(new ByteAlignment(16));
         assemblyFile.instructions.add(new LabelInstruction(symbolName));
 
         // add the instructions for the statements -> x64
         for (InterStatement statement : statements) {
-            statement.compile(context, assemblyFile);
+            statement.compile(assemblyFile);
         }
 
         assemblyFile.instructions.add(new ReturnInstruction());

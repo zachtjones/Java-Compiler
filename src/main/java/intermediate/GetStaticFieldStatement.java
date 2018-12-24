@@ -53,7 +53,7 @@ public class GetStaticFieldStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64Context context, X64File assemblyFile) throws CompileException {
+	public void compile(X64File assemblyFile) throws CompileException {
 		if (className.startsWith("java/")) {
 
 		} else {

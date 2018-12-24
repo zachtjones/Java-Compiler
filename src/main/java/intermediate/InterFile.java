@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import helper.CompileException;
 import tree.NameNode;
-import x64.X64Context;
 import x64.X64File;
 
 public class InterFile {
@@ -226,10 +225,9 @@ public class InterFile {
 		// TODO use the inheritance to build to function tables
 
 		X64File compiled = new X64File(this.name);
-		X64Context context = new X64Context(this.name);
 
 		for (InterFunction function : functions) {
-			function.compile(context, compiled);
+			function.compile(compiled);
 		}
 
 		return compiled;

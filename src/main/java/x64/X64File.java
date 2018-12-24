@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 public class X64File {
 
+    private final String javaClassName;
     private final String fileName;
     public ArrayList<Instruction> instructions;
 
@@ -12,6 +13,7 @@ public class X64File {
      * @param name The java class/interface/enum name, ex: java/lang/String
      */
     public X64File(String name) {
+        javaClassName = name;
         // use the java -> native pattern, escaping _ in package names
         fileName = name.replace("_", "_1").replace('/', '_') + ".s";
         instructions = new ArrayList<>();
@@ -27,5 +29,9 @@ public class X64File {
         return instructions.stream()
                 .map(Instruction::toString)
                 .collect(Collectors.joining("\n"));
+    }
+
+    public String getJavaName() {
+        return javaClassName;
     }
 }
