@@ -7,6 +7,9 @@ import main.JavaCompiler;
 import x64.*;
 import x64.instructions.MoveInstruction;
 
+import static x64.PCRelativeData.fromField;
+import static x64.X64Register.fromILRegister;
+
 public class GetStaticFieldStatement implements InterStatement {
 	private final String className;
 	private final String fieldName;
@@ -55,9 +58,12 @@ public class GetStaticFieldStatement implements InterStatement {
 
 		} else {
 			// mov CLASS_NAME_FIELD_NAME(%rip), %destination
-			SourceOperand src = PCRelativeData.fromField(className, fieldName, result);
-			DestinationOperand dest = X64Register.fromILRegister(result);
-			assemblyFile.instructions.add(new MoveInstruction(src, dest));
+			assemblyFile.instructions.add(
+				new MoveInstruction(
+					fromField(className, fieldName, result),
+					fromILRegister(result)
+				)
+			);
 		}
 
 	}
