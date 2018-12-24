@@ -6,7 +6,6 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 public class EnumNode implements TypeDecNode {
     public String name;
@@ -35,7 +34,7 @@ public class EnumNode implements TypeDecNode {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// nothing needed either -- only simple enum's supported.
 		// this method should not be called, since you call the compile(String) one instead.
 	}

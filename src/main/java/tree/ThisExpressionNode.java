@@ -3,7 +3,6 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 /** "this" */
 public class ThisExpressionNode implements Expression {
@@ -31,8 +30,8 @@ public class ThisExpressionNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
-		c.setThis();
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+		f.history.setThis();
 	}
 
 }

@@ -77,14 +77,14 @@ public class FieldDeclarationNode implements Node {
 				func.isInstance = !isStatic;
 				RegisterAllocator r = new RegisterAllocator();
 				CompileHistory c = new CompileHistory();
-				a.compile(syms, func, r, c);
+				a.compile(syms, func);
 				f.addFunction(func);
 			}
 		}
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		/* Nothing to do here*/
 	}
 }

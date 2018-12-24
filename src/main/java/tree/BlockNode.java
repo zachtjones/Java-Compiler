@@ -7,7 +7,6 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.EndScopeStatement;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 public class BlockNode implements StatementNode {
     public ArrayList<BlockStatementNode> statements;
@@ -38,12 +37,12 @@ public class BlockNode implements StatementNode {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// create new scope for variables
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.local);
 		// compile with this new table, placing declarations where needed.
 		for (BlockStatementNode b : statements) {
-			b.compile(newTable, f, r, c);
+			b.compile(newTable, f);
 		}
 		// remove all new symbols from the table
 		HashMap<String, String> entries = s.getCurrentEntries();

@@ -6,7 +6,6 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.PutLocalStatement;
-import intermediate.RegisterAllocator;
 import intermediate.StartScopeStatement;
 
 public class LocalVariableDecNode implements Node {
@@ -41,16 +40,16 @@ public class LocalVariableDecNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// place in symbol table and add intermediate code
 		for (VariableDecNode d : declarators) {
 			s.putEntry(d.id.name, type.interRep(), fileName, line);
 			f.statements.add(new StartScopeStatement(d.id.name, type.interRep()));
 			if (d.init != null) {
 				// put in the code to compute initial value.
-				d.init.compile(s, f, r, c);
+				d.init.compile(s, f);
 				// store the initial value into the local variable.
-				f.statements.add(new PutLocalStatement(r.getLast(), d.id.name, fileName, line));
+				f.statements.add(new PutLocalStatement(f.allocator.getLast(), d.id.name, fileName, line));
 			}
 		}
 	}

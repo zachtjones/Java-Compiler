@@ -4,7 +4,6 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 import intermediate.UnaryOpStatement;
 
 /** ! expr */
@@ -34,9 +33,9 @@ public class LogicalNotExpressionNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
-		expr.compile(s, f, r, c);
-		f.statements.add(new UnaryOpStatement(r.getLast(), 
-				r.getNext(Register.BYTE), UnaryOpStatement.LOGNOT, fileName, line));
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+		expr.compile(s, f);
+		f.statements.add(new UnaryOpStatement(f.allocator.getLast(),
+				f.allocator.getNext(Register.BYTE), UnaryOpStatement.LOGNOT, fileName, line));
 	}
 }

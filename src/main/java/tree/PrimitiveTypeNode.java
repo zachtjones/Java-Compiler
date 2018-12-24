@@ -3,7 +3,6 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 /** Represents a primitive type */
 public class PrimitiveTypeNode implements Node {
@@ -41,7 +40,7 @@ public class PrimitiveTypeNode implements Node {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// nothing to do here.
 	}
 	

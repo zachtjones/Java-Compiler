@@ -4,7 +4,6 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 import intermediate.SetConditionStatement;
 
 /** left < right */
@@ -36,11 +35,11 @@ public class LessThanExpressionNode implements Expression {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
-		left.compile(s, f, r, c);
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+		left.compile(s, f);
 		Register leftResult = r.getLast();
 		
-		right.compile(s, f, r, c);
+		right.compile(s, f);
 		Register rightResult = r.getLast();
 		
 		// add in the condition

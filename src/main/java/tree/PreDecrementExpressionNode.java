@@ -7,7 +7,6 @@ import intermediate.CopyStatement;
 import intermediate.InterFunction;
 import intermediate.LoadLiteralStatement;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 
 /** -- expr */
 public class PreDecrementExpressionNode implements StatementExprNode, Expression {
@@ -36,28 +35,28 @@ public class PreDecrementExpressionNode implements StatementExprNode, Expression
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// get new one = expr
 		// expr -- (but have to use the previous answer - 1, can't calculate 2x)
 		// copy new new one from new one
-		expr.compile(s, f, r, c);
-		Register result = r.getLast();
+		expr.compile(s, f);
+		Register result = f.allocator.getLast();
 		
 		// subtract 1
-		f.statements.add(new LoadLiteralStatement("1", r, fileName, line));
-		Register one = r.getLast();
+		f.statements.add(new LoadLiteralStatement("1", f.allocator, fileName, line));
+		Register one = f.allocator.getLast();
 		
-		f.statements.add(new BinaryOpStatement(result, one, r.getNext(result.type), '-', fileName, line));
-		Register minusOne = r.getLast();
+		f.statements.add(new BinaryOpStatement(result, one, f.allocator.getNext(result.type), '-', fileName, line));
+		Register minusOne = f.allocator.getLast();
 		// compile in the store to the address
 		if (!(expr instanceof LValue)) {
 			throw new CompileException("Can't assign the expression.", fileName, line);
 		}
-		((LValue)expr).compileAddress(s, f, r, c);
+		((LValue)expr).compileAddress(s, f);
 		// store it back
-		f.statements.add(new CopyStatement(minusOne, r.getLast(), fileName, line));
+		f.statements.add(new CopyStatement(minusOne, f.allocator.getLast(), fileName, line));
 		
 		// result is before the subtraction
-		f.statements.add(new CopyStatement(result, r.getNext(result.type), fileName, line));
+		f.statements.add(new CopyStatement(result, f.allocator.getNext(result.type), fileName, line));
 	}
 }

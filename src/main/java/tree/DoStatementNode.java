@@ -5,7 +5,6 @@ import helper.CompileException;
 import intermediate.BranchStatementTrue;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
-import intermediate.RegisterAllocator;
 
 /** do { statement } while (expression); */
 public class DoStatementNode implements StatementNode {
@@ -36,15 +35,15 @@ public class DoStatementNode implements StatementNode {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// label at top of statement
-		LabelStatement l = new LabelStatement("L_L" + r.getNextLabel());
+		LabelStatement l = new LabelStatement("L_L" + f.allocator.getNextLabel());
 		f.statements.add(l);
 		// then follows the statement
-		statement.compile(s, f, r, c);
+		statement.compile(s, f);
 		// immediately followed by expression
-		expression.compile(s, f, r, c);
+		expression.compile(s, f);
 		// conditional jump to top of statement
-		f.statements.add(new BranchStatementTrue(l, r.getLast(), fileName, line));
+		f.statements.add(new BranchStatementTrue(l, f.allocator.getLast(), fileName, line));
 	}
 }

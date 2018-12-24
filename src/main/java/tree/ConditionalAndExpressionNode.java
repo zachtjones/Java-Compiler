@@ -7,7 +7,6 @@ import intermediate.ChooseStatement;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 
 /** left && right */
 public class ConditionalAndExpressionNode implements Expression {
@@ -38,21 +37,21 @@ public class ConditionalAndExpressionNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
-		left.compile(s, f, r, c);
-		LabelStatement end = new LabelStatement("L_" + r.getNextLabel());
-		Register leftResult = r.getLast();
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+		left.compile(s, f);
+		LabelStatement end = new LabelStatement("L_" + f.allocator.getNextLabel());
+		Register leftResult = f.allocator.getLast();
 		// if left is false, jump to end
 		f.statements.add(new BranchStatmentFalse(end, leftResult, fileName, line));
 		
 		// compile in right half
-		right.compile(s, f, r, c);
-		Register rightResult = r.getLast();
+		right.compile(s, f);
+		Register rightResult = f.allocator.getLast();
 		
 		f.statements.add(end);
 
 		// keep in SSA, need choose statement
-		Register newReg = r.getNext(Register.BOOLEAN); // result is boolean
+		Register newReg = f.allocator.getNext(Register.BOOLEAN); // result is boolean
 		f.statements.add(new ChooseStatement(leftResult, rightResult, newReg, fileName, line));
 	}
 }

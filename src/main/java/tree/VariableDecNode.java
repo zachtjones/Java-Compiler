@@ -3,7 +3,6 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 public class VariableDecNode implements Node {
     public VariableIdNode id;
@@ -33,7 +32,7 @@ public class VariableDecNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// this is already done at higher levels in tree.
 	}
     

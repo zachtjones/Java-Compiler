@@ -3,7 +3,6 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 /** "super" . fieldName 
  * Note that fields are not inherited, need a way to qualify in IL, 
@@ -36,7 +35,7 @@ public class SuperFieldExpressionNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// TODO
 		throw new CompileException("super.field not implemented yet", fileName, line);
 	}

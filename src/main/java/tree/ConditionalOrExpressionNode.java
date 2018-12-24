@@ -7,7 +7,6 @@ import intermediate.ChooseStatement;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 
 /** Chain of || of the operands */
 public class ConditionalOrExpressionNode implements Expression {
@@ -38,17 +37,17 @@ public class ConditionalOrExpressionNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c)
+	public void compile(SymbolTable s, InterFunction f)
 			throws CompileException {
 		
-		left.compile(s, f, r, c);
+		left.compile(s, f);
 		LabelStatement end = new LabelStatement("L_" + r.getNextLabel());
 		Register leftResult = r.getLast();
 		// if left is true, jump to end
 		f.statements.add(new BranchStatementTrue(end, leftResult, fileName, line));
 		
 		// compile in right half
-		right.compile(s, f, r, c);
+		right.compile(s, f);
 		Register rightResult = r.getLast();
 		
 		f.statements.add(end);

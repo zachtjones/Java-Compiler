@@ -3,7 +3,6 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 /** expr -- */
 public class PostDecrementExpressionNode implements StatementExprNode, Expression {
@@ -32,7 +31,7 @@ public class PostDecrementExpressionNode implements StatementExprNode, Expressio
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// construct an AssignmentNode:  expr += 1;
 		AssignmentNode n = new AssignmentNode(fileName, line);
 		n.left = expr;
@@ -42,6 +41,6 @@ public class PostDecrementExpressionNode implements StatementExprNode, Expressio
 		n.right = literal;
 		
 		// compile it
-		n.compile(s, f, r, c);
+		n.compile(s, f);
 	}
 }

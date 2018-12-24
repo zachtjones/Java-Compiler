@@ -97,7 +97,7 @@ public class ConstructorNode {
 		// compile the block
 		CompileHistory c = new CompileHistory();
 		for (BlockStatementNode b : this.code) {
-			b.compile(newTable, func, r, c);
+			b.compile(newTable, func);
 		}
 		
 		// add the function to the intermediate file.

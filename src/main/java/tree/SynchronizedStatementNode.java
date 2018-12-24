@@ -3,7 +3,6 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 /** synchronized (expression) block */
 public class SynchronizedStatementNode implements StatementNode {
@@ -34,7 +33,7 @@ public class SynchronizedStatementNode implements StatementNode {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		throw new CompileException("Synchronized blocks not implemented yet.", fileName, line);
 		
 		/*expression.compile(s, f, r);

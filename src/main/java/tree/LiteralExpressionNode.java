@@ -4,7 +4,6 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.LoadLiteralStatement;
-import intermediate.RegisterAllocator;
 
 public class LiteralExpressionNode implements Expression {
 	
@@ -33,8 +32,8 @@ public class LiteralExpressionNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// the IL code does the work here
-		f.statements.add(new LoadLiteralStatement(value, r, fileName, line));	
+		f.statements.add(new LoadLiteralStatement(value, f.allocator, fileName, line));
 	}
 }

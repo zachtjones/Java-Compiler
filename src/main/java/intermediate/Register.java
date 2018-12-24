@@ -2,7 +2,6 @@ package intermediate;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import tree.CompileHistory;
 import tree.Expression;
 import tree.SymbolTable;
 import x64.Instruction;
@@ -122,9 +121,9 @@ public class Register implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// make a copy statement so the result can be gotten with r.getLast()
-		Register result = r.getNext(type);
+		Register result = f.allocator.getNext(type);
 		f.statements.add(new CopyStatement(this, result, fileName, line));
 	}
 	

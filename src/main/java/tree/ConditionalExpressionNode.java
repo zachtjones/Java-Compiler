@@ -3,7 +3,6 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 /** condition ? truePart : falsePart */
 public class ConditionalExpressionNode implements Expression {
@@ -36,7 +35,7 @@ public class ConditionalExpressionNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) 
+	public void compile(SymbolTable s, InterFunction f)
 			throws CompileException {
 		
 		// TODO

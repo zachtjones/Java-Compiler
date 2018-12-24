@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 public class MethodDeclaratorNode implements Node {
     public String name;
@@ -38,7 +37,7 @@ public class MethodDeclaratorNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// set the name
 		f.name = name;
 		

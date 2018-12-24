@@ -5,7 +5,6 @@ import helper.CompileException;
 import intermediate.GetArrayValueStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 
 /** [ expr ] */
 public class ArrayIndexExpressionNode implements Expression, LValue {
@@ -34,26 +33,26 @@ public class ArrayIndexExpressionNode implements Expression, LValue {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
-		Register array = r.getLast();
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+		Register array = f.allocator.getLast();
 		// get the index
-		expr.compile(s, f, r, c);
-		Register index = r.getLast();
+		expr.compile(s, f);
+		Register index = f.allocator.getLast();
 		// load the memory at the address
-		Register result = r.getNext("unknown");
+		Register result = f.allocator.getNext("unknown");
 		f.statements.add(new GetArrayValueStatement(array, index, result, fileName, line));
 	}
 
 	@Override
-	public void compileAddress(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c)
+	public void compileAddress(SymbolTable s, InterFunction f)
 			throws CompileException {
 		
-		Register array = r.getLast();
+		Register array = f.allocator.getLast();
 		// get the index
-		expr.compile(s, f, r, c);
-		Register index = r.getLast();
+		expr.compile(s, f);
+		Register index = f.allocator.getLast();
 		// load the memory at the address
-		Register result = r.getNext("unknown");
+		Register result = f.allocator.getNext("unknown");
 		f.statements.add(new GetArrayValueStatement(array, index, result, fileName, line));
 	}
 

@@ -9,7 +9,6 @@ import intermediate.CallVirtualStatement;
 import intermediate.CopyStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 
 /** new Name (args) */
 public class ConstructorCallNode implements Expression {
@@ -40,14 +39,14 @@ public class ConstructorCallNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		Register result = r.getNext(name.primaryName);
 
 		ArrayList<Expression> expressions = args.expressions;
 		// compile in the args
 		Register[] results = new Register[expressions.size()];
 		for(int i = 0; i < expressions.size(); i++) {
-			expressions.get(i).compile(s, f, r, c);
+			expressions.get(i).compile(s, f);
 			results[i] = r.getLast();
 		}
 		

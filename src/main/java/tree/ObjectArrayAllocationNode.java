@@ -7,7 +7,6 @@ import helper.CompileException;
 import intermediate.CreateArrayStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 
 /** new type[expression or empty] ... */
 public class ObjectArrayAllocationNode implements Expression {
@@ -41,16 +40,16 @@ public class ObjectArrayAllocationNode implements Expression {
    	}
        
    	@Override
-   	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+   	public void compile(SymbolTable s, InterFunction f) throws CompileException {
    		if (expressions.get(0) == null) {
    			throw new CompileException(
    				"The first dimension of an array has to have a size given at the constructor.",
    				fileName, line);
    		}
    		if (expressions.size() == 1) {
-   			expressions.get(0).compile(s, f, r, c);
-   			Register size = r.getLast();
-   			Register result = r.getNext("unknown");
+   			expressions.get(0).compile(s, f);
+   			Register size = f.allocator.getLast();
+   			Register result = f.allocator.getNext("unknown");
    			f.statements.add(new CreateArrayStatement(size, type.toString(), result));
    		} else {
    			// TODO handle multi-dimensional arrays.

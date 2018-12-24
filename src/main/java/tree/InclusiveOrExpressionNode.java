@@ -7,7 +7,6 @@ import helper.CompileException;
 import intermediate.BinaryOpStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 
 /** Chain of | of the operands (not short-circuiting, aka bitwise or also)*/
 public class InclusiveOrExpressionNode implements Expression {
@@ -38,14 +37,14 @@ public class InclusiveOrExpressionNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// compile in the first one
-		expressions.get(0).compile(s, f, r, c);
+		expressions.get(0).compile(s, f);
 
 		// use its result in the next one
 		Register result = r.getLast();
 		for (int i = 1; i < expressions.size(); i++) {
-			expressions.get(i).compile(s, f, r, c);
+			expressions.get(i).compile(s, f);
 			// add in OR of the last two
 			Register current = result;
 			Register two = r.getLast();

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import helper.CompileException;
+import tree.CompileHistory;
 import x64.SymbolNames;
 import x64.X64File;
 import x64.X64Function;
@@ -27,6 +28,9 @@ public class InterFunction {
 	public ArrayList<String> throwsList;
 	
 	public ArrayList<InterStatement> statements;
+
+	public final RegisterAllocator allocator;
+	public final CompileHistory history;
 	
 	
 	public InterFunction() {
@@ -34,6 +38,9 @@ public class InterFunction {
 		this.paramNames = new ArrayList<>();
 		this.throwsList = new ArrayList<>();
 		this.statements = new ArrayList<>();
+
+		allocator = new RegisterAllocator();
+		history = new CompileHistory();
 	}
 	
 	@Override

@@ -5,7 +5,6 @@ import helper.CompileException;
 import intermediate.BinaryOpStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 
 /** left - right */
 public class SubtractExpressionNode implements Expression {
@@ -35,11 +34,11 @@ public class SubtractExpressionNode implements Expression {
 		right.resolveImports(c);
 	}
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
-		left.compile(s, f, r, c);
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+		left.compile(s, f);
 		Register rightResult = r.getLast();
 		
-		right.compile(s, f, r, c);
+		right.compile(s, f);
 		Register leftResult = r.getLast();
 		
 		Register result = r.getNext(Register.getLarger(leftResult.type, rightResult.type));

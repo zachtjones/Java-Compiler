@@ -3,7 +3,6 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 public class BreakStatementNode implements StatementNode {
     public String name; // could be null - label to break
@@ -31,7 +30,7 @@ public class BreakStatementNode implements StatementNode {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// nothing needed, check if name is in symbol table for
 		//  the compile method if name != null.
 	}

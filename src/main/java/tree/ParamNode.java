@@ -3,7 +3,6 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 public class ParamNode implements Node {
     public TypeNode type;
@@ -34,7 +33,7 @@ public class ParamNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// already dealt with in MethodNode or ConstructorNode.
 		if (this.isVarargs) {
 			throw new CompileException("Error: varargs not implemented yet.", fileName, line);
