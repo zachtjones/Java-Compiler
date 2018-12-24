@@ -56,6 +56,11 @@ public class GetStaticFieldStatement implements InterStatement {
 	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
 		if (className.startsWith("java/")) {
 
+			// the flag on the register that is returned that it is a JNI register is based on the type, which is java/*
+			//  for java types intrinsic to the JVM.
+			// When we call methods on the JVM type, will also have to do the split logic, similar to here
+
+
 		} else {
 			// mov CLASS_NAME_FIELD_NAME(%rip), %destination
 			function.addInstruction(

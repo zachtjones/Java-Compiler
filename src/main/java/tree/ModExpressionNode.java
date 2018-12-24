@@ -40,13 +40,13 @@ public class ModExpressionNode implements Expression {
 		
 		// evaluate left
 		left.compile(s, f);
-		Register leftResult = r.getLast();
+		Register leftResult = f.allocator.getLast();
 		// evaluate right
 		right.compile(s, f);
-		Register rightResult = r.getLast();
+		Register rightResult = f.allocator.getLast();
 
 		// add them
-		Register destination = r.getNext(Register.getLarger(leftResult.type, rightResult.type));
+		Register destination = f.allocator.getNext(Register.getLarger(leftResult.type, rightResult.type));
 		f.statements.add(new BinaryOpStatement(leftResult, rightResult, destination, '%', fileName, line));
 	}
 }

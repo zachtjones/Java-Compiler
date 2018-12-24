@@ -48,8 +48,8 @@ public class PrimitiveArrayAllocationNode implements Expression {
 		}
 		if (expressions.size() == 1) {
 			expressions.get(0).compile(s, f);
-			Register size = r.getLast();
-			Register result = r.getNext("unknown");
+			Register size = f.allocator.getLast();
+			Register result = f.allocator.getNext("unknown");
 			f.statements.add(new CreateArrayStatement(size, type.toString(), result));
 		} else {
 			// TODO handle multi-dimensional arrays.

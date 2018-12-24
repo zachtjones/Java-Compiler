@@ -36,13 +36,13 @@ public class LessThanEqualExpressionNode implements Expression {
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		left.compile(s, f);
-		Register leftResult = r.getLast();
+		Register leftResult = f.allocator.getLast();
 		
 		right.compile(s, f);
-		Register rightResult = r.getLast();
+		Register rightResult = f.allocator.getLast();
 		
 		// add in the condition
-		Register result = r.getNext(Register.BOOLEAN);
+		Register result = f.allocator.getNext(Register.BOOLEAN);
 		f.statements.add(new SetConditionStatement(
 			SetConditionStatement.LESSEQUAL, leftResult, rightResult, result, fileName, line));
 	}

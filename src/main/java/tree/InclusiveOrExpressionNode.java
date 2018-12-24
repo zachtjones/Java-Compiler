@@ -10,7 +10,7 @@ import intermediate.Register;
 
 /** Chain of | of the operands (not short-circuiting, aka bitwise or also)*/
 public class InclusiveOrExpressionNode implements Expression {
-    public ArrayList<Expression> expressions = new ArrayList<Expression>();
+    public ArrayList<Expression> expressions = new ArrayList<>();
     public String fileName;
     public int line;
     
@@ -42,13 +42,13 @@ public class InclusiveOrExpressionNode implements Expression {
 		expressions.get(0).compile(s, f);
 
 		// use its result in the next one
-		Register result = r.getLast();
+		Register result = f.allocator.getLast();
 		for (int i = 1; i < expressions.size(); i++) {
 			expressions.get(i).compile(s, f);
 			// add in OR of the last two
 			Register current = result;
-			Register two = r.getLast();
-			result = r.getNext(Register.getLarger(current.type, two.type));
+			Register two = f.allocator.getLast();
+			result = f.allocator.getNext(Register.getLarger(current.type, two.type));
 			// add the OR statement
 			f.statements.add(new BinaryOpStatement(current, two, result, '|', fileName, line));
 		}

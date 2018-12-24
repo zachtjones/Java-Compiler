@@ -37,13 +37,13 @@ public class RightShiftLogExpressionNode implements Expression {
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		left.compile(s, f);
-		Register leftResult = r.getLast();
+		Register leftResult = f.allocator.getLast();
 		
 		right.compile(s, f);
-		Register rightResult = r.getLast();
+		Register rightResult = f.allocator.getLast();
 		
 		// result is of type left
-		Register result = r.getNext(leftResult.type);
+		Register result = f.allocator.getNext(leftResult.type);
 		f.statements.add(new BinaryOpStatement(
 				leftResult, rightResult, result, (char)BinaryOpStatement.RSHIFTLOG, fileName, line));
 	}

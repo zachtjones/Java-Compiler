@@ -40,21 +40,21 @@ public class ConstructorCallNode implements Expression {
 
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
-		Register result = r.getNext(name.primaryName);
+		Register result = f.allocator.getNext(name.primaryName);
 
 		ArrayList<Expression> expressions = args.expressions;
 		// compile in the args
 		Register[] results = new Register[expressions.size()];
 		for(int i = 0; i < expressions.size(); i++) {
 			expressions.get(i).compile(s, f);
-			results[i] = r.getLast();
+			results[i] = f.allocator.getLast();
 		}
 		
 		// allocate memory
 		f.statements.add(new AllocateClassMemoryStatement(name.primaryName, result));
 		
 		// copy
-		Register finalResult = r.getNext(result.type);
+		Register finalResult = f.allocator.getNext(result.type);
 		
 		// add in the call virtual statement
 		f.statements.add(new CallVirtualStatement(result, "<init>", results, null, fileName, line));

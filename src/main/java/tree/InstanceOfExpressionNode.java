@@ -38,11 +38,11 @@ public class InstanceOfExpressionNode implements Expression {
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		left.compile(s, f);
-		Register value = r.getLast();
+		Register value = f.allocator.getLast();
 		// test if value is the instance of the class
 		String className = right.getILRep();
 		
-		Register result = r.getNext(Register.BOOLEAN);
+		Register result = f.allocator.getNext(Register.BOOLEAN);
 		
 		f.statements.add(new InstanceOfStatement(value, className, result, fileName, line));
 	}

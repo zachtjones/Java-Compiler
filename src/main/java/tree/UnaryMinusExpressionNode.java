@@ -35,8 +35,8 @@ public class UnaryMinusExpressionNode implements Expression {
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		expr.compile(s, f);
-		Register exprResult = r.getLast();
-		Register result = r.getNext(exprResult.type);
+		Register exprResult = f.allocator.getLast();
+		Register result = f.allocator.getNext(exprResult.type);
 		f.statements.add(new UnaryOpStatement(exprResult, result, '-', fileName, line));
 	}
 }
