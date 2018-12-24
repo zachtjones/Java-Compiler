@@ -53,12 +53,12 @@ public class GetStaticFieldStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64File assemblyFile) throws CompileException {
+	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
 		if (className.startsWith("java/")) {
 
 		} else {
 			// mov CLASS_NAME_FIELD_NAME(%rip), %destination
-			assemblyFile.instructions.add(
+			function.addInstruction(
 				new MoveInstruction(
 					fromField(className, fieldName, result),
 					fromILRegister(result)

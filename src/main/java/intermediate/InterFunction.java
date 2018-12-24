@@ -6,6 +6,7 @@ import java.util.HashMap;
 import helper.CompileException;
 import x64.SymbolNames;
 import x64.X64File;
+import x64.X64Function;
 import x64.directives.ByteAlignment;
 import x64.directives.GlobalSymbol;
 import x64.directives.LabelInstruction;
@@ -117,20 +118,15 @@ public class InterFunction {
 	 */
     public void compile(X64File assemblyFile) throws CompileException {
 
-        // TODO the java_class_name.method_name_args
-        assemblyFile.instructions.add(new SegmentChange(SegmentChange.TEXT));
-        final String symbolName = SymbolNames.getFieldName(assemblyFile.getJavaName(), this.name);
-        assemblyFile.instructions.add(new GlobalSymbol(symbolName));
-        assemblyFile.instructions.add(new ByteAlignment(16));
-        assemblyFile.instructions.add(new LabelInstruction(symbolName));
+        // TODO the name mangled args to allow for method overloading
+		X64Function function = new X64Function(assemblyFile.getJavaName(), name);
 
         // add the instructions for the statements -> x64
         for (InterStatement statement : statements) {
-            statement.compile(assemblyFile);
+            statement.compile(assemblyFile, function);
         }
 
-        assemblyFile.instructions.add(new ReturnInstruction());
-
+        assemblyFile.addFunction(function);
 
     }
 }

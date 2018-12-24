@@ -7,7 +7,7 @@ public class X64File {
 
     private final String javaClassName;
     private final String fileName;
-    public ArrayList<Instruction> instructions;
+    public ArrayList<X64Function> functions;
 
     /** Creates an initially empty x64 assembly file, given the name
      * @param name The java class/interface/enum name, ex: java/lang/String
@@ -16,7 +16,7 @@ public class X64File {
         javaClassName = name;
         // use the java -> native pattern, escaping _ in package names
         fileName = name.replace("_", "_1").replace('/', '_') + ".s";
-        instructions = new ArrayList<>();
+        functions = new ArrayList<>();
     }
 
     /** Gets the file name that this assembly file should be. (Not including the directory) */
@@ -24,14 +24,21 @@ public class X64File {
         return fileName;
     }
 
-    @Override
-    public String toString() {
-        return instructions.stream()
-                .map(Instruction::toString)
-                .collect(Collectors.joining("\n"));
-    }
-
+    /** Gets the fully qualified java class name that this file represents. */
     public String getJavaName() {
         return javaClassName;
     }
+
+    /** Adds the function to the list of functions */
+    public void addFunction(X64Function function) {
+        functions.add(function);
+    }
+
+    @Override
+    public String toString() {
+        return functions.stream()
+                .map(X64Function::toString)
+                .collect(Collectors.joining("\n\n"));
+    }
+
 }

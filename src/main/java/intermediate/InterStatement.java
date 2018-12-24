@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import x64.X64File;
+import x64.X64Function;
 
 public interface InterStatement {
 	/** Replaces all reference types with their fully qualified name 
@@ -20,10 +21,11 @@ public interface InterStatement {
 	 * Compiles this statement down to the assembly level for x64
 	 *
 	 * @param assemblyFile The assembly file to add the instructions to.
+	 * @param function
 	 * @throws CompileException If there is an error compiling, note that this should only happen for statements
 	 * not implemented yet.
 	 */
-	default void compile(X64File assemblyFile) throws CompileException {
+	default void compile(X64File assemblyFile, X64Function function) throws CompileException {
 		throw new CompileException("compiling to x64 not done for " + this, "", -1);
 	}
 }
