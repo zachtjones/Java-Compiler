@@ -4,6 +4,7 @@ import intermediate.Register;
 import x64.Instruction;
 import x64.SymbolNames;
 
+/** Represents displacement from the program counter, OFFSET(%rip) in x64 */
 public class PCRelativeData implements SourceOperand, DestinationOperand {
 
     private final String label;

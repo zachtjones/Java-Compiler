@@ -5,7 +5,7 @@ import x64.Instruction;
 
 /** This is an abstraction of a hardware register that is preserved across function calls */
 public class X64PreservedRegister implements SourceOperand, DestinationOperand {
-    
+
     private final int number;
     private final Instruction.Size size;
     public X64PreservedRegister(int number, Instruction.Size size) {
