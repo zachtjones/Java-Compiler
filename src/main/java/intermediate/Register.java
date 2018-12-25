@@ -177,7 +177,7 @@ public class Register implements Expression {
 			case DOUBLE:
 				return Instruction.Size.DOUBLE;
 		}
-		// this line shouldn't be reached
+		// references / nulls
 		return Instruction.Size.QUAD;
     }
 }
