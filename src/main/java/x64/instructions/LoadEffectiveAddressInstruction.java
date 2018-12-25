@@ -6,6 +6,6 @@ import x64.SourceOperand;
 public class LoadEffectiveAddressInstruction extends BinaryInstruction {
 
     public LoadEffectiveAddressInstruction(SourceOperand source, DestinationOperand destination) {
-        super("leaq", source, destination);
+        super("lea", source, destination);
     }
 }
