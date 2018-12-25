@@ -1,4 +1,6 @@
-package x64;
+package x64.operands;
+
+import x64.Instruction;
 
 import static x64.Instruction.Size.QUAD;
 

@@ -7,10 +7,11 @@ import main.JavaCompiler;
 import x64.*;
 import x64.instructions.LoadEffectiveAddressInstruction;
 import x64.instructions.MoveInstruction;
+import x64.operands.X64Register;
 
-import static x64.PCRelativeData.fromField;
-import static x64.PCRelativeData.pointerFromLabel;
-import static x64.X64Register.fromILRegister;
+import static x64.operands.PCRelativeData.fromField;
+import static x64.operands.PCRelativeData.pointerFromLabel;
+import static x64.operands.X64Register.fromILRegister;
 
 public class GetStaticFieldStatement implements InterStatement {
 	private final String className;
@@ -80,6 +81,7 @@ public class GetStaticFieldStatement implements InterStatement {
 			function.loadJNI1();
 
 			// mov FindClass_Offset(%javaEnvOne), %temp
+
 			// TODO
 
 			// call *%temp

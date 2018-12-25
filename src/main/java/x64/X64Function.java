@@ -6,6 +6,8 @@ import x64.directives.LabelInstruction;
 import x64.directives.SegmentChange;
 import x64.instructions.MoveInstruction;
 import x64.instructions.ReturnInstruction;
+import x64.operands.X64NativeRegister;
+import x64.operands.X64Register;
 
 import java.util.ArrayList;
 import java.util.List;

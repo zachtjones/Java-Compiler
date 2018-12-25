@@ -1,6 +1,8 @@
-package x64;
+package x64.operands;
 
 import intermediate.Register;
+import x64.Instruction;
+import x64.SymbolNames;
 
 public class PCRelativeData implements SourceOperand, DestinationOperand {
 

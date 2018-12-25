@@ -1,4 +1,4 @@
-package x64;
+package x64.operands;
 
 /**
  * Represents an x64 source operand, which can be either a register, memory combo, or immediate

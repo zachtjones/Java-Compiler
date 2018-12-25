@@ -1,6 +1,7 @@
-package x64;
+package x64.operands;
 
 import intermediate.Register;
+import x64.Instruction;
 
 /** This is an abstraction of a hardware register, broken into 3 types */
 public class X64Register implements SourceOperand, DestinationOperand {

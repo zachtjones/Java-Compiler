@@ -1,4 +1,6 @@
-package x64;
+package x64.operands;
+
+import x64.Instruction;
 
 /**
  * Represents an x64 destination operand, which can be either a register or memory combo
