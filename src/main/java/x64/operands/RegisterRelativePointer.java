@@ -6,9 +6,9 @@ import x64.Instruction;
 public class RegisterRelativePointer implements SourceOperand, DestinationOperand {
 
     private final int offset;
-    private final X64Register javaEnvPointer;
+    private final X64PreservedRegister javaEnvPointer;
 
-    public RegisterRelativePointer(int offset, X64Register javaEnvPointer) {
+    public RegisterRelativePointer(int offset, X64PreservedRegister javaEnvPointer) {
         this.offset = offset;
         this.javaEnvPointer = javaEnvPointer;
     }

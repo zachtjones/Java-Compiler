@@ -10,12 +10,12 @@ import x64.instructions.LoadEffectiveAddressInstruction;
 import x64.instructions.MoveInstruction;
 import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
-import x64.operands.X64Register;
+import x64.operands.X64PreservedRegister;
 
 import static x64.JNIOffsets.FIND_CLASS;
 import static x64.operands.PCRelativeData.fromField;
 import static x64.operands.PCRelativeData.pointerFromLabel;
-import static x64.operands.X64Register.fromILRegister;
+import static x64.operands.X64PreservedRegister.fromILRegister;
 
 public class GetStaticFieldStatement implements InterStatement {
 	private final String className;
@@ -85,7 +85,7 @@ public class GetStaticFieldStatement implements InterStatement {
 			function.loadJNI1();
 
 			// mov FindClass_Offset(%javaEnvOne), %temp
-			final X64Register temp = X64Register.newTempQuad(function.getNextFreeRegister());
+			final X64PreservedRegister temp = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
 			function.addInstruction(
 				new MoveInstruction(
 					new RegisterRelativePointer(FIND_CLASS.getOffset(), function.javaEnvPointer),
@@ -101,7 +101,7 @@ public class GetStaticFieldStatement implements InterStatement {
 			);
 
 			// mov %result, %class storage register
-			final X64Register classReg = X64Register.newTempQuad(function.getNextFreeRegister());
+			final X64PreservedRegister classReg = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
 			function.addInstruction(
 				new MoveInstruction(
 					X64NativeRegister.RAX,

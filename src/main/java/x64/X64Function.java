@@ -7,7 +7,7 @@ import x64.directives.SegmentChange;
 import x64.instructions.MoveInstruction;
 import x64.instructions.ReturnInstruction;
 import x64.operands.X64NativeRegister;
-import x64.operands.X64Register;
+import x64.operands.X64PreservedRegister;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class X64Function {
 
 	private int nextFreeRegister;
 
-	public final X64Register javaEnvPointer;
+	public final X64PreservedRegister javaEnvPointer;
 
 	public X64Function(String javaClass, String javaMethod, int nextFreeRegister) {
 
@@ -31,7 +31,7 @@ public class X64Function {
 		prologue.add(new ByteAlignment(16));
 		prologue.add(new LabelInstruction(symbolName));
 
-		javaEnvPointer = new X64Register(getNextFreeRegister(), X64Register.TEMPORARY, Instruction.Size.QUAD);
+		javaEnvPointer = new X64PreservedRegister(getNextFreeRegister(), Instruction.Size.QUAD);
 
 		// save the first argument, the java environment pointer to a dedicated virtual register.
 		prologue.add(new MoveInstruction(X64NativeRegister.RDI, javaEnvPointer));
@@ -49,8 +49,7 @@ public class X64Function {
 
 	/** Loads the JNI pointer into the first argument */
 	public void loadJNI1() {
-		X64Register firstArg = new X64Register(1, X64Register.ARGUMENT, Instruction.Size.QUAD);
-		addInstruction(new MoveInstruction(javaEnvPointer, firstArg));
+		addInstruction(new MoveInstruction(javaEnvPointer, X64NativeRegister.RDI));
 	}
 
 	/** Gets the number associated with the next free register.
