@@ -5,10 +5,14 @@ import java.util.HashMap;
 import helper.CompileException;
 import main.JavaCompiler;
 import x64.*;
+import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.LoadEffectiveAddressInstruction;
 import x64.instructions.MoveInstruction;
+import x64.operands.RegisterRelativePointer;
+import x64.operands.X64NativeRegister;
 import x64.operands.X64Register;
 
+import static x64.JNIOffsets.FIND_CLASS;
 import static x64.operands.PCRelativeData.fromField;
 import static x64.operands.PCRelativeData.pointerFromLabel;
 import static x64.operands.X64Register.fromILRegister;
@@ -73,7 +77,7 @@ public class GetStaticFieldStatement implements InterStatement {
 			function.addInstruction(
 				new LoadEffectiveAddressInstruction(
 					pointerFromLabel(label),
-					new X64Register(2, X64Register.ARGUMENT, Instruction.Size.QUAD)
+					X64NativeRegister.RSI
 				)
 			);
 
@@ -81,17 +85,45 @@ public class GetStaticFieldStatement implements InterStatement {
 			function.loadJNI1();
 
 			// mov FindClass_Offset(%javaEnvOne), %temp
-
-			// TODO
+			final X64Register temp = X64Register.newTempQuad(function.getNextFreeRegister());
+			function.addInstruction(
+				new MoveInstruction(
+					new RegisterRelativePointer(FIND_CLASS.getOffset(), function.javaEnvPointer),
+					temp
+				)
+			);
 
 			// call *%temp
-			// TODO
+			function.addInstruction(
+				new CallFunctionPointerInstruction(
+					temp
+				)
+			);
 
 			// mov %result, %class storage register
-			// TODO
+			final X64Register classReg = X64Register.newTempQuad(function.getNextFreeRegister());
+			function.addInstruction(
+				new MoveInstruction(
+					X64NativeRegister.RAX,
+					classReg
+				)
+			);
+			// DONE: classReg = javaEnv -> FindClass(JNIEnv* env, char* name);
+
 
 			// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
 			//    - use the class param just obtained, name is the field name, sig is the field type signature
+
+			// mov %javaEnvOne, %arg1
+			function.loadJNI1();
+
+			// mov %classReg, %arg2
+			function.addInstruction(
+				new MoveInstruction(
+					classReg,
+					X64NativeRegister.RSI
+				)
+			);
 
 			// 3. result = javaEnv -> GetStatic<Type>Field(JNIEnv *env, class, fieldID)
 			//    - use the class param obtained, as well as the field id just obtained
