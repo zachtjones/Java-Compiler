@@ -45,6 +45,12 @@ public class X64Function {
 		this.contents.add(instruction);
 	}
 
+	/** Loads the JNI pointer into the first argument */
+	public void loadJNI1() {
+		X64Register firstArg = new X64Register(1, X64Register.ARGUMENT, Instruction.Size.QUAD);
+		addInstruction(new MoveInstruction(javaEnvPointer, firstArg));
+	}
+
 	/** Gets the number associated with the next free register.
 	 * (In this abstraction, there are an unlimited number) */
 	public int getNextFreeRegister() {

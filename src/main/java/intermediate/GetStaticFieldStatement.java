@@ -5,9 +5,11 @@ import java.util.HashMap;
 import helper.CompileException;
 import main.JavaCompiler;
 import x64.*;
+import x64.instructions.LoadEffectiveAddressInstruction;
 import x64.instructions.MoveInstruction;
 
 import static x64.PCRelativeData.fromField;
+import static x64.PCRelativeData.pointerFromLabel;
 import static x64.X64Register.fromILRegister;
 
 public class GetStaticFieldStatement implements InterStatement {
@@ -63,8 +65,30 @@ public class GetStaticFieldStatement implements InterStatement {
 			// Steps:
 			// 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
 			//    - name is like: java/lang/String for java.lang.String or [Ljava/lang/Object; for java.lang.Object[]
+			//    - here the name is just the className that was set
 
-			// 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
+			// leaq NEW_STRING_REFERENCE(%rip), %arg2
+			String label = assemblyFile.insertDataString(className);
+			function.addInstruction(
+				new LoadEffectiveAddressInstruction(
+					pointerFromLabel(label),
+					new X64Register(2, X64Register.ARGUMENT, Instruction.Size.QUAD)
+				)
+			);
+
+			// mov %javaEnvOne, %arg1
+			function.loadJNI1();
+
+			// mov FindClass_Offset(%javaEnvOne), %temp
+			// TODO
+
+			// call *%temp
+			// TODO
+
+			// mov %result, %class storage register
+			// TODO
+
+			// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
 			//    - use the class param just obtained, name is the field name, sig is the field type signature
 
 			// 3. result = javaEnv -> GetStatic<Type>Field(JNIEnv *env, class, fieldID)

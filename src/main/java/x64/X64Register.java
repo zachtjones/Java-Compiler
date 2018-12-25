@@ -23,6 +23,10 @@ public class X64Register implements SourceOperand, DestinationOperand {
         return new X64Register(intermediate.num, X64Register.TEMPORARY, intermediate.x64Type());
     }
 
+    public static X64Register newTempQuad(int number) {
+        return new X64Register(number, X64Register.TEMPORARY, Instruction.Size.QUAD);
+    }
+
     @Override
     public Instruction.Size getSuffix() {
         return size;
