@@ -6,13 +6,15 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.UsageCheck;
 import main.JavaCompiler;
+import x64.X64File;
+import x64.X64Function;
 
 /** Represents a function call via v-table lookup. */
 public class CallVirtualStatement implements InterStatement {
-	Register obj;
+	private final Register obj;
 	String name;
-	Register[] args;
-	Register returnVal;
+	private final Register[] args;
+	private final Register returnVal;
 	
 	private final String fileName;
 	private final int line;
@@ -68,6 +70,26 @@ public class CallVirtualStatement implements InterStatement {
 			
 			returnVal.typeFull = returnType;
 			regs.put(returnVal, returnVal.typeFull);
+		}
+	}
+
+	@Override
+	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+		// if the type of the register is java/*, use JNI
+		if (obj.typeFull.startsWith("java/")) {
+			// clazz = GetClass
+			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
+			// 3 options for the method call
+			// %result = Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
+			// %result = Call<type>MethodA(JNIEnv *env, jobject obj, jmethodID methodID, const jvalue *args);
+			// %result = Call<type>MethodV(JNIEnv *env, jobject obj, jmethodID methodID, va_list args);
+
+			// TODO optimization -- use the first one if there are 3 args or less to the method call without A or V
+			// const jvalue* args with A is probably the best way to create it otherwise, although pushing the
+			//  extra args onto the stack might not be too bad
+		} else {
+			// TODO requires adding the virtual function tables to the system of files
+			throw new CompileException("V-table lookup not implemented yet.", fileName, line);
 		}
 	}
 }
