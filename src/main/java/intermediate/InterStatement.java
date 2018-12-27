@@ -18,10 +18,10 @@ public interface InterStatement {
 			InterFunction func) throws CompileException;
 
 	/**
-	 * Compiles this statement down to the assembly level for x64
-	 *
-	 * @param assemblyFile The assembly file to add the instructions to.
-	 * @param function
+	 * Compiles this statement down to the assembly level for x64,
+	 * with the only catch being unlimited temporary registers.
+	 * @param assemblyFile The assembly file for more context, used in adding data segment parts.
+	 * @param function The x64 function to add the instructions to.
 	 * @throws CompileException If there is an error compiling, note that this should only happen for statements
 	 * not implemented yet.
 	 */
