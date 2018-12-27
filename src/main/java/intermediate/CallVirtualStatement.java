@@ -8,11 +8,12 @@ import helper.UsageCheck;
 import main.JavaCompiler;
 import x64.X64File;
 import x64.X64Function;
+import x64.jni.GetMethodIdJNI;
 import x64.jni.GetObjectClassJNI;
 import x64.operands.X64PreservedRegister;
 
 /** Represents a function call via v-table lookup. */
-public class CallVirtualStatement implements InterStatement, GetObjectClassJNI {
+public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, GetMethodIdJNI {
 	private final Register obj;
 	String name;
 	private final Register[] args;
@@ -84,6 +85,9 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI {
 				addGetObjectClass(function, X64PreservedRegister.fromILRegister(obj));
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
+			X64PreservedRegister methodId =
+				addGetMethodId(assemblyFile, function, clazz, name, args, returnVal);
+
 			// 3 options for the method call
 			// %result = Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
 			// %result = Call<type>MethodA(JNIEnv *env, jobject obj, jmethodID methodID, const jvalue *args);
