@@ -8,9 +8,11 @@ import helper.UsageCheck;
 import main.JavaCompiler;
 import x64.X64File;
 import x64.X64Function;
+import x64.jni.GetObjectClassJNI;
+import x64.operands.X64PreservedRegister;
 
 /** Represents a function call via v-table lookup. */
-public class CallVirtualStatement implements InterStatement {
+public class CallVirtualStatement implements InterStatement, GetObjectClassJNI {
 	private final Register obj;
 	String name;
 	private final Register[] args;
@@ -78,6 +80,9 @@ public class CallVirtualStatement implements InterStatement {
 		// if the type of the register is java/*, use JNI
 		if (obj.typeFull.startsWith("java/")) {
 			// clazz = GetClass
+			X64PreservedRegister clazz =
+				addGetObjectClass(function, X64PreservedRegister.fromILRegister(obj));
+
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
 			// 3 options for the method call
 			// %result = Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
