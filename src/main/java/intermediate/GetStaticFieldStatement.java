@@ -9,6 +9,7 @@ import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.MoveInstruction;
 import x64.jni.FindClassJNI;
 import x64.jni.GetStaticFieldIdJNI;
+import x64.jni.GetStaticFieldJNI;
 import x64.operands.PCRelativeData;
 import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
@@ -18,7 +19,7 @@ import static x64.JNIOffsets.GET_STATIC_FIELD_ID;
 import static x64.operands.PCRelativeData.fromField;
 import static x64.operands.X64PreservedRegister.fromILRegister;
 
-public class GetStaticFieldStatement implements InterStatement, FindClassJNI, GetStaticFieldIdJNI {
+public class GetStaticFieldStatement implements InterStatement, FindClassJNI, GetStaticFieldIdJNI, GetStaticFieldJNI {
 	private final String className;
 	private final String fieldName;
 	Register result;
@@ -68,62 +69,17 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 			// which is java/* for java types intrinsic to the JVM.
 			// When we call methods on the JVM type, will also have to do the split logic, similar to here
 
-			// Steps:
-			// 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
-			//    - name is like: java/lang/String for java.lang.String or [Ljava/lang/Object; for java.lang.Object[]
-			//    - here the name is just the className that was set
-
+			// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
+			//    - name is like: java/lang/String
 			final X64PreservedRegister classReg = addFindClassJNICall(assemblyFile, function, className);
 
 			// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
-			//    - use the class param just obtained, name is the field name, sig is the field type signature
-
 			final X64PreservedRegister fieldIDReg =
 				addGetStaticFieldIdJNICall(result, fieldName, classReg, assemblyFile, function);
 
 
 			// Step 3. result = javaEnv -> GetStatic<Type>Field(JNIEnv *env, class, fieldID)
-			final String fieldType = SymbolNames.getJNISignatureFromILType(result.typeFull);
-
-			// load the args
-			function.loadJNI1();
-			function.addInstruction(
-				new MoveInstruction(
-					classReg,
-					X64NativeRegister.RSI
-				)
-			);
-			function.addInstruction(
-				new MoveInstruction(
-					fieldIDReg,
-					X64NativeRegister.RDX
-				)
-			);
-
-			// mov GetFieldID_Offset(%javaEnvOne), %temp3
-			final X64PreservedRegister temp3 = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
-			function.addInstruction(
-				new MoveInstruction(
-					new RegisterRelativePointer(JNIOffsets.getStaticFieldOffset(fieldType), function.javaEnvPointer),
-					temp3
-				)
-			);
-
-			// call *%temp3
-			function.addInstruction(
-				new CallFunctionPointerInstruction(
-					temp3
-				)
-			);
-
-			// mov %result, %final result
-			function.addInstruction(
-				new MoveInstruction(
-					X64NativeRegister.RAX,
-					X64PreservedRegister.fromILRegister(result)
-				)
-			);
-
+			addGetStaticField(function, classReg, fieldIDReg, result);
 
 		} else {
 			// mov CLASS_NAME_FIELD_NAME(%rip), %destination
