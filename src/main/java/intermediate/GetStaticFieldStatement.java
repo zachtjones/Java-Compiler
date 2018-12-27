@@ -6,20 +6,18 @@ import helper.CompileException;
 import main.JavaCompiler;
 import x64.*;
 import x64.instructions.CallFunctionPointerInstruction;
-import x64.instructions.LoadEffectiveAddressInstruction;
 import x64.instructions.MoveInstruction;
+import x64.jni.FindClassJNI;
 import x64.operands.PCRelativeData;
 import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 
-import static x64.JNIOffsets.FIND_CLASS;
 import static x64.JNIOffsets.GET_STATIC_FIELD_ID;
 import static x64.operands.PCRelativeData.fromField;
-import static x64.operands.PCRelativeData.pointerFromLabel;
 import static x64.operands.X64PreservedRegister.fromILRegister;
 
-public class GetStaticFieldStatement implements InterStatement {
+public class GetStaticFieldStatement implements InterStatement, FindClassJNI {
 	private final String className;
 	private final String fieldName;
 	Register result;
@@ -74,44 +72,7 @@ public class GetStaticFieldStatement implements InterStatement {
 			//    - name is like: java/lang/String for java.lang.String or [Ljava/lang/Object; for java.lang.Object[]
 			//    - here the name is just the className that was set
 
-			// leaq NEW_STRING_REFERENCE(%rip), %arg2
-			String label = assemblyFile.insertDataString(className);
-			function.addInstruction(
-				new LoadEffectiveAddressInstruction(
-					pointerFromLabel(label),
-					X64NativeRegister.RSI
-				)
-			);
-
-			// mov %javaEnvOne, %arg1
-			function.loadJNI1();
-
-			// mov FindClass_Offset(%javaEnvOne), %temp
-			final X64PreservedRegister temp = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
-			function.addInstruction(
-				new MoveInstruction(
-					new RegisterRelativePointer(FIND_CLASS.getOffset(), function.javaEnvPointer),
-					temp
-				)
-			);
-
-			// call *%temp
-			function.addInstruction(
-				new CallFunctionPointerInstruction(
-					temp
-				)
-			);
-
-			// mov %result, %class storage register
-			final X64PreservedRegister classReg = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
-			function.addInstruction(
-				new MoveInstruction(
-					X64NativeRegister.RAX,
-					classReg
-				)
-			);
-			// DONE: classReg = javaEnv -> FindClass(JNIEnv* env, char* name);
-
+			final X64PreservedRegister classReg = addFindClassJNICall(assemblyFile, function, className);
 
 			// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
 			//    - use the class param just obtained, name is the field name, sig is the field type signature
