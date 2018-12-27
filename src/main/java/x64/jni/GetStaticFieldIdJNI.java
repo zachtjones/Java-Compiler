@@ -1,7 +1,6 @@
 package x64.jni;
 
 import intermediate.Register;
-import x64.JNIOffsets;
 import x64.SymbolNames;
 import x64.X64File;
 import x64.X64Function;

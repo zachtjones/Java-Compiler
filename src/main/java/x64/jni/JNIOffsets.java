@@ -1,4 +1,4 @@
-package x64;
+package x64.jni;
 
 public enum JNIOffsets {
     FIND_CLASS(6), GET_OBJECT_CLASS(31), GET_METHOD_ID(33), GET_STATIC_FIELD_ID(144),

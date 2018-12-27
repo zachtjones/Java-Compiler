@@ -7,7 +7,7 @@ import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 
-import static x64.JNIOffsets.GET_OBJECT_CLASS;
+import static x64.jni.JNIOffsets.GET_OBJECT_CLASS;
 
 public interface GetObjectClassJNI {
 

@@ -9,7 +9,7 @@ import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 
-import static x64.JNIOffsets.FIND_CLASS;
+import static x64.jni.JNIOffsets.FIND_CLASS;
 import static x64.operands.PCRelativeData.pointerFromLabel;
 
 public interface FindClassJNI {
