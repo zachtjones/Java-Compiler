@@ -8,6 +8,7 @@ import x64.*;
 import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.MoveInstruction;
 import x64.jni.FindClassJNI;
+import x64.jni.GetStaticFieldIdJNI;
 import x64.operands.PCRelativeData;
 import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
@@ -17,7 +18,7 @@ import static x64.JNIOffsets.GET_STATIC_FIELD_ID;
 import static x64.operands.PCRelativeData.fromField;
 import static x64.operands.X64PreservedRegister.fromILRegister;
 
-public class GetStaticFieldStatement implements InterStatement, FindClassJNI {
+public class GetStaticFieldStatement implements InterStatement, FindClassJNI, GetStaticFieldIdJNI {
 	private final String className;
 	private final String fieldName;
 	Register result;
@@ -77,64 +78,12 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI {
 			// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
 			//    - use the class param just obtained, name is the field name, sig is the field type signature
 
-			// mov %javaEnvOne, %arg1
-			function.loadJNI1();
+			final X64PreservedRegister fieldIDReg =
+				addGetStaticFieldIdJNICall(result, fieldName, classReg, assemblyFile, function);
 
-			// mov %classReg, %arg2
-			function.addInstruction(
-				new MoveInstruction(
-					classReg,
-					X64NativeRegister.RSI
-				)
-			);
 
-			// add field name to the data strings -> %arg3
-			String fieldNameLabel = assemblyFile.insertDataString(fieldName);
-			function.addInstruction(
-				new MoveInstruction(
-					PCRelativeData.pointerFromLabel(fieldNameLabel),
-					X64NativeRegister.RDX
-				)
-			);
-
-			// add the signature of the field type -> %arg4
+			// Step 3. result = javaEnv -> GetStatic<Type>Field(JNIEnv *env, class, fieldID)
 			final String fieldType = SymbolNames.getJNISignatureFromILType(result.typeFull);
-			final String fieldTypeLabel = assemblyFile.insertDataString(fieldType);
-			function.addInstruction(
-				new MoveInstruction(
-					PCRelativeData.pointerFromLabel(fieldTypeLabel),
-					X64NativeRegister.RCX
-				)
-			);
-
-			// mov GetFieldID_Offset(%javaEnvOne), %temp2
-			final X64PreservedRegister temp2 = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
-			function.addInstruction(
-				new MoveInstruction(
-					new RegisterRelativePointer(GET_STATIC_FIELD_ID.getOffset(), function.javaEnvPointer),
-					temp2
-				)
-			);
-
-			// call *%temp2
-			function.addInstruction(
-				new CallFunctionPointerInstruction(
-					temp2
-				)
-			);
-
-			// mov %result, %class storage register
-			final X64PreservedRegister fieldIDReg = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
-			function.addInstruction(
-				new MoveInstruction(
-					X64NativeRegister.RAX,
-					fieldIDReg
-				)
-			);
-
-			// DONE: fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
-
-			// 3. result = javaEnv -> GetStatic<Type>Field(JNIEnv *env, class, fieldID)
 
 			// load the args
 			function.loadJNI1();
