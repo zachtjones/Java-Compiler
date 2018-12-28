@@ -26,6 +26,7 @@ public class Register implements Expression {
 	public static final int REFERENCE = 8;
 	public static final int NULL = 9;
 	public static final int LABEL = 10;
+	public static final int VOID = 11;
 	
 	public int num;
 	public int type;
@@ -56,6 +57,7 @@ public class Register implements Expression {
 			case FLOAT: return "%f" + num;
 			case DOUBLE: return "%d" + num;
 			case REFERENCE: return "%r" + num;
+			case VOID: return "%v" + num;
 			}
 			return "unknown register type: " + type;
 		} else {
@@ -111,6 +113,9 @@ public class Register implements Expression {
 			break;
 		case NULL:
 			typeFull = "null";
+			break;
+		case VOID:
+			typeFull = "void";
 			break;
 		}
 	}

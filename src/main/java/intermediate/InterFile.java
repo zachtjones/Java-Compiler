@@ -137,7 +137,7 @@ public class InterFile {
 			// add the name and return type
 			d.name = "<init>";
 			d.isInstance = true;
-			d.returnType = fileName.replace(".jil", "");
+			d.returnType = "void";
 			
 			// add the only statement, super();
 			d.statements = new ArrayList<>();
@@ -148,13 +148,14 @@ public class InterFile {
 			RegisterAllocator ra = new RegisterAllocator();
 			Register thisPointer = ra.getNext(Register.REFERENCE);
 			d.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
+			Register voidReg = ra.getNext(Register.VOID);
 			//  superclass of this object.
 			if (superNode != null) {
 				// add in the call to it's init
-				c = new CallActualStatement(thisPointer, superNode.primaryName, "<init>", args, null,
+				c = new CallActualStatement(thisPointer, superNode.primaryName, "<init>", args, voidReg,
 						fileName, line);
 			} else {
-				c = new CallActualStatement(thisPointer, "java/lang/Object", "<init>", args, null,
+				c = new CallActualStatement(thisPointer, "java/lang/Object", "<init>", args, voidReg,
 						fileName, line);
 			}
 			d.statements.add(c);
