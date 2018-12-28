@@ -147,6 +147,7 @@ public class InterFile {
 			// load this pointer (call super on this)
 			RegisterAllocator ra = new RegisterAllocator();
 			Register thisPointer = ra.getNext(Register.REFERENCE);
+			thisPointer.typeFull = name;
 			d.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
 			Register voidReg = ra.getNext(Register.VOID);
 			//  superclass of this object.
