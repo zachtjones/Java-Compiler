@@ -8,12 +8,13 @@ import helper.UsageCheck;
 import main.JavaCompiler;
 import x64.X64File;
 import x64.X64Function;
+import x64.jni.CallMethodJNI;
 import x64.jni.GetMethodIdJNI;
 import x64.jni.GetObjectClassJNI;
 import x64.operands.X64PreservedRegister;
 
 /** Represents a function call via v-table lookup. */
-public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, GetMethodIdJNI {
+public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, GetMethodIdJNI, CallMethodJNI {
 	private final Register obj;
 	String name;
 	private final Register[] args;
@@ -80,22 +81,19 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
 		// if the type of the register is java/*, use JNI
 		if (obj.typeFull.startsWith("java/")) {
+
+			final X64PreservedRegister objReg = X64PreservedRegister.fromILRegister(obj);
+
 			// clazz = GetClass
-			X64PreservedRegister clazz =
-				addGetObjectClass(function, X64PreservedRegister.fromILRegister(obj));
+			X64PreservedRegister clazz = addGetObjectClass(function, objReg);
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
 			X64PreservedRegister methodId =
 				addGetMethodId(assemblyFile, function, clazz, name, args, returnVal);
 
-			// 3 options for the method call
-			// %result = Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
-			// %result = Call<type>MethodA(JNIEnv *env, jobject obj, jmethodID methodID, const jvalue *args);
-			// %result = Call<type>MethodV(JNIEnv *env, jobject obj, jmethodID methodID, va_list args);
+			// result = Call<Type>Method(JNIEnv, obj, methodID, ...)
+			addCallMethodJNI(assemblyFile, function, objReg, methodId, args, returnVal);
 
-			// TODO optimization -- use the first one if there are 3 args or less to the method call without A or V
-			// const jvalue* args with A is probably the best way to create it otherwise, although pushing the
-			//  extra args onto the stack might not be too bad
 		} else {
 			// TODO requires adding the virtual function tables to the system of files
 			throw new CompileException("V-table lookup not implemented yet.", fileName, line);
