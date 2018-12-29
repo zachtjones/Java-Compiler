@@ -12,6 +12,11 @@ public class CallFunctionPointerInstruction implements Instruction {
     }
 
     @Override
+    public boolean isCalling() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "\tcallq *" + temp.assemblyRep();
     }

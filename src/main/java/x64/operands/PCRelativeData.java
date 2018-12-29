@@ -3,6 +3,7 @@ package x64.operands;
 import intermediate.Register;
 import x64.Instruction;
 import x64.SymbolNames;
+import x64.allocation.RegistersUsed;
 
 /** Represents displacement from the program counter, OFFSET(%rip) in x64 */
 public class PCRelativeData implements SourceOperand, DestinationOperand {
@@ -35,5 +36,15 @@ public class PCRelativeData implements SourceOperand, DestinationOperand {
     @Override
     public String assemblyRep() {
         return label + "(%rip)";
+    }
+
+    @Override
+    public void markUsed(int i, RegistersUsed usedRegs) {
+        // uses the instruction pointer register, no preserved registers
+    }
+
+    @Override
+    public void markDefined(int i, RegistersUsed usedRegs) {
+        // same as markUsed
     }
 }

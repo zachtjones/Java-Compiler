@@ -1,5 +1,7 @@
 package x64.operands;
 
+import x64.allocation.RegistersUsed;
+
 /** Represents an immediate value that can be directly part of the instruction.
  * The assembler chooses which size of data is necessary for the instruction, but up to 64-bit values are allowed */
 public class Immediate implements SourceOperand {
@@ -18,5 +20,10 @@ public class Immediate implements SourceOperand {
     public String assemblyRep() {
         // simple toString
         return Long.toString(value);
+    }
+
+    @Override
+    public void markUsed(int i, RegistersUsed usedRegs) {
+        // doesn't use register
     }
 }

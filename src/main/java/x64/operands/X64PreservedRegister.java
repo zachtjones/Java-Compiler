@@ -2,6 +2,7 @@ package x64.operands;
 
 import intermediate.Register;
 import x64.Instruction;
+import x64.allocation.RegistersUsed;
 
 /** This is an abstraction of a hardware register that is preserved across function calls */
 public class X64PreservedRegister implements SourceOperand, DestinationOperand {
@@ -30,5 +31,15 @@ public class X64PreservedRegister implements SourceOperand, DestinationOperand {
     @Override
     public String assemblyRep() {
         return "%" + size.size + number;
+    }
+
+    @Override
+    public void markUsed(int i, RegistersUsed usedRegs) {
+        usedRegs.markUsed(this, i);
+    }
+
+    @Override
+    public void markDefined(int i, RegistersUsed usedRegs) {
+        usedRegs.markDefined(this, i);
     }
 }

@@ -15,6 +15,11 @@ public class CallClassMethod implements Instruction {
     }
 
     @Override
+    public boolean isCalling() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "\tcall " + label;
     }

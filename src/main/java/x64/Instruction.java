@@ -1,5 +1,7 @@
 package x64;
 
+import x64.allocation.RegistersUsed;
+
 public interface Instruction {
 
     enum Size {
@@ -14,6 +16,12 @@ public interface Instruction {
             this.size = suffix;
         }
     }
+
+    /** Returns true if and only if this instruction is a variety of call */
+    boolean isCalling();
+
+    /** Call the methods for the marking the registers as used / defined. */
+    void markRegisters(int i, RegistersUsed usedRegs);
 
     /** Represents how this instruction should be represented in x64 assembly */
     String toString();
