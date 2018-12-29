@@ -31,7 +31,7 @@ public class SymbolNames {
             case "double": return "D";
         }
 
-        if (typeFull.contains("[")) {
+        if (typeFull.contains("]")) {
             // remove a [] type
             final String oneLayerLess = typeFull.substring(0, typeFull.length() - 2);
             return "[L" + getJNISignatureFromILType(oneLayerLess) + ";";
@@ -40,5 +40,16 @@ public class SymbolNames {
         }
 
         // TODO: mapping from primitives to their signatures
+    }
+
+    /***
+     * Returns the label for the method name
+     * @param className The class, as in java/lang/Object
+     * @param name The name of the method, &lt;init&gt; for constructors
+     * @return The label that is used to call to go to this method
+     */
+    public static String getMethodName(String className, String name) {
+        // TODO include the args into the mangled signature
+        return getFieldName(className, name);
     }
 }

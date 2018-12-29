@@ -6,14 +6,23 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.UsageCheck;
 import main.JavaCompiler;
+import x64.X64File;
+import x64.X64Function;
+import x64.instructions.CallClassMethod;
+import x64.instructions.MoveInstruction;
+import x64.jni.CallNonVirtualMethodJNI;
+import x64.jni.FindClassJNI;
+import x64.jni.GetMethodIdJNI;
+import x64.operands.X64NativeRegister;
+import x64.operands.X64PreservedRegister;
 
 /** Represents a function call without a lookup. */
-public class CallActualStatement implements InterStatement {
-	Register obj;
-	String className;
+public class CallActualStatement implements InterStatement, FindClassJNI, GetMethodIdJNI, CallNonVirtualMethodJNI {
+	private final Register obj;
+	private final String className;
 	String name;
-	Register[] args;
-	Register returnVal;
+	private final Register[] args;
+	private final Register returnVal;
 	
 	private final String fileName;
 	private final int line;
@@ -65,6 +74,61 @@ public class CallActualStatement implements InterStatement {
 
 			returnVal.typeFull = returnType;
 			regs.put(returnVal, returnVal.typeFull);
+		}
+	}
+
+	@Override
+	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+		// if the type of the register is java/*, use JNI
+		if (obj.typeFull.startsWith("java/")) {
+
+			final X64PreservedRegister objReg = X64PreservedRegister.fromILRegister(obj);
+
+			// clazz = FindClass
+			X64PreservedRegister clazz = addFindClassJNICall(assemblyFile, function, className);
+
+			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
+			X64PreservedRegister methodId =
+				addGetMethodId(assemblyFile, function, clazz, name, args, returnVal);
+
+			// result = CallNonVirtual<Type>Method(JNIEnv, obj, methodID, ...)
+			addCallNonVirtualMethodJNI(function, objReg, methodId, args, returnVal);
+
+		} else {
+
+			// 1. Move the arguments in
+			function.loadJNI1(); // JNIEnv
+
+			// object
+			function.addInstruction(
+				new MoveInstruction(
+					X64PreservedRegister.fromILRegister(obj),
+					X64NativeRegister.RSI
+				)
+			);
+
+			// the rest of the args
+			for (int i = 0; i < args.length; i++) {
+				function.addInstruction(
+					new MoveInstruction(
+						X64PreservedRegister.fromILRegister(args[i]),
+						X64NativeRegister.argNumbered(3 + i)
+					)
+				);
+			}
+
+			// 2. call CLASS_NAME_METHOD_NAME
+			function.addInstruction(
+				new CallClassMethod(className, name)
+			);
+
+			// 3. mov %rax, result
+			function.addInstruction(
+				new MoveInstruction(
+					X64NativeRegister.RAX,
+					X64PreservedRegister.fromILRegister(returnVal)
+				)
+			);
 		}
 	}
 }

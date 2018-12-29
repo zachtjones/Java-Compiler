@@ -92,7 +92,7 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 				addGetMethodId(assemblyFile, function, clazz, name, args, returnVal);
 
 			// result = Call<Type>Method(JNIEnv, obj, methodID, ...)
-			addCallMethodJNI(assemblyFile, function, objReg, methodId, args, returnVal);
+			addCallMethodJNI(function, objReg, methodId, args, returnVal);
 
 		} else {
 			// TODO requires adding the virtual function tables to the system of files

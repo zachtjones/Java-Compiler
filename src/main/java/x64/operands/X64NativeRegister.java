@@ -41,6 +41,7 @@ public class X64NativeRegister implements SourceOperand, DestinationOperand {
 
 	/** Returns the argument numbered, starting from 1 as %rdi */
 	public static X64NativeRegister argNumbered(int paramIndex) {
+		// TODO if > 6, return a new class, a pseudo argument register that gets resolved later to stack pushes/pops
 		return args[paramIndex - 1];
 	}
 
