@@ -92,7 +92,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 				addGetMethodId(assemblyFile, function, clazz, name, args, returnVal);
 
 			// result = CallNonVirtual<Type>Method(JNIEnv, obj, methodID, ...)
-			addCallNonVirtualMethodJNI(function, objReg, methodId, args, returnVal);
+			addCallNonVirtualMethodJNI(function, clazz, objReg, methodId, args, returnVal);
 
 		} else {
 
