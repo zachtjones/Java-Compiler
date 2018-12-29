@@ -6,7 +6,7 @@ import x64.allocation.RegistersUsed;
 /**
  * This class represents the addressable registers for the native x64 register set.
  */
-public class X64NativeRegister implements SourceOperand, DestinationOperand {
+public class X64NativeRegister {
 
 	/** Represents the first argument register */
 	public static final X64NativeRegister RDI = new X64NativeRegister("%rdi");
@@ -51,23 +51,12 @@ public class X64NativeRegister implements SourceOperand, DestinationOperand {
 		return args[paramIndex - 1];
 	}
 
-	@Override
-	public Instruction.Size getSuffix() {
+	Instruction.Size getSuffix() {
 		return Instruction.Size.QUAD;
 	}
 
-	@Override
 	public String assemblyRep() {
 		return representation;
 	}
 
-	@Override
-	public void markUsed(int i, RegistersUsed usedRegs) {
-		// no pseudo-registers used
-	}
-
-	@Override
-	public void markDefined(int i, RegistersUsed usedRegs) {
-		// no pseudo-registers defined
-	}
 }

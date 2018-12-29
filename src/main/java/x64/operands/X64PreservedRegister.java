@@ -5,7 +5,7 @@ import x64.Instruction;
 import x64.allocation.RegistersUsed;
 
 /** This is an abstraction of a hardware register that is preserved across function calls */
-public class X64PreservedRegister implements SourceOperand, DestinationOperand {
+public class X64PreservedRegister {
 
     private final int number;
     private final Instruction.Size size;
@@ -23,23 +23,11 @@ public class X64PreservedRegister implements SourceOperand, DestinationOperand {
         return new X64PreservedRegister(number, Instruction.Size.QUAD);
     }
 
-    @Override
-    public Instruction.Size getSuffix() {
+    Instruction.Size getSuffix() {
         return size;
     }
 
-    @Override
     public String assemblyRep() {
         return "%" + size.size + number;
-    }
-
-    @Override
-    public void markUsed(int i, RegistersUsed usedRegs) {
-        usedRegs.markUsed(this, i);
-    }
-
-    @Override
-    public void markDefined(int i, RegistersUsed usedRegs) {
-        usedRegs.markDefined(this, i);
     }
 }

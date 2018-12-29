@@ -1,6 +1,10 @@
 package x64;
 
 import x64.allocation.RegistersUsed;
+import x64.operands.X64NativeRegister;
+import x64.operands.X64PreservedRegister;
+
+import java.util.Map;
 
 public interface Instruction {
 
@@ -22,6 +26,9 @@ public interface Instruction {
 
     /** Call the methods for the marking the registers as used / defined. */
     void markRegisters(int i, RegistersUsed usedRegs);
+
+    /** Swaps out the X64Preserved registers to their allocated one */
+    void allocateRegisters(Map<X64PreservedRegister, X64NativeRegister> mapping);
 
     /** Represents how this instruction should be represented in x64 assembly */
     String toString();
