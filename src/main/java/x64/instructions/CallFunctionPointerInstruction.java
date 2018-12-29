@@ -1,6 +1,7 @@
 package x64.instructions;
 
 import x64.Instruction;
+import x64.allocation.RegistersUsed;
 import x64.operands.X64PreservedRegister;
 
 /** Represents a call to a function pointer, callq *%rbx for example */
@@ -14,6 +15,11 @@ public class CallFunctionPointerInstruction implements Instruction {
     @Override
     public boolean isCalling() {
         return true;
+    }
+
+    @Override
+    public void markRegisters(int i, RegistersUsed usedRegs) {
+        // doesn't use registers
     }
 
     @Override
