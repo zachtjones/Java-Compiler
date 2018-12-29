@@ -34,12 +34,25 @@ This program is not complete, but does the following:
 
 ## Compiler passes
 1. Parses the language, and builds the resulting tree from the context-free grammar.
-  - classes: JavaParser.jj and generated java source files. (using JavaCC)
+  - package main and the javaCC generated java source files. (using JavaCC)
 2. Resolve imports, and fully qualify names.
-  - classes: tree/\*.java - method resolveImports()
-3. Build the symbol table, and resolve the declarations of the symbols
-  - classes: tree/\*.java - method resolveSymbols()
-4. Compile to intermediate language (IL) code. (hopefully pass 4 only)
+  - package tree - method resolveImports()
+3. Build the symbol table, resolving the declarations of the symbols & convert to intermediate language (IL)
+  - package tree - method compile()
+4. Type-check the intermediate language
+  - package intermediate - method typeCheck(), which may bring in other source files into compilation to this step
+  - this also fully-qualifies the function calls & now all registers have a primitive/class type
+5. Convert to pseudo-assembly (see below)
+  - package intermediate - method compile()
+6. Allocate the hardware registers
+  - package x64.allocation
+7. Write out the x64 assembly
+8. Use the assembler to create the dynamic linked library
+
+
+## Pseudo assembly
+ - the only difference between this and x64 is that there are an unlimited amount of registers
+ - these extra registers are preserved between function calls
 
 ## Optimizations (done)
 The key to most of these optimizations is to keep the IL in SSA form.
