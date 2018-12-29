@@ -1,8 +1,6 @@
 package x64.directives;
 
-import x64.Instruction;
-
-public class LabelInstruction implements Instruction {
+public class LabelInstruction extends Directive {
     private final String name;
 
     public LabelInstruction(String name) {

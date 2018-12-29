@@ -1,9 +1,7 @@
 package x64.directives;
 
-import x64.Instruction;
-
 /** Represents the .global NAME directive, useful for imports and exports. */
-public class GlobalSymbol implements Instruction {
+public class GlobalSymbol extends Directive {
     private final String name;
 
     public GlobalSymbol(String name) {

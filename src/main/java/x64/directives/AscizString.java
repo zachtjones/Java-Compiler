@@ -1,8 +1,6 @@
 package x64.directives;
 
-import x64.Instruction;
-
-public class AscizString implements Instruction {
+public class AscizString extends Directive {
 
     private String content;
 
