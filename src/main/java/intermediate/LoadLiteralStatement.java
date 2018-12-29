@@ -3,8 +3,11 @@ package intermediate;
 import helper.CompileException;
 import x64.X64File;
 import x64.X64Function;
+import x64.instructions.LoadEffectiveAddressInstruction;
 import x64.instructions.MoveInstruction;
+import x64.jni.NewStringUTF_JNI;
 import x64.operands.Immediate;
+import x64.operands.X64PreservedRegister;
 
 import java.util.HashMap;
 
@@ -12,7 +15,7 @@ import static x64.operands.PCRelativeData.pointerFromLabel;
 import static x64.operands.X64PreservedRegister.fromILRegister;
 
 /** load 10 into %i12; load "hello, world" into %r4, ... */
-public class LoadLiteralStatement implements InterStatement {
+public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 
 	public String value;
 	// 4 types of literals: char, String, long, double.
@@ -150,14 +153,21 @@ public class LoadLiteralStatement implements InterStatement {
 			);
 			break;
 		case "java/lang/String":
-			// trim off the " and the beginning and the end
+			// trim off the " and the beginning and the end, insert into data segment
 			String label = assemblyFile.insertDataString(value.substring(1, value.length() - 1));
+
+			// leaq LABEL(%rip), %temp
+			X64PreservedRegister chars = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
 			function.addInstruction(
-				new MoveInstruction(
+				new LoadEffectiveAddressInstruction(
 					pointerFromLabel(label),
-					fromILRegister(r)
+					chars
 				)
 			);
+
+			// NewStringUTF(JNIEnv, %temp) -> result
+			addNewStringUTF_JNI(function, chars, r);
+
 			break;
 		}
 	}
