@@ -19,7 +19,7 @@ public class CallFunctionPointerInstruction implements Instruction {
 
     @Override
     public void markRegisters(int i, RegistersUsed usedRegs) {
-        // doesn't use registers
+        usedRegs.markUsed(temp, i);
     }
 
     @Override
