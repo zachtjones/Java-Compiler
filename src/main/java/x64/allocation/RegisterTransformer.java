@@ -1,25 +1,99 @@
 package x64.allocation;
 
 import x64.Instruction;
+import x64.operands.X64NativeRegister;
+import x64.operands.X64PreservedRegister;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 public class RegisterTransformer {
 
-	public AllocatedUnit allocate(ArrayList<Instruction> contents) {
+	private final ArrayList<Instruction> initialContents;
+	private final Stack<X64NativeRegister> preservedOnes;
+	private final Stack<X64NativeRegister> temporaryOnes;
 
-		// determine the usages of the registers
+	public RegisterTransformer(ArrayList<Instruction> contents) {
+		this.initialContents = contents;
+
+		preservedOnes = new Stack<>();
+		preservedOnes.push(X64NativeRegister.RBX);
+		preservedOnes.push(X64NativeRegister.RBP);
+		preservedOnes.push(X64NativeRegister.R12);
+		preservedOnes.push(X64NativeRegister.R13);
+		preservedOnes.push(X64NativeRegister.R14);
+		preservedOnes.push(X64NativeRegister.R15);
+
+		temporaryOnes = new Stack<>();
+		temporaryOnes.push(X64NativeRegister.R10);
+		temporaryOnes.push(X64NativeRegister.R11);
+	}
+
+	private X64NativeRegister getNextTemporary() {
+		if (!temporaryOnes.empty()) return temporaryOnes.pop();
+		return preservedOnes.pop();
+	}
+
+	private X64NativeRegister getNextPreserved() {
+		return preservedOnes.pop();
+	}
+
+	private void doneWithRegister(X64NativeRegister reg) {
+		if (reg == X64NativeRegister.R10 || reg == X64NativeRegister.R11) {
+			temporaryOnes.push(reg);
+		} else {
+			preservedOnes.push(reg);
+		}
+	}
+
+	public AllocatedUnit allocate() {
+
+		// determine the usages of the registers, as well as which ones are used across function calls
 		RegistersUsed usedRegs = new RegistersUsed();
-		for (int i = 0; i < contents.size(); i++) {
-			contents.get(i).markRegisters(i, usedRegs);
+		for (int i = 0; i < initialContents.size(); i++) {
+			final Instruction temp = initialContents.get(i);
+			temp.markRegisters(i, usedRegs);
+			if (temp.isCalling()) {
+				usedRegs.markFunctionCall(i);
+			}
 		}
 
-		// now we can determine which ones need preserved across function calls
-		// when splitting, include the call instruction in the previous list
+		Map<Integer, X64PreservedRegister> lastUsedLines = usedRegs.getLastUsages();
+		Map<Integer, X64PreservedRegister> definedLines = usedRegs.getDefinitions();
 
+		Map<X64PreservedRegister, X64NativeRegister> mapping = new HashMap<>();
 
-		// determine the registers that actually need preserved = call happens between set/use
+		for (int i = 0; i < initialContents.size(); i++) {
+			// if the instruction defines a X64PreservedRegister, then:
+			// 1. add it to the map of currentUsed
+			// 2. pop from the stack
+			if (definedLines.containsKey(i)) {
+				final X64PreservedRegister using = definedLines.get(i);
 
+				X64NativeRegister replacement =
+					usedRegs.canBeTemporary(using) ? getNextTemporary() : getNextPreserved();
+				mapping.put(using, replacement);
+			}
+
+			// if a preserved register is last used on the current line:
+			// - add the native register associated with it back to the stacks
+			if (lastUsedLines.containsKey(i)) {
+				final X64PreservedRegister doneWith = lastUsedLines.get(i);
+
+				doneWithRegister(mapping.get(doneWith));
+			}
+		}
+
+		// iterate through the instructions, converting the X64PreservedRegister's to the X64NativeRegister's
+		for (Instruction i : initialContents) {
+			i.allocateRegisters(mapping);
+		}
+
+		AllocatedUnit au = new AllocatedUnit();
+		au.afterAllocationInstructions = initialContents;
+		return au;
 	}
 
 }

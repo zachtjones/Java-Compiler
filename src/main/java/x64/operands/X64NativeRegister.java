@@ -24,12 +24,17 @@ public class X64NativeRegister implements SourceOperand, DestinationOperand {
 	/** Represents the return register */
 	public static final X64NativeRegister RAX = new X64NativeRegister("%rax");
 
+	// preserved registers
 	public static final X64NativeRegister RBX = new X64NativeRegister("%rbx");
 	public static final X64NativeRegister RBP = new X64NativeRegister("%rbp");
 	public static final X64NativeRegister R12 = new X64NativeRegister("%r12");
 	public static final X64NativeRegister R13 = new X64NativeRegister("%r13");
 	public static final X64NativeRegister R14 = new X64NativeRegister("%r14");
 	public static final X64NativeRegister R15 = new X64NativeRegister("%r15");
+
+	// temporary ones
+	public static final X64NativeRegister R10 = new X64NativeRegister("%r10");
+	public static final X64NativeRegister R11 = new X64NativeRegister("%r11");
 
 	private static final X64NativeRegister[] args = { RDI, RSI, RDX, RCX, R8, R9 };
 
