@@ -144,6 +144,9 @@ public class JavaCompiler {
 			for (InterFile f : cache.values()) {
 				X64File compiled = f.compileX64();
 				FileWriter.writeToOutput(OutputDirs.PSEUDO_ASSEMBLY, compiled.getFileName(), compiled.toString());
+
+				compiled.allocateRegisters();
+				FileWriter.writeToOutput(OutputDirs.ASSEMBLY, compiled.getFileName(), compiled.toString());
 			}
 
 			System.out.println("Done, results are in the temp folder.");

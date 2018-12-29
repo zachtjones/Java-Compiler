@@ -1,10 +1,14 @@
 package x64;
 
+import x64.allocation.AllocatedUnit;
+import x64.allocation.RegisterTransformer;
 import x64.directives.ByteAlignment;
 import x64.directives.GlobalSymbol;
 import x64.directives.LabelInstruction;
 import x64.directives.SegmentChange;
 import x64.instructions.MoveInstruction;
+import x64.instructions.PopInstruction;
+import x64.instructions.PushInstruction;
 import x64.instructions.ReturnInstruction;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
@@ -16,7 +20,7 @@ import java.util.stream.Collectors;
 public class X64Function {
 
 	private final ArrayList<Instruction> prologue = new ArrayList<>();
-	private final ArrayList<Instruction> contents = new ArrayList<>();
+	private ArrayList<Instruction> contents = new ArrayList<>();
 	private final ArrayList<Instruction> epilogue = new ArrayList<>();
 
 	private int nextFreeRegister;
@@ -39,9 +43,6 @@ public class X64Function {
 		prologue.add(new MoveInstruction(X64NativeRegister.RDI, javaEnvPointer));
 
 		epilogue.add(new ReturnInstruction());
-
-
-
 	}
 
 	/** Adds an instruction to this function */
@@ -59,6 +60,22 @@ public class X64Function {
 	public int getNextFreeRegister() {
 		nextFreeRegister++;
 		return nextFreeRegister;
+	}
+
+	/** Allocates the registers, transforming pseudo-registers to real ones */
+	void allocateRegisters() {
+		AllocatedUnit au = new RegisterTransformer().allocate(contents);
+		this.contents = au.afterAllocationInstructions;
+
+		// build up the push @ beginning / pop before return for used registers
+		for (X64NativeRegister usedReg : au.preservedUsed) {
+			this.prologue.add(
+				new PushInstruction(usedReg)
+			);
+			this.epilogue.add(0,
+				new PopInstruction(usedReg)
+			);
+		}
 	}
 
 	@Override

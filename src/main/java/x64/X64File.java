@@ -55,6 +55,16 @@ public class X64File {
         return label;
     }
 
+    /**
+     * Allocates the registers, swapping the pseudo registers for real ones
+     */
+    public void allocateRegisters() {
+        // functions are all independent
+        for (X64Function function : functions) {
+            function.allocateRegisters();
+        }
+    }
+
     @Override
     public String toString() {
         return functions.stream()
