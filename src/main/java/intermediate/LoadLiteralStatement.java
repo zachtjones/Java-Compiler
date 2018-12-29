@@ -150,7 +150,8 @@ public class LoadLiteralStatement implements InterStatement {
 			);
 			break;
 		case "java/lang/String":
-			String label = assemblyFile.insertDataString(value);
+			// trim off the " and the beginning and the end
+			String label = assemblyFile.insertDataString(value.substring(1, value.length() - 1));
 			function.addInstruction(
 				new MoveInstruction(
 					pointerFromLabel(label),

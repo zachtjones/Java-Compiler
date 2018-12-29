@@ -13,6 +13,6 @@ public class CallFunctionPointerInstruction implements Instruction {
 
     @Override
     public String toString() {
-        return "callq *" + temp.assemblyRep();
+        return "\tcallq *" + temp.assemblyRep();
     }
 }

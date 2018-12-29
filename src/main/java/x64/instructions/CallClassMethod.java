@@ -16,6 +16,6 @@ public class CallClassMethod implements Instruction {
 
     @Override
     public String toString() {
-        return "call " + label;
+        return "\tcall " + label;
     }
 }

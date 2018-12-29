@@ -11,7 +11,7 @@ public abstract class BinaryInstruction implements Instruction {
     private final String name;
 
 
-    public BinaryInstruction(String name, SourceOperand source, DestinationOperand destination) {
+    BinaryInstruction(String name, SourceOperand source, DestinationOperand destination) {
         this.name = name;
         this.source = source;
         this.destination = destination;
@@ -19,6 +19,7 @@ public abstract class BinaryInstruction implements Instruction {
 
     /** Represents how this instruction should be represented */
     public final String toString() {
-        return name + destination.getSuffix().size + " " + source.assemblyRep() + ", " + destination.assemblyRep();
+        return '\t' + name + destination.getSuffix().size + " " +
+                source.assemblyRep() + ", " + destination.assemblyRep();
     }
 }
