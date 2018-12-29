@@ -106,6 +106,8 @@ public class JavaCompiler {
 			// resolve types of the IL functions to do type checking.
 			for (InterFile f : files) {
 				f.typeCheck();
+				// write to output
+				FileWriter.writeToOutput(OutputDirs.INTERMEDIATE, f.getName(), f.toString());
 			}
 
 			InterFile mainClass = null;
@@ -141,7 +143,7 @@ public class JavaCompiler {
 
 			for (InterFile f : cache.values()) {
 				X64File compiled = f.compileX64();
-				FileWriter.writeToOutput(OutputDirs.ASSEMBLY, compiled.getFileName(), compiled.toString());
+				FileWriter.writeToOutput(OutputDirs.PSEUDO_ASSEMBLY, compiled.getFileName(), compiled.toString());
 			}
 
 			System.out.println("Done, results are in the temp folder.");

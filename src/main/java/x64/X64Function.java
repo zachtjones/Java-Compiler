@@ -31,6 +31,8 @@ public class X64Function {
 		prologue.add(new ByteAlignment(16));
 		prologue.add(new LabelInstruction(symbolName));
 
+		this.nextFreeRegister = nextFreeRegister;
+		
 		javaEnvPointer = new X64PreservedRegister(getNextFreeRegister(), Instruction.Size.QUAD);
 
 		// save the first argument, the java environment pointer to a dedicated virtual register.
@@ -38,7 +40,7 @@ public class X64Function {
 
 		epilogue.add(new ReturnInstruction());
 
-		this.nextFreeRegister = nextFreeRegister;
+
 
 	}
 

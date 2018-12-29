@@ -7,6 +7,7 @@ import java.io.File;
 public enum OutputDirs {
     JAVA_LIBRARY("temp/java/"),
     INTERMEDIATE("temp/intermediate/"),
+    PSEUDO_ASSEMBLY("temp/pseudo-asm/"),
     ASSEMBLY("temp/assembly/"),
     ASSEMBLED("temp/assembled/");
 
