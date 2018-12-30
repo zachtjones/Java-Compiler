@@ -132,18 +132,18 @@ public class InterFile {
 				hasOne = true;
 			}
 		}
-		if (!hasOne) {
+		if (!hasOne && superNode != null) {
 			InterFunction d = new InterFunction();
 			// add the name and return type
 			d.name = "<init>";
 			d.isInstance = true;
 			d.returnType = "void";
-			
+
 			// add the only statement, super();
 			d.statements = new ArrayList<>();
 			CallActualStatement c;
 			Register[] args = new Register[0];
-			
+
 			// load this pointer (call super on this)
 			RegisterAllocator ra = new RegisterAllocator();
 			Register thisPointer = ra.getNext(Register.REFERENCE);
@@ -151,14 +151,9 @@ public class InterFile {
 			d.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
 			Register voidReg = ra.getNext(Register.VOID);
 			//  superclass of this object.
-			if (superNode != null) {
-				// add in the call to it's init
-				c = new CallActualStatement(thisPointer, superNode.primaryName, "<init>", args, voidReg,
-						fileName, line);
-			} else {
-				c = new CallActualStatement(thisPointer, "java/lang/Object", "<init>", args, voidReg,
-						fileName, line);
-			}
+			// add in the call to it's init
+			c = new CallActualStatement(thisPointer, superNode.primaryName, "<init>", args, voidReg,
+				fileName, line);
 			d.statements.add(c);
 			functions.add(d);
 		}

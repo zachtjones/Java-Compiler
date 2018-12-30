@@ -151,7 +151,8 @@ public class JavaCompiler {
 			}
 
 			System.out.println(entryCode.getLibraryName());
-			final String command = "gcc --save-temps -shared Main.s HelloWorld.s -o " + entryCode.getLibraryName();
+			final String command = "gcc --save-temps -shared Main.s HelloWorld.s -o ../assembled/"
+				+ entryCode.getLibraryName();
 
 			Process assembleCode = Runtime.getRuntime()
 				.exec(command, new String[]{}, new File(OutputDirs.ASSEMBLY.location));
