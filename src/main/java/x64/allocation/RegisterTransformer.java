@@ -91,9 +91,7 @@ public class RegisterTransformer {
 			i.allocateRegisters(mapping);
 		}
 
-		AllocatedUnit au = new AllocatedUnit();
-		au.afterAllocationInstructions = initialContents;
-		return au;
+		return new AllocatedUnit();
 	}
 
 }

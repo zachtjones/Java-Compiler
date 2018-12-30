@@ -55,9 +55,6 @@ public class X64RegisterOperand implements SourceOperand, DestinationOperand {
 	public void swapOut(Map<X64PreservedRegister, X64NativeRegister> mapping) {
 		if (preservedOne != null) {
 			nativeOne = mapping.get(preservedOne);
-			if (nativeOne == null) {
-				throw new NullPointerException("oops!");
-			}
 			preservedOne = null;
 		}
 	}

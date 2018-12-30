@@ -30,4 +30,15 @@ public class X64PreservedRegister {
     public String assemblyRep() {
         return "%" + size.size + number;
     }
+
+    @Override
+    public int hashCode() {
+        return number ^ size.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof X64PreservedRegister &&
+            ((X64PreservedRegister)other).assemblyRep().equals(this.assemblyRep());
+    }
 }

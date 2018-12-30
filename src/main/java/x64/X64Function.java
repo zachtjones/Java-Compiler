@@ -68,7 +68,6 @@ public class X64Function {
 	/** Allocates the registers, transforming pseudo-registers to real ones */
 	void allocateRegisters() {
 		AllocatedUnit au = new RegisterTransformer(contents).allocate();
-		this.contents = au.afterAllocationInstructions;
 
 		// build up the push @ beginning / pop before return for used registers
 		for (X64NativeRegister usedReg : au.preservedUsed) {
