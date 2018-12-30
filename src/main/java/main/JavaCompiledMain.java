@@ -38,14 +38,15 @@ public class JavaCompiledMain {
         //  short = jshort, float = jfloat, double = jdouble
         //  int = jsize
 
-        // System.loadLibrary("Main"); library is named: -->
-        //  - Mac OS -- libMain.dylib
-        //  - Linux -- libMain.so - untested
-        //  - Windows -- Main.dll - untested
-
         // System.getProperty("os.arch") -> "x86_64" or "amd64"
         // System.getProperty("os.name") -> "Mac OS X"
         // System.getProperty("os.version") -> "10.14"
 
+    }
+
+    /** Returns the library file name for "Main"
+     * On Mac OS this is libMain.dylib, Windows is Main.dll */
+    String getLibraryName() {
+        return System.mapLibraryName("Main");
     }
 }

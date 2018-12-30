@@ -10,9 +10,11 @@ public class SymbolNames {
     /** Escapes the name suitable for the name of the assembly / C function */
     private static String escape(String content) {
         return content
-            .replace("[", "_3")
-            .replace(";", "_2")
             .replace("_", "_1")
+            .replace("<", "_5") // these 2 are defined by me to allow for calling constructors
+            .replace(">", "_4") // ^^ same
+            .replace("[", "_3") // the rest of these are defined by the JNI spec
+            .replace(";", "_2")
             .replace('/', '_');
     }
 

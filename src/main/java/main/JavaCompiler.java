@@ -1,8 +1,6 @@
 package main;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -152,10 +150,22 @@ public class JavaCompiler {
 				FileWriter.writeToOutput(OutputDirs.ASSEMBLY, compiled.getFileName(), compiled.toString());
 			}
 
-			System.out.println("Done, results are in the temp folder.");
-			System.out.println("Invoke the program: `java -Djava.library.path=. Main` from the temp folder");
+			System.out.println(entryCode.getLibraryName());
+			final String command = "gcc --save-temps -shared Main.s HelloWorld.s -o " + entryCode.getLibraryName();
 
-			// gcc *.s -dynamiclib -o libMain.dylib -- command to compile all the assembly files
+			Process assembleCode = Runtime.getRuntime()
+				.exec(command, new String[]{}, new File(OutputDirs.ASSEMBLY.location));
+
+			System.out.println("Output from gcc:");
+			BufferedReader assemblerOutputReader = new BufferedReader(
+				new InputStreamReader(assembleCode.getErrorStream()));
+			String line;
+			while ((line = assemblerOutputReader.readLine()) != null) {
+				System.out.println(line);
+			}
+
+			System.out.println("Done, results are in the temp/assembled folder.");
+			System.out.println("Invoke the program: `java -Djava.library.path=. Main` from the temp folder");
 
 		} catch (ParseException e) {
 			System.out.print("Syntax error at line ");
