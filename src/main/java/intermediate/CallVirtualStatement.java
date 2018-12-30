@@ -12,6 +12,9 @@ import x64.jni.CallMethodJNI;
 import x64.jni.GetMethodIdJNI;
 import x64.jni.GetObjectClassJNI;
 import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
+
+import static x64.operands.X64RegisterOperand.of;
 
 /** Represents a function call via v-table lookup. */
 public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, GetMethodIdJNI, CallMethodJNI {
@@ -82,13 +85,13 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 		// if the type of the register is java/*, use JNI
 		if (obj.typeFull.startsWith("java/")) {
 
-			final X64PreservedRegister objReg = X64PreservedRegister.fromILRegister(obj);
+			final X64RegisterOperand objReg = of(X64PreservedRegister.fromILRegister(obj));
 
 			// clazz = GetClass
-			X64PreservedRegister clazz = addGetObjectClass(function, objReg);
+			final X64RegisterOperand clazz = addGetObjectClass(function, objReg);
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
-			X64PreservedRegister methodId =
+			X64RegisterOperand methodId =
 				addGetMethodId(assemblyFile, function, clazz, name, args, returnVal);
 
 			// result = Call<Type>Method(JNIEnv, obj, methodID, ...)

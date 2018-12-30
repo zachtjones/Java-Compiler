@@ -7,8 +7,10 @@ import x64.instructions.MoveInstruction;
 import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
 
 import static x64.jni.JNIOffsets.NEW_STRING_UTF;
+import static x64.operands.X64RegisterOperand.of;
 
 public interface NewStringUTF_JNI {
 
@@ -18,7 +20,7 @@ public interface NewStringUTF_JNI {
 	 * @param chars The register holding the utf-8 characters
 	 * @param result The IL register that holds the result of this call
 	 */
-	default void addNewStringUTF_JNI(X64Function function, X64PreservedRegister chars, Register result) {
+	default void addNewStringUTF_JNI(X64Function function, X64RegisterOperand chars, Register result) {
 
 		// arg 1
 		function.loadJNI1();
@@ -32,7 +34,7 @@ public interface NewStringUTF_JNI {
 		);
 
 		// mov NewStringUTF_offset(%javaEnvOne), %temp
-		final X64PreservedRegister temp = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
+		final X64RegisterOperand temp = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
 		function.addInstruction(
 			new MoveInstruction(
 				new RegisterRelativePointer(NEW_STRING_UTF.getOffset(), function.javaEnvPointer),
@@ -51,7 +53,7 @@ public interface NewStringUTF_JNI {
 		function.addInstruction(
 			new MoveInstruction(
 				X64NativeRegister.RAX,
-				X64PreservedRegister.fromILRegister(result)
+				of(X64PreservedRegister.fromILRegister(result))
 			)
 		);
 	}

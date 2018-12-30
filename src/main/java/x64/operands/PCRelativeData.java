@@ -5,6 +5,8 @@ import x64.Instruction;
 import x64.SymbolNames;
 import x64.allocation.RegistersUsed;
 
+import java.util.Map;
+
 /** Represents displacement from the program counter, OFFSET(%rip) in x64 */
 public class PCRelativeData implements SourceOperand, DestinationOperand {
 
@@ -34,13 +36,18 @@ public class PCRelativeData implements SourceOperand, DestinationOperand {
     }
 
     @Override
-    public String assemblyRep() {
+    public String toString() {
         return label + "(%rip)";
     }
 
     @Override
     public void markUsed(int i, RegistersUsed usedRegs) {
         // uses the instruction pointer register, no preserved registers
+    }
+
+    @Override
+    public void swapOut(Map<X64PreservedRegister, X64NativeRegister> mapping) {
+        // same as markUsed
     }
 
     @Override

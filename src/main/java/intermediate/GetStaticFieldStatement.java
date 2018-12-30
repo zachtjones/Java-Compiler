@@ -10,9 +10,11 @@ import x64.jni.FindClassJNI;
 import x64.jni.GetStaticFieldIdJNI;
 import x64.jni.GetStaticFieldJNI;
 import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
 
 import static x64.operands.PCRelativeData.fromField;
 import static x64.operands.X64PreservedRegister.fromILRegister;
+import static x64.operands.X64RegisterOperand.of;
 
 public class GetStaticFieldStatement implements InterStatement, FindClassJNI, GetStaticFieldIdJNI, GetStaticFieldJNI {
 	private final String className;
@@ -66,10 +68,10 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 
 			// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
 			//    - name is like: java/lang/String
-			final X64PreservedRegister classReg = addFindClassJNICall(assemblyFile, function, className);
+			final X64RegisterOperand classReg = addFindClassJNICall(assemblyFile, function, className);
 
 			// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
-			final X64PreservedRegister fieldIDReg =
+			final X64RegisterOperand fieldIDReg =
 				addGetStaticFieldIdJNICall(result, fieldName, classReg, assemblyFile, function);
 
 
@@ -81,7 +83,7 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 			function.addInstruction(
 				new MoveInstruction(
 					fromField(className, fieldName, result),
-					fromILRegister(result)
+					of(fromILRegister(result))
 				)
 			);
 		}

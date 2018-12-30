@@ -12,10 +12,13 @@ import x64.instructions.PushInstruction;
 import x64.instructions.ReturnInstruction;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static x64.operands.X64RegisterOperand.of;
 
 public class X64Function {
 
@@ -25,7 +28,7 @@ public class X64Function {
 
 	private int nextFreeRegister;
 
-	public final X64PreservedRegister javaEnvPointer;
+	public final X64RegisterOperand javaEnvPointer;
 
 	public X64Function(String javaClass, String javaMethod, int nextFreeRegister) {
 
@@ -37,7 +40,7 @@ public class X64Function {
 
 		this.nextFreeRegister = nextFreeRegister;
 		
-		javaEnvPointer = new X64PreservedRegister(getNextFreeRegister(), Instruction.Size.QUAD);
+		javaEnvPointer = of(new X64PreservedRegister(getNextFreeRegister(), Instruction.Size.QUAD));
 
 		// save the first argument, the java environment pointer to a dedicated virtual register.
 		contents.add(new MoveInstruction(X64NativeRegister.RDI, javaEnvPointer));

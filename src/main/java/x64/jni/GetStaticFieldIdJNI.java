@@ -5,6 +5,7 @@ import x64.SymbolNames;
 import x64.X64File;
 import x64.X64Function;
 import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
 
 public interface GetStaticFieldIdJNI extends GetIdJNI {
 
@@ -17,8 +18,8 @@ public interface GetStaticFieldIdJNI extends GetIdJNI {
      * @param function The function to add the instructions to.
      * @return A new register that holds the ID that points to a class field field.
      */
-    default X64PreservedRegister addGetStaticFieldIdJNICall(Register type, String fieldName,
-            X64PreservedRegister classReg, X64File assemblyFile, X64Function function) {
+    default X64RegisterOperand addGetStaticFieldIdJNICall(Register type, String fieldName,
+            X64RegisterOperand classReg, X64File assemblyFile, X64Function function) {
 
         final String signature = SymbolNames.getJNISignatureFromILType(type.typeFull);
         final int jniOffset = JNIOffsets.getStaticFieldOffset(signature);

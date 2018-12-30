@@ -4,6 +4,10 @@ import x64.allocation.RegistersUsed;
 import x64.operands.DestinationOperand;
 import x64.Instruction;
 import x64.operands.SourceOperand;
+import x64.operands.X64NativeRegister;
+import x64.operands.X64PreservedRegister;
+
+import java.util.Map;
 
 public abstract class BinaryInstruction implements Instruction {
 
@@ -29,10 +33,16 @@ public abstract class BinaryInstruction implements Instruction {
         destination.markDefined(i, usedRegs);
     }
 
+    @Override
+    public void allocateRegisters(Map<X64PreservedRegister, X64NativeRegister> mapping) {
+        source.swapOut(mapping);
+        destination.swapOut(mapping);
+    }
+
     /** Represents how this instruction should be represented */
     @Override
     public final String toString() {
         return '\t' + name + destination.getSuffix().size + " " +
-                source.assemblyRep() + ", " + destination.assemblyRep();
+                source.toString() + ", " + destination.toString();
     }
 }

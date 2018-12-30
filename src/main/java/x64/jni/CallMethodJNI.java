@@ -8,13 +8,15 @@ import x64.instructions.MoveInstruction;
 import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
 
 import static x64.jni.JNIOffsets.getCallMethodOffset;
+import static x64.operands.X64RegisterOperand.of;
 
 public interface CallMethodJNI {
 
-    default void addCallMethodJNI(X64Function function, X64PreservedRegister objReg,
-            X64PreservedRegister methodId, Register[] args, Register returnVal) {
+    default void addCallMethodJNI(X64Function function, X64RegisterOperand objReg,
+            X64RegisterOperand methodId, Register[] args, Register returnVal) {
 
         // 3 options for the method call, using the first one:
         // %result = Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
@@ -44,7 +46,7 @@ public interface CallMethodJNI {
         for (int i = 0; i < args.length; i++) {
             function.addInstruction(
                 new MoveInstruction(
-                    X64PreservedRegister.fromILRegister(args[i]),
+                    of(X64PreservedRegister.fromILRegister(args[i])),
                     X64NativeRegister.argNumbered(i + 4)
                 )
             );
@@ -54,7 +56,7 @@ public interface CallMethodJNI {
         // Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
 
         // mov Call<Type>Method(%javaEnvOne), %temp
-        final X64PreservedRegister temp = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
+        final X64RegisterOperand temp = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
         final String nativeType = SymbolNames.getJNISignatureFromILType(returnVal.typeFull);
         function.addInstruction(
             new MoveInstruction(
@@ -74,7 +76,7 @@ public interface CallMethodJNI {
         function.addInstruction(
             new MoveInstruction(
                 X64NativeRegister.RAX,
-                X64PreservedRegister.fromILRegister(returnVal)
+                of(X64PreservedRegister.fromILRegister(returnVal))
             )
         );
     }

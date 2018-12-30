@@ -8,6 +8,9 @@ import x64.instructions.MoveInstruction;
 import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
+
+import static x64.operands.X64RegisterOperand.of;
 
 public interface GetStaticFieldJNI {
 
@@ -18,8 +21,8 @@ public interface GetStaticFieldJNI {
      * @param fieldIDReg The x64 register holding the result of GetStaticFieldId
      * @param result The IL Register that is used for the type and the returned value.
      */
-    default void addGetStaticField(X64Function function, X64PreservedRegister classReg,
-                                   X64PreservedRegister fieldIDReg, Register result) {
+    default void addGetStaticField(X64Function function, X64RegisterOperand classReg,
+                                   X64RegisterOperand fieldIDReg, Register result) {
 
         final String fieldType = SymbolNames.getJNISignatureFromILType(result.typeFull);
 
@@ -39,7 +42,7 @@ public interface GetStaticFieldJNI {
         );
 
         // mov GetFieldID_Offset(%javaEnvOne), %temp3
-        final X64PreservedRegister temp3 = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
+        final X64RegisterOperand temp3 = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
         function.addInstruction(
             new MoveInstruction(
                 new RegisterRelativePointer(JNIOffsets.getStaticFieldOffset(fieldType), function.javaEnvPointer),
@@ -58,7 +61,7 @@ public interface GetStaticFieldJNI {
         function.addInstruction(
             new MoveInstruction(
                 X64NativeRegister.RAX,
-                X64PreservedRegister.fromILRegister(result)
+                of(X64PreservedRegister.fromILRegister(result))
             )
         );
     }

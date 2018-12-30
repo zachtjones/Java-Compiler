@@ -4,6 +4,7 @@ import intermediate.Register;
 import x64.X64File;
 import x64.X64Function;
 import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -12,8 +13,8 @@ import static x64.SymbolNames.getJNISignatureFromILType;
 
 public interface GetMethodIdJNI extends GetIdJNI {
 
-    default X64PreservedRegister addGetMethodId(X64File assemblyFile, X64Function function,
-                                                X64PreservedRegister classReg, String name, Register[] args,
+    default X64RegisterOperand addGetMethodId(X64File assemblyFile, X64Function function,
+                                                X64RegisterOperand classReg, String name, Register[] args,
                                                 Register returnType) {
 
         final String argsSig = Arrays.stream(args)

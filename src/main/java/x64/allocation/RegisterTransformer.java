@@ -19,16 +19,16 @@ public class RegisterTransformer {
 		this.initialContents = contents;
 
 		preservedOnes = new Stack<>();
-		preservedOnes.push(X64NativeRegister.RBX);
-		preservedOnes.push(X64NativeRegister.RBP);
-		preservedOnes.push(X64NativeRegister.R12);
-		preservedOnes.push(X64NativeRegister.R13);
-		preservedOnes.push(X64NativeRegister.R14);
-		preservedOnes.push(X64NativeRegister.R15);
+		preservedOnes.push(X64NativeRegister.RBX.nativeOne);
+		preservedOnes.push(X64NativeRegister.RBP.nativeOne);
+		preservedOnes.push(X64NativeRegister.R12.nativeOne);
+		preservedOnes.push(X64NativeRegister.R13.nativeOne);
+		preservedOnes.push(X64NativeRegister.R14.nativeOne);
+		preservedOnes.push(X64NativeRegister.R15.nativeOne);
 
 		temporaryOnes = new Stack<>();
-		temporaryOnes.push(X64NativeRegister.R10);
-		temporaryOnes.push(X64NativeRegister.R11);
+		temporaryOnes.push(X64NativeRegister.R10.nativeOne);
+		temporaryOnes.push(X64NativeRegister.R11.nativeOne);
 	}
 
 	private X64NativeRegister getNextTemporary() {
@@ -41,7 +41,7 @@ public class RegisterTransformer {
 	}
 
 	private void doneWithRegister(X64NativeRegister reg) {
-		if (reg == X64NativeRegister.R10 || reg == X64NativeRegister.R11) {
+		if (reg == X64NativeRegister.R10.nativeOne || reg == X64NativeRegister.R11.nativeOne) {
 			temporaryOnes.push(reg);
 		} else {
 			preservedOnes.push(reg);

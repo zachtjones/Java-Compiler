@@ -6,8 +6,10 @@ import x64.instructions.MoveInstruction;
 import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
 
 import static x64.jni.JNIOffsets.GET_OBJECT_CLASS;
+import static x64.operands.X64RegisterOperand.of;
 
 public interface GetObjectClassJNI {
 
@@ -17,7 +19,7 @@ public interface GetObjectClassJNI {
      * @param object The x64 register that holds the reference to the object
      * @return A new x64 register that holds the object's class.
      */
-    default X64PreservedRegister addGetObjectClass(X64Function function, X64PreservedRegister object) {
+    default X64RegisterOperand addGetObjectClass(X64Function function, X64RegisterOperand object) {
         // result = JNIEnv -> GetObjectClass(JNIEnv, obj);
 
         function.loadJNI1();
@@ -28,7 +30,7 @@ public interface GetObjectClassJNI {
             )
         );
 
-        X64PreservedRegister temp = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
+        X64RegisterOperand temp = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
 
         // mov GetObjectClass_Offset(%javaEnvOne), %temp3
         function.addInstruction(
@@ -46,7 +48,7 @@ public interface GetObjectClassJNI {
         );
 
         // mov %result, %final result
-        X64PreservedRegister result = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
+        X64RegisterOperand result = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
         function.addInstruction(
             new MoveInstruction(
                 X64NativeRegister.RAX,

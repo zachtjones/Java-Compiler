@@ -3,11 +3,13 @@ package x64.operands;
 import x64.Instruction;
 import x64.allocation.RegistersUsed;
 
+import java.util.Map;
+
 public class X64RegisterOperand implements SourceOperand, DestinationOperand {
 
 
-	private final X64NativeRegister nativeOne;
-	private final X64PreservedRegister preservedOne;
+	public X64NativeRegister nativeOne;
+	private X64PreservedRegister preservedOne;
 
 	private X64RegisterOperand(X64NativeRegister nativeOne, X64PreservedRegister preservedOne) {
 		this.nativeOne = nativeOne;
@@ -37,7 +39,7 @@ public class X64RegisterOperand implements SourceOperand, DestinationOperand {
 	}
 
 	@Override
-	public String assemblyRep() {
+	public String toString() {
 		return nativeOne != null ? nativeOne.assemblyRep() : preservedOne.assemblyRep();
 	}
 
@@ -45,6 +47,18 @@ public class X64RegisterOperand implements SourceOperand, DestinationOperand {
 	public void markUsed(int i, RegistersUsed usedRegs) {
 		if (preservedOne != null) {
 			usedRegs.markUsed(preservedOne, i);
+		}
+	}
+
+	/** Swaps the preserved register for the native one allocated. */
+	@Override
+	public void swapOut(Map<X64PreservedRegister, X64NativeRegister> mapping) {
+		if (preservedOne != null) {
+			nativeOne = mapping.get(preservedOne);
+			if (nativeOne == null) {
+				throw new NullPointerException("oops!");
+			}
+			preservedOne = null;
 		}
 	}
 }

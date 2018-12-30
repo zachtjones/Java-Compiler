@@ -15,6 +15,9 @@ import x64.jni.FindClassJNI;
 import x64.jni.GetMethodIdJNI;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
+
+import static x64.operands.X64RegisterOperand.of;
 
 /** Represents a function call without a lookup. */
 public class CallActualStatement implements InterStatement, FindClassJNI, GetMethodIdJNI, CallNonVirtualMethodJNI {
@@ -82,13 +85,13 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 		// if the type of the register is java/*, use JNI
 		if (obj.typeFull.startsWith("java/")) {
 
-			final X64PreservedRegister objReg = X64PreservedRegister.fromILRegister(obj);
+			final X64RegisterOperand objReg = of(X64PreservedRegister.fromILRegister(obj));
 
 			// clazz = FindClass
-			X64PreservedRegister clazz = addFindClassJNICall(assemblyFile, function, className);
+			final X64RegisterOperand clazz = addFindClassJNICall(assemblyFile, function, className);
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
-			X64PreservedRegister methodId =
+			final X64RegisterOperand methodId =
 				addGetMethodId(assemblyFile, function, clazz, name, args, returnVal);
 
 			// result = CallNonVirtual<Type>Method(JNIEnv, obj, methodID, ...)
@@ -102,7 +105,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			// object
 			function.addInstruction(
 				new MoveInstruction(
-					X64PreservedRegister.fromILRegister(obj),
+					of(X64PreservedRegister.fromILRegister(obj)),
 					X64NativeRegister.RSI
 				)
 			);
@@ -111,7 +114,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			for (int i = 0; i < args.length; i++) {
 				function.addInstruction(
 					new MoveInstruction(
-						X64PreservedRegister.fromILRegister(args[i]),
+						of(X64PreservedRegister.fromILRegister(args[i])),
 						X64NativeRegister.argNumbered(3 + i)
 					)
 				);
@@ -126,7 +129,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			function.addInstruction(
 				new MoveInstruction(
 					X64NativeRegister.RAX,
-					X64PreservedRegister.fromILRegister(returnVal)
+					of(X64PreservedRegister.fromILRegister(returnVal))
 				)
 			);
 		}

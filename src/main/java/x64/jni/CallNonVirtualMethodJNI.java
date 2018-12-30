@@ -8,8 +8,10 @@ import x64.instructions.MoveInstruction;
 import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
 
 import static x64.jni.JNIOffsets.getCallNonVirtualMethodOffset;
+import static x64.operands.X64RegisterOperand.of;
 
 public interface CallNonVirtualMethodJNI {
 
@@ -22,8 +24,8 @@ public interface CallNonVirtualMethodJNI {
      * @param args The program arguments to the function
      * @param returnVal Where to store the returned value
      */
-    default void addCallNonVirtualMethodJNI(X64Function function, X64PreservedRegister classReg,
-            X64PreservedRegister objReg, X64PreservedRegister methodId, Register[] args, Register returnVal) {
+    default void addCallNonVirtualMethodJNI(X64Function function, X64RegisterOperand classReg,
+            X64RegisterOperand objReg, X64RegisterOperand methodId, Register[] args, Register returnVal) {
 
         // 3 options for the method call, but will use the first one
         // %result = CallNonVirtual<type>Method(JNIEnv, obj, class, methodID, ...);
@@ -60,7 +62,7 @@ public interface CallNonVirtualMethodJNI {
         for (int i = 0; i < args.length; i++) {
             function.addInstruction(
                 new MoveInstruction(
-                    X64PreservedRegister.fromILRegister(args[i]),
+                    of(X64PreservedRegister.fromILRegister(args[i])),
                     X64NativeRegister.argNumbered(i + 5)
                 )
             );
@@ -70,7 +72,7 @@ public interface CallNonVirtualMethodJNI {
         // Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
 
         // mov CallNonVirtual<Type>Method(%javaEnvOne), %temp
-        final X64PreservedRegister temp = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
+        final X64RegisterOperand temp = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
         final String nativeType = SymbolNames.getJNISignatureFromILType(returnVal.typeFull);
         function.addInstruction(
             new MoveInstruction(
@@ -90,7 +92,7 @@ public interface CallNonVirtualMethodJNI {
         function.addInstruction(
             new MoveInstruction(
                 X64NativeRegister.RAX,
-                X64PreservedRegister.fromILRegister(returnVal)
+                of(X64PreservedRegister.fromILRegister(returnVal))
             )
         );
     }

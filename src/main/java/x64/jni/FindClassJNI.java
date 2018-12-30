@@ -8,9 +8,11 @@ import x64.instructions.MoveInstruction;
 import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
 
 import static x64.jni.JNIOffsets.FIND_CLASS;
 import static x64.operands.PCRelativeData.pointerFromLabel;
+import static x64.operands.X64RegisterOperand.of;
 
 public interface FindClassJNI {
 
@@ -22,7 +24,7 @@ public interface FindClassJNI {
      * @param className The java class name to load
      * @return The newly allocated preserved register holding a reference to the JNI class
      */
-    default X64PreservedRegister addFindClassJNICall(X64File assemblyFile, X64Function function, String className) {
+    default X64RegisterOperand addFindClassJNICall(X64File assemblyFile, X64Function function, String className) {
         // leaq NEW_STRING_REFERENCE(%rip), %arg2
         String label = assemblyFile.insertDataString(className);
         function.addInstruction(
@@ -36,7 +38,7 @@ public interface FindClassJNI {
         function.loadJNI1();
 
         // mov FindClass_Offset(%javaEnvOne), %temp
-        final X64PreservedRegister temp = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
+        final X64RegisterOperand temp = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
         function.addInstruction(
             new MoveInstruction(
                 new RegisterRelativePointer(FIND_CLASS.getOffset(), function.javaEnvPointer),
@@ -52,7 +54,7 @@ public interface FindClassJNI {
         );
 
         // mov %result, %class storage register
-        final X64PreservedRegister classReg = X64PreservedRegister.newTempQuad(function.getNextFreeRegister());
+        final X64RegisterOperand classReg = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
         function.addInstruction(
             new MoveInstruction(
                 X64NativeRegister.RAX,
