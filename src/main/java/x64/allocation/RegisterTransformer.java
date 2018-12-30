@@ -4,10 +4,7 @@ import x64.Instruction;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 public class RegisterTransformer {
 
@@ -48,7 +45,11 @@ public class RegisterTransformer {
 		}
 	}
 
-	public AllocatedUnit allocate() {
+	/**
+	 * Allocates the hardware registers,
+	 * returning a set of the actual preserved registers that need to be saved / restored.
+	 */
+	public Set<X64NativeRegister> allocate() {
 
 		// determine the usages of the registers, as well as which ones are used across function calls
 		RegistersUsed usedRegs = new RegistersUsed();
@@ -91,7 +92,14 @@ public class RegisterTransformer {
 			i.allocateRegisters(mapping);
 		}
 
-		return new AllocatedUnit();
+		Set<X64NativeRegister> usedPreservedRegs = new HashSet<>();
+		for (X64NativeRegister reg : mapping.values()) {
+			if (reg != X64NativeRegister.R10.nativeOne && reg != X64NativeRegister.R11.nativeOne) {
+				usedPreservedRegs.add(reg);
+			}
+		}
+
+		return usedPreservedRegs;
 	}
 
 }

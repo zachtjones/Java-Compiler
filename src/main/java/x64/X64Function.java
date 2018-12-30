@@ -1,6 +1,5 @@
 package x64;
 
-import x64.allocation.AllocatedUnit;
 import x64.allocation.RegisterTransformer;
 import x64.directives.ByteAlignment;
 import x64.directives.GlobalSymbol;
@@ -16,6 +15,7 @@ import x64.operands.X64RegisterOperand;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static x64.operands.X64RegisterOperand.of;
@@ -67,15 +67,15 @@ public class X64Function {
 
 	/** Allocates the registers, transforming pseudo-registers to real ones */
 	void allocateRegisters() {
-		AllocatedUnit au = new RegisterTransformer(contents).allocate();
+		Set<X64NativeRegister> usedRegs = new RegisterTransformer(contents).allocate();
 
 		// build up the push @ beginning / pop before return for used registers
-		for (X64NativeRegister usedReg : au.preservedUsed) {
+		for (X64NativeRegister usedReg : usedRegs) {
 			this.prologue.add(
-				new PushInstruction(usedReg)
+				new PushInstruction(of(usedReg))
 			);
 			this.epilogue.add(0,
-				new PopInstruction(usedReg)
+				new PopInstruction(of(usedReg))
 			);
 		}
 	}
