@@ -2,7 +2,6 @@
 # this file represents the bridge from java code to native code
 #  this is simply another wrapper layer of main(String[] args), with this layer calling the compiled main
 
-# import the name
     .global $NAME$
 
 .text
