@@ -12,6 +12,7 @@ import helper.CompileException;
 import javaLibrary.JavaLibraryLookup;
 import tree.*;
 import intermediate.*;
+import x64.SymbolNames;
 import x64.X64File;
 
 public class JavaCompiler {
@@ -138,7 +139,9 @@ public class JavaCompiler {
 						"Unsupported computer architecture. Currently only supports x86_64 & amd64.", "", -1);
 			}
 
-			String assemblyMain = FileReader.readResourcesFile("Main-x86_64.s");
+			final String assemblyMain = FileReader.readResourcesFile("Main-x86_64.s")
+				.replace("$NAME$", SymbolNames.getMethodName(mainClass.getName(), "main"));
+
 			FileWriter.writeToOutput(OutputDirs.ASSEMBLY, "main.s", assemblyMain);
 
 			for (InterFile f : cache.values()) {

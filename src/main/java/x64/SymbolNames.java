@@ -4,19 +4,23 @@ public class SymbolNames {
 
     public static String getFieldName(String javaClass, String javaField) {
         // use the JNI syntax
-        return "_" + escape(javaClass) + "_" + escape(javaField);
+        return "_Java_" + escape(javaClass) + "_" + escape(javaField);
     }
 
+    /** Escapes the name suitable for the name of the assembly / C function */
     private static String escape(String content) {
-        return content.replace("_", "_1")
-                .replace('/', '_');
+        return content
+            .replace("[", "_3")
+            .replace(";", "_2")
+            .replace("_", "_1")
+            .replace('/', '_');
     }
 
     /** Returns the signature string used in JNI calls, created from the intermediate language type */
     public static String getJNISignatureFromILType(String typeFull) {
 
         // [Ljava/lang/Object; for Object[]
-        // [L[Ljava/lang/Object;; for Object[][]
+        // [[Ljava/lang/Object; for Object[][]
 
         // handle the primitives -- see below link for JNI docs
         // https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html#primitive_types
