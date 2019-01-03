@@ -7,7 +7,7 @@ import x64.X64Function;
 import x64.jni.helpers.GetIdJNI;
 import x64.operands.X64RegisterOperand;
 
-import static x64.jni.JNIOffsets.getStaticFieldOffset;
+import static x64.jni.JNIOffsets.GET_STATIC_FIELD_ID;
 
 public interface GetStaticFieldIdJNI extends GetIdJNI {
 
@@ -25,7 +25,6 @@ public interface GetStaticFieldIdJNI extends GetIdJNI {
 
         final String signature = SymbolNames.getJNISignatureFromILType(type.typeFull);
 
-        return addGetIdJNICall(getStaticFieldOffset(signature),
-            fieldName, signature, assemblyFile, function, classReg);
+        return addGetIdJNICall(GET_STATIC_FIELD_ID, fieldName, signature, assemblyFile, function, classReg);
     }
 }
