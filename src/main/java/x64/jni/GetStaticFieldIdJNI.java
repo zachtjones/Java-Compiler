@@ -4,8 +4,10 @@ import intermediate.Register;
 import x64.SymbolNames;
 import x64.X64File;
 import x64.X64Function;
-import x64.operands.X64PreservedRegister;
+import x64.jni.helpers.GetIdJNI;
 import x64.operands.X64RegisterOperand;
+
+import static x64.jni.JNIOffsets.getStaticFieldOffset;
 
 public interface GetStaticFieldIdJNI extends GetIdJNI {
 
@@ -22,8 +24,8 @@ public interface GetStaticFieldIdJNI extends GetIdJNI {
             X64RegisterOperand classReg, X64File assemblyFile, X64Function function) {
 
         final String signature = SymbolNames.getJNISignatureFromILType(type.typeFull);
-        final int jniOffset = JNIOffsets.getStaticFieldOffset(signature);
 
-        return addGetIdJNICall(jniOffset, fieldName, signature, assemblyFile, function, classReg);
+        return addGetIdJNICall(getStaticFieldOffset(signature),
+            fieldName, signature, assemblyFile, function, classReg);
     }
 }

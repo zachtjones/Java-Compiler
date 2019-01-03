@@ -2,9 +2,8 @@ package x64.jni;
 
 import intermediate.Register;
 import x64.X64Function;
-import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.MoveInstruction;
-import x64.operands.RegisterRelativePointer;
+import x64.jni.helpers.CallJNIMethod;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
@@ -12,7 +11,7 @@ import x64.operands.X64RegisterOperand;
 import static x64.jni.JNIOffsets.NEW_STRING_UTF;
 import static x64.operands.X64RegisterOperand.of;
 
-public interface NewStringUTF_JNI {
+public interface NewStringUTF_JNI extends CallJNIMethod {
 
 	/**
 	 * Inserts the call NewStringUTF(JNIEnv, char*) into the function, with result holding the end value
@@ -33,28 +32,8 @@ public interface NewStringUTF_JNI {
 			)
 		);
 
-		// mov NewStringUTF_offset(%javaEnvOne), %temp
-		final X64RegisterOperand temp = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
-		function.addInstruction(
-			new MoveInstruction(
-				new RegisterRelativePointer(NEW_STRING_UTF.getOffset(), function.javaEnvPointer),
-				temp
-			)
-		);
+		final X64RegisterOperand returned = of(X64PreservedRegister.fromILRegister(result));
 
-		// call *%temp
-		function.addInstruction(
-			new CallFunctionPointerInstruction(
-				temp
-			)
-		);
-
-		// mov %rax, result
-		function.addInstruction(
-			new MoveInstruction(
-				X64NativeRegister.RAX,
-				of(X64PreservedRegister.fromILRegister(result))
-			)
-		);
+		addCallJNI(function, NEW_STRING_UTF, returned);
 	}
 }

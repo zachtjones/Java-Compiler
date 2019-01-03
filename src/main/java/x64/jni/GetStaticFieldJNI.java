@@ -3,16 +3,15 @@ package x64.jni;
 import intermediate.Register;
 import x64.SymbolNames;
 import x64.X64Function;
-import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.MoveInstruction;
-import x64.operands.RegisterRelativePointer;
+import x64.jni.helpers.CallJNIMethod;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
 
 import static x64.operands.X64RegisterOperand.of;
 
-public interface GetStaticFieldJNI {
+public interface GetStaticFieldJNI extends CallJNIMethod {
 
     /**
      * Adds the code result = GetStatic&lt;Type&gt;Field(JNI, class, fieldId)
@@ -27,13 +26,18 @@ public interface GetStaticFieldJNI {
         final String fieldType = SymbolNames.getJNISignatureFromILType(result.typeFull);
 
         // load the args
+        // arg1 = JNI
         function.loadJNI1();
+
+        // arg2 = class reference
         function.addInstruction(
             new MoveInstruction(
                 classReg,
                 X64NativeRegister.RSI
             )
         );
+
+        // arg3 = field ID
         function.addInstruction(
             new MoveInstruction(
                 fieldIDReg,
@@ -41,28 +45,9 @@ public interface GetStaticFieldJNI {
             )
         );
 
-        // mov GetFieldID_Offset(%javaEnvOne), %temp3
-        final X64RegisterOperand temp3 = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
-        function.addInstruction(
-            new MoveInstruction(
-                new RegisterRelativePointer(JNIOffsets.getStaticFieldOffset(fieldType), function.javaEnvPointer),
-                temp3
-            )
-        );
+        final JNIOffsets functionToCall = JNIOffsets.getStaticFieldOffset(fieldType);
+        final X64RegisterOperand returned = of(X64PreservedRegister.fromILRegister(result));
 
-        // call *%temp3
-        function.addInstruction(
-            new CallFunctionPointerInstruction(
-                temp3
-            )
-        );
-
-        // mov %result, %final result
-        function.addInstruction(
-            new MoveInstruction(
-                X64NativeRegister.RAX,
-                of(X64PreservedRegister.fromILRegister(result))
-            )
-        );
+        addCallJNI(function, functionToCall, returned);
     }
 }

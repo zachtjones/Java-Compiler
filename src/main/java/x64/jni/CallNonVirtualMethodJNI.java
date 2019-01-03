@@ -5,10 +5,7 @@ import x64.SymbolNames;
 import x64.X64Function;
 import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.MoveInstruction;
-import x64.operands.RegisterRelativePointer;
-import x64.operands.X64NativeRegister;
-import x64.operands.X64PreservedRegister;
-import x64.operands.X64RegisterOperand;
+import x64.operands.*;
 
 import static x64.jni.JNIOffsets.getCallNonVirtualMethodOffset;
 import static x64.operands.X64RegisterOperand.of;
@@ -70,13 +67,20 @@ public interface CallNonVirtualMethodJNI {
 
         // load the function pointer
         // Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
+        final X64RegisterOperand temp2 = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
+        function.addInstruction(
+            new MoveInstruction(
+                new MemoryAtRegister(function.javaEnvPointer),
+                temp2
+            )
+        );
 
         // mov CallNonVirtual<Type>Method(%javaEnvOne), %temp
         final X64RegisterOperand temp = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
         final String nativeType = SymbolNames.getJNISignatureFromILType(returnVal.typeFull);
         function.addInstruction(
             new MoveInstruction(
-                new RegisterRelativePointer(getCallNonVirtualMethodOffset(nativeType), function.javaEnvPointer),
+                new RegisterRelativePointer(getCallNonVirtualMethodOffset(nativeType), temp2),
                 temp
             )
         );

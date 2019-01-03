@@ -5,6 +5,7 @@ import x64.SymbolNames;
 import x64.X64Function;
 import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.MoveInstruction;
+import x64.jni.helpers.CallJNIMethod;
 import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
@@ -13,7 +14,7 @@ import x64.operands.X64RegisterOperand;
 import static x64.jni.JNIOffsets.getCallMethodOffset;
 import static x64.operands.X64RegisterOperand.of;
 
-public interface CallMethodJNI {
+public interface CallMethodJNI extends CallJNIMethod {
 
     default void addCallMethodJNI(X64Function function, X64RegisterOperand objReg,
             X64RegisterOperand methodId, Register[] args, Register returnVal) {
@@ -52,32 +53,13 @@ public interface CallMethodJNI {
             );
         }
 
-        // load the function pointer
-        // Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
-
-        // mov Call<Type>Method(%javaEnvOne), %temp
-        final X64RegisterOperand temp = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
+        // Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...) -> returnVal
+        // determine which type of object it is:
         final String nativeType = SymbolNames.getJNISignatureFromILType(returnVal.typeFull);
-        function.addInstruction(
-            new MoveInstruction(
-                new RegisterRelativePointer(getCallMethodOffset(nativeType), function.javaEnvPointer),
-                temp
-            )
-        );
+        final JNIOffsets offset = getCallMethodOffset(nativeType);
 
-        // call *%temp
-        function.addInstruction(
-            new CallFunctionPointerInstruction(
-                temp
-            )
-        );
+        final X64RegisterOperand result = of(X64PreservedRegister.fromILRegister(returnVal));
 
-        // mov %RAX, %result
-        function.addInstruction(
-            new MoveInstruction(
-                X64NativeRegister.RAX,
-                of(X64PreservedRegister.fromILRegister(returnVal))
-            )
-        );
+        addCallJNI(function, offset, result);
     }
 }

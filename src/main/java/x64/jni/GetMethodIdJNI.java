@@ -3,13 +3,14 @@ package x64.jni;
 import intermediate.Register;
 import x64.X64File;
 import x64.X64Function;
-import x64.operands.X64PreservedRegister;
+import x64.jni.helpers.GetIdJNI;
 import x64.operands.X64RegisterOperand;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static x64.SymbolNames.getJNISignatureFromILType;
+import static x64.jni.JNIOffsets.GET_METHOD_ID;
 
 public interface GetMethodIdJNI extends GetIdJNI {
 
@@ -24,8 +25,6 @@ public interface GetMethodIdJNI extends GetIdJNI {
         // example: main method is (Ljava/lang/String;)V
         final String signature = "(" + argsSig + ")" + getJNISignatureFromILType(returnType.typeFull);
 
-        final int jniOffset = JNIOffsets.GET_METHOD_ID.getOffset();
-
-        return addGetIdJNICall(jniOffset, name, signature, assemblyFile, function, classReg);
+        return addGetIdJNICall(GET_METHOD_ID, name, signature, assemblyFile, function, classReg);
     }
 }

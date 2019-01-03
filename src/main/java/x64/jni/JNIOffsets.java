@@ -28,18 +28,18 @@ public enum JNIOffsets {
      * @param fieldType The JNI type that is used to determine the offset
      * @return The integer offset into the virtual function table (the index * pointer size)
      */
-    public static int getStaticFieldOffset(String fieldType) {
+    public static JNIOffsets getStaticFieldOffset(String fieldType) {
         switch (fieldType) {
-            case "Z": return GET_STATIC_BOOLEAN_FIELD.getOffset();
-            case "B": return GET_STATIC_BYTE_FIELD.getOffset();
-            case "C": return GET_STATIC_CHAR_FIELD.getOffset();
-            case "S": return GET_STATIC_SHORT_FIELD.getOffset();
-            case "I": return GET_STATIC_INT_FIELD.getOffset();
-            case "J": return GET_STATIC_LONG_FIELD.getOffset();
-            case "F": return GET_STATIC_FLOAT_FIELD.getOffset();
-            case "D": return GET_STATIC_DOUBLE_FIELD.getOffset();
+            case "Z": return GET_STATIC_BOOLEAN_FIELD;
+            case "B": return GET_STATIC_BYTE_FIELD;
+            case "C": return GET_STATIC_CHAR_FIELD;
+            case "S": return GET_STATIC_SHORT_FIELD;
+            case "I": return GET_STATIC_INT_FIELD;
+            case "J": return GET_STATIC_LONG_FIELD;
+            case "F": return GET_STATIC_FLOAT_FIELD;
+            case "D": return GET_STATIC_DOUBLE_FIELD;
         }
-        return GET_STATIC_OBJECT_FIELD.getOffset();
+        return GET_STATIC_OBJECT_FIELD;
     }
 
     /**
@@ -47,19 +47,19 @@ public enum JNIOffsets {
      * @param nativeType The JNI type that is used to determine the offset
      * @return The integer offset into the virtual function table (the index * pointer size)
      */
-    public static int getCallMethodOffset(String nativeType) {
+    public static JNIOffsets getCallMethodOffset(String nativeType) {
         switch (nativeType) {
-            case "V": return CALL_VOID_METHOD.getOffset();
-            case "Z": return CALL_BOOLEAN_METHOD.getOffset();
-            case "B": return CALL_BYTE_METHOD.getOffset();
-            case "C": return CALL_CHAR_METHOD.getOffset();
-            case "S": return CALL_SHORT_METHOD.getOffset();
-            case "I": return CALL_INT_METHOD.getOffset();
-            case "J": return CALL_LONG_METHOD.getOffset();
-            case "F": return CALL_FLOAT_METHOD.getOffset();
-            case "D": return CALL_DOUBLE_METHOD.getOffset();
+            case "V": return CALL_VOID_METHOD;
+            case "Z": return CALL_BOOLEAN_METHOD;
+            case "B": return CALL_BYTE_METHOD;
+            case "C": return CALL_CHAR_METHOD;
+            case "S": return CALL_SHORT_METHOD;
+            case "I": return CALL_INT_METHOD;
+            case "J": return CALL_LONG_METHOD;
+            case "F": return CALL_FLOAT_METHOD;
+            case "D": return CALL_DOUBLE_METHOD;
         }
-        return CALL_OBJECT_METHOD.getOffset();
+        return CALL_OBJECT_METHOD;
     }
 
     /**
@@ -69,7 +69,7 @@ public enum JNIOffsets {
      */
     public static int getCallNonVirtualMethodOffset(String nativeType) {
         // indexes are all 30 higher * 8 bytes for pointer size
-        return getCallMethodOffset(nativeType) + 30 * 8;
+        return getCallMethodOffset(nativeType).getOffset() + 30 * 8;
     }
 
     /** Returns the offset into the virtual function table for the JNI object for this method.

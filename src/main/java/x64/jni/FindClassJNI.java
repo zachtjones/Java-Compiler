@@ -2,19 +2,15 @@ package x64.jni;
 
 import x64.X64File;
 import x64.X64Function;
-import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.LoadEffectiveAddressInstruction;
-import x64.instructions.MoveInstruction;
-import x64.operands.RegisterRelativePointer;
-import x64.operands.X64NativeRegister;
-import x64.operands.X64PreservedRegister;
-import x64.operands.X64RegisterOperand;
+import x64.jni.helpers.CallJNIMethod;
+import x64.operands.*;
 
 import static x64.jni.JNIOffsets.FIND_CLASS;
 import static x64.operands.PCRelativeData.pointerFromLabel;
 import static x64.operands.X64RegisterOperand.of;
 
-public interface FindClassJNI {
+public interface FindClassJNI extends CallJNIMethod {
 
     /**
      * Adds the necessary instructions required to get the class into the function, returning the allocated register
@@ -25,6 +21,10 @@ public interface FindClassJNI {
      * @return The newly allocated preserved register holding a reference to the JNI class
      */
     default X64RegisterOperand addFindClassJNICall(X64File assemblyFile, X64Function function, String className) {
+
+        // mov %javaEnvOne, %arg1
+        function.loadJNI1();
+
         // leaq NEW_STRING_REFERENCE(%rip), %arg2
         String label = assemblyFile.insertDataString(className);
         function.addInstruction(
@@ -34,33 +34,11 @@ public interface FindClassJNI {
             )
         );
 
-        // mov %javaEnvOne, %arg1
-        function.loadJNI1();
-
-        // mov FindClass_Offset(%javaEnvOne), %temp
-        final X64RegisterOperand temp = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
-        function.addInstruction(
-            new MoveInstruction(
-                new RegisterRelativePointer(FIND_CLASS.getOffset(), function.javaEnvPointer),
-                temp
-            )
-        );
-
-        // call *%temp
-        function.addInstruction(
-            new CallFunctionPointerInstruction(
-                temp
-            )
-        );
-
-        // mov %result, %class storage register
+        // call JNI find class with the arguments, storing result in class register
         final X64RegisterOperand classReg = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
-        function.addInstruction(
-            new MoveInstruction(
-                X64NativeRegister.RAX,
-                classReg
-            )
-        );
+
+        addCallJNI(function, FIND_CLASS, classReg);
+
         return classReg;
     }
 }

@@ -1,22 +1,22 @@
-package x64.jni;
+package x64.jni.helpers;
 
 import x64.X64File;
 import x64.X64Function;
-import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.LoadEffectiveAddressInstruction;
 import x64.instructions.MoveInstruction;
+import x64.jni.JNIOffsets;
 import x64.operands.*;
 
 import static x64.operands.X64RegisterOperand.of;
 
 
-public interface GetIdJNI {
+public interface GetIdJNI extends CallJNIMethod {
 
     /** All the GetFieldId, GetStaticFieldId, GetMethodId, GetStaticMethodId have a similar
      * method call, the difference being the class/object param and how to determine the char* sig parameter.
      * This interface is created as a helper for those specific ones
      * Returns the allocated register for the methodId/fieldId */
-    default X64RegisterOperand addGetIdJNICall(int jniOffset, String fieldOrMethodName, String signature,
+    default X64RegisterOperand addGetIdJNICall(JNIOffsets jniOffset, String fieldOrMethodName, String signature,
             X64File assemblyFile, X64Function function, X64RegisterOperand classReg) {
 
         // mov %javaEnvOne, %arg1
@@ -48,30 +48,10 @@ public interface GetIdJNI {
             )
         );
 
-        // mov GetFieldID_Offset(%javaEnvOne), %temp
-        final X64RegisterOperand temp = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
-        function.addInstruction(
-            new MoveInstruction(
-                new RegisterRelativePointer(jniOffset, function.javaEnvPointer),
-                temp
-            )
-        );
-
-        // call *%temp2
-        function.addInstruction(
-            new CallFunctionPointerInstruction(
-                temp
-            )
-        );
-
-        // mov %result, %class storage register
+        // call the method, storing result in fieldIDReg
         final X64RegisterOperand fieldIDReg = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
-        function.addInstruction(
-            new MoveInstruction(
-                X64NativeRegister.RAX,
-                fieldIDReg
-            )
-        );
+        addCallJNI(function, jniOffset, fieldIDReg);
+
         return fieldIDReg;
     }
 }
