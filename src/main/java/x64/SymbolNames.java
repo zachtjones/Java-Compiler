@@ -35,14 +35,15 @@ public class SymbolNames {
             case "long": return "J";
             case "float": return "F";
             case "double": return "D";
+            case "void": return "V";
         }
 
         if (typeFull.contains("]")) {
             // remove a [] type
             final String oneLayerLess = typeFull.substring(0, typeFull.length() - 2);
-            return "[L" + getJNISignatureFromILType(oneLayerLess) + ";";
+            return "[" + getJNISignatureFromILType(oneLayerLess);
         } else {
-            return typeFull;
+            return "L" + typeFull + ";";
         }
 
         // TODO: mapping from primitives to their signatures
