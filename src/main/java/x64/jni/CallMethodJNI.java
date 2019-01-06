@@ -3,16 +3,12 @@ package x64.jni;
 import intermediate.Register;
 import x64.SymbolNames;
 import x64.X64Function;
-import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
-import x64.operands.RegisterRelativePointer;
 import x64.operands.X64NativeRegister;
-import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
 
 import static x64.jni.JNIOffsets.getCallMethodOffset;
-import static x64.operands.X64RegisterOperand.of;
 
 public interface CallMethodJNI extends CallJNIMethod {
 
@@ -47,7 +43,7 @@ public interface CallMethodJNI extends CallJNIMethod {
         for (int i = 0; i < args.length; i++) {
             function.addInstruction(
                 new MoveInstruction(
-                    of(X64PreservedRegister.fromILRegister(args[i])),
+                    args[i].toX64(),
                     X64NativeRegister.argNumbered(i + 4)
                 )
             );
@@ -58,8 +54,6 @@ public interface CallMethodJNI extends CallJNIMethod {
         final String nativeType = SymbolNames.getJNISignatureFromILType(returnVal.typeFull);
         final JNIOffsets offset = getCallMethodOffset(nativeType);
 
-        final X64RegisterOperand result = of(X64PreservedRegister.fromILRegister(returnVal));
-
-        addCallJNI(function, offset, result);
+        addCallJNI(function, offset, returnVal.toX64());
     }
 }

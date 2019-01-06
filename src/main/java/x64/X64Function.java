@@ -40,7 +40,7 @@ public class X64Function {
 
 		this.nextFreeRegister = nextFreeRegister;
 		
-		javaEnvPointer = of(new X64PreservedRegister(getNextFreeRegister(), Instruction.Size.QUAD));
+		javaEnvPointer = this.getNextQuadRegister();
 
 		// save the first argument, the java environment pointer to a dedicated virtual register.
 		contents.add(new MoveInstruction(X64NativeRegister.RDI, javaEnvPointer));
@@ -58,11 +58,10 @@ public class X64Function {
 		addInstruction(new MoveInstruction(javaEnvPointer, X64NativeRegister.RDI));
 	}
 
-	/** Gets the number associated with the next free register.
-	 * (In this abstraction, there are an unlimited number) */
-	public int getNextFreeRegister() {
+	/** Returns the next pseudo register available that is a quad-word size (64-bit) */
+	public X64RegisterOperand getNextQuadRegister() {
 		nextFreeRegister++;
-		return nextFreeRegister;
+		return of(new X64PreservedRegister(nextFreeRegister, Instruction.Size.QUAD));
 	}
 
 	/** Allocates the registers, transforming pseudo-registers to real ones */

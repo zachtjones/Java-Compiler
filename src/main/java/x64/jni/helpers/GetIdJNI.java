@@ -7,8 +7,6 @@ import x64.instructions.MoveInstruction;
 import x64.jni.JNIOffsets;
 import x64.operands.*;
 
-import static x64.operands.X64RegisterOperand.of;
-
 
 public interface GetIdJNI extends CallJNIMethod {
 
@@ -49,7 +47,7 @@ public interface GetIdJNI extends CallJNIMethod {
         );
 
         // call the method, storing result in fieldIDReg
-        final X64RegisterOperand fieldIDReg = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
+        final X64RegisterOperand fieldIDReg = function.getNextQuadRegister();
         addCallJNI(function, jniOffset, fieldIDReg);
 
         return fieldIDReg;

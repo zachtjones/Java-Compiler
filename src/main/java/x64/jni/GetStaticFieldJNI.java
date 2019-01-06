@@ -6,10 +6,7 @@ import x64.X64Function;
 import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.X64NativeRegister;
-import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
-
-import static x64.operands.X64RegisterOperand.of;
 
 public interface GetStaticFieldJNI extends CallJNIMethod {
 
@@ -46,7 +43,7 @@ public interface GetStaticFieldJNI extends CallJNIMethod {
         );
 
         final JNIOffsets functionToCall = JNIOffsets.getStaticFieldOffset(fieldType);
-        final X64RegisterOperand returned = of(X64PreservedRegister.fromILRegister(result));
+        final X64RegisterOperand returned = result.toX64();
 
         addCallJNI(function, functionToCall, returned);
     }

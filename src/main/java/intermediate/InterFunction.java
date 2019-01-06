@@ -5,14 +5,8 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import tree.CompileHistory;
-import x64.SymbolNames;
 import x64.X64File;
 import x64.X64Function;
-import x64.directives.ByteAlignment;
-import x64.directives.GlobalSymbol;
-import x64.directives.LabelInstruction;
-import x64.directives.SegmentChange;
-import x64.instructions.ReturnInstruction;
 
 public class InterFunction {
 	

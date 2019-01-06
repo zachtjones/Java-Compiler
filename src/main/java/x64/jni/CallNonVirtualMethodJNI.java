@@ -8,7 +8,6 @@ import x64.instructions.MoveInstruction;
 import x64.operands.*;
 
 import static x64.jni.JNIOffsets.getCallNonVirtualMethodOffset;
-import static x64.operands.X64RegisterOperand.of;
 
 public interface CallNonVirtualMethodJNI {
 
@@ -59,7 +58,7 @@ public interface CallNonVirtualMethodJNI {
         for (int i = 0; i < args.length; i++) {
             function.addInstruction(
                 new MoveInstruction(
-                    of(X64PreservedRegister.fromILRegister(args[i])),
+                    args[i].toX64(),
                     X64NativeRegister.argNumbered(i + 5)
                 )
             );
@@ -67,7 +66,7 @@ public interface CallNonVirtualMethodJNI {
 
         // load the function pointer
         // Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
-        final X64RegisterOperand temp2 = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
+        final X64RegisterOperand temp2 = function.getNextQuadRegister();
         function.addInstruction(
             new MoveInstruction(
                 new MemoryAtRegister(function.javaEnvPointer),
@@ -76,7 +75,7 @@ public interface CallNonVirtualMethodJNI {
         );
 
         // mov CallNonVirtual<Type>Method(%javaEnvOne), %temp
-        final X64RegisterOperand temp = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
+        final X64RegisterOperand temp = function.getNextQuadRegister();
         final String nativeType = SymbolNames.getJNISignatureFromILType(returnVal.typeFull);
         function.addInstruction(
             new MoveInstruction(
@@ -96,7 +95,7 @@ public interface CallNonVirtualMethodJNI {
         function.addInstruction(
             new MoveInstruction(
                 X64NativeRegister.RAX,
-                of(X64PreservedRegister.fromILRegister(returnVal))
+                returnVal.toX64()
             )
         );
     }
