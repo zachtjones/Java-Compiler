@@ -159,7 +159,7 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 			String label = assemblyFile.insertDataString(value.substring(1, value.length() - 1));
 
 			// leaq LABEL(%rip), %temp
-			X64RegisterOperand chars = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
+			X64RegisterOperand chars = function.getNextQuadRegister();
 			function.addInstruction(
 				new LoadEffectiveAddressInstruction(
 					pointerFromLabel(label),

@@ -34,7 +34,7 @@ public interface GetObjectClassJNI extends CallJNIMethod {
             )
         );
 
-        X64RegisterOperand result = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
+        X64RegisterOperand result = function.getNextQuadRegister();
 
         addCallJNI(function, GET_OBJECT_CLASS, result);
 

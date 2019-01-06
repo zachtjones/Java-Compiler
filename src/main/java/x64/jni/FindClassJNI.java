@@ -35,7 +35,7 @@ public interface FindClassJNI extends CallJNIMethod {
         );
 
         // call JNI find class with the arguments, storing result in class register
-        final X64RegisterOperand classReg = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
+        final X64RegisterOperand classReg = function.getNextQuadRegister();
 
         addCallJNI(function, FIND_CLASS, classReg);
 

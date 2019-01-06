@@ -49,7 +49,7 @@ public interface GetIdJNI extends CallJNIMethod {
         );
 
         // call the method, storing result in fieldIDReg
-        final X64RegisterOperand fieldIDReg = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
+        final X64RegisterOperand fieldIDReg = function.getNextQuadRegister();
         addCallJNI(function, jniOffset, fieldIDReg);
 
         return fieldIDReg;

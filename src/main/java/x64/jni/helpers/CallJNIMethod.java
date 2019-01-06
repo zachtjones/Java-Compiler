@@ -13,7 +13,7 @@ public interface CallJNIMethod {
     default void addCallJNI(X64Function function, JNIOffsets jniOffset, X64RegisterOperand resultHolder) {
 
         // mov %javaEnv*, %javaEnv
-        final X64RegisterOperand temp2 = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
+        final X64RegisterOperand temp2 = function.getNextQuadRegister();
         function.addInstruction(
             new MoveInstruction(
                 new MemoryAtRegister(function.javaEnvPointer),
@@ -22,7 +22,7 @@ public interface CallJNIMethod {
         );
 
         // mov JNI_METHOD_Offset(%javaEnv), %temp
-        final X64RegisterOperand temp = of(X64PreservedRegister.newTempQuad(function.getNextFreeRegister()));
+        final X64RegisterOperand temp = function.getNextQuadRegister();
         function.addInstruction(
             new MoveInstruction(
                 new RegisterRelativePointer(jniOffset.getOffset(), temp2),
