@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import helper.ClassLookup;
 import helper.CompileException;
@@ -136,23 +137,29 @@ public class JavaCompiler {
 						"Unsupported computer architecture. Currently only supports x86_64 & amd64.", "", -1);
 			}
 
+			// build up the list of files to assemble & link using gcc
+			final List<String> gccCommands = new ArrayList<>(Arrays.asList(
+				"gcc",
+				"-shared",
+				"--save-temps",
+				"-o",
+				"../assembled/" + entryCode.getLibraryName(),
+				"Main.s" // other ones added to this list
+			));
+
+			// convert files from intermediate to assembly
 			for (InterFile f : cache.values()) {
 				X64File compiled = f.compileX64();
 				FileWriter.writeToOutput(OutputDirs.PSEUDO_ASSEMBLY, compiled.getFileName(), compiled.toString());
 
 				compiled.allocateRegisters();
 				FileWriter.writeToOutput(OutputDirs.ASSEMBLY, compiled.getFileName(), compiled.toString());
+				gccCommands.add(compiled.getFileName());
 			}
 
-			final ProcessBuilder builder = new ProcessBuilder(
-				"gcc",
-				"-shared",
-				"--save-temps",
-				"Main.s",
-				"HelloWorld.s",
-				"-o",
-				"../assembled/" + entryCode.getLibraryName()
-			);
+			// run the gcc compiler
+			final ProcessBuilder builder = new ProcessBuilder(gccCommands);
+
 			builder.directory(new File(OutputDirs.ASSEMBLY.location));
 			builder.redirectErrorStream(true);
 			final Process p = builder.start();
@@ -167,7 +174,7 @@ public class JavaCompiler {
 			System.out.println("gcc exit: " + p.waitFor());
 
 			System.out.println("Done, results are in the temp/assembled folder.");
-			System.out.println("Invoke the program: `java -Djava.library.path=. Main` from the temp folder");
+			System.out.println("Invoke the program: `java -Djava.library.path=\".\" Main` from the temp folder");
 
 		} catch (ParseException e) {
 			System.out.print("Syntax error at line ");
