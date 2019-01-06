@@ -5,11 +5,9 @@ import x64.X64Function;
 import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.X64NativeRegister;
-import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
 
 import static x64.jni.JNIOffsets.NEW_STRING_UTF;
-import static x64.operands.X64RegisterOperand.of;
 
 public interface NewStringUTF_JNI extends CallJNIMethod {
 
@@ -32,7 +30,7 @@ public interface NewStringUTF_JNI extends CallJNIMethod {
 			)
 		);
 
-		final X64RegisterOperand returned = of(X64PreservedRegister.fromILRegister(result));
+		final X64RegisterOperand returned = result.toX64();
 
 		addCallJNI(function, NEW_STRING_UTF, returned);
 	}

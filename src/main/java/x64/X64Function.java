@@ -61,7 +61,7 @@ public class X64Function {
 	/** Returns the next pseudo register available that is a quad-word size (64-bit) */
 	public X64RegisterOperand getNextQuadRegister() {
 		nextFreeRegister++;
-		return of(X64PreservedRegister.newTempQuad(nextFreeRegister));
+		return of(new X64PreservedRegister(nextFreeRegister, Instruction.Size.QUAD));
 	}
 
 	/** Allocates the registers, transforming pseudo-registers to real ones */

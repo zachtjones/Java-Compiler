@@ -8,7 +8,6 @@ import x64.instructions.MoveInstruction;
 import x64.operands.*;
 
 import static x64.jni.JNIOffsets.getCallNonVirtualMethodOffset;
-import static x64.operands.X64RegisterOperand.of;
 
 public interface CallNonVirtualMethodJNI {
 
@@ -59,7 +58,7 @@ public interface CallNonVirtualMethodJNI {
         for (int i = 0; i < args.length; i++) {
             function.addInstruction(
                 new MoveInstruction(
-                    of(X64PreservedRegister.fromILRegister(args[i])),
+                    args[i].toX64(),
                     X64NativeRegister.argNumbered(i + 5)
                 )
             );
@@ -96,7 +95,7 @@ public interface CallNonVirtualMethodJNI {
         function.addInstruction(
             new MoveInstruction(
                 X64NativeRegister.RAX,
-                of(X64PreservedRegister.fromILRegister(returnVal))
+                returnVal.toX64()
             )
         );
     }

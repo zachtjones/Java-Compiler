@@ -7,9 +7,7 @@ import x64.X64File;
 import x64.X64Function;
 import x64.instructions.MoveInstruction;
 import x64.operands.X64NativeRegister;
-import x64.operands.X64PreservedRegister;
 
-import static x64.operands.X64RegisterOperand.of;
 
 /** getParam %register = name */
 public class GetParamStatement implements InterStatement {
@@ -59,7 +57,7 @@ public class GetParamStatement implements InterStatement {
 			function.addInstruction(
 				new MoveInstruction(
 					X64NativeRegister.RSI,
-					of(X64PreservedRegister.fromILRegister(r))
+					r.toX64()
 				)
 			);
 		} else {
@@ -69,7 +67,7 @@ public class GetParamStatement implements InterStatement {
 			function.addInstruction(
 				new MoveInstruction(
 					X64NativeRegister.argNumbered(paramIndex),
-					of(X64PreservedRegister.fromILRegister(r))
+					r.toX64()
 				)
 			);
 		}

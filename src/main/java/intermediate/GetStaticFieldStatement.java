@@ -12,8 +12,6 @@ import x64.jni.GetStaticFieldJNI;
 import x64.operands.X64RegisterOperand;
 
 import static x64.operands.PCRelativeData.fromField;
-import static x64.operands.X64PreservedRegister.fromILRegister;
-import static x64.operands.X64RegisterOperand.of;
 
 public class GetStaticFieldStatement implements InterStatement, FindClassJNI, GetStaticFieldIdJNI, GetStaticFieldJNI {
 	private final String className;
@@ -82,7 +80,7 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 			function.addInstruction(
 				new MoveInstruction(
 					fromField(className, fieldName, result),
-					of(fromILRegister(result))
+					result.toX64()
 				)
 			);
 		}
