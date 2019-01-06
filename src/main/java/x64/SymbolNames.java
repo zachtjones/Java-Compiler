@@ -3,8 +3,14 @@ package x64;
 public class SymbolNames {
 
     public static String getFieldName(String javaClass, String javaField) {
+        final String prefix; // dependent on OS, windows has no leading underscores
+        if (System.getProperty("os.name").contains("Win")) {
+            prefix = "Java_";
+        } else {
+            prefix = "_Java_";
+        }
         // use the JNI syntax
-        return "_Java_" + escape(javaClass) + "_" + escape(javaField);
+        return prefix + escape(javaClass) + "_" + escape(javaField);
     }
 
     /** Escapes the name suitable for the name of the assembly / C function */

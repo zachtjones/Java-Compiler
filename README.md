@@ -3,19 +3,13 @@ This is a Java program used to compile Java files into native code.
 Instead of using a complete java library implementation, this uses the Java Native Interface for calling
 Java library methods.
 
-The supported output languages are planned to be x86-64 and AMD64.
+The supported output languages are x86-64 and AMD64.
 
-## Introduction
-This program is written in Java, with the use of JavaCC as the parser.
-If using Intellij, install the JavaCC plugin,
-The purpose of this project is not to replace the JVM, but instead demonstrate an
-understanding of how a high level language can actually run on hardware.
-This program is not complete, but does the following:
-  1. Parses java code
-  2. Converts the AST to a register-based intermediate language
-     - this language was designed to be a high level abstraction of common assembly languages
-  3. Type checks the resulting intermediate language
-  4. Prints out the intermediate language
+## Prerequisites
+ - java/javac 8+ in the path
+ - gcc, also in the PATH (used to assemble and link results)
+ - If using Intellij, there is a plugin for JavaCC; this will make editing the parser easier
+
 
 ## Contributing
  - GitHub issues are being used for features & bugs that are planned to be implemented

@@ -1,6 +1,13 @@
 package main;
 
 import helper.CompileException;
+import intermediate.InterFile;
+import x64.X64File;
+import x64.X64Function;
+import x64.instructions.CallClassMethod;
+import x64.instructions.PopInstruction;
+import x64.instructions.PushInstruction;
+import x64.operands.X64NativeRegister;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,9 +17,11 @@ import static main.FileWriter.writeToOutput;
 
 public class JavaCompiledMain {
     private final String content;
+    private final InterFile mainClass;
 
-    JavaCompiledMain() {
+    JavaCompiledMain(InterFile mainClass) {
         content = readResourcesFile("Main.java");
+        this.mainClass = mainClass;
     }
 
     /** Compiles the Main class for java, saving it to the temp folder. */
@@ -24,24 +33,26 @@ public class JavaCompiledMain {
         // `javac Main.java`
         Process p = Runtime.getRuntime().exec("javac Main.java",
                 new String[]{}, new File(OutputDirs.ASSEMBLED.location));
-        p.waitFor();
-        System.out.println("javac Main.java -> " + p.exitValue());
 
-        // copy the assembly bridge file
-        writeToOutput(OutputDirs.ASSEMBLY, "Main.s", readResourcesFile("Main-x86_64.s"));
+        System.out.println("javac Main.java -> " + p.waitFor());
 
-        // Signature for the main method defined in the program
-        // JNIEXPORT void JNICALL Java_Main_mainMethod(JNIEnv *, jclass, jobjectArray);
+        // write the assembly bridge file
+        final X64File bridgeFile = new X64File("main");
+        final X64Function bridgeFunction = new X64Function("Main", "mainMethod", 0);
+        bridgeFile.addFunction(bridgeFunction);
 
-        // 64-bit architecture:
-        //  int = jint, long = jlong, unsigned char = jboolean, unsigned short = jchar,
-        //  short = jshort, float = jfloat, double = jdouble
-        //  int = jsize
+        bridgeFunction.addInstruction(
+            new PushInstruction(X64NativeRegister.RBX)
+        );
+        bridgeFunction.addInstruction(
+            new CallClassMethod(mainClass.getName(), "main")
+        );
+        bridgeFunction.addInstruction(
+            new PopInstruction(X64NativeRegister.RBX)
+        );
+        bridgeFile.allocateRegisters();
 
-        // System.getProperty("os.arch") -> "x86_64" or "amd64"
-        // System.getProperty("os.name") -> "Mac OS X"
-        // System.getProperty("os.version") -> "10.14"
-
+        FileWriter.writeToOutput(OutputDirs.ASSEMBLY, "Main.s", bridgeFile.toString());
     }
 
     /** Returns the library file name for "Main"

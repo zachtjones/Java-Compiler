@@ -13,3 +13,4 @@ temp/*
 differences.txt
 .idea/
 target/
+config.properties

@@ -10,7 +10,6 @@ import helper.CompileException;
 import javaLibrary.JavaLibraryLookup;
 import tree.*;
 import intermediate.*;
-import x64.SymbolNames;
 import x64.X64File;
 
 public class JavaCompiler {
@@ -124,7 +123,7 @@ public class JavaCompiler {
 			}
 
 			// compile to the native code - starting with the java -> native class
-			final JavaCompiledMain entryCode = new JavaCompiledMain();
+			final JavaCompiledMain entryCode = new JavaCompiledMain(mainClass);
 			entryCode.compile();
 
 			// step 1: compile the code down to assembly files
@@ -137,11 +136,6 @@ public class JavaCompiler {
 						"Unsupported computer architecture. Currently only supports x86_64 & amd64.", "", -1);
 			}
 
-			final String assemblyMain = FileReader.readResourcesFile("Main-x86_64.s")
-				.replace("$NAME$", SymbolNames.getMethodName(mainClass.getName(), "main"));
-
-			FileWriter.writeToOutput(OutputDirs.ASSEMBLY, "main.s", assemblyMain);
-
 			for (InterFile f : cache.values()) {
 				X64File compiled = f.compileX64();
 				FileWriter.writeToOutput(OutputDirs.PSEUDO_ASSEMBLY, compiled.getFileName(), compiled.toString());
@@ -150,20 +144,27 @@ public class JavaCompiler {
 				FileWriter.writeToOutput(OutputDirs.ASSEMBLY, compiled.getFileName(), compiled.toString());
 			}
 
-			System.out.println(entryCode.getLibraryName());
-			final String command = "gcc --save-temps -shared Main.s HelloWorld.s -o ../assembled/"
-				+ entryCode.getLibraryName();
-
-			Process assembleCode = Runtime.getRuntime()
-				.exec(command, new String[]{}, new File(OutputDirs.ASSEMBLY.location));
+			final ProcessBuilder builder = new ProcessBuilder(
+				"gcc",
+				"-shared",
+				"--save-temps",
+				"Main.s",
+				"HelloWorld.s",
+				"-o",
+				"../assembled/" + entryCode.getLibraryName()
+			);
+			builder.directory(new File(OutputDirs.ASSEMBLY.location));
+			builder.redirectErrorStream(true);
+			final Process p = builder.start();
 
 			System.out.println("Output from gcc:");
 			BufferedReader assemblerOutputReader = new BufferedReader(
-				new InputStreamReader(assembleCode.getErrorStream()));
+				new InputStreamReader(p.getInputStream()));
 			String line;
 			while ((line = assemblerOutputReader.readLine()) != null) {
 				System.out.println(line);
 			}
+			System.out.println("gcc exit: " + p.waitFor());
 
 			System.out.println("Done, results are in the temp/assembled folder.");
 			System.out.println("Invoke the program: `java -Djava.library.path=. Main` from the temp folder");
