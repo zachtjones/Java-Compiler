@@ -2,9 +2,9 @@ package intermediate;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import tree.CompileHistory;
 import tree.Expression;
 import tree.SymbolTable;
+import x64.Instruction;
 
 /**
  * Represents an abstraction of a hardware Register.
@@ -26,6 +26,7 @@ public class Register implements Expression {
 	public static final int REFERENCE = 8;
 	public static final int NULL = 9;
 	public static final int LABEL = 10;
+	public static final int VOID = 11;
 	
 	public int num;
 	public int type;
@@ -56,6 +57,7 @@ public class Register implements Expression {
 			case FLOAT: return "%f" + num;
 			case DOUBLE: return "%d" + num;
 			case REFERENCE: return "%r" + num;
+			case VOID: return "%v" + num;
 			}
 			return "unknown register type: " + type;
 		} else {
@@ -112,6 +114,9 @@ public class Register implements Expression {
 		case NULL:
 			typeFull = "null";
 			break;
+		case VOID:
+			typeFull = "void";
+			break;
 		}
 	}
 
@@ -121,9 +126,9 @@ public class Register implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// make a copy statement so the result can be gotten with r.getLast()
-		Register result = r.getNext(type);
+		Register result = f.allocator.getNext(type);
 		f.statements.add(new CopyStatement(this, result, fileName, line));
 	}
 	
@@ -153,4 +158,31 @@ public class Register implements Expression {
 		// return -1, line doesn't exist
 		return -1;
 	}
+
+	/** Returns the instruction size that is suitable for this instruction, for the x64 architecture */
+	public Instruction.Size x64Type() {
+		switch(type) {
+			case BOOLEAN:
+			case BYTE:
+				return Instruction.Size.BYTE;
+
+			case CHAR:
+			case SHORT:
+				return Instruction.Size.WORD;
+
+			case INT:
+				return Instruction.Size.LONG;
+
+			case LONG:
+				return Instruction.Size.QUAD;
+
+			case FLOAT:
+				return Instruction.Size.SINGLE;
+
+			case DOUBLE:
+				return Instruction.Size.DOUBLE;
+		}
+		// references / nulls
+		return Instruction.Size.QUAD;
+    }
 }

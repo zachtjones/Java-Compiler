@@ -4,6 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import helper.CompileException;
+import tree.CompileHistory;
+import x64.SymbolNames;
+import x64.X64File;
+import x64.X64Function;
+import x64.directives.ByteAlignment;
+import x64.directives.GlobalSymbol;
+import x64.directives.LabelInstruction;
+import x64.directives.SegmentChange;
+import x64.instructions.ReturnInstruction;
 
 public class InterFunction {
 	
@@ -19,13 +28,19 @@ public class InterFunction {
 	public ArrayList<String> throwsList;
 	
 	public ArrayList<InterStatement> statements;
+
+	public final RegisterAllocator allocator;
+	public final CompileHistory history;
 	
 	
 	public InterFunction() {
-		this.paramTypes = new ArrayList<String>();
-		this.paramNames = new ArrayList<String>();
-		this.throwsList = new ArrayList<String>();
-		this.statements = new ArrayList<InterStatement>();
+		this.paramTypes = new ArrayList<>();
+		this.paramNames = new ArrayList<>();
+		this.throwsList = new ArrayList<>();
+		this.statements = new ArrayList<>();
+
+		allocator = new RegisterAllocator();
+		history = new CompileHistory();
 	}
 	
 	@Override
@@ -86,10 +101,10 @@ public class InterFunction {
 	 * @param className	The fully qualified name for the InterFile. 
 	 * @throws CompileException If there is an error with type checking.*/
 	public void typeCheck(String className) throws CompileException {
-		HashMap<Register, String> definitions = new HashMap<Register, String>();
-		HashMap<String, String> locals = new HashMap<String, String>();
+		HashMap<Register, String> definitions = new HashMap<>();
+		HashMap<String, String> locals = new HashMap<>();
 		// define parameters and fill it in.
-		HashMap<String, String> params = new HashMap<String, String>();
+		HashMap<String, String> params = new HashMap<>();
 		for (int i = 0; i < paramTypes.size(); i++) {
 			params.put(paramNames.get(i), paramTypes.get(i));
 		}
@@ -102,4 +117,23 @@ public class InterFunction {
 			i.typeCheck(definitions, locals, params, this);
 		}		
 	}
+
+	/**
+	 * Compiles down to the assembly.
+	 * Note the x64 assembly has unlimited registers until it goes to the next step.
+	 * @param assemblyFile The assembly file to add instructions to.
+	 */
+    public void compile(X64File assemblyFile) throws CompileException {
+
+        // TODO the name mangled args to allow for method overloading
+		X64Function function = new X64Function(assemblyFile.getJavaName(), name, allocator.getNextLabel());
+
+        // add the instructions for the statements -> x64
+        for (InterStatement statement : statements) {
+            statement.compile(assemblyFile, function);
+        }
+
+        assemblyFile.addFunction(function);
+
+    }
 }

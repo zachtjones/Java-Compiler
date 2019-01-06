@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import helper.CompileException;
 import tree.NameNode;
+import x64.X64File;
 
 public class InterFile {
 	private String name;
@@ -16,13 +17,13 @@ public class InterFile {
 
 	/**
 	 * Creates an intermediate file, given the name
-	 * @param fileName The name, such as java/util/Scanner
+	 * @param name The name, such as java/util/Scanner
 	 */
 	public InterFile(String name) {
 		this.name = name;
 		this.staticPart = new InterStructure(false);
 		this.instancePart = new InterStructure(true);
-		this.functions = new ArrayList<InterFunction>();
+		this.functions = new ArrayList<>();
 	}
 
 	/**
@@ -131,31 +132,28 @@ public class InterFile {
 				hasOne = true;
 			}
 		}
-		if (!hasOne) {
+		if (!hasOne && superNode != null) {
 			InterFunction d = new InterFunction();
 			// add the name and return type
 			d.name = "<init>";
 			d.isInstance = true;
-			d.returnType = fileName.replace(".jil", "");
-			
+			d.returnType = "void";
+
 			// add the only statement, super();
-			d.statements = new ArrayList<InterStatement>();
+			d.statements = new ArrayList<>();
 			CallActualStatement c;
 			Register[] args = new Register[0];
-			
+
 			// load this pointer (call super on this)
 			RegisterAllocator ra = new RegisterAllocator();
 			Register thisPointer = ra.getNext(Register.REFERENCE);
+			thisPointer.typeFull = name;
 			d.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
+			Register voidReg = ra.getNext(Register.VOID);
 			//  superclass of this object.
-			if (superNode != null) {
-				// add in the call to it's init
-				c = new CallActualStatement(thisPointer, superNode.primaryName, "<init>", args, null,
-						fileName, line);
-			} else {
-				c = new CallActualStatement(thisPointer, "java/lang/Object", "<init>", args, null,
-						fileName, line);
-			}
+			// add in the call to it's init
+			c = new CallActualStatement(thisPointer, superNode.primaryName, "<init>", args, voidReg,
+				fileName, line);
 			d.statements.add(c);
 			functions.add(d);
 		}
@@ -212,5 +210,23 @@ public class InterFile {
 			// TODO the ... on args and inheritance
 		}
 		return null;
+	}
+
+	/**
+	 * Creates an X64 file representing this intermediate file.
+	 * @return The X64 assembly file.
+	 * @throws CompileException If there is a problem converting the IL to the assembly.
+	 */
+	public X64File compileX64() throws CompileException {
+
+		// TODO use the inheritance to build to function tables
+
+		X64File compiled = new X64File(this.name);
+
+		for (InterFunction function : functions) {
+			function.compile(compiled);
+		}
+
+		return compiled;
 	}
 }

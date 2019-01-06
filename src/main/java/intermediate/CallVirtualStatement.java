@@ -6,13 +6,22 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.UsageCheck;
 import main.JavaCompiler;
+import x64.X64File;
+import x64.X64Function;
+import x64.jni.CallMethodJNI;
+import x64.jni.GetMethodIdJNI;
+import x64.jni.GetObjectClassJNI;
+import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
+
+import static x64.operands.X64RegisterOperand.of;
 
 /** Represents a function call via v-table lookup. */
-public class CallVirtualStatement implements InterStatement {
-	Register obj;
+public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, GetMethodIdJNI, CallMethodJNI {
+	private final Register obj;
 	String name;
-	Register[] args;
-	Register returnVal;
+	private final Register[] args;
+	private final Register returnVal;
 	
 	private final String fileName;
 	private final int line;
@@ -68,6 +77,29 @@ public class CallVirtualStatement implements InterStatement {
 			
 			returnVal.typeFull = returnType;
 			regs.put(returnVal, returnVal.typeFull);
+		}
+	}
+
+	@Override
+	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+		// if the type of the register is java/*, use JNI
+		if (obj.typeFull.startsWith("java/")) {
+
+			final X64RegisterOperand objReg = of(X64PreservedRegister.fromILRegister(obj));
+
+			// clazz = GetClass
+			final X64RegisterOperand clazz = addGetObjectClass(function, objReg);
+
+			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
+			X64RegisterOperand methodId =
+				addGetMethodId(assemblyFile, function, clazz, name, args, returnVal);
+
+			// result = Call<Type>Method(JNIEnv, obj, methodID, ...)
+			addCallMethodJNI(function, objReg, methodId, args, returnVal);
+
+		} else {
+			// TODO requires adding the virtual function tables to the system of files
+			throw new CompileException("V-table lookup not implemented yet.", fileName, line);
 		}
 	}
 }

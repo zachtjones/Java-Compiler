@@ -4,7 +4,6 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 /** Represents a do-nothing operation*/
 public class NoOp implements Node, Expression, StatementNode, TypeDecNode {
@@ -30,8 +29,7 @@ public class NoOp implements Node, Expression, StatementNode, TypeDecNode {
 	public void resolveImports(ClassLookup c) throws CompileException {}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, 
-			CompileHistory c) throws CompileException {}
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {}
 
 	@Override
 	public InterFile compile(String packageName, SymbolTable classLevel) throws CompileException {

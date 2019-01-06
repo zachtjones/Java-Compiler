@@ -1,16 +1,16 @@
 package helper;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import main.JavaCompiler;
+
+import javaLibrary.JavaLibraryLookup;
 import tree.ImportNode;
 import tree.NameNode;
 import tree.SymbolTable;
 
 public class ClassLookup {
-	private HashMap<String, String> items = new HashMap<String, String>();
+	private HashMap<String, String> items = new HashMap<>();
 	
 	/**
 	 * Loads the imports to reference the proper items.
@@ -52,23 +52,12 @@ public class ClassLookup {
 			String name = i.name.primaryName;
 			if (name.startsWith("java.")) {
 				if (i.isAll) {
-					File folderName = new File(JavaCompiler.javaDir + "/" + name.replace('.', '/'));
-					String[] files = folderName.list();
-					for (String file : files) {
-						if (file.endsWith(".java")) {
-							String shortName = file.replace(".java", "");
-							String fullName = name.replace('.', '/') + '/' + shortName;
-							items.put(shortName, fullName);
-							items.put(fullName.replace('/', '.'), fullName);
-							items.put(fullName, fullName);
-						}
+					String packageImported = i.name.primaryName;
+					for (String className : JavaLibraryLookup.getClassesInPackage(packageImported)) {
+						putNames(className);
 					}
 				} else {
-					String simpleName = name.substring(name.lastIndexOf('.') + 1);
-					String fullyQualified = name.replace('.', '/');
-					items.put(simpleName, fullyQualified);
-					items.put(fullyQualified, fullyQualified);
-					items.put(name, fullyQualified);
+					putNames(name);
 				}
 			}
 		}
@@ -80,15 +69,18 @@ public class ClassLookup {
 		}
 	}
 
+	private void putNames(String name) {
+		String simpleName = name.substring(name.lastIndexOf('.') + 1);
+		String fullyQualified = name.replace('.', '/');
+		items.put(simpleName, fullyQualified);
+		items.put(fullyQualified, fullyQualified);
+		items.put(name, fullyQualified);
+	}
+
 	/** Gets the full name from the short name representation.
 	 * @param shortName the short name of this class/interface/enum
-	 * @throws IOException A network is used to lookup the java all 
-	 * classes for the first time.
-	 * If there is an issue with this lookup, this exception is thrown.
-	 * @throws CompileException If there is an error compiling.
 	 * */
-	public String getFullName(String shortName, String fileName, int line)
-			throws CompileException {
+	public String getFullName(String shortName) {
 
 		// handle Object -> java/lang/Object, 
 		//   java.lang.Object -> java/lang/Object, 

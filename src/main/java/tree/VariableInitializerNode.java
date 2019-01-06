@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 public class VariableInitializerNode implements Node {
     /** this is if you do { VariableInitializerNodes }
@@ -45,9 +44,9 @@ public class VariableInitializerNode implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		if (e != null) {
-			e.compile(s, f, r, c);
+			e.compile(s, f);
 		} else {
 			// TODO
 			throw new CompileException("array initializer expressions with items not implemented.",

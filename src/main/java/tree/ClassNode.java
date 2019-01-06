@@ -6,7 +6,6 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 /** This represents a class in the tree
 * @author Zach Jones
@@ -63,7 +62,7 @@ public class ClassNode implements TypeDecNode {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// this method should not be called.
 	}
 

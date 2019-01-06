@@ -3,7 +3,6 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 public class BlockStatementNode implements Node {
     // only one of these is not null
@@ -38,12 +37,12 @@ public class BlockStatementNode implements Node {
 	}
     
     @Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// pass down -- local variable declaration puts an entry
     	if (statement != null) {
-    		statement.compile(s, f, r, c);
+    		statement.compile(s, f);
     	} else {
-    		dec.compile(s, f, r, c);
+    		dec.compile(s, f);
     	}
 		
 	}

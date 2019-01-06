@@ -3,7 +3,6 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 import intermediate.ThrowStatement;
 
 public class ThrowStatementNode implements StatementNode {
@@ -32,11 +31,11 @@ public class ThrowStatementNode implements StatementNode {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// compile in the expression
-		expression.compile(s, f, r, c);
+		expression.compile(s, f);
 		// throw the result of the expression.
-		ThrowStatement th = new ThrowStatement(r.getLast(), fileName, line);
+		ThrowStatement th = new ThrowStatement(f.allocator.getLast(), fileName, line);
 		f.statements.add(th);
 	}
 }

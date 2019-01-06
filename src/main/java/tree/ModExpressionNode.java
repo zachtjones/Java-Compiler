@@ -5,7 +5,6 @@ import helper.CompileException;
 import intermediate.BinaryOpStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 
 /** left % right */
 public class ModExpressionNode implements Expression {
@@ -36,18 +35,18 @@ public class ModExpressionNode implements Expression {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) 
+	public void compile(SymbolTable s, InterFunction f)
 			throws CompileException {
 		
 		// evaluate left
-		left.compile(s, f, r, c);
-		Register leftResult = r.getLast();
+		left.compile(s, f);
+		Register leftResult = f.allocator.getLast();
 		// evaluate right
-		right.compile(s, f, r, c);
-		Register rightResult = r.getLast();
+		right.compile(s, f);
+		Register rightResult = f.allocator.getLast();
 
 		// add them
-		Register destination = r.getNext(Register.getLarger(leftResult.type, rightResult.type));
+		Register destination = f.allocator.getNext(Register.getLarger(leftResult.type, rightResult.type));
 		f.statements.add(new BinaryOpStatement(leftResult, rightResult, destination, '%', fileName, line));
 	}
 }

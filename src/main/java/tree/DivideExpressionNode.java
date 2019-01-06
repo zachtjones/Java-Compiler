@@ -5,7 +5,6 @@ import helper.CompileException;
 import intermediate.BinaryOpStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 
 /** left / right */
 public class DivideExpressionNode implements Expression {
@@ -36,15 +35,15 @@ public class DivideExpressionNode implements Expression {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
-		left.compile(s, f, r, c);
-		Register leftResult = r.getLast();
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+		left.compile(s, f);
+		Register leftResult = f.allocator.getLast();
 		
-		right.compile(s, f, r, c);
-		Register rightResult = r.getLast();
+		right.compile(s, f);
+		Register rightResult = f.allocator.getLast();
 		
 		// get the result
-		Register result = r.getNext(Register.getLarger(leftResult.type, rightResult.type));
+		Register result = f.allocator.getNext(Register.getLarger(leftResult.type, rightResult.type));
 		f.statements.add(new BinaryOpStatement(leftResult, rightResult, result, '/', fileName, line));
 		
 	}

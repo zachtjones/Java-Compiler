@@ -3,7 +3,6 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 public class LabeledStatementNode implements StatementNode {
     public String name;
@@ -32,7 +31,7 @@ public class LabeledStatementNode implements StatementNode {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// put the label into the table
 		s.putEntry(name, "Label", fileName, line);
 		

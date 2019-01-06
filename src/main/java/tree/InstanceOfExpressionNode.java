@@ -5,7 +5,6 @@ import helper.CompileException;
 import intermediate.InstanceOfStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 
 /* left instanceof right */
 public class InstanceOfExpressionNode implements Expression {
@@ -37,13 +36,13 @@ public class InstanceOfExpressionNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
-		left.compile(s, f, r, c);
-		Register value = r.getLast();
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+		left.compile(s, f);
+		Register value = f.allocator.getLast();
 		// test if value is the instance of the class
 		String className = right.getILRep();
 		
-		Register result = r.getNext(Register.BOOLEAN);
+		Register result = f.allocator.getNext(Register.BOOLEAN);
 		
 		f.statements.add(new InstanceOfStatement(value, className, result, fileName, line));
 	}

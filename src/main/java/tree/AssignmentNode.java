@@ -5,7 +5,6 @@ import helper.CompileException;
 import intermediate.CopyStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
-import intermediate.RegisterAllocator;
 import intermediate.StoreAddressStatement;
 
 /** left type right */
@@ -51,7 +50,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) 
+	public void compile(SymbolTable s, InterFunction f)
 			throws CompileException {
 		
 		if (type == ASSIGN) {
@@ -59,12 +58,12 @@ public class AssignmentNode implements StatementExprNode, Expression {
 				throw new CompileException("left side of = expression not able to assign to. " 
 							+ left.toString(), fileName, line);
 			}
-			right.compile(s, f, r, c);
-			Register rightResult = r.getLast();
+			right.compile(s, f);
+			Register rightResult = f.allocator.getLast();
 			
 			LValue leftSide = (LValue)left;
-			leftSide.compileAddress(s, f, r, c);
-			Register leftAddress = r.getLast(); // a reference
+			leftSide.compileAddress(s, f);
+			Register leftAddress = f.allocator.getLast(); // a reference
 			
 			// store the result of the right side into the address
 			StoreAddressStatement store = new StoreAddressStatement(rightResult, leftAddress,
@@ -74,7 +73,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			
 			// the result of an assign is the expression on the right
 			// this allows for x = y = 5;
-			Register result = r.getNext(rightResult.type);
+			Register result = f.allocator.getNext(rightResult.type);
 			f.statements.add(new CopyStatement(rightResult, result, fileName, line));
 		} else if (type == STARASSIGN) {
 			// x *= 5 ->  x = x * 5;
@@ -86,7 +85,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			assign.right = mult;
 			
 			// compile the new node created
-			assign.compile(s, f, r, c);
+			assign.compile(s, f);
 
 		} else if (type == SLASHASSIGN) {
 			// x /= 5 ->  x = x / 5;
@@ -98,7 +97,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			assign.right = div;
 
 			// compile the new node created
-			assign.compile(s, f, r, c);
+			assign.compile(s, f);
 
 		} else if (type == REMASSIGN) {
 			// x %= 5 ->  x = x % 5;
@@ -110,7 +109,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			assign.right = mod;
 
 			// compile the new node created
-			assign.compile(s, f, r, c);
+			assign.compile(s, f);
 			
 		} else if (type == PLUSASSIGN) {
 			// x += 5 ->  x = x + 5;
@@ -122,7 +121,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			assign.right = add;
 			
 			// compile the new node created
-			assign.compile(s, f, r, c);
+			assign.compile(s, f);
 			
 		} else if (type == MINUSASSIGN) {
 			// x -= 5 ->  x = x - 5;
@@ -134,7 +133,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			assign.right = sub;
 			
 			// compile the new node created
-			assign.compile(s, f, r, c);
+			assign.compile(s, f);
 			
 		} else if (type == LSHIFTASSIGN) {
 			// x -= 5 ->  x = x << 5;
@@ -146,7 +145,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			assign.right = lefts;
 
 			// compile the new node created
-			assign.compile(s, f, r, c);
+			assign.compile(s, f);
 
 		} else if (type == RSIGNEDSHIFTASSIGN) {
 			// x -= 5 ->  x = x >> 5;
@@ -158,7 +157,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			assign.right = rights;
 
 			// compile the new node created
-			assign.compile(s, f, r, c);
+			assign.compile(s, f);
 			
 		} else if (type == RUNSIGNEDSHIFTASSIGN) {
 			// x -= 5 ->  x = x >> 5;
@@ -170,7 +169,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			assign.right = rights;
 
 			// compile the new node created
-			assign.compile(s, f, r, c);
+			assign.compile(s, f);
 			
 		} else if (type == ANDASSIGN) {
 			// x -= 5 ->  x = x >> 5;
@@ -182,7 +181,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			assign.right = and;
 
 			// compile the new node created
-			assign.compile(s, f, r, c);
+			assign.compile(s, f);
 
 		} else if (type == ORASSIGN) {
 			// x -= 5 ->  x = x >> 5;
@@ -194,7 +193,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			assign.right = and;
 
 			// compile the new node created
-			assign.compile(s, f, r, c);
+			assign.compile(s, f);
 			
 		} else {
 			// unknown type of assignment.

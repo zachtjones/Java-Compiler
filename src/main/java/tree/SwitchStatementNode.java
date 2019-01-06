@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 public class SwitchStatementNode implements StatementNode {
     public Expression expression;
@@ -42,7 +41,7 @@ public class SwitchStatementNode implements StatementNode {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) 
+	public void compile(SymbolTable s, InterFunction f)
 			throws CompileException {
 		
 		throw new CompileException("Switch statement compiling not implemented yet.", fileName, line);

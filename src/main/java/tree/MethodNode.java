@@ -52,16 +52,13 @@ public class MethodNode {
 		
 		// TODO - final and synchronized, ... modifiers
 		
-		RegisterAllocator r = new RegisterAllocator();
-		CompileHistory c = new CompileHistory();
-		
 		// create new scope, use the declaratorNode to add to the new scope
 		SymbolTable paramTable = new SymbolTable(syms, SymbolTable.parameter);
-		dec.compile(paramTable, func, r, c);
+		dec.compile(paramTable, func);
 		
 		// create new scope under the parameters for the code
 		SymbolTable codeTable = new SymbolTable(paramTable, SymbolTable.local);
-		code.compile(codeTable, func, r, c);
+		code.compile(codeTable, func);
 		f.addFunction(func);
 	}
 

@@ -3,7 +3,6 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 /** (type[]...)expr */
 public class ObjectCastExpressionNode implements Expression {
@@ -35,7 +34,7 @@ public class ObjectCastExpressionNode implements Expression {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// TODO
 		throw new CompileException("Object cast not implemented yet.", fileName, line);
 	}

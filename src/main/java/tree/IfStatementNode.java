@@ -6,7 +6,6 @@ import intermediate.BranchStatmentFalse;
 import intermediate.InterFunction;
 import intermediate.JumpStatement;
 import intermediate.LabelStatement;
-import intermediate.RegisterAllocator;
 
 public class IfStatementNode implements StatementNode {
     public Expression expression;
@@ -40,21 +39,21 @@ public class IfStatementNode implements StatementNode {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f, RegisterAllocator r, CompileHistory c) throws CompileException {
+	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// create new scope
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.local);
 		
-		LabelStatement elseLbl = new LabelStatement("L_ELSE" + r.getNextLabel());
-		LabelStatement endLbl = new LabelStatement("L_END" + r.getNextLabel());
+		LabelStatement elseLbl = new LabelStatement("L_ELSE" + f.allocator.getNextLabel());
+		LabelStatement endLbl = new LabelStatement("L_END" + f.allocator.getNextLabel());
 		
 		// if expression == 0, goto else
 		// start with the expression
-		expression.compile(newTable, f, r, c);
+		expression.compile(newTable, f);
 		// branch if == 0 to else (false)
-		f.statements.add(new BranchStatmentFalse(elseLbl, r.getLast(), fileName, line));
+		f.statements.add(new BranchStatmentFalse(elseLbl, f.allocator.getLast(), fileName, line));
 		
 		// compile in the true part
-		statement.compile(newTable, f, r, c);
+		statement.compile(newTable, f);
 		// true part -> jump to end
 		f.statements.add(new JumpStatement(endLbl));
 		
@@ -62,7 +61,7 @@ public class IfStatementNode implements StatementNode {
 		f.statements.add(elseLbl);
 		// compile in the else part
 		if (elsePart != null) {
-			elsePart.compile(newTable, f, r, c);
+			elsePart.compile(newTable, f);
 		}
 		
 		// add in end label
