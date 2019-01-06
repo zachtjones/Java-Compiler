@@ -9,7 +9,6 @@ import x64.instructions.MoveInstruction;
 import x64.jni.FindClassJNI;
 import x64.jni.GetStaticFieldIdJNI;
 import x64.jni.GetStaticFieldJNI;
-import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
 
 import static x64.operands.PCRelativeData.fromField;

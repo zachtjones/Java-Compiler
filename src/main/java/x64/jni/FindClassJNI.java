@@ -8,7 +8,6 @@ import x64.operands.*;
 
 import static x64.jni.JNIOffsets.FIND_CLASS;
 import static x64.operands.PCRelativeData.pointerFromLabel;
-import static x64.operands.X64RegisterOperand.of;
 
 public interface FindClassJNI extends CallJNIMethod {
 

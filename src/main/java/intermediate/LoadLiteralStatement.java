@@ -7,7 +7,6 @@ import x64.instructions.LoadEffectiveAddressInstruction;
 import x64.instructions.MoveInstruction;
 import x64.jni.NewStringUTF_JNI;
 import x64.operands.Immediate;
-import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
 
 import java.util.HashMap;

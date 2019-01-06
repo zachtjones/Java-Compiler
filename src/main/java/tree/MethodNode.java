@@ -6,7 +6,6 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 public class MethodNode {
     public boolean isPublic;

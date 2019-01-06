@@ -7,8 +7,6 @@ import x64.instructions.MoveInstruction;
 import x64.jni.JNIOffsets;
 import x64.operands.*;
 
-import static x64.operands.X64RegisterOperand.of;
-
 
 public interface GetIdJNI extends CallJNIMethod {
 

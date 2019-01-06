@@ -2,7 +2,6 @@ package x64.operands;
 
 import intermediate.Register;
 import x64.Instruction;
-import x64.allocation.RegistersUsed;
 
 /** This is an abstraction of a hardware register that is preserved across function calls */
 public class X64PreservedRegister {
