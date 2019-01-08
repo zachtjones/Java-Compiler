@@ -4,10 +4,10 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.ProcessRunner;
 import javaLibrary.JavaLibraryLookup;
 import tree.*;
 import intermediate.*;
@@ -137,41 +137,31 @@ public class JavaCompiler {
 						"Unsupported computer architecture. Currently only supports x86_64 & amd64.", "", -1);
 			}
 
-			// build up the list of files to assemble & link using gcc
-			final List<String> gccCommands = new ArrayList<>(Arrays.asList(
+			final ProcessRunner gcc = new ProcessRunner(
 				"gcc",
 				"-shared",
 				"--save-temps",
 				"-o",
 				"../assembled/" + entryCode.getLibraryName(),
 				"Main.s" // other ones added to this list
-			));
+			);
 
-			// convert files from intermediate to assembly
+			// convert files from intermediate to assembly & add argument to gcc
 			for (InterFile f : cache.values()) {
 				X64File compiled = f.compileX64();
 				FileWriter.writeToOutput(OutputDirs.PSEUDO_ASSEMBLY, compiled.getFileName(), compiled.toString());
 
 				compiled.allocateRegisters();
 				FileWriter.writeToOutput(OutputDirs.ASSEMBLY, compiled.getFileName(), compiled.toString());
-				gccCommands.add(compiled.getFileName());
+				gcc.addArg(compiled.getFileName());
 			}
 
-			// run the gcc compiler
-			final ProcessBuilder builder = new ProcessBuilder(gccCommands);
+			gcc.setDirectory(new File(OutputDirs.ASSEMBLY.location));
 
-			builder.directory(new File(OutputDirs.ASSEMBLY.location));
-			builder.redirectErrorStream(true);
-			final Process p = builder.start();
-
-			System.out.println("Output from gcc:");
-			BufferedReader assemblerOutputReader = new BufferedReader(
-				new InputStreamReader(p.getInputStream()));
-			String line;
-			while ((line = assemblerOutputReader.readLine()) != null) {
-				System.out.println(line);
+			final ProcessRunner.ProcessResult gccResult = gcc.run();
+			if (gccResult.getExitCode() != 0) {
+				throw new CompileException("gcc failed, error is: " + gccResult.getError(), "", -1);
 			}
-			System.out.println("gcc exit: " + p.waitFor());
 
 			System.out.println("Done, results are in the temp/assembled folder.");
 			System.out.println("Invoke the program: `java -Djava.library.path=\".\" Main` from the temp folder");
@@ -187,12 +177,6 @@ public class JavaCompiler {
 			e.printStackTrace();
 		} catch (CompileException e) {
 			System.out.println("Error: " + e.getMessage());
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			System.out.println("Error: interrupted while running");
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.out.println("Error: I/O exception happened while compiling.");
 			e.printStackTrace();
 		}
 	}
