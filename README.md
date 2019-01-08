@@ -8,8 +8,21 @@ The supported output languages are x86-64 and AMD64.
 ## Prerequisites
  - java/javac 8+ in the path
  - gcc, also in the PATH (used to assemble and link results)
+   - clang may be aliased to gcc on Mac OS is there is XCode installed; this is not a problem
  - If using Intellij, there is a plugin for JavaCC; this will make editing the parser easier
 
+### GCC / java instillation on Windows
+ - For the other platforms, having the two on the path works fine for all versions I've tested
+ - There might be other setups that work, but this one worked for me.
+ - Note that the calling convention is different on Windows than all the other platforms
+ - But for windows, make sure you use MSYS2 with MingGW-w64 installed on it:
+   - https://stackoverflow.com/questions/30069830/how-to-install-mingw-w64-and-msys2/30071634#30071634
+   - If the link above becomes inaccessible:
+     - download msys2 from http://www.msys2.org/ (use the 64-bit version)
+     - from msys2, run `pacman -S mingw-w64-x86_64-gcc`
+     - from msys2, run `pacman -S mingw-w64-x86_64-gsl`
+     - add `C:\path\to\msys64\mingw64\bin` to your PATH variable
+     - verify gcc works by opening a new cmd.exe command prompt, and running `gcc -v`
 
 ## Contributing
  - GitHub issues are being used for features & bugs that are planned to be implemented
