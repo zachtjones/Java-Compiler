@@ -41,18 +41,18 @@ The supported output languages are x86-64 and AMD64.
 
 ## Compiler passes
 1. Parses the language, and builds the resulting tree from the context-free grammar.
-  - package main and the javaCC generated java source files. (using JavaCC)
+   - package main and the javaCC generated java source files. (using JavaCC)
 2. Resolve imports, and fully qualify names.
-  - package tree - method resolveImports()
+   - package tree - method resolveImports()
 3. Build the symbol table, resolving the declarations of the symbols & convert to intermediate language (IL)
-  - package tree - method compile()
+   - package tree - method compile()
 4. Type-check the intermediate language
-  - package intermediate - method typeCheck(), which may bring in other source files into compilation to this step
-  - this also fully-qualifies the function calls & now all registers have a primitive/class type
+   - package intermediate - method typeCheck(), which may bring in other source files into compilation to this step
+   - this also fully-qualifies the function calls & now all registers have a primitive/class type
 5. Convert to pseudo-assembly (see below)
-  - package intermediate - method compile()
+   - package intermediate - method compile()
 6. Allocate the hardware registers
-  - package x64.allocation
+   - package x64.allocation
 7. Write out the x64 assembly
 8. Use the assembler to create the dynamic linked library
 
