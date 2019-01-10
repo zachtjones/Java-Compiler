@@ -3,33 +3,38 @@ package x64.allocation;
 import x64.Instruction;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
+import x64.operands.X64RegisterOperand;
 
 import java.util.*;
 
 public class RegisterTransformer {
 
 	private final ArrayList<Instruction> initialContents;
-	private final Stack<X64NativeRegister> preservedOnes;
-	private final Stack<X64NativeRegister> temporaryOnes;
+	private final Deque<X64NativeRegister> preservedOnes;
+	private final Deque<X64NativeRegister> temporaryOnes;
+
+	private final Deque<X64NativeRegister> initialTemps;
 
 	public RegisterTransformer(ArrayList<Instruction> contents) {
 		this.initialContents = contents;
 
-		preservedOnes = new Stack<>();
-		preservedOnes.push(X64NativeRegister.RBX.nativeOne);
-		preservedOnes.push(X64NativeRegister.RBP.nativeOne);
-		preservedOnes.push(X64NativeRegister.R12.nativeOne);
-		preservedOnes.push(X64NativeRegister.R13.nativeOne);
-		preservedOnes.push(X64NativeRegister.R14.nativeOne);
-		preservedOnes.push(X64NativeRegister.R15.nativeOne);
+		final CallingConvention cc = new CallingConvention();
 
-		temporaryOnes = new Stack<>();
-		temporaryOnes.push(X64NativeRegister.R10.nativeOne);
-		temporaryOnes.push(X64NativeRegister.R11.nativeOne);
+		preservedOnes = new ArrayDeque<>();
+		for (X64RegisterOperand op : cc.getPreservedRegisters()) {
+			preservedOnes.add(op.nativeOne);
+		}
+
+		temporaryOnes = new ArrayDeque<>();
+		initialTemps = new ArrayDeque<>();
+		for (X64RegisterOperand op : cc.getTemporaryRegisters()) {
+			temporaryOnes.add(op.nativeOne);
+			initialTemps.add(op.nativeOne);
+		}
 	}
 
 	private X64NativeRegister getNextTemporary() {
-		if (!temporaryOnes.empty()) return temporaryOnes.pop();
+		if (!temporaryOnes.isEmpty()) return temporaryOnes.pop();
 		return preservedOnes.pop();
 	}
 
@@ -38,7 +43,7 @@ public class RegisterTransformer {
 	}
 
 	private void doneWithRegister(X64NativeRegister reg) {
-		if (reg == X64NativeRegister.R10.nativeOne || reg == X64NativeRegister.R11.nativeOne) {
+		if (initialTemps.contains(reg)) {
 			temporaryOnes.push(reg);
 		} else {
 			preservedOnes.push(reg);
