@@ -1,7 +1,6 @@
 package x64.allocation;
 
 import x64.Instruction;
-import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
 
@@ -18,16 +17,14 @@ public class RegisterTransformer {
 	public RegisterTransformer(ArrayList<Instruction> contents) {
 		this.initialContents = contents;
 
-		final CallingConvention cc = new CallingConvention();
-
 		preservedOnes = new ArrayDeque<>();
-		for (X64RegisterOperand op : cc.getPreservedRegisters()) {
+		for (X64RegisterOperand op : CallingConvention.preservedRegisters()) {
 			preservedOnes.add(op.nativeOne);
 		}
 
 		temporaryOnes = new ArrayDeque<>();
 		initialTemps = new ArrayDeque<>();
-		for (X64RegisterOperand op : cc.getTemporaryRegisters()) {
+		for (X64RegisterOperand op : CallingConvention.temporaryRegisters()) {
 			temporaryOnes.add(op.nativeOne);
 			initialTemps.add(op.nativeOne);
 		}

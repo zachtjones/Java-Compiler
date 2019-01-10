@@ -5,9 +5,10 @@ import x64.SymbolNames;
 import x64.X64Function;
 import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
-import x64.operands.X64NativeRegister;
+import x64.allocation.X64NativeRegister;
 import x64.operands.X64RegisterOperand;
 
+import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.jni.JNIOffsets.getCallMethodOffset;
 
 public interface CallMethodJNI extends CallJNIMethod {
@@ -25,7 +26,7 @@ public interface CallMethodJNI extends CallJNIMethod {
         function.addInstruction(
             new MoveInstruction(
                 objReg,
-                X64NativeRegister.RSI
+                argumentRegister(2)
             )
         );
 
@@ -33,7 +34,7 @@ public interface CallMethodJNI extends CallJNIMethod {
         function.addInstruction(
             new MoveInstruction(
                 methodId,
-                X64NativeRegister.RDX
+                argumentRegister(3)
             )
         );
 

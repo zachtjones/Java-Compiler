@@ -9,7 +9,7 @@ import x64.instructions.MoveInstruction;
 import x64.instructions.PopInstruction;
 import x64.instructions.PushInstruction;
 import x64.instructions.ReturnInstruction;
-import x64.operands.X64NativeRegister;
+import x64.allocation.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
 
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.operands.X64RegisterOperand.of;
 
 public class X64Function {
@@ -43,7 +44,7 @@ public class X64Function {
 		javaEnvPointer = this.getNextQuadRegister();
 
 		// save the first argument, the java environment pointer to a dedicated virtual register.
-		contents.add(new MoveInstruction(X64NativeRegister.RDI, javaEnvPointer));
+		contents.add(new MoveInstruction(argumentRegister(1), javaEnvPointer));
 
 		epilogue.add(new ReturnInstruction());
 	}
@@ -55,7 +56,7 @@ public class X64Function {
 
 	/** Loads the JNI pointer into the first argument */
 	public void loadJNI1() {
-		addInstruction(new MoveInstruction(javaEnvPointer, X64NativeRegister.RDI));
+		addInstruction(new MoveInstruction(javaEnvPointer, argumentRegister(1)));
 	}
 
 	/** Returns the next pseudo register available that is a quad-word size (64-bit) */

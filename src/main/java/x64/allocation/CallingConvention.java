@@ -2,22 +2,16 @@ package x64.allocation;
 
 import x64.operands.X64RegisterOperand;
 
-import static x64.operands.X64NativeRegister.*;
+import static x64.allocation.X64NativeRegister.*;
 
 /**
- * This represents the calling convention, including useful methods for abstracting away the current
- * platform's calling convention.
  * This class deals with the platform specifics of the calling conventions, allowing the other classes to refer
  * to the registers as arg4 instead of RCX on System V AMD64 or R9 on Microsoft x64
  */
 public class CallingConvention {
 
-	private final boolean isMicrosoft;
-
-	/** Uses a constructor & non-static methods so that system properties don't need to be looked up a lot. */
-	public CallingConvention() {
-		isMicrosoft = systemIsMicrosoft();
-	}
+	/** holds if this system is a Microsoft system, so that we don't need repeated system property lookups */
+	private static final boolean isMicrosoft = System.getProperty("os.name").contains("Windows");
 
 	private static final X64RegisterOperand[] argsSystemV = { RDI, RSI, RDX, RCX, R8, R9 };
 	private static final X64RegisterOperand[] argsMicrosoft = { RCX, RDX, R8, R9 };
@@ -32,7 +26,7 @@ public class CallingConvention {
 	 * @param num 1 for the first argument, 2 for the second, ...
 	 * @return The RegisterOperand which is a reference to that register.
 	 */
-	public X64RegisterOperand getArgumentRegister(int num) {
+	public static X64RegisterOperand argumentRegister(int num) {
 		// TODO a sort of pseudo-register for extra arguments more than 4 / 6
 		if (isMicrosoft) {
 			return argsMicrosoft[num - 1];
@@ -42,23 +36,18 @@ public class CallingConvention {
 	}
 
 	/** returns the register operand that is used for holding return values */
-	public X64RegisterOperand getReturnValueRegister() {
+	public static X64RegisterOperand returnValueRegister() {
 		// both System V and Microsoft are same
 		return RAX;
 	}
 
 	/** returns the array of registers whose values must be preserved (not including the stack pointer) */
-	public X64RegisterOperand[] getPreservedRegisters() {
+	public static X64RegisterOperand[] preservedRegisters() {
 		return isMicrosoft ? preservedMicrosoft : preservedSystemV;
 	}
 
 	/** returns the array of registers whose values are temporary */
-	public X64RegisterOperand[] getTemporaryRegisters() {
+	public static X64RegisterOperand[] temporaryRegisters() {
 		return extraTemps;
-	}
-
-	/** Utility method to determine if the system uses the microsoft calling convention. */
-	private static boolean systemIsMicrosoft() {
-		return System.getProperty("os.name").contains("Windows");
 	}
 }

@@ -6,7 +6,8 @@ import helper.CompileException;
 import x64.X64File;
 import x64.X64Function;
 import x64.instructions.MoveInstruction;
-import x64.operands.X64NativeRegister;
+
+import static x64.allocation.CallingConvention.argumentRegister;
 
 
 /** getParam %register = name */
@@ -56,7 +57,7 @@ public class GetParamStatement implements InterStatement {
 		if (localName.equals("this")) {
 			function.addInstruction(
 				new MoveInstruction(
-					X64NativeRegister.RSI,
+					argumentRegister(2),
 					r.toX64()
 				)
 			);
@@ -66,7 +67,7 @@ public class GetParamStatement implements InterStatement {
 
 			function.addInstruction(
 				new MoveInstruction(
-					X64NativeRegister.argNumbered(paramIndex),
+					argumentRegister(paramIndex),
 					r.toX64()
 				)
 			);

@@ -4,10 +4,10 @@ import helper.CompileException;
 import intermediate.InterFile;
 import x64.X64File;
 import x64.X64Function;
+import x64.allocation.CallingConvention;
 import x64.instructions.CallClassMethod;
 import x64.instructions.PopInstruction;
 import x64.instructions.PushInstruction;
-import x64.operands.X64NativeRegister;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,14 +41,15 @@ public class JavaCompiledMain {
         final X64Function bridgeFunction = new X64Function("Main", "mainMethod", 0);
         bridgeFile.addFunction(bridgeFunction);
 
+        // have to save/restore 1 register to preserve 16-byte alignment
         bridgeFunction.addInstruction(
-            new PushInstruction(X64NativeRegister.RBX)
+            new PushInstruction(CallingConvention.argumentRegister(1))
         );
         bridgeFunction.addInstruction(
             new CallClassMethod(mainClass.getName(), "main")
         );
         bridgeFunction.addInstruction(
-            new PopInstruction(X64NativeRegister.RBX)
+            new PopInstruction(CallingConvention.argumentRegister(1))
         );
         bridgeFile.allocateRegisters();
 

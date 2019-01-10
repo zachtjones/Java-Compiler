@@ -2,6 +2,7 @@ package x64.jni;
 
 import x64.X64File;
 import x64.X64Function;
+import x64.allocation.CallingConvention;
 import x64.instructions.LoadEffectiveAddressInstruction;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.*;
@@ -29,7 +30,7 @@ public interface FindClassJNI extends CallJNIMethod {
         function.addInstruction(
             new LoadEffectiveAddressInstruction(
                 pointerFromLabel(label),
-                X64NativeRegister.RSI
+                CallingConvention.argumentRegister(2)
             )
         );
 
