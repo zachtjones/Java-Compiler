@@ -101,6 +101,11 @@ public class RegisterTransformer {
 			}
 		}
 
+		// add another one if there are an even number used -- might add one already in the set
+		while (usedPreservedRegs.size() % 2 == 0) {
+			usedPreservedRegs.add(getNextPreserved());
+		}
+
 		return usedPreservedRegs;
 	}
 

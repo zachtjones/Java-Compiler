@@ -50,4 +50,9 @@ public class CallingConvention {
 	public static X64RegisterOperand[] temporaryRegisters() {
 		return extraTemps;
 	}
+
+	/** returns true if the caller need to allocate 32 bytes (4 registers) for the callee to store it's args */
+	public static boolean needsToAllocate32BytesForArgs() {
+		return isMicrosoft;
+	}
 }

@@ -5,11 +5,9 @@ import x64.directives.ByteAlignment;
 import x64.directives.GlobalSymbol;
 import x64.directives.LabelInstruction;
 import x64.directives.SegmentChange;
-import x64.instructions.MoveInstruction;
-import x64.instructions.PopInstruction;
-import x64.instructions.PushInstruction;
-import x64.instructions.ReturnInstruction;
+import x64.instructions.*;
 import x64.allocation.X64NativeRegister;
+import x64.operands.Immediate;
 import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
 
@@ -19,6 +17,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static x64.allocation.CallingConvention.argumentRegister;
+import static x64.allocation.CallingConvention.needsToAllocate32BytesForArgs;
+import static x64.allocation.X64NativeRegister.RSP;
 import static x64.operands.X64RegisterOperand.of;
 
 public class X64Function {
@@ -77,6 +77,19 @@ public class X64Function {
 			this.epilogue.add(0,
 				new PopInstruction(of(usedReg))
 			);
+		}
+
+		// do the allocation of 32 bytes stack space for callee to save arguments if needed by the calling convention
+		if (needsToAllocate32BytesForArgs()) {
+			prologue.add(new SubtractInstruction(
+				new Immediate(32),
+				RSP
+			));
+
+			epilogue.add(0, new AddInstruction(
+				new Immediate(32),
+				RSP
+			));
 		}
 	}
 

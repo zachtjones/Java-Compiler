@@ -38,6 +38,9 @@ public class X64NativeRegister {
 	static final X64RegisterOperand R10 = of(new X64NativeRegister("%r10"));
 	static final X64RegisterOperand R11 = of(new X64NativeRegister("%r11"));
 
+	// stack pointer
+	public static final X64RegisterOperand RSP = of(new X64NativeRegister("%rsp"));
+
 	/** How this x64 machine register is represented in the assembly language*/
 	private final String representation;
 
