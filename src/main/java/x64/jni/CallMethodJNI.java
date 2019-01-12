@@ -5,7 +5,6 @@ import x64.SymbolNames;
 import x64.X64Function;
 import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
-import x64.allocation.X64NativeRegister;
 import x64.operands.X64RegisterOperand;
 
 import static x64.allocation.CallingConvention.argumentRegister;
@@ -45,7 +44,7 @@ public interface CallMethodJNI extends CallJNIMethod {
             function.addInstruction(
                 new MoveInstruction(
                     args[i].toX64(),
-                    X64NativeRegister.argNumbered(i + 4)
+                    argumentRegister(i + 4)
                 )
             );
         }

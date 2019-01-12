@@ -3,7 +3,6 @@ package x64.jni;
 import intermediate.Register;
 import x64.SymbolNames;
 import x64.X64Function;
-import x64.allocation.X64NativeRegister;
 import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.MoveInstruction;
 import x64.operands.*;
@@ -62,7 +61,7 @@ public interface CallNonVirtualMethodJNI {
             function.addInstruction(
                 new MoveInstruction(
                     args[i].toX64(),
-                    X64NativeRegister.argNumbered(i + 5)
+                    argumentRegister(i + 5)
                 )
             );
         }
