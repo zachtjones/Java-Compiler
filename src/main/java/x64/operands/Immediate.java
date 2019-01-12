@@ -20,8 +20,7 @@ public class Immediate implements SourceOperand {
 
     @Override
     public String toString() {
-        // simple toString
-        return Long.toString(value);
+        return "$" + value;
     }
 
     @Override

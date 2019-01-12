@@ -2,9 +2,9 @@ package x64.jni;
 
 import intermediate.Register;
 import x64.X64Function;
+import x64.allocation.CallingConvention;
 import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
-import x64.operands.X64NativeRegister;
 import x64.operands.X64RegisterOperand;
 
 import static x64.jni.JNIOffsets.NEW_STRING_UTF;
@@ -26,7 +26,7 @@ public interface NewStringUTF_JNI extends CallJNIMethod {
 		function.addInstruction(
 			new MoveInstruction(
 				chars,
-				X64NativeRegister.RSI
+				CallingConvention.argumentRegister(2)
 			)
 		);
 

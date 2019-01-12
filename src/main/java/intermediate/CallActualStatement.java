@@ -13,8 +13,10 @@ import x64.instructions.MoveInstruction;
 import x64.jni.CallNonVirtualMethodJNI;
 import x64.jni.FindClassJNI;
 import x64.jni.GetMethodIdJNI;
-import x64.operands.X64NativeRegister;
 import x64.operands.X64RegisterOperand;
+
+import static x64.allocation.CallingConvention.argumentRegister;
+import static x64.allocation.CallingConvention.returnValueRegister;
 
 /** Represents a function call without a lookup. */
 public class CallActualStatement implements InterStatement, FindClassJNI, GetMethodIdJNI, CallNonVirtualMethodJNI {
@@ -43,7 +45,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 	public String toString() {
 		// use the Arrays.toString and remove '[' and ']'
 		return "call " + obj + " " + className + '.' + name + "(" 
-				+ Arrays.toString(args).replaceAll("\\[|\\]", "") + ") -> " + returnVal + ";";
+				+ Arrays.toString(args).replaceAll("[]\\[]", "") + ") -> " + returnVal + ";";
 	}
 
 	@Override
@@ -103,7 +105,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			function.addInstruction(
 				new MoveInstruction(
 					obj.toX64(),
-					X64NativeRegister.RSI
+					argumentRegister(2)
 				)
 			);
 
@@ -112,7 +114,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 				function.addInstruction(
 					new MoveInstruction(
 						args[i].toX64(),
-						X64NativeRegister.argNumbered(3 + i)
+						argumentRegister(3 + i)
 					)
 				);
 			}
@@ -125,7 +127,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			// 3. mov %rax, result
 			function.addInstruction(
 				new MoveInstruction(
-					X64NativeRegister.RAX,
+					returnValueRegister(),
 					returnVal.toX64()
 				)
 			);

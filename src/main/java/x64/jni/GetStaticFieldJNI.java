@@ -5,8 +5,9 @@ import x64.SymbolNames;
 import x64.X64Function;
 import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
-import x64.operands.X64NativeRegister;
 import x64.operands.X64RegisterOperand;
+
+import static x64.allocation.CallingConvention.argumentRegister;
 
 public interface GetStaticFieldJNI extends CallJNIMethod {
 
@@ -30,7 +31,7 @@ public interface GetStaticFieldJNI extends CallJNIMethod {
         function.addInstruction(
             new MoveInstruction(
                 classReg,
-                X64NativeRegister.RSI
+                argumentRegister(2)
             )
         );
 
@@ -38,7 +39,7 @@ public interface GetStaticFieldJNI extends CallJNIMethod {
         function.addInstruction(
             new MoveInstruction(
                 fieldIDReg,
-                X64NativeRegister.RDX
+                argumentRegister(3)
             )
         );
 
