@@ -2,7 +2,7 @@ package x64.allocation;
 
 import x64.operands.X64RegisterOperand;
 
-import static x64.allocation.X64NativeRegister.*;
+import static x64.operands.X64NativeRegister.*;
 
 /**
  * This class deals with the platform specifics of the calling conventions, allowing the other classes to refer
@@ -42,12 +42,12 @@ public class CallingConvention {
 	}
 
 	/** returns the array of registers whose values must be preserved (not including the stack pointer) */
-	public static X64RegisterOperand[] preservedRegisters() {
+	static X64RegisterOperand[] preservedRegisters() {
 		return isMicrosoft ? preservedMicrosoft : preservedSystemV;
 	}
 
 	/** returns the array of registers whose values are temporary */
-	public static X64RegisterOperand[] temporaryRegisters() {
+	static X64RegisterOperand[] temporaryRegisters() {
 		return extraTemps;
 	}
 

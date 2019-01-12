@@ -4,7 +4,6 @@ import intermediate.Register;
 import x64.Instruction;
 import x64.SymbolNames;
 import x64.allocation.RegistersUsed;
-import x64.allocation.X64NativeRegister;
 
 import java.util.Map;
 

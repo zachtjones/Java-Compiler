@@ -6,7 +6,7 @@ import x64.directives.GlobalSymbol;
 import x64.directives.LabelInstruction;
 import x64.directives.SegmentChange;
 import x64.instructions.*;
-import x64.allocation.X64NativeRegister;
+import x64.operands.X64NativeRegister;
 import x64.operands.Immediate;
 import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.allocation.CallingConvention.needsToAllocate32BytesForArgs;
-import static x64.allocation.X64NativeRegister.RSP;
+import static x64.operands.X64NativeRegister.RSP;
 import static x64.operands.X64RegisterOperand.of;
 
 public class X64Function {

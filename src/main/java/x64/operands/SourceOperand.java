@@ -1,7 +1,6 @@
 package x64.operands;
 
 import x64.allocation.RegistersUsed;
-import x64.allocation.X64NativeRegister;
 
 import java.util.Map;
 
