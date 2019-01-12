@@ -3,9 +3,9 @@ package x64.jni;
 import x64.X64Function;
 import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
-import x64.operands.X64NativeRegister;
 import x64.operands.X64RegisterOperand;
 
+import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.jni.JNIOffsets.GET_OBJECT_CLASS;
 
 public interface GetObjectClassJNI extends CallJNIMethod {
@@ -26,7 +26,7 @@ public interface GetObjectClassJNI extends CallJNIMethod {
         function.addInstruction(
             new MoveInstruction(
                 object,
-                X64NativeRegister.RSI
+                argumentRegister(2)
             )
         );
 

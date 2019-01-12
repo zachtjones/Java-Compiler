@@ -7,6 +7,8 @@ import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.MoveInstruction;
 import x64.operands.*;
 
+import static x64.allocation.CallingConvention.argumentRegister;
+import static x64.allocation.CallingConvention.returnValueRegister;
 import static x64.jni.JNIOffsets.getCallNonVirtualMethodOffset;
 
 public interface CallNonVirtualMethodJNI {
@@ -33,7 +35,7 @@ public interface CallNonVirtualMethodJNI {
         function.addInstruction(
             new MoveInstruction(
                 objReg,
-                X64NativeRegister.RSI
+                argumentRegister(2)
             )
         );
 
@@ -41,7 +43,7 @@ public interface CallNonVirtualMethodJNI {
         function.addInstruction(
             new MoveInstruction(
                 classReg,
-                X64NativeRegister.RDX
+                argumentRegister(3)
             )
         );
 
@@ -49,7 +51,7 @@ public interface CallNonVirtualMethodJNI {
         function.addInstruction(
             new MoveInstruction(
                 methodId,
-                X64NativeRegister.RCX
+                argumentRegister(4)
             )
         );
 
@@ -59,7 +61,7 @@ public interface CallNonVirtualMethodJNI {
             function.addInstruction(
                 new MoveInstruction(
                     args[i].toX64(),
-                    X64NativeRegister.argNumbered(i + 5)
+                    argumentRegister(i + 5)
                 )
             );
         }
@@ -94,7 +96,7 @@ public interface CallNonVirtualMethodJNI {
         // mov %RAX, %result
         function.addInstruction(
             new MoveInstruction(
-                X64NativeRegister.RAX,
+                returnValueRegister(),
                 returnVal.toX64()
             )
         );

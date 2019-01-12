@@ -37,7 +37,8 @@ public class X64NativeRegister {
 	public static final X64RegisterOperand R10 = of(new X64NativeRegister("%r10"));
 	public static final X64RegisterOperand R11 = of(new X64NativeRegister("%r11"));
 
-	private static final X64RegisterOperand[] args = { RDI, RSI, RDX, RCX, R8, R9 };
+	// stack pointer
+	public static final X64RegisterOperand RSP = of(new X64NativeRegister("%rsp"));
 
 	/** How this x64 machine register is represented in the assembly language*/
 	private final String representation;
@@ -46,13 +47,7 @@ public class X64NativeRegister {
 		this.representation = representation;
 	}
 
-	/** Returns the argument numbered, starting from 1 as %rdi */
-	public static X64RegisterOperand argNumbered(int paramIndex) {
-		// TODO if > 6, return a new class, a pseudo argument register that gets resolved later to stack pushes/pops
-		return args[paramIndex - 1];
-	}
-
-	Instruction.Size getSuffix() {
+	public Instruction.Size getSuffix() {
 		return Instruction.Size.QUAD;
 	}
 

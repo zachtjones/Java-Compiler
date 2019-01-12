@@ -7,6 +7,8 @@ import x64.instructions.MoveInstruction;
 import x64.jni.JNIOffsets;
 import x64.operands.*;
 
+import static x64.allocation.CallingConvention.argumentRegister;
+
 
 public interface GetIdJNI extends CallJNIMethod {
 
@@ -24,7 +26,7 @@ public interface GetIdJNI extends CallJNIMethod {
         function.addInstruction(
             new MoveInstruction(
                 classReg,
-                X64NativeRegister.RSI
+                argumentRegister(2)
             )
         );
 
@@ -33,7 +35,7 @@ public interface GetIdJNI extends CallJNIMethod {
         function.addInstruction(
             new LoadEffectiveAddressInstruction(
                 PCRelativeData.pointerFromLabel(fieldNameLabel),
-                X64NativeRegister.RDX
+                argumentRegister(3)
             )
         );
 
@@ -42,7 +44,7 @@ public interface GetIdJNI extends CallJNIMethod {
         function.addInstruction(
             new LoadEffectiveAddressInstruction(
                 PCRelativeData.pointerFromLabel(fieldTypeLabel),
-                X64NativeRegister.RCX
+                argumentRegister(4)
             )
         );
 

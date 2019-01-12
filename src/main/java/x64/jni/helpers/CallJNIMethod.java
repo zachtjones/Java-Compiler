@@ -6,6 +6,8 @@ import x64.instructions.MoveInstruction;
 import x64.jni.JNIOffsets;
 import x64.operands.*;
 
+import static x64.allocation.CallingConvention.returnValueRegister;
+
 public interface CallJNIMethod {
 
     default void addCallJNI(X64Function function, JNIOffsets jniOffset, X64RegisterOperand resultHolder) {
@@ -38,7 +40,7 @@ public interface CallJNIMethod {
         // mov %RAX, %result holder
         function.addInstruction(
             new MoveInstruction(
-                X64NativeRegister.RAX,
+                returnValueRegister(),
                 resultHolder
             )
         );
