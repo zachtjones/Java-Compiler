@@ -990,10 +990,9 @@ Expression AdditiveExpression() :
     two=MultiplicativeExpression()
     {
         if (type == 0) {
-            AddExpressionNode add = new AddExpressionNode(fileName, token.beginLine);
-            add.left = one;
-            add.right = two;
-            one = add;
+            BinaryExpressionNode node =
+                new BinaryExpressionNode(fileName, token.beginLine, one, two, BinaryOperation.ADD);
+            one = node;
         } else {
             SubtractExpressionNode sub = new SubtractExpressionNode(fileName, token.beginLine);
             sub.left = one;

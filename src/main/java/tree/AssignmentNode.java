@@ -7,6 +7,8 @@ import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.StoreAddressStatement;
 
+import static tree.BinaryOperation.ADD;
+
 /** left type right */
 public class AssignmentNode extends NodeImpl implements StatementExprNode, Expression {
 	public final static int ASSIGN = 0;
@@ -102,10 +104,7 @@ public class AssignmentNode extends NodeImpl implements StatementExprNode, Expre
 			// x += 5 ->  x = x + 5;
 			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			AddExpressionNode add = new AddExpressionNode(getFileName(), getLine());
-			add.left = left;
-			add.right = right;
-			assign.right = add;
+			assign.right = new BinaryExpressionNode(getFileName(), getLine(), left, right, ADD);
 			
 			// compile the new node created
 			assign.compile(s, f);

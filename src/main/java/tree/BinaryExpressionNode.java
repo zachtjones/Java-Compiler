@@ -6,14 +6,17 @@ import intermediate.BinaryOpStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 
-/** left + right */
-public class AddExpressionNode extends NodeImpl implements Expression {
-    public Expression left;
-    public Expression right;
-    
-    public AddExpressionNode(String fileName, int line) {
-    	super(fileName, line);
-    }
+public class BinaryExpressionNode extends NodeImpl implements Expression {
+	private final Expression left;
+	private final Expression right;
+	private final BinaryOperation op;
+
+	public BinaryExpressionNode(String fileName, int line, Expression left, Expression right, BinaryOperation op) {
+		super(fileName, line);
+		this.left = left;
+		this.right = right;
+		this.op = op;
+	}
 
 	@Override
 	public void resolveImports(ClassLookup c) throws CompileException {
@@ -29,11 +32,13 @@ public class AddExpressionNode extends NodeImpl implements Expression {
 		// evaluate right
 		right.compile(s, f);
 		Register rightResult = f.allocator.getLast();
-		
-		// add them
+
+		// perform the binary operation on the 2
 		Register destination = f.allocator.getNext(Register.getLarger(leftResult.type, rightResult.type));
-		f.statements.add(new BinaryOpStatement(leftResult, rightResult, destination, '+',
+
+		f.statements.add(new BinaryOpStatement(
+			leftResult, rightResult,
+			destination, op.getRepresentation(),
 			getFileName(), getLine()));
 	}
-	
 }
