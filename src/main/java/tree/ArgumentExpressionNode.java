@@ -10,26 +10,12 @@ import intermediate.Register;
 
 /** ( expressions * )
 * This is the second part of a function call, the arguments list. */
-public class ArgumentExpressionNode implements Expression {
+public class ArgumentExpressionNode extends NodeImpl implements Expression {
     /** The expressions to evaluate before the function call. Could be empty, but will not be null. */
     public ArrayList<Expression> expressions = new ArrayList<>();
-    
-    public String fileName;
-    public int line;
-    
+
     public ArgumentExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override
@@ -58,7 +44,7 @@ public class ArgumentExpressionNode implements Expression {
 		
 		// add in the call virtual statement
 		f.statements.add(new CallVirtualStatement(obj, name, result,
-				f.allocator.getNext(Register.REFERENCE), fileName, line));
+				f.allocator.getNext(Register.REFERENCE), getFileName(), getLine()));
 	}
 
 }

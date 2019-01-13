@@ -5,24 +5,11 @@ import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.ThrowStatement;
 
-public class ThrowStatementNode implements StatementNode {
+public class ThrowStatementNode extends NodeImpl implements StatementNode {
     public Expression expression;
-    public String fileName;
-    public int line;
-    
+
     public ThrowStatementNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override
@@ -35,7 +22,7 @@ public class ThrowStatementNode implements StatementNode {
 		// compile in the expression
 		expression.compile(s, f);
 		// throw the result of the expression.
-		ThrowStatement th = new ThrowStatement(f.allocator.getLast(), fileName, line);
+		ThrowStatement th = new ThrowStatement(f.allocator.getLast(), getFileName(), getLine());
 		f.statements.add(th);
 	}
 }

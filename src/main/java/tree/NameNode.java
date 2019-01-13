@@ -14,26 +14,12 @@ import intermediate.GetStaticFieldStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 
-public class NameNode implements Node, Expression, LValue {
+public class NameNode extends NodeImpl implements Expression, LValue {
 	public String primaryName;
 	public ArrayList<GenericNode> generics;
 	
-	public String fileName;
-    public int line;
-    
     public NameNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override
@@ -56,36 +42,35 @@ public class NameNode implements Node, Expression, LValue {
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		if (generics != null) {
-			throw new CompileException("Generics compiling not supported yet.", fileName, line);
+			throw new CompileException("Generics compiling not supported yet.", getFileName(), getLine());
 			// TODO
 		}
 		
-		System.out.println(primaryName); //TODO
 		if (!primaryName.contains(".")) {
 			// on the right side, get the result
 			int tableLookup = s.lookup(primaryName);
 			String type;
 			if (tableLookup == -1) {
 				throw new CompileException("symbol: '" + primaryName + "' not found.",
-						fileName, line);
+						getFileName(), getLine());
 			} else {
 				type = s.getType(primaryName);
 			}
 			if (tableLookup == SymbolTable.local) {
 				Register result = f.allocator.getNext(type);
-				f.statements.add(new GetLocalStatement(result, primaryName, fileName, line));
+				f.statements.add(new GetLocalStatement(result, primaryName, getFileName(), getLine()));
 			} else if (tableLookup == SymbolTable.parameter) {
 				Register result = f.allocator.getNext(type);
-				f.statements.add(new GetParamStatement(result, primaryName, fileName, line));
+				f.statements.add(new GetParamStatement(result, primaryName, getFileName(), getLine()));
 			} else { // assume static/instance field / method
 				// load 'this' pointer
 				Register thisPointer = f.allocator.getNext(Register.REFERENCE);
-				f.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
+				f.statements.add(new GetParamStatement(thisPointer, "this", getFileName(), getLine()));
 				
 				// load the field from 'this' pointer
 				Register result = f.allocator.getNext(type);
 				f.statements.add(new GetInstanceFieldStatement(thisPointer, primaryName, result,
-						fileName, line));
+						getFileName(), getLine()));
 				
 				f.history.setName(primaryName);
 			}
@@ -96,19 +81,19 @@ public class NameNode implements Node, Expression, LValue {
 			if (tableLookup == SymbolTable.className) {
 				// get the static field, then do the chain of instance fields
 				Register result = f.allocator.getNext(Register.REFERENCE);
-				f.statements.add(new GetStaticFieldStatement(split[0], split[1], result, fileName, line));
+				f.statements.add(new GetStaticFieldStatement(split[0], split[1], result, getFileName(), getLine()));
 				f.history.setName(split[1]);
 				for (int i = 2; i < split.length; i++) {
 					Register temp3 = f.allocator.getNext(Register.REFERENCE);
 					f.history.setName(split[i]);
 					f.statements.add(new GetInstanceFieldStatement(result, split[i], temp3,
-							fileName, line));
+							getFileName(), getLine()));
 					result = temp3;
 				}
 				
 			} else {
 				// instance fields of the parameter
-				NameNode temp = new NameNode(this.fileName, this.line);
+				NameNode temp = new NameNode(getFileName(), getLine());
 				temp.primaryName = split[0];
 				
 				temp.compile(s, f);
@@ -118,7 +103,7 @@ public class NameNode implements Node, Expression, LValue {
 					Register temp3 = f.allocator.getNext(Register.REFERENCE);
 					f.history.setName(split[i]);
 					f.statements.add(new GetInstanceFieldStatement(result, split[i], temp3,
-							fileName, line));
+							getFileName(), getLine()));
 					
 					result = temp3;
 				}
@@ -130,7 +115,7 @@ public class NameNode implements Node, Expression, LValue {
 	public void compileAddress(SymbolTable s, InterFunction f) throws CompileException {
 		
 		if (generics != null) {
-			throw new CompileException("Generics compiling not supported yet.", fileName, line);
+			throw new CompileException("Generics compiling not supported yet.", getFileName(), getLine());
 			// TODO
 		}
 		
@@ -140,25 +125,25 @@ public class NameNode implements Node, Expression, LValue {
 			int tableLookup = s.lookup(primaryName);
 			if (tableLookup == -1) {
 				throw new CompileException("symbol: '" + primaryName + "' not defined.",
-						fileName, line);
+						getFileName(), getLine());
 			}
 			String type = s.getType(primaryName);
 			 
 			if (tableLookup == SymbolTable.local) {
 				Register result = f.allocator.getNext(type);
-				f.statements.add(new GetLocalAddressStatement(result, primaryName, fileName, line));
+				f.statements.add(new GetLocalAddressStatement(result, primaryName, getFileName(), getLine()));
 			} else if (tableLookup == SymbolTable.parameter) {
 				Register result = f.allocator.getNext(type);
-				f.statements.add(new GetParamAddressStatement(result, primaryName, fileName, line));
+				f.statements.add(new GetParamAddressStatement(result, primaryName, getFileName(), getLine()));
 			} else if (tableLookup == SymbolTable.className){
 				// load 'this' pointer
 				Register thisPointer = f.allocator.getNext(Register.REFERENCE);
-				f.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
+				f.statements.add(new GetParamStatement(thisPointer, "this", getFileName(), getLine()));
 				
 				// load the field from 'this' pointer
 				Register result = f.allocator.getNext(type);
 				f.statements.add(new GetInstanceFieldAddressStatement(thisPointer, primaryName, result,
-						fileName, line));
+						getFileName(), getLine()));
 			}
 			// don't do anything
 		} else {
@@ -166,15 +151,15 @@ public class NameNode implements Node, Expression, LValue {
 			String[] split = primaryName.split("\\."); // split by the . character
 
 			// construct a primaryExpressionNode
-			PrimaryExpressionNode ex = new PrimaryExpressionNode(this.fileName, this.line);
+			PrimaryExpressionNode ex = new PrimaryExpressionNode(getFileName(), getLine());
 
 			// set the name - use NoOp since you need something as the prefix.
 			f.history.setName(split[0]);
-			ex.prefix = new NoOp(this.fileName, this.line);
+			ex.prefix = new NoOp(getFileName(), getLine());
 			ex.suffixes = new ArrayList<>();
 			// the rest are consecutive fieldAccesses
 			for (int i = 1; i < split.length; i++) {
-				FieldExpressionNode field = new FieldExpressionNode(this.fileName, this.line);
+				FieldExpressionNode field = new FieldExpressionNode(getFileName(), getLine());
 				field.identifier = split[i];
 				ex.suffixes.add(field);
 			}

@@ -7,24 +7,11 @@ import intermediate.InterFunction;
 import intermediate.Register;
 
 /** [ expr ] */
-public class ArrayIndexExpressionNode implements Expression, LValue {
+public class ArrayIndexExpressionNode extends NodeImpl implements Expression, LValue {
     public Expression expr;
-    public String fileName;
-    public int line;
-    
+
     public ArrayIndexExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override
@@ -40,7 +27,7 @@ public class ArrayIndexExpressionNode implements Expression, LValue {
 		Register index = f.allocator.getLast();
 		// load the memory at the address
 		Register result = f.allocator.getNext("unknown");
-		f.statements.add(new GetArrayValueStatement(array, index, result, fileName, line));
+		f.statements.add(new GetArrayValueStatement(array, index, result, getFileName(), getLine()));
 	}
 
 	@Override
@@ -53,7 +40,7 @@ public class ArrayIndexExpressionNode implements Expression, LValue {
 		Register index = f.allocator.getLast();
 		// load the memory at the address
 		Register result = f.allocator.getNext("unknown");
-		f.statements.add(new GetArrayValueStatement(array, index, result, fileName, line));
+		f.statements.add(new GetArrayValueStatement(array, index, result, getFileName(), getLine()));
 	}
 
 	

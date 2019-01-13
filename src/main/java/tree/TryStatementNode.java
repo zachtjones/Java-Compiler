@@ -6,7 +6,7 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 
-public class TryStatementNode implements StatementNode {
+public class TryStatementNode extends NodeImpl implements StatementNode {
 	
     public BlockNode block;
     // these two are same size;
@@ -14,22 +14,9 @@ public class TryStatementNode implements StatementNode {
     public ArrayList<BlockNode> catchBlocks;
     
     public BlockNode finallyPart; // optional
-    public String fileName;
-    public int line;
-    
+
     public TryStatementNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override
@@ -46,7 +33,7 @@ public class TryStatementNode implements StatementNode {
 
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
-		throw new CompileException("try statements not implemented yet.", fileName, line);
+		throw new CompileException("try statements not implemented yet.", getFileName(), getLine());
 		// TODO
 	}
     

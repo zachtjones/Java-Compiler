@@ -54,7 +54,7 @@ public class ClassLookup {
 				if (i.isAll) {
 					String packageImported = i.name.primaryName;
 					for (String className : JavaLibraryLookup.getClassesInPackage(packageImported)) {
-						putNames(className);
+						putNames(className.trim());
 					}
 				} else {
 					putNames(name);

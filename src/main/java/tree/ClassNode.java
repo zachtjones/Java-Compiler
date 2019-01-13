@@ -10,7 +10,7 @@ import intermediate.InterFunction;
 /** This represents a class in the tree
 * @author Zach Jones
 */
-public class ClassNode implements TypeDecNode {
+public class ClassNode extends NodeImpl implements TypeDecNode {
     public boolean isAbstract;
     public boolean isFinal;
     public boolean isPublic;
@@ -22,22 +22,9 @@ public class ClassNode implements TypeDecNode {
     public ArrayList<NameNode> interfaces;
     public ArrayList<ClassBodyNode> body = new ArrayList<>();
     public ArrayList<NameNode> typeParams;
-    public String fileName;
-    public int line;
     
     public ClassNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override
@@ -75,7 +62,7 @@ public class ClassNode implements TypeDecNode {
 		}
 		
 		// place the class name in the symbol table (used for static fields)
-		classLevel.putEntry(name, "className", fileName, line);
+		classLevel.putEntry(name, "className", getFileName(), getLine());
 		
 		// define the super classes and interfaces
 		//   - treated the same way (kind of)
@@ -103,7 +90,7 @@ public class ClassNode implements TypeDecNode {
 		
 		if (!isAbstract && !isInterface) {
 			// generate default <init> if needed only.
-			f.generateDefaultConstructor(fileName, line);
+			f.generateDefaultConstructor(getFileName(), getLine());
 		}
 		
 		// TODO stuff with the isAbstract, isFinal optimizations

@@ -8,24 +8,11 @@ import helper.CompileException;
 import intermediate.EndScopeStatement;
 import intermediate.InterFunction;
 
-public class BlockNode implements StatementNode {
+public class BlockNode extends NodeImpl implements StatementNode {
     public ArrayList<BlockStatementNode> statements;
-    public String fileName;
-    public int line;
-    
+
     public BlockNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override
@@ -46,9 +33,9 @@ public class BlockNode implements StatementNode {
 		}
 		// remove all new symbols from the table
 		HashMap<String, String> entries = s.getCurrentEntries();
-		entries.forEach((name, type) -> {
-			f.statements.add(new EndScopeStatement(name));
-		});
+		entries.forEach((name, type) ->
+			f.statements.add(new EndScopeStatement(name))
+		);
 	}
 
 	

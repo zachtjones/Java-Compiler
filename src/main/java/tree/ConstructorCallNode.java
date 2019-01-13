@@ -11,27 +11,14 @@ import intermediate.InterFunction;
 import intermediate.Register;
 
 /** new Name (args) */
-public class ConstructorCallNode implements Expression {
+public class ConstructorCallNode extends NodeImpl implements Expression {
     public NameNode name;
     public ArgumentExpressionNode args;
-    public String fileName;
-    public int line;
-    
+
     public ConstructorCallNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
+    	super(fileName, line);
     }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
-    }
-    
+
 	@Override
 	public void resolveImports(ClassLookup c) throws CompileException {
 		name.resolveImports(c);
@@ -57,10 +44,11 @@ public class ConstructorCallNode implements Expression {
 		Register finalResult = f.allocator.getNext(result.type);
 		
 		// add in the call virtual statement
-		f.statements.add(new CallVirtualStatement(result, "<init>", results, null, fileName, line));
+		f.statements.add(new CallVirtualStatement(result, "<init>", results, null,
+			getFileName(), getLine()));
 		
 		// result is the finalResult
-		f.statements.add(new CopyStatement(result, finalResult, fileName, line));
+		f.statements.add(new CopyStatement(result, finalResult, getFileName(), getLine()));
 		
 	}
 }

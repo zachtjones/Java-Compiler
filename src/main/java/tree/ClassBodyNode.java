@@ -4,7 +4,6 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 public class ClassBodyNode {
     // one of these will be not null
@@ -33,12 +32,9 @@ public class ClassBodyNode {
 	 * @throws CompileException If there is an error during the compiling phase.
 	 */
 	public void compile(InterFile f, SymbolTable syms) throws CompileException {
-		// create register allocator
-		RegisterAllocator r = new RegisterAllocator();
 		// pass down
 		if (staticInit != null) {
 			InterFunction func = new InterFunction();
-			CompileHistory c = new CompileHistory();
 			staticInit.compile(syms, func);
 			f.addFunction(func);
 		} else if (constructor != null) {

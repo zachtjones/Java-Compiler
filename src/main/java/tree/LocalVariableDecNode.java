@@ -8,25 +8,12 @@ import intermediate.InterFunction;
 import intermediate.PutLocalStatement;
 import intermediate.StartScopeStatement;
 
-public class LocalVariableDecNode implements Node {
+public class LocalVariableDecNode extends NodeImpl {
     public TypeNode type;
     public ArrayList<VariableDecNode> declarators;
-    public String fileName;
-    public int line;
     
     public LocalVariableDecNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
     
 	@Override
@@ -43,13 +30,13 @@ public class LocalVariableDecNode implements Node {
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// place in symbol table and add intermediate code
 		for (VariableDecNode d : declarators) {
-			s.putEntry(d.id.name, type.interRep(), fileName, line);
+			s.putEntry(d.id.name, type.interRep(), getFileName(), getLine());
 			f.statements.add(new StartScopeStatement(d.id.name, type.interRep()));
 			if (d.init != null) {
 				// put in the code to compute initial value.
 				d.init.compile(s, f);
 				// store the initial value into the local variable.
-				f.statements.add(new PutLocalStatement(f.allocator.getLast(), d.id.name, fileName, line));
+				f.statements.add(new PutLocalStatement(f.allocator.getLast(), d.id.name, getFileName(), getLine()));
 			}
 		}
 	}

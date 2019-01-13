@@ -5,28 +5,13 @@ import helper.CompileException;
 import intermediate.InterFunction;
 
 /** "super" . fieldName 
- * Note that fields are not inherited, need a way to qualify in IL, 
- * thinking of having a 'super' pointer in the structures. 
- * */
-public class SuperFieldExpressionNode implements Expression {
+ * Note that fields are not inherited, need a way to qualify in IL
+ */
+public class SuperFieldExpressionNode extends NodeImpl implements Expression {
     public String fieldName;
-    
-    private final String fileName;
-    private final int line;
-    
+
     public SuperFieldExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override
@@ -37,6 +22,6 @@ public class SuperFieldExpressionNode implements Expression {
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// TODO
-		throw new CompileException("super.field not implemented yet", fileName, line);
+		throw new CompileException("super.field not implemented yet", getFileName(), getLine());
 	}
 }

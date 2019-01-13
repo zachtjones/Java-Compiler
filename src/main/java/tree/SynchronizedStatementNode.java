@@ -5,25 +5,12 @@ import helper.CompileException;
 import intermediate.InterFunction;
 
 /** synchronized (expression) block */
-public class SynchronizedStatementNode implements StatementNode {
+public class SynchronizedStatementNode extends NodeImpl implements StatementNode {
     public Expression expression;
     public BlockNode block;
-    public String fileName;
-    public int line;
-    
+
     public SynchronizedStatementNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
     
 	@Override
@@ -34,7 +21,7 @@ public class SynchronizedStatementNode implements StatementNode {
 
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
-		throw new CompileException("Synchronized blocks not implemented yet.", fileName, line);
+		throw new CompileException("Synchronized blocks not implemented yet.", getFileName(), getLine());
 		
 		/*expression.compile(s, f, r);
 		block.compile(s, f, r);*/

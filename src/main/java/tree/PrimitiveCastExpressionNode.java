@@ -5,26 +5,13 @@ import helper.CompileException;
 import intermediate.InterFunction;
 
 /** (type[]...)expr */
-public class PrimitiveCastExpressionNode implements Expression {
+public class PrimitiveCastExpressionNode extends NodeImpl implements Expression {
     public Expression expr;
     public PrimitiveTypeNode type;
     public int arrayDims = 0;
-    public String fileName;
-    public int line;
     
     public PrimitiveCastExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
     
     @Override
@@ -36,6 +23,6 @@ public class PrimitiveCastExpressionNode implements Expression {
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// TODO
-		throw new CompileException("Primitive cast not implemented yet.", fileName, line);
+		throw new CompileException("Primitive cast not implemented yet.", getFileName(), getLine());
 	}
 }

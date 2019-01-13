@@ -8,7 +8,7 @@ import intermediate.Register;
 import intermediate.StoreAddressStatement;
 
 /** left type right */
-public class AssignmentNode implements StatementExprNode, Expression {
+public class AssignmentNode extends NodeImpl implements StatementExprNode, Expression {
 	public final static int ASSIGN = 0;
 	public final static int STARASSIGN = 1;
 	public final static int SLASHASSIGN = 2;
@@ -25,22 +25,9 @@ public class AssignmentNode implements StatementExprNode, Expression {
 	public Expression left;
 	public int type;
 	public Expression right;
-	public String fileName;
-    public int line;
-    
+
     public AssignmentNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 	
 	@Override
@@ -56,7 +43,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 		if (type == ASSIGN) {
 			if (!(left instanceof LValue)) {
 				throw new CompileException("left side of = expression not able to assign to. " 
-							+ left.toString(), fileName, line);
+							+ left.toString(), getFileName(), getLine());
 			}
 			right.compile(s, f);
 			Register rightResult = f.allocator.getLast();
@@ -67,19 +54,19 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			
 			// store the result of the right side into the address
 			StoreAddressStatement store = new StoreAddressStatement(rightResult, leftAddress,
-					fileName, line);
+					getFileName(), getLine());
 			
 			f.statements.add(store);
 			
 			// the result of an assign is the expression on the right
 			// this allows for x = y = 5;
 			Register result = f.allocator.getNext(rightResult.type);
-			f.statements.add(new CopyStatement(rightResult, result, fileName, line));
+			f.statements.add(new CopyStatement(rightResult, result, getFileName(), getLine()));
 		} else if (type == STARASSIGN) {
 			// x *= 5 ->  x = x * 5;
-			AssignmentNode assign = new AssignmentNode(fileName, line);
+			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			TimesExpressionNode mult = new TimesExpressionNode(fileName, line);
+			TimesExpressionNode mult = new TimesExpressionNode(getFileName(), getLine());
 			mult.left = left;
 			mult.right = right;
 			assign.right = mult;
@@ -89,9 +76,9 @@ public class AssignmentNode implements StatementExprNode, Expression {
 
 		} else if (type == SLASHASSIGN) {
 			// x /= 5 ->  x = x / 5;
-			AssignmentNode assign = new AssignmentNode(fileName, line);
+			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			DivideExpressionNode div = new DivideExpressionNode(fileName, line);
+			DivideExpressionNode div = new DivideExpressionNode(getFileName(), getLine());
 			div.left = left;
 			div.right = right;
 			assign.right = div;
@@ -101,9 +88,9 @@ public class AssignmentNode implements StatementExprNode, Expression {
 
 		} else if (type == REMASSIGN) {
 			// x %= 5 ->  x = x % 5;
-			AssignmentNode assign = new AssignmentNode(fileName, line);
+			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			ModExpressionNode mod = new ModExpressionNode(fileName, line);
+			ModExpressionNode mod = new ModExpressionNode(getFileName(), getLine());
 			mod.left = left;
 			mod.right = right;
 			assign.right = mod;
@@ -113,9 +100,9 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			
 		} else if (type == PLUSASSIGN) {
 			// x += 5 ->  x = x + 5;
-			AssignmentNode assign = new AssignmentNode(fileName, line);
+			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			AddExpressionNode add = new AddExpressionNode(fileName, line);
+			AddExpressionNode add = new AddExpressionNode(getFileName(), getLine());
 			add.left = left;
 			add.right = right;
 			assign.right = add;
@@ -125,9 +112,9 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			
 		} else if (type == MINUSASSIGN) {
 			// x -= 5 ->  x = x - 5;
-			AssignmentNode assign = new AssignmentNode(fileName, line);
+			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			SubtractExpressionNode sub = new SubtractExpressionNode(fileName, line);
+			SubtractExpressionNode sub = new SubtractExpressionNode(getFileName(), getLine());
 			sub.left = left;
 			sub.right = right;
 			assign.right = sub;
@@ -137,9 +124,9 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			
 		} else if (type == LSHIFTASSIGN) {
 			// x -= 5 ->  x = x << 5;
-			AssignmentNode assign = new AssignmentNode(fileName, line);
+			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			LeftShiftExpressionNode lefts = new LeftShiftExpressionNode(fileName, line);
+			LeftShiftExpressionNode lefts = new LeftShiftExpressionNode(getFileName(), getLine());
 			lefts.left = left;
 			lefts.right = right;
 			assign.right = lefts;
@@ -149,9 +136,9 @@ public class AssignmentNode implements StatementExprNode, Expression {
 
 		} else if (type == RSIGNEDSHIFTASSIGN) {
 			// x -= 5 ->  x = x >> 5;
-			AssignmentNode assign = new AssignmentNode(fileName, line);
+			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			RightShiftArithExpressionNode rights = new RightShiftArithExpressionNode(fileName, line);
+			RightShiftArithExpressionNode rights = new RightShiftArithExpressionNode(getFileName(), getLine());
 			rights.left = left;
 			rights.right = right;
 			assign.right = rights;
@@ -161,9 +148,9 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			
 		} else if (type == RUNSIGNEDSHIFTASSIGN) {
 			// x -= 5 ->  x = x >> 5;
-			AssignmentNode assign = new AssignmentNode(fileName, line);
+			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			RightShiftLogExpressionNode rights = new RightShiftLogExpressionNode(fileName, line);
+			RightShiftLogExpressionNode rights = new RightShiftLogExpressionNode(getFileName(), getLine());
 			rights.left = left;
 			rights.right = right;
 			assign.right = rights;
@@ -173,9 +160,9 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			
 		} else if (type == ANDASSIGN) {
 			// x -= 5 ->  x = x >> 5;
-			AssignmentNode assign = new AssignmentNode(fileName, line);
+			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			AndExpressionNode and = new AndExpressionNode(fileName, line);
+			AndExpressionNode and = new AndExpressionNode(getFileName(), getLine());
 			and.expressions.add(left);
 			and.expressions.add(right);
 			assign.right = and;
@@ -185,9 +172,9 @@ public class AssignmentNode implements StatementExprNode, Expression {
 
 		} else if (type == ORASSIGN) {
 			// x -= 5 ->  x = x >> 5;
-			AssignmentNode assign = new AssignmentNode(fileName, line);
+			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			AndExpressionNode and = new AndExpressionNode(fileName, line);
+			AndExpressionNode and = new AndExpressionNode(getFileName(), getLine());
 			and.expressions.add(left);
 			and.expressions.add(right);
 			assign.right = and;
@@ -197,7 +184,7 @@ public class AssignmentNode implements StatementExprNode, Expression {
 			
 		} else {
 			// unknown type of assignment.
-			throw new CompileException("unknown type of Assignment: " + type, fileName, line);
+			throw new CompileException("unknown type of Assignment: " + type, getFileName(), getLine());
 		}
 		
 	}

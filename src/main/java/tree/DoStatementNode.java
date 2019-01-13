@@ -7,25 +7,12 @@ import intermediate.InterFunction;
 import intermediate.LabelStatement;
 
 /** do { statement } while (expression); */
-public class DoStatementNode implements StatementNode {
+public class DoStatementNode extends NodeImpl implements StatementNode {
     public StatementNode statement;
     public Expression expression;
-    public String fileName;
-    public int line;
-    
+
     public DoStatementNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
     
 	@Override
@@ -44,6 +31,6 @@ public class DoStatementNode implements StatementNode {
 		// immediately followed by expression
 		expression.compile(s, f);
 		// conditional jump to top of statement
-		f.statements.add(new BranchStatementTrue(l, f.allocator.getLast(), fileName, line));
+		f.statements.add(new BranchStatementTrue(l, f.allocator.getLast(), getFileName(), getLine()));
 	}
 }

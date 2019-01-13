@@ -7,27 +7,14 @@ import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 
-public class EnumNode implements TypeDecNode {
+public class EnumNode extends NodeImpl implements TypeDecNode {
     public String name;
     public ArrayList<String> values;
-    public String fileName;
-    public int line;
-    
+
     public EnumNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
+    	super(fileName, line);
     }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
-    }
-    
+
 	@Override
 	public void resolveImports(ClassLookup c) throws CompileException {
 		// nothing needed

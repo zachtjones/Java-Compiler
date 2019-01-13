@@ -7,25 +7,12 @@ import intermediate.InterFunction;
 import intermediate.JumpStatement;
 import intermediate.LabelStatement;
 
-public class WhileStatementNode implements StatementNode {
+public class WhileStatementNode extends NodeImpl implements StatementNode {
     public Expression expression;
     public StatementNode statement;
-    public String fileName;
-    public int line;
-    
+
     public WhileStatementNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
     
 	@Override
@@ -47,7 +34,7 @@ public class WhileStatementNode implements StatementNode {
 		expression.compile(s, f);
 		
 		// if false, goto end
-		f.statements.add(new BranchStatmentFalse(endLbl, f.allocator.getLast(), fileName, line));
+		f.statements.add(new BranchStatmentFalse(endLbl, f.allocator.getLast(), getFileName(), getLine()));
 		
 		// compile in the block
 		statement.compile(s, f);

@@ -9,24 +9,11 @@ import intermediate.InterFunction;
 import intermediate.Register;
 
 /** Chain of | of the operands (not short-circuiting, aka bitwise or also)*/
-public class InclusiveOrExpressionNode implements Expression {
+public class InclusiveOrExpressionNode extends NodeImpl implements Expression {
     public ArrayList<Expression> expressions = new ArrayList<>();
-    public String fileName;
-    public int line;
     
     public InclusiveOrExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override
@@ -50,7 +37,7 @@ public class InclusiveOrExpressionNode implements Expression {
 			Register two = f.allocator.getLast();
 			result = f.allocator.getNext(Register.getLarger(current.type, two.type));
 			// add the OR statement
-			f.statements.add(new BinaryOpStatement(current, two, result, '|', fileName, line));
+			f.statements.add(new BinaryOpStatement(current, two, result, '|', getFileName(), getLine()));
 		}
 	}
 }

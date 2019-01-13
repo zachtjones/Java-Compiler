@@ -9,24 +9,11 @@ import intermediate.LoadLiteralStatement;
 import intermediate.Register;
 
 /** -- expr */
-public class PreDecrementExpressionNode implements StatementExprNode, Expression {
+public class PreDecrementExpressionNode extends NodeImpl implements StatementExprNode, Expression {
     public Expression expr;
-    public String fileName;
-    public int line;
-    
+
     public PreDecrementExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override
@@ -43,20 +30,20 @@ public class PreDecrementExpressionNode implements StatementExprNode, Expression
 		Register result = f.allocator.getLast();
 		
 		// subtract 1
-		f.statements.add(new LoadLiteralStatement("1", f.allocator, fileName, line));
+		f.statements.add(new LoadLiteralStatement("1", f.allocator, getFileName(), getLine()));
 		Register one = f.allocator.getLast();
 		
-		f.statements.add(new BinaryOpStatement(result, one, f.allocator.getNext(result.type), '-', fileName, line));
+		f.statements.add(new BinaryOpStatement(result, one, f.allocator.getNext(result.type), '-', getFileName(), getLine()));
 		Register minusOne = f.allocator.getLast();
 		// compile in the store to the address
 		if (!(expr instanceof LValue)) {
-			throw new CompileException("Can't assign the expression.", fileName, line);
+			throw new CompileException("Can't assign the expression.", getFileName(), getLine());
 		}
 		((LValue)expr).compileAddress(s, f);
 		// store it back
-		f.statements.add(new CopyStatement(minusOne, f.allocator.getLast(), fileName, line));
+		f.statements.add(new CopyStatement(minusOne, f.allocator.getLast(), getFileName(), getLine()));
 		
 		// result is before the subtraction
-		f.statements.add(new CopyStatement(result, f.allocator.getNext(result.type), fileName, line));
+		f.statements.add(new CopyStatement(result, f.allocator.getNext(result.type), getFileName(), getLine()));
 	}
 }

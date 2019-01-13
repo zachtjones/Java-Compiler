@@ -5,26 +5,13 @@ import helper.CompileException;
 import intermediate.InterFunction;
 
 /** expr -- */
-public class PostDecrementExpressionNode implements StatementExprNode, Expression {
+public class PostDecrementExpressionNode extends NodeImpl implements StatementExprNode, Expression {
     public Expression expr;
-    public String fileName;
-    public int line;
     
     public PostDecrementExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
+    	super(fileName, line);
     }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
-    }
-    
+
     @Override
 	public void resolveImports(ClassLookup c) throws CompileException {
 		expr.resolveImports(c);
@@ -33,10 +20,10 @@ public class PostDecrementExpressionNode implements StatementExprNode, Expressio
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// construct an AssignmentNode:  expr += 1;
-		AssignmentNode n = new AssignmentNode(fileName, line);
+		AssignmentNode n = new AssignmentNode(getFileName(), getLine());
 		n.left = expr;
 		n.type = AssignmentNode.MINUSASSIGN;
-		LiteralExpressionNode literal = new LiteralExpressionNode(fileName, line);
+		LiteralExpressionNode literal = new LiteralExpressionNode(getFileName(), getLine());
 		literal.value = "1";
 		n.right = literal;
 		

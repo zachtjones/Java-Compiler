@@ -5,28 +5,15 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 
-public class TypeNode implements Node {
+public class TypeNode extends NodeImpl {
     // one of these two will not be null
     public PrimitiveTypeNode primitive;
     public NameNode name;
 
     public int arrayDims; // 0 for not array;
-    public String fileName;
-    public int line;
     
     public TypeNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override

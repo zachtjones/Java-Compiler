@@ -5,7 +5,7 @@ import helper.CompileException;
 import intermediate.InterFunction;
 
 /** Represents a primitive type */
-public class PrimitiveTypeNode implements Node {
+public class PrimitiveTypeNode extends NodeImpl {
     public static final int BOOLEAN = 0;
     public static final int CHAR = 1;
     public static final int BYTE = 2;
@@ -16,22 +16,9 @@ public class PrimitiveTypeNode implements Node {
     public static final int DOUBLE = 7;
 
     public int type; // holds value 0-7 inclusive
-    public String fileName;
-    public int line;
     
     public PrimitiveTypeNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override

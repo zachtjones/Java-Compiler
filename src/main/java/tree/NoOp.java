@@ -6,23 +6,10 @@ import intermediate.InterFile;
 import intermediate.InterFunction;
 
 /** Represents a do-nothing operation*/
-public class NoOp implements Node, Expression, StatementNode, TypeDecNode {
-	public String fileName;
-    public int line;
+public class NoOp extends NodeImpl implements Expression, StatementNode, TypeDecNode {
     
     public NoOp(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override

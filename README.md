@@ -8,17 +8,32 @@ The supported output languages are x86-64 and AMD64.
 ## Prerequisites
  - java/javac 8+ in the path
  - gcc, also in the PATH (used to assemble and link results)
+   - clang may be aliased to gcc on Mac OS is there is XCode installed; this is not a problem
  - If using Intellij, there is a plugin for JavaCC; this will make editing the parser easier
 
+### GCC / java instillation on Windows
+ - For the other platforms, having the two on the path works fine for all versions I've tested
+ - There might be other setups that work, but this one worked for me.
+ - Note that the calling convention is different on Windows than all the other platforms
+ - But for windows, make sure you use MSYS2 with MingGW-w64 installed on it:
+   - https://stackoverflow.com/questions/30069830/how-to-install-mingw-w64-and-msys2/30071634#30071634
+   - If the link above becomes inaccessible:
+     - download msys2 from http://www.msys2.org/ (use the 64-bit version)
+     - from msys2, run `pacman -S mingw-w64-x86_64-gcc`
+     - from msys2, run `pacman -S mingw-w64-x86_64-gsl`
+     - add `C:\path\to\msys64\mingw64\bin` to your PATH variable
+     - verify gcc works by opening a new cmd.exe command prompt, and running `gcc -v`
 
 ## Contributing
  - GitHub issues are being used for features & bugs that are planned to be implemented
- - The idea for progress is as follows:
-   1. Get a Hello, World program to compile to x86 assembly, invoke the GCC as to assemble & link.
-   2. Make lots of test classes for basic java syntax & how it works
-   3. Do some optimizations (and create issues from the list that I want to do next)
-   4. Implement a bunch more of the java library (writing test classes as I go)
- - Implementing many of these features may change the structure of this program drastically, I'm not sure
+ - Create a branch with a name resembling the issue
+ - Implement the fix / feature
+ - Run the tests, `mvn clean test jacoco:report`
+ - Create a Pull request
+ 
+The idea for progress is as follows:
+  1. Make lots of test classes for basic java syntax & how it works
+  2. Do some optimizations (and create issues from the list that I want to do next)
 
 ## Usage
 1. Install Java 8+ and Apache Maven
@@ -28,18 +43,18 @@ The supported output languages are x86-64 and AMD64.
 
 ## Compiler passes
 1. Parses the language, and builds the resulting tree from the context-free grammar.
-  - package main and the javaCC generated java source files. (using JavaCC)
+   - package main and the javaCC generated java source files. (using JavaCC)
 2. Resolve imports, and fully qualify names.
-  - package tree - method resolveImports()
+   - package tree - method resolveImports()
 3. Build the symbol table, resolving the declarations of the symbols & convert to intermediate language (IL)
-  - package tree - method compile()
+   - package tree - method compile()
 4. Type-check the intermediate language
-  - package intermediate - method typeCheck(), which may bring in other source files into compilation to this step
-  - this also fully-qualifies the function calls & now all registers have a primitive/class type
+   - package intermediate - method typeCheck(), which may bring in other source files into compilation to this step
+   - this also fully-qualifies the function calls & now all registers have a primitive/class type
 5. Convert to pseudo-assembly (see below)
-  - package intermediate - method compile()
+   - package intermediate - method compile()
 6. Allocate the hardware registers
-  - package x64.allocation
+   - package x64.allocation
 7. Write out the x64 assembly
 8. Use the assembler to create the dynamic linked library
 

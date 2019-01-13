@@ -6,27 +6,14 @@ import intermediate.InterFunction;
 import intermediate.UnaryOpStatement;
 
 /** ~ expr */
-public class BitwiseNotExpressionNode implements Expression {
+public class BitwiseNotExpressionNode extends NodeImpl implements Expression {
     public Expression expr;
-    public String fileName;
-    public int line;
-    
+
     public BitwiseNotExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
-	@Override
+    @Override
 	public void resolveImports(ClassLookup c) throws CompileException {
 		expr.resolveImports(c);
 	}
@@ -36,6 +23,6 @@ public class BitwiseNotExpressionNode implements Expression {
 		expr.compile(s, f);
 		// take bitwise not of the result.
 		f.statements.add(new UnaryOpStatement(f.allocator.getLast(),
-				f.allocator.getNext(f.allocator.getLast().type), '~', fileName, line));
+				f.allocator.getNext(f.allocator.getLast().type), '~', getFileName(), getLine()));
 	}
 }

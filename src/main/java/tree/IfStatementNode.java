@@ -7,26 +7,13 @@ import intermediate.InterFunction;
 import intermediate.JumpStatement;
 import intermediate.LabelStatement;
 
-public class IfStatementNode implements StatementNode {
+public class IfStatementNode extends NodeImpl implements StatementNode {
     public Expression expression;
     public StatementNode statement;
     public StatementNode elsePart;
-    public String fileName;
-    public int line;
     
     public IfStatementNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
     
 	@Override
@@ -50,7 +37,7 @@ public class IfStatementNode implements StatementNode {
 		// start with the expression
 		expression.compile(newTable, f);
 		// branch if == 0 to else (false)
-		f.statements.add(new BranchStatmentFalse(elseLbl, f.allocator.getLast(), fileName, line));
+		f.statements.add(new BranchStatmentFalse(elseLbl, f.allocator.getLast(), getFileName(), getLine()));
 		
 		// compile in the true part
 		statement.compile(newTable, f);

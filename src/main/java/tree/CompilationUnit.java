@@ -9,7 +9,7 @@ import intermediate.InterFunction;
 
 /** Represents a CompilationUnit, that is a source file.
 *  @author Zach Jones */
-public class CompilationUnit implements Node {
+public class CompilationUnit extends NodeImpl implements Node {
     public NameNode packageName;
     public ArrayList<ImportNode> imports = new ArrayList<>();
     public ArrayList<TypeDecNode> types = new ArrayList<>();
@@ -17,18 +17,7 @@ public class CompilationUnit implements Node {
     public int line;
     
     public CompilationUnit(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
     @Override
@@ -52,7 +41,7 @@ public class CompilationUnit implements Node {
 	 * @throws CompileException If there is an error compiling this.
 	 */
 	public ArrayList<InterFile> compile(SymbolTable classLevel) throws CompileException {
-		ArrayList<InterFile> a = new ArrayList<InterFile>();
+		ArrayList<InterFile> a = new ArrayList<>();
 		// names are already resolved, so there should be no need
 		//   to pass down the imports -- everything can be figured out
 		//   even with expressions like a.b.c, can still find out the type

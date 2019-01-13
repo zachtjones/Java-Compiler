@@ -7,27 +7,14 @@ import intermediate.InterFunction;
 import intermediate.Register;
 
 /** left >>> right (0 filled) */
-public class RightShiftLogExpressionNode implements Expression {
+public class RightShiftLogExpressionNode extends NodeImpl implements Expression {
     public Expression left;
     public Expression right;
-    public String fileName;
-    public int line;
     
     public RightShiftLogExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
+    	super(fileName, line);
     }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
-    }
-    
+
 	@Override
 	public void resolveImports(ClassLookup c) throws CompileException {
 		left.resolveImports(c);
@@ -45,6 +32,6 @@ public class RightShiftLogExpressionNode implements Expression {
 		// result is of type left
 		Register result = f.allocator.getNext(leftResult.type);
 		f.statements.add(new BinaryOpStatement(
-				leftResult, rightResult, result, (char)BinaryOpStatement.RSHIFTLOG, fileName, line));
+				leftResult, rightResult, result, (char)BinaryOpStatement.RSHIFTLOG, getFileName(), getLine()));
 	}
 }

@@ -6,25 +6,12 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 
-public class PrimaryExpressionNode implements Expression, LValue {
+public class PrimaryExpressionNode extends NodeImpl implements Expression, LValue {
     public Expression prefix;
-    public ArrayList<Expression> suffixes = new ArrayList<Expression>();
-    public String fileName;
-    public int line;
+    public ArrayList<Expression> suffixes = new ArrayList<>();
     
     public PrimaryExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
     
 	@Override
@@ -54,7 +41,7 @@ public class PrimaryExpressionNode implements Expression, LValue {
 					( (LValue) suffixes.get(i) ).compileAddress(s, f);
 				} else {
 					throw new CompileException("left side of = expression not able to assign to. " 
-						+ suffixes.get(i), fileName, line);
+						+ suffixes.get(i), getFileName(), getLine());
 				}
 			} else {
 				suffixes.get(i).compile(s, f);

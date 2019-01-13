@@ -6,11 +6,8 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 
-public class GenericNode implements Node {
-	
-	private final int line;
-	private final String fileName;
-	
+public class GenericNode extends NodeImpl implements Node {
+
 	// one of these three groups will be set (not null)
 	
 	/** These are used for Name() [extends Name()] in the type args.
@@ -24,8 +21,7 @@ public class GenericNode implements Node {
 	public ArrayList<NameNode> hookSuper;
 	
 	public GenericNode(String fileName, int line) {
-		this.fileName = fileName;
-		this.line = line;
+		super(fileName, line);
 	}
 
 	@Override
@@ -47,16 +43,6 @@ public class GenericNode implements Node {
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public String getFileName() {
-		return fileName;
-	}
-
-	@Override
-	public int getLine() {
-		return line;
 	}
 
 }
