@@ -68,10 +68,7 @@ public class AssignmentNode extends NodeImpl implements StatementExprNode, Expre
 			// x *= 5 ->  x = x * 5;
 			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			TimesExpressionNode mult = new TimesExpressionNode(getFileName(), getLine());
-			mult.left = left;
-			mult.right = right;
-			assign.right = mult;
+			assign.right = new BinaryExpressionNode(getFileName(), getLine(), left, right, TIMES);
 			
 			// compile the new node created
 			assign.compile(s, f);
@@ -80,10 +77,7 @@ public class AssignmentNode extends NodeImpl implements StatementExprNode, Expre
 			// x /= 5 ->  x = x / 5;
 			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			DivideExpressionNode div = new DivideExpressionNode(getFileName(), getLine());
-			div.left = left;
-			div.right = right;
-			assign.right = div;
+			assign.right = new BinaryExpressionNode(getFileName(), getLine(), left, right, DIVIDE);
 
 			// compile the new node created
 			assign.compile(s, f);
@@ -92,10 +86,7 @@ public class AssignmentNode extends NodeImpl implements StatementExprNode, Expre
 			// x %= 5 ->  x = x % 5;
 			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			ModExpressionNode mod = new ModExpressionNode(getFileName(), getLine());
-			mod.left = left;
-			mod.right = right;
-			assign.right = mod;
+			assign.right = new BinaryExpressionNode(getFileName(), getLine(), left, right, MOD);
 
 			// compile the new node created
 			assign.compile(s, f);

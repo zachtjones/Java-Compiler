@@ -1011,31 +1011,17 @@ Expression MultiplicativeExpression() :
 {
     Expression one;
     Expression two;
-    int type;
+    BinaryOperation type;
 }
 {
     one=UnaryExpression()
-    ( ( "*" { type = 0; }
-    |   "/" { type = 1; }
-    |   "%" { type = 2; })
+    ( ( "*" { type = BinaryOperation.TIMES; }
+    |   "/" { type = BinaryOperation.DIVIDE; }
+    |   "%" { type = BinaryOperation.MOD; })
     two=UnaryExpression()
     {
-        if (type == 0) {
-            TimesExpressionNode t = new TimesExpressionNode(fileName, token.beginLine);
-            t.left = one;
-            t.right = two;
-            one = t;
-        } else if (type == 1) {
-            DivideExpressionNode d = new DivideExpressionNode(fileName, token.beginLine);
-            d.left = one;
-            d.right = two;
-            one = d;
-        } else {
-            ModExpressionNode m = new ModExpressionNode(fileName, token.beginLine);
-            m.left = one;
-            m.right = two;
-            one = m;
-        }
+        BinaryExpressionNode node = new BinaryExpressionNode(fileName, token.beginLine, one, two, type);
+        one = node;
     })*
     {
         return one;

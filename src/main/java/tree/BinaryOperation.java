@@ -2,7 +2,7 @@ package tree;
 
 /** These are the non short-circuiting binary operations (+ - / * % ^ & &lt;&lt; &gt;&gt; &gt;&gt;&gt;) */
 public enum BinaryOperation {
-	ADD('+'), AND('&'), XOR('^'), OR('|');
+	ADD('+'), AND('&'), XOR('^'), OR('|'), TIMES('*'), DIVIDE('/'), MOD('%');
 
 	private final char rep;
 	BinaryOperation(char rep) {
