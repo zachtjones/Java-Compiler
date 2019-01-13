@@ -20,6 +20,11 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.1</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <jgiven.report.dir>target/jgiven-reports/json</jgiven.report.dir>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

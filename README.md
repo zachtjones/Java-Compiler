@@ -26,12 +26,14 @@ The supported output languages are x86-64 and AMD64.
 
 ## Contributing
  - GitHub issues are being used for features & bugs that are planned to be implemented
- - The idea for progress is as follows:
-   1. Get a Hello, World program to compile to x86 assembly, invoke the GCC as to assemble & link.
-   2. Make lots of test classes for basic java syntax & how it works
-   3. Do some optimizations (and create issues from the list that I want to do next)
-   4. Implement a bunch more of the java library (writing test classes as I go)
- - Implementing many of these features may change the structure of this program drastically, I'm not sure
+ - Create a branch with a name resembling the issue
+ - Implement the fix / feature
+ - Run the tests, `mvn clean test jacoco:report`
+ - Create a Pull request
+ 
+The idea for progress is as follows:
+  1. Make lots of test classes for basic java syntax & how it works
+  2. Do some optimizations (and create issues from the list that I want to do next)
 
 ## Usage
 1. Install Java 8+ and Apache Maven
