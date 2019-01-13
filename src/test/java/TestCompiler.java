@@ -2,15 +2,12 @@ import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ExpectedScenarioState;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 import com.tngtech.jgiven.junit.ScenarioTest;
-import helper.CompileException;
 import helper.ProcessRunner;
 import main.JavaCompiler;
 import main.OutputDirs;
-import main.ParseException;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import static main.FileReader.readResourcesFile;
 import static org.assertj.core.api.Assertions.assertThat;

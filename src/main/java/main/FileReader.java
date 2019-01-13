@@ -1,7 +1,6 @@
 package main;
 
 import java.io.*;
-import java.util.stream.Collectors;
 
 public class FileReader {
 
