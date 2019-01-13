@@ -95,13 +95,13 @@ class ThenExpectedOutputIs extends Stage<ThenExpectedOutputIs> {
 
     public ThenExpectedOutputIs theOutputsMatchFile(String name) {
         final String contents = readResourcesFile("test-output/" + name + ".txt");
-        assertThat(output).isEqualToIgnoringNewLines(contents);
+        assertThat(output).isEqualToNormalizingNewlines(contents);
         return self();
     }
 
     public ThenExpectedOutputIs theErrorMatchesFile(String name) {
         final String contents = readResourcesFile("test-error/" + name + ".txt");
-        assertThat(errOutput).isEqualToIgnoringNewLines(contents);
+        assertThat(errOutput).isEqualToNormalizingNewlines(contents);
         return self();
     }
 
