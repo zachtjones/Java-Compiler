@@ -2,22 +2,29 @@ import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ExpectedScenarioState;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 import com.tngtech.jgiven.junit.ScenarioTest;
+import com.tngtech.jgiven.junit5.JGivenExtension;
 import helper.ProcessRunner;
 import main.JavaCompiler;
 import main.OutputDirs;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
+import java.util.stream.Stream;
 
 import static main.FileReader.readResourcesFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith( JGivenExtension.class )
 public class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns, ThenExpectedOutputIs> {
 
-    @Test
-    public void testValidPrograms() throws Exception {
+    @ParameterizedTest
+    @MethodSource("programList")
+    public void testValidPrograms(String inputProgram) throws Exception {
         given()
-            .theInputProgram("HelloWorld");
+            .theInputProgram(inputProgram);
 
         when()
             .theProgramCompilesSuccessfully()
@@ -27,9 +34,16 @@ public class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompiles
         then()
             .theExitCodeIs(0)
             .and()
-            .theOutputsMatchFile("HelloWorld")
+            .theOutputsMatchFile(inputProgram)
             .and()
-            .theErrorMatchesFile("HelloWorld");
+            .theErrorMatchesFile(inputProgram);
+    }
+
+    /// names of the programs to run
+    public static Stream<String> programList() {
+        return Stream.of(
+            "HelloWorld"
+        );
     }
 
 
