@@ -827,18 +827,19 @@ Expression ExclusiveOrExpression() :
 
 Expression AndExpression() :
 {
-    AndExpressionNode e = new AndExpressionNode(fileName, token.beginLine);
-    Expression temp;
+    Expression one;
+    Expression two;
 }
 {
-    temp=EqualityExpression() { e.expressions.add(temp); }
-    ( "&" temp=EqualityExpression() { e.expressions.add(temp); } )*
+    // transform the list into the binary tree of & operations, if there are any
+    one=EqualityExpression()
+    ( "&" two=EqualityExpression()
     {
-        if (e.expressions.size() == 1) { // not actually & of terms
-            return temp;
-        } else {
-            return e;
-        }
+        BinaryExpressionNode node = new BinaryExpressionNode(fileName, token.beginLine, one, two, BinaryOperation.AND);
+        one = node;
+    } )*
+    {
+        return one;
     }
 }
 

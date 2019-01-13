@@ -2,7 +2,7 @@ package tree;
 
 /** These are the non short-circuiting binary operations (+ - / * % ^ & &lt;&lt; &gt;&gt; &gt;&gt;&gt;) */
 public enum BinaryOperation {
-	ADD('+');
+	ADD('+'), AND('&');
 
 	private final char rep;
 	BinaryOperation(char rep) {
