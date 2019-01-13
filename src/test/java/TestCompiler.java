@@ -6,25 +6,26 @@ import com.tngtech.jgiven.junit5.JGivenExtension;
 import helper.ProcessRunner;
 import main.JavaCompiler;
 import main.OutputDirs;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.util.stream.Stream;
 
-import static main.FileReader.readResourcesFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith( JGivenExtension.class )
-public class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns, ThenExpectedOutputIs> {
+class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns, ThenExpectedOutputIs> {
 
     @ParameterizedTest
     @MethodSource("programList")
-    public void testValidPrograms(String inputProgram) throws Exception {
+    void testValidPrograms(String inputProgramName, int exitCode, String output, String errorOut)
+        throws Exception {
+
         given()
-            .theInputProgram(inputProgram);
+            .theInputProgram(inputProgramName);
 
         when()
             .theProgramCompilesSuccessfully()
@@ -32,17 +33,17 @@ public class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompiles
             .itRuns();
 
         then()
-            .theExitCodeIs(0)
+            .theExitCodeIs(exitCode)
             .and()
-            .theOutputsMatchFile(inputProgram)
+            .theOutputsMatches(output)
             .and()
-            .theErrorMatchesFile(inputProgram);
+            .theErrorMatches(errorOut);
     }
 
     /// names of the programs to run
-    public static Stream<String> programList() {
+    static Stream<Arguments> programList() {
         return Stream.of(
-            "HelloWorld"
+            Arguments.of("HelloWorld", 0, "Hello, World!\n", "")
         );
     }
 
@@ -55,7 +56,8 @@ class GivenInputProgram extends Stage<GivenInputProgram> {
     private String fileName;
 
 
-    public GivenInputProgram theInputProgram(String fileName) {
+    @SuppressWarnings("UnusedReturnValue") // used by jGiven
+    GivenInputProgram theInputProgram(String fileName) {
         this.fileName = "src/main/resources/test-programs/" + fileName + ".java";
         return self();
     }
@@ -76,13 +78,14 @@ class WhenItCompilesAndRuns extends Stage<WhenItCompilesAndRuns> {
     private int exitCode;
 
 
-    public WhenItCompilesAndRuns theProgramCompilesSuccessfully() throws Exception {
+    WhenItCompilesAndRuns theProgramCompilesSuccessfully() throws Exception {
         String[] file = { fileName };
         JavaCompiler.main(file);
         return self();
     }
 
-    public WhenItCompilesAndRuns itRuns() {
+    @SuppressWarnings("UnusedReturnValue") // used by jGiven
+    WhenItCompilesAndRuns itRuns() {
         ProcessRunner runner = new ProcessRunner("java", "\"-Djava.library.path=.\"", "Main");
         runner.setDirectory(new File(OutputDirs.ASSEMBLED.location));
         ProcessRunner.ProcessResult results = runner.run();
@@ -104,19 +107,18 @@ class ThenExpectedOutputIs extends Stage<ThenExpectedOutputIs> {
     @ExpectedScenarioState
     private int exitCode;
 
-    public ThenExpectedOutputIs theOutputsMatchFile(String name) {
-        final String contents = readResourcesFile("test-output/" + name + ".txt");
-        assertThat(output).isEqualToNormalizingNewlines(contents);
+    ThenExpectedOutputIs theOutputsMatches(String content) {
+        assertThat(output).isEqualToNormalizingNewlines(content);
         return self();
     }
 
-    public ThenExpectedOutputIs theErrorMatchesFile(String name) {
-        final String contents = readResourcesFile("test-error/" + name + ".txt");
-        assertThat(errOutput).isEqualToNormalizingNewlines(contents);
+    @SuppressWarnings("UnusedReturnValue") // used by jGiven
+    ThenExpectedOutputIs theErrorMatches(String content) {
+        assertThat(errOutput).isEqualToNormalizingNewlines(content);
         return self();
     }
 
-    public ThenExpectedOutputIs theExitCodeIs(int value) {
+    ThenExpectedOutputIs theExitCodeIs(int value) {
         assertThat(exitCode).isEqualTo(value);
         return self();
     }
