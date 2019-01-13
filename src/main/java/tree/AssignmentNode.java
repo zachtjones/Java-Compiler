@@ -7,8 +7,7 @@ import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.StoreAddressStatement;
 
-import static tree.BinaryOperation.ADD;
-import static tree.BinaryOperation.AND;
+import static tree.BinaryOperation.*;
 
 /** left type right */
 public class AssignmentNode extends NodeImpl implements StatementExprNode, Expression {
@@ -168,13 +167,10 @@ public class AssignmentNode extends NodeImpl implements StatementExprNode, Expre
 			assign.compile(s, f);
 
 		} else if (type == ORASSIGN) {
-			// x -= 5 ->  x = x >> 5;
+			// x |= 5 ->  x = x | 5;
 			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			InclusiveOrExpressionNode and = new InclusiveOrExpressionNode(getFileName(), getLine());
-			and.expressions.add(left);
-			and.expressions.add(right);
-			assign.right = and;
+			assign.right = new BinaryExpressionNode(getFileName(), getLine(), left, right, OR);
 
 			// compile the new node created
 			assign.compile(s, f);

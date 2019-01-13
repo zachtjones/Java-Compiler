@@ -793,35 +793,36 @@ Expression ConditionalAndExpression() :
 
 Expression InclusiveOrExpression() :
 {
-    InclusiveOrExpressionNode e = new InclusiveOrExpressionNode(fileName, token.beginLine);
-    Expression temp;
+    Expression one;
+    Expression two;
 }
 {
-    temp=ExclusiveOrExpression() { e.expressions.add(temp); }
-    ( "|" temp=ExclusiveOrExpression() { e.expressions.add(temp); } )*
+    one=ExclusiveOrExpression()
+    ( "|" two=ExclusiveOrExpression()
     {
-        if (e.expressions.size() == 1) { // not actually | of any terms
-            return temp;
-        } else {
-            return e;
-        }
+        BinaryExpressionNode node = new BinaryExpressionNode(fileName, token.beginLine, one, two, BinaryOperation.OR);
+        one = node;
+    } )*
+    {
+        return one;
     }
 }
 
 Expression ExclusiveOrExpression() :
 {
-    ExclusiveOrExpressionNode e = new ExclusiveOrExpressionNode(fileName, token.beginLine);
-    Expression temp;
+    Expression one;
+    Expression two;
 }
 {
-    temp=AndExpression() { e.expressions.add(temp); }
-    ( "^" temp=AndExpression() { e.expressions.add(temp); } )*
+    // same -- transform into the binary tree of ^ operations, if there are any
+    one=AndExpression()
+    ( "^" two=AndExpression()
     {
-        if (e.expressions.size() == 1) { // not actually ^ of terms
-            return temp;
-        } else {
-            return e;
-        }
+        BinaryExpressionNode node = new BinaryExpressionNode(fileName, token.beginLine, one, two, BinaryOperation.XOR);
+        one = node;
+    } )*
+    {
+        return one;
     }
 }
 
