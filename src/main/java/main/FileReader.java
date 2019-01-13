@@ -16,7 +16,12 @@ public class FileReader {
         if (is == null) { // resource doesn't exist, treat as empty file
             return "";
         }
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+        // actually have to read character by character because we need to know if the file ends in a new line
+        //  or not, but we don't need the specific characters
+        try {
+            return new String(is.readAllBytes());
+        } catch (IOException e) {
+            return "";
+        }
     }
 }
