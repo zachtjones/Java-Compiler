@@ -2,12 +2,15 @@ import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ExpectedScenarioState;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 import com.tngtech.jgiven.junit.ScenarioTest;
+import helper.CompileException;
 import helper.ProcessRunner;
 import main.JavaCompiler;
 import main.OutputDirs;
+import main.ParseException;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import static main.FileReader.readResourcesFile;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,9 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns, ThenExpectedOutputIs> {
 
     @Test
-    public void testValidPrograms() {
+    public void testValidPrograms() throws Exception {
         given()
-            .theInputProgram("HelloWorld.java");
+            .theInputProgram("HelloWorld");
 
         when()
             .theProgramCompilesSuccessfully()
@@ -25,11 +28,11 @@ public class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompiles
             .itRuns();
 
         then()
-            .theOutputsMatchFile("HelloWorld.txt")
+            .theExitCodeIs(0)
             .and()
-            .theErrorMatchesFile("HelloWorld.txt")
+            .theOutputsMatchFile("HelloWorld")
             .and()
-            .theExitCodeIs(0);
+            .theErrorMatchesFile("HelloWorld");
     }
 
 
@@ -42,7 +45,7 @@ class GivenInputProgram extends Stage<GivenInputProgram> {
 
 
     public GivenInputProgram theInputProgram(String fileName) {
-        this.fileName = fileName;
+        this.fileName = "src/main/resources/test-programs/" + fileName + ".java";
         return self();
     }
 }
@@ -62,7 +65,7 @@ class WhenItCompilesAndRuns extends Stage<WhenItCompilesAndRuns> {
     private int exitCode;
 
 
-    public WhenItCompilesAndRuns theProgramCompilesSuccessfully() {
+    public WhenItCompilesAndRuns theProgramCompilesSuccessfully() throws Exception {
         String[] file = { fileName };
         JavaCompiler.main(file);
         return self();
@@ -91,13 +94,13 @@ class ThenExpectedOutputIs extends Stage<ThenExpectedOutputIs> {
     private int exitCode;
 
     public ThenExpectedOutputIs theOutputsMatchFile(String name) {
-        final String contents = readResourcesFile("output/" + name);
+        final String contents = readResourcesFile("test-output/" + name + ".txt");
         assertThat(output).isEqualToIgnoringNewLines(contents);
         return self();
     }
 
     public ThenExpectedOutputIs theErrorMatchesFile(String name) {
-        final String contents = readResourcesFile("error/" + name);
+        final String contents = readResourcesFile("test-error/" + name + ".txt");
         assertThat(errOutput).isEqualToIgnoringNewLines(contents);
         return self();
     }
