@@ -4,25 +4,12 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 
-public class VariableDecNode implements Node {
+public class VariableDecNode extends NodeImpl {
     public VariableIdNode id;
     public VariableInitializerNode init;
-    public String fileName;
-    public int line;
-    
+
     public VariableDecNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
     
 	@Override

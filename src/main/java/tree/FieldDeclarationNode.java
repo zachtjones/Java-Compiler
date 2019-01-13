@@ -6,9 +6,8 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
-public class FieldDeclarationNode implements Node {
+public class FieldDeclarationNode extends NodeImpl {
 	public boolean isPublic;
 	public boolean isProtected;
 	public boolean isPrivate;
@@ -19,22 +18,9 @@ public class FieldDeclarationNode implements Node {
 
 	public TypeNode type;
 	public ArrayList<VariableDecNode> variables = new ArrayList<>();
-	public String fileName;
-    public int line;
-    
+
     public FieldDeclarationNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	public void resolveImports(ClassLookup c) throws CompileException {
@@ -53,18 +39,18 @@ public class FieldDeclarationNode implements Node {
 		String typeRep = type.interRep();
 		for (VariableDecNode d : variables) {
 			// fix: String[] id[] -> String[][] id;
-			String temp = typeRep;
+			StringBuilder temp = new StringBuilder(typeRep);
 			for (int i = 0; i < d.id.numDimensions; i++) {
-				temp += "[]";
+				temp.append("[]");
 			}
-			f.addField(temp, d.id.name, isStatic);
-			syms.putEntry(d.id.name, typeRep, fileName, line);
+			f.addField(temp.toString(), d.id.name, isStatic);
+			syms.putEntry(d.id.name, typeRep, getFileName(), getLine());
 
 			// add the initial values if any
 			if (d.init != null && d.init.e != null) {
 				// construct the assignment to the expression
-				AssignmentNode a = new AssignmentNode(fileName, line);
-				NameNode n = new NameNode(fileName, line);
+				AssignmentNode a = new AssignmentNode(getFileName(), getLine());
+				NameNode n = new NameNode(getFileName(), getLine());
 				n.primaryName = d.id.name;
 				a.left = n;
 				a.type = AssignmentNode.ASSIGN;
@@ -75,8 +61,6 @@ public class FieldDeclarationNode implements Node {
 				// add instance initializers
 				func.isInit = true;
 				func.isInstance = !isStatic;
-				RegisterAllocator r = new RegisterAllocator();
-				CompileHistory c = new CompileHistory();
 				a.compile(syms, func);
 				f.addFunction(func);
 			}

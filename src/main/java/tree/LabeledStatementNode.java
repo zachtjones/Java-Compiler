@@ -4,25 +4,12 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 
-public class LabeledStatementNode implements StatementNode {
+public class LabeledStatementNode extends NodeImpl implements StatementNode {
     public String name;
     public StatementNode statement;
-    public String fileName;
-    public int line;
     
     public LabeledStatementNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
     
 	@Override
@@ -33,10 +20,10 @@ public class LabeledStatementNode implements StatementNode {
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// put the label into the table
-		s.putEntry(name, "Label", fileName, line);
+		s.putEntry(name, "Label", getFileName(), getLine());
 		
 		// java doesn't have goto, so the only jumping of labeled statements is
 		//  in break or continue statements.
-		throw new CompileException("Labeled statements are not supported (yet).", fileName, line);
+		throw new CompileException("Labeled statements are not supported (yet).", getFileName(), getLine());
 	}
 }

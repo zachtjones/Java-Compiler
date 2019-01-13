@@ -6,30 +6,16 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 
-public class VariableInitializerNode implements Node {
+public class VariableInitializerNode extends NodeImpl {
     /** this is if you do { VariableInitializerNodes }
     * empty otherwise */
     public ArrayList<VariableInitializerNode> nextLevel = new ArrayList<>();
 
     /** this is just a normal expression */
     public Expression e;
-    
-    public String fileName;
-    public int line;
-    
+
     public VariableInitializerNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override
@@ -50,7 +36,7 @@ public class VariableInitializerNode implements Node {
 		} else {
 			// TODO
 			throw new CompileException("array initializer expressions with items not implemented.",
-					fileName, line);
+					getFileName(), getLine());
 		}
 	}
     

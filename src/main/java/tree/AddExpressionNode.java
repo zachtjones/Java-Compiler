@@ -7,27 +7,14 @@ import intermediate.InterFunction;
 import intermediate.Register;
 
 /** left + right */
-public class AddExpressionNode implements Expression {
+public class AddExpressionNode extends NodeImpl implements Expression {
     public Expression left;
     public Expression right;
-    public String fileName;
-    public int line;
     
     public AddExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
+    	super(fileName, line);
     }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
-    }
-    
+
 	@Override
 	public void resolveImports(ClassLookup c) throws CompileException {
 		left.resolveImports(c);
@@ -45,7 +32,8 @@ public class AddExpressionNode implements Expression {
 		
 		// add them
 		Register destination = f.allocator.getNext(Register.getLarger(leftResult.type, rightResult.type));
-		f.statements.add(new BinaryOpStatement(leftResult, rightResult, destination, '+', fileName, line));
+		f.statements.add(new BinaryOpStatement(leftResult, rightResult, destination, '+',
+			getFileName(), getLine()));
 	}
 	
 }

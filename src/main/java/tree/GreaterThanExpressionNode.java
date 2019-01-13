@@ -7,27 +7,14 @@ import intermediate.Register;
 import intermediate.SetConditionStatement;
 
 /** left > right */
-public class GreaterThanExpressionNode implements Expression {
+public class GreaterThanExpressionNode extends NodeImpl implements Expression {
     public Expression left;
     public Expression right;
-    public String fileName;
-    public int line;
     
     public GreaterThanExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
+    	super(fileName, line);
     }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
-    }
-    
+
 	@Override
 	public void resolveImports(ClassLookup c) throws CompileException {
 		left.resolveImports(c);
@@ -44,6 +31,6 @@ public class GreaterThanExpressionNode implements Expression {
 		// add in the condition
 		Register result = f.allocator.getNext(Register.BOOLEAN);
 		f.statements.add(new SetConditionStatement(
-			SetConditionStatement.GREATER, leftResult, rightResult, result, fileName, line));
+			SetConditionStatement.GREATER, leftResult, rightResult, result, getFileName(), getLine()));
 	}
 }

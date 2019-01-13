@@ -7,25 +7,14 @@ import intermediate.InterFunction;
 import intermediate.Register;
 
 /** left - right */
-public class SubtractExpressionNode implements Expression {
+public class SubtractExpressionNode extends NodeImpl implements Expression {
     public Expression left;
     public Expression right;
     public String fileName;
     public int line;
     
     public SubtractExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
     
 	@Override
@@ -42,6 +31,6 @@ public class SubtractExpressionNode implements Expression {
 		Register leftResult = f.allocator.getLast();
 		
 		Register result = f.allocator.getNext(Register.getLarger(leftResult.type, rightResult.type));
-		f.statements.add(new BinaryOpStatement(leftResult, rightResult, result, '-', fileName, line));
+		f.statements.add(new BinaryOpStatement(leftResult, rightResult, result, '-', getFileName(), getLine()));
 	}
 }

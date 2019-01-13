@@ -7,26 +7,12 @@ import intermediate.InterFunction;
 import intermediate.Register;
 
 /* left instanceof right */
-public class InstanceOfExpressionNode implements Expression {
+public class InstanceOfExpressionNode extends NodeImpl implements Expression {
     public Expression left;
     public TypeNode right;
     
-    private final String fileName;
-    private final int line;
-    
     public InstanceOfExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override
@@ -44,6 +30,6 @@ public class InstanceOfExpressionNode implements Expression {
 		
 		Register result = f.allocator.getNext(Register.BOOLEAN);
 		
-		f.statements.add(new InstanceOfStatement(value, className, result, fileName, line));
+		f.statements.add(new InstanceOfStatement(value, className, result, getFileName(), getLine()));
 	}
 }

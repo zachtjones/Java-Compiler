@@ -8,29 +8,16 @@ import intermediate.BranchStatmentFalse;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
 
-public class ForStatementNode implements StatementNode {
+public class ForStatementNode extends NodeImpl implements StatementNode {
     // these 3 are all optional, so could be null
     public ForInitNode init;
     public Expression condition;
     public ArrayList<StatementExprNode> update;
     // the block of code
     public StatementNode block;
-    public String fileName;
-    public int line;
     
     public ForStatementNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
     
 	@Override
@@ -64,7 +51,7 @@ public class ForStatementNode implements StatementNode {
 		
 		// conditional branch to end
 		// if false (zero) take the branch.
-		f.statements.add(new BranchStatmentFalse(endLabel, f.allocator.getLast(), fileName, line));
+		f.statements.add(new BranchStatmentFalse(endLabel, f.allocator.getLast(), getFileName(), getLine()));
 		
 		// compile in the body
 		block.compile(newTable, f);

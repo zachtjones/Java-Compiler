@@ -9,27 +9,14 @@ import intermediate.InterFunction;
 import intermediate.Register;
 
 /** new type[expression or empty] ... */
-public class PrimitiveArrayAllocationNode implements Expression {
+public class PrimitiveArrayAllocationNode extends NodeImpl implements Expression {
     public PrimitiveTypeNode type;
     public ArrayList<Expression> expressions; // never empty list, but can have null in the list
-    public String fileName;
-    public int line;
     
     public PrimitiveArrayAllocationNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
+    	super(fileName, line);
     }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
-    }
-	
+
     @Override
 	public void resolveImports(ClassLookup c) throws CompileException {
 		for (Expression e : expressions) {
@@ -44,7 +31,7 @@ public class PrimitiveArrayAllocationNode implements Expression {
 		if (expressions.get(0) == null) {
 			throw new CompileException(
 				"The first dimension of an array has to have a size given at the constructor.",
-				fileName, line);
+				getFileName(), getLine());
 		}
 		if (expressions.size() == 1) {
 			expressions.get(0).compile(s, f);

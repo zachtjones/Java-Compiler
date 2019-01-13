@@ -7,25 +7,12 @@ import intermediate.InterFunction;
 import intermediate.Register;
 
 /** left >> right (sign filled)*/
-public class RightShiftArithExpressionNode implements Expression {
+public class RightShiftArithExpressionNode extends NodeImpl implements Expression {
     public Expression left;
     public Expression right;
-    public String fileName;
-    public int line;
     
     public RightShiftArithExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
     
 	@Override
@@ -44,6 +31,6 @@ public class RightShiftArithExpressionNode implements Expression {
 		// result is of type left
 		Register result = f.allocator.getNext(leftResult.type);
 		f.statements.add(new BinaryOpStatement(
-				leftResult, rightResult, result, (char)BinaryOpStatement.RSHIFTARITH, fileName, line));
+				leftResult, rightResult, result, (char)BinaryOpStatement.RSHIFTARITH, getFileName(), getLine()));
 	}
 }

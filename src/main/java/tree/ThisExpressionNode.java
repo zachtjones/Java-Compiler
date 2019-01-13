@@ -5,23 +5,10 @@ import helper.CompileException;
 import intermediate.InterFunction;
 
 /** "this" */
-public class ThisExpressionNode implements Expression {
-	public String fileName;
-    public int line;
-    
+public class ThisExpressionNode extends NodeImpl implements Expression {
+
     public ThisExpressionNode(String fileName, int line) {
-    	this.fileName = fileName;
-    	this.line = line;
-    }
-    
-    @Override
-    public String getFileName() {
-    	return fileName;
-    }
-    
-    @Override
-    public int getLine() {
-    	return line;
+    	super(fileName, line);
     }
 
 	@Override
