@@ -49,12 +49,11 @@ public class FieldDeclarationNode extends NodeImpl {
 			// add the initial values if any
 			if (d.init != null && d.init.e != null) {
 				// construct the assignment to the expression
-				AssignmentNode a = new AssignmentNode(getFileName(), getLine());
 				NameNode n = new NameNode(getFileName(), getLine());
 				n.primaryName = d.id.name;
-				a.left = n;
-				a.type = AssignmentNode.ASSIGN;
-				a.right = d.init.e;
+
+				// the type is null here
+				AssignmentNode a = new AssignmentNode(getFileName(), getLine(), n, d.init.e, null);
 
 				// compile the created expression.
 				InterFunction func = new InterFunction();

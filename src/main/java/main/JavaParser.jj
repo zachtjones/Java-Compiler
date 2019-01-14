@@ -703,32 +703,35 @@ Expression Expression() :
 
 AssignmentNode Assignment() :
 {
-    AssignmentNode e = new AssignmentNode(fileName, token.beginLine);
+    Expression left;
+    BinaryOperation type;
+    Expression right;
 }
 {
-    e.left = PrimaryExpression()
-    e.type = AssignmentOperator()
-    e.right = Expression()
+    left = PrimaryExpression()
+    type = AssignmentOperator()
+    right = Expression()
     {
-        return e;
+        return new AssignmentNode(fileName, token.beginLine, left, right, type);
     }
 }
 
-int AssignmentOperator() :
+/** Returns null if the assignment is just a regular =, otherwise the binary operation constant */
+BinaryOperation AssignmentOperator() :
 {}
 {
-    "=" { return AssignmentNode.ASSIGN; }
-|   "*=" { return AssignmentNode.STARASSIGN; }
-|   "/=" { return AssignmentNode.SLASHASSIGN; }
-|   "%=" { return AssignmentNode.REMASSIGN; }
-|   "+=" { return AssignmentNode.PLUSASSIGN; }
-|   "-=" { return AssignmentNode.MINUSASSIGN; }
-|   "<<=" { return AssignmentNode.LSHIFTASSIGN; }
-|   ">>=" { return AssignmentNode.RSIGNEDSHIFTASSIGN; }
-|   ">>>=" { return AssignmentNode.RUNSIGNEDSHIFTASSIGN; }
-|   "&=" { return AssignmentNode.ANDASSIGN; }
-|   "^=" { return AssignmentNode.XORASSIGN; }
-|   "|=" { return AssignmentNode.ORASSIGN; }
+    "=" { return null; }
+|   "*=" { return BinaryOperation.TIMES; }
+|   "/=" { return BinaryOperation.DIVIDE; }
+|   "%=" { return BinaryOperation.MOD; }
+|   "+=" { return BinaryOperation.ADD; }
+|   "-=" { return BinaryOperation.SUBTRACT; }
+|   "<<=" { return BinaryOperation.LEFT_SHIFT; }
+|   ">>=" { return BinaryOperation.RIGHT_SHIFT_SIGN; }
+|   ">>>=" { return BinaryOperation.RIGHT_SHIFT_UNSIGNED; }
+|   "&=" { return BinaryOperation.AND; }
+|   "^=" { return BinaryOperation.XOR; }
+|   "|=" { return BinaryOperation.OR; }
 }
 
 /* return an Expression since we don't know if it's a
