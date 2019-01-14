@@ -104,10 +104,7 @@ public class AssignmentNode extends NodeImpl implements StatementExprNode, Expre
 			// x -= 5 ->  x = x - 5;
 			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			SubtractExpressionNode sub = new SubtractExpressionNode(getFileName(), getLine());
-			sub.left = left;
-			sub.right = right;
-			assign.right = sub;
+			assign.right = new BinaryExpressionNode(getFileName(), getLine(), left, right, SUBTRACT);
 			
 			// compile the new node created
 			assign.compile(s, f);
@@ -116,10 +113,7 @@ public class AssignmentNode extends NodeImpl implements StatementExprNode, Expre
 			// x -= 5 ->  x = x << 5;
 			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			LeftShiftExpressionNode lefts = new LeftShiftExpressionNode(getFileName(), getLine());
-			lefts.left = left;
-			lefts.right = right;
-			assign.right = lefts;
+			assign.right = new BinaryExpressionNode(getFileName(), getLine(), left, right, LEFT_SHIFT);
 
 			// compile the new node created
 			assign.compile(s, f);
@@ -128,22 +122,16 @@ public class AssignmentNode extends NodeImpl implements StatementExprNode, Expre
 			// x -= 5 ->  x = x >> 5;
 			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			RightShiftArithExpressionNode rights = new RightShiftArithExpressionNode(getFileName(), getLine());
-			rights.left = left;
-			rights.right = right;
-			assign.right = rights;
+			assign.right = new BinaryExpressionNode(getFileName(), getLine(), left, right, RIGHT_SHIFT_SIGN);
 
 			// compile the new node created
 			assign.compile(s, f);
 			
 		} else if (type == RUNSIGNEDSHIFTASSIGN) {
-			// x -= 5 ->  x = x >> 5;
+			// x -= 5 ->  x = x >>> 5;
 			AssignmentNode assign = new AssignmentNode(getFileName(), getLine());
 			assign.left = left;
-			RightShiftLogExpressionNode rights = new RightShiftLogExpressionNode(getFileName(), getLine());
-			rights.left = left;
-			rights.right = right;
-			assign.right = rights;
+			assign.right = new BinaryExpressionNode(getFileName(), getLine(), left, right, RIGHT_SHIFT_UNSIGNED);
 
 			// compile the new node created
 			assign.compile(s, f);
