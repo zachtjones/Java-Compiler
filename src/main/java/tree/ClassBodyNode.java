@@ -5,6 +5,11 @@ import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class ClassBodyNode {
     // one of these will be not null
     public BlockNode staticInit;
@@ -46,4 +51,12 @@ public class ClassBodyNode {
 		}
 	}
 
+	/** Places the symbols if needed into the class level symbol table. */
+	public void putSymbols(SymbolTable classLevel) throws CompileException {
+		if (method != null) {
+			method.putSymbols(classLevel);
+		} else if (field != null) {
+			field.putSymbols(classLevel);
+		}
+	}
 }

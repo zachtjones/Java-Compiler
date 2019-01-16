@@ -1,11 +1,11 @@
+package main;
+
 import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ExpectedScenarioState;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 import com.tngtech.jgiven.junit.ScenarioTest;
 import com.tngtech.jgiven.junit5.JGivenExtension;
 import helper.ProcessRunner;
-import main.JavaCompiler;
-import main.OutputDirs;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

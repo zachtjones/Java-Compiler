@@ -70,4 +70,12 @@ public class FieldDeclarationNode extends NodeImpl {
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		/* Nothing to do here*/
 	}
+
+	/** places the symbols declared by this field declaration */
+	void putSymbols(SymbolTable classLevel) throws CompileException {
+		String type = isStatic ? "staticField" : "instanceField";
+		for (VariableDecNode variable : variables) {
+			classLevel.putEntry(variable.id.name, type, getFileName(), getLine());
+		}
+	}
 }
