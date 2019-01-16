@@ -6,21 +6,24 @@ import intermediate.BinaryOpStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 
-/** left * right */
-public class TimesExpressionNode extends NodeImpl implements Expression {
-    public Expression left;
-    public Expression right;
+public class BinaryExpressionNode extends NodeImpl implements Expression {
+	private final Expression left;
+	private final Expression right;
+	private final BinaryOperation op;
 
-    public TimesExpressionNode(String fileName, int line) {
-    	super(fileName, line);
-    }
-    
+	public BinaryExpressionNode(String fileName, int line, Expression left, Expression right, BinaryOperation op) {
+		super(fileName, line);
+		this.left = left;
+		this.right = right;
+		this.op = op;
+	}
+
 	@Override
 	public void resolveImports(ClassLookup c) throws CompileException {
 		left.resolveImports(c);
-		right.resolveImports(c);		
+		right.resolveImports(c);
 	}
-	
+
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// evaluate left
@@ -30,8 +33,12 @@ public class TimesExpressionNode extends NodeImpl implements Expression {
 		right.compile(s, f);
 		Register rightResult = f.allocator.getLast();
 
-		// * them
+		// perform the binary operation on the 2
 		Register destination = f.allocator.getNext(Register.getLarger(leftResult.type, rightResult.type));
-		f.statements.add(new BinaryOpStatement(leftResult, rightResult, destination, '*', getFileName(), getLine()));
+
+		f.statements.add(new BinaryOpStatement(
+			leftResult, rightResult,
+			destination, op.getRepresentation(),
+			getFileName(), getLine()));
 	}
 }

@@ -703,32 +703,35 @@ Expression Expression() :
 
 AssignmentNode Assignment() :
 {
-    AssignmentNode e = new AssignmentNode(fileName, token.beginLine);
+    Expression left;
+    BinaryOperation type;
+    Expression right;
 }
 {
-    e.left = PrimaryExpression()
-    e.type = AssignmentOperator()
-    e.right = Expression()
+    left = PrimaryExpression()
+    type = AssignmentOperator()
+    right = Expression()
     {
-        return e;
+        return new AssignmentNode(fileName, token.beginLine, left, right, type);
     }
 }
 
-int AssignmentOperator() :
+/** Returns null if the assignment is just a regular =, otherwise the binary operation constant */
+BinaryOperation AssignmentOperator() :
 {}
 {
-    "=" { return AssignmentNode.ASSIGN; }
-|   "*=" { return AssignmentNode.STARASSIGN; }
-|   "/=" { return AssignmentNode.SLASHASSIGN; }
-|   "%=" { return AssignmentNode.REMASSIGN; }
-|   "+=" { return AssignmentNode.PLUSASSIGN; }
-|   "-=" { return AssignmentNode.MINUSASSIGN; }
-|   "<<=" { return AssignmentNode.LSHIFTASSIGN; }
-|   ">>=" { return AssignmentNode.RSIGNEDSHIFTASSIGN; }
-|   ">>>=" { return AssignmentNode.RUNSIGNEDSHIFTASSIGN; }
-|   "&=" { return AssignmentNode.ANDASSIGN; }
-|   "^=" { return AssignmentNode.XORASSIGN; }
-|   "|=" { return AssignmentNode.ORASSIGN; }
+    "=" { return null; }
+|   "*=" { return BinaryOperation.TIMES; }
+|   "/=" { return BinaryOperation.DIVIDE; }
+|   "%=" { return BinaryOperation.MOD; }
+|   "+=" { return BinaryOperation.ADD; }
+|   "-=" { return BinaryOperation.SUBTRACT; }
+|   "<<=" { return BinaryOperation.LEFT_SHIFT; }
+|   ">>=" { return BinaryOperation.RIGHT_SHIFT_SIGN; }
+|   ">>>=" { return BinaryOperation.RIGHT_SHIFT_UNSIGNED; }
+|   "&=" { return BinaryOperation.AND; }
+|   "^=" { return BinaryOperation.XOR; }
+|   "|=" { return BinaryOperation.OR; }
 }
 
 /* return an Expression since we don't know if it's a
@@ -793,52 +796,54 @@ Expression ConditionalAndExpression() :
 
 Expression InclusiveOrExpression() :
 {
-    InclusiveOrExpressionNode e = new InclusiveOrExpressionNode(fileName, token.beginLine);
-    Expression temp;
+    Expression one;
+    Expression two;
 }
 {
-    temp=ExclusiveOrExpression() { e.expressions.add(temp); }
-    ( "|" temp=ExclusiveOrExpression() { e.expressions.add(temp); } )*
+    one=ExclusiveOrExpression()
+    ( "|" two=ExclusiveOrExpression()
     {
-        if (e.expressions.size() == 1) { // not actually | of any terms
-            return temp;
-        } else {
-            return e;
-        }
+        BinaryExpressionNode node = new BinaryExpressionNode(fileName, token.beginLine, one, two, BinaryOperation.OR);
+        one = node;
+    } )*
+    {
+        return one;
     }
 }
 
 Expression ExclusiveOrExpression() :
 {
-    ExclusiveOrExpressionNode e = new ExclusiveOrExpressionNode(fileName, token.beginLine);
-    Expression temp;
+    Expression one;
+    Expression two;
 }
 {
-    temp=AndExpression() { e.expressions.add(temp); }
-    ( "^" temp=AndExpression() { e.expressions.add(temp); } )*
+    // same -- transform into the binary tree of ^ operations, if there are any
+    one=AndExpression()
+    ( "^" two=AndExpression()
     {
-        if (e.expressions.size() == 1) { // not actually ^ of terms
-            return temp;
-        } else {
-            return e;
-        }
+        BinaryExpressionNode node = new BinaryExpressionNode(fileName, token.beginLine, one, two, BinaryOperation.XOR);
+        one = node;
+    } )*
+    {
+        return one;
     }
 }
 
 Expression AndExpression() :
 {
-    AndExpressionNode e = new AndExpressionNode(fileName, token.beginLine);
-    Expression temp;
+    Expression one;
+    Expression two;
 }
 {
-    temp=EqualityExpression() { e.expressions.add(temp); }
-    ( "&" temp=EqualityExpression() { e.expressions.add(temp); } )*
+    // transform the list into the binary tree of & operations, if there are any
+    one=EqualityExpression()
+    ( "&" two=EqualityExpression()
     {
-        if (e.expressions.size() == 1) { // not actually & of terms
-            return temp;
-        } else {
-            return e;
-        }
+        BinaryExpressionNode node = new BinaryExpressionNode(fileName, token.beginLine, one, two, BinaryOperation.AND);
+        one = node;
+    } )*
+    {
+        return one;
     }
 }
 
@@ -946,31 +951,17 @@ Expression ShiftExpression() :
 {
     Expression one;
     Expression two;
-    int type;
+    BinaryOperation type;
 }
 {
     one=AdditiveExpression()
-    ( ( "<<" { type = 0; }
-    |   ">>" { type = 1; }
-    |   ">>>" { type = 2; })
+    ( ( "<<" { type = BinaryOperation.LEFT_SHIFT; }
+    |   ">>" { type = BinaryOperation.RIGHT_SHIFT_SIGN; }
+    |   ">>>" { type = BinaryOperation.RIGHT_SHIFT_UNSIGNED; })
     two=AdditiveExpression()
     {
-        if (type == 0) {
-            LeftShiftExpressionNode ls = new LeftShiftExpressionNode(fileName, token.beginLine);
-            ls.left = one;
-            ls.right = two;
-            one = ls;
-        } else if (type == 1) {
-            RightShiftArithExpressionNode rs = new RightShiftArithExpressionNode(fileName, token.beginLine);
-            rs.left = one;
-            rs.right = two;
-            one = rs;
-        } else {
-            RightShiftLogExpressionNode rss = new RightShiftLogExpressionNode(fileName, token.beginLine);
-            rss.left = one;
-            rss.right = two;
-            one = rss;
-        }
+        BinaryExpressionNode node = new BinaryExpressionNode(fileName, token.beginLine, one, two, type);
+        one = node;
     })*
     {
         return one;
@@ -981,25 +972,16 @@ Expression AdditiveExpression() :
 {
     Expression one;
     Expression two;
-    int type;
+    BinaryOperation type;
 }
 {
     one=MultiplicativeExpression()
-    ( ( "+" { type = 0; }
-    |   "-" { type = 1; })
+    ( ( "+" { type = BinaryOperation.ADD; }
+    |   "-" { type = BinaryOperation.SUBTRACT; })
     two=MultiplicativeExpression()
     {
-        if (type == 0) {
-            AddExpressionNode add = new AddExpressionNode(fileName, token.beginLine);
-            add.left = one;
-            add.right = two;
-            one = add;
-        } else {
-            SubtractExpressionNode sub = new SubtractExpressionNode(fileName, token.beginLine);
-            sub.left = one;
-            sub.right = two;
-            one = sub;
-        }
+        BinaryExpressionNode node = new BinaryExpressionNode(fileName, token.beginLine, one, two, type);
+        one = node;
     })*
     {
         return one;
@@ -1010,31 +992,17 @@ Expression MultiplicativeExpression() :
 {
     Expression one;
     Expression two;
-    int type;
+    BinaryOperation type;
 }
 {
     one=UnaryExpression()
-    ( ( "*" { type = 0; }
-    |   "/" { type = 1; }
-    |   "%" { type = 2; })
+    ( ( "*" { type = BinaryOperation.TIMES; }
+    |   "/" { type = BinaryOperation.DIVIDE; }
+    |   "%" { type = BinaryOperation.MOD; })
     two=UnaryExpression()
     {
-        if (type == 0) {
-            TimesExpressionNode t = new TimesExpressionNode(fileName, token.beginLine);
-            t.left = one;
-            t.right = two;
-            one = t;
-        } else if (type == 1) {
-            DivideExpressionNode d = new DivideExpressionNode(fileName, token.beginLine);
-            d.left = one;
-            d.right = two;
-            one = d;
-        } else {
-            ModExpressionNode m = new ModExpressionNode(fileName, token.beginLine);
-            m.left = one;
-            m.right = two;
-            one = m;
-        }
+        BinaryExpressionNode node = new BinaryExpressionNode(fileName, token.beginLine, one, two, type);
+        one = node;
     })*
     {
         return one;

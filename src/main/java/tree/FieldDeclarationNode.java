@@ -49,12 +49,11 @@ public class FieldDeclarationNode extends NodeImpl {
 			// add the initial values if any
 			if (d.init != null && d.init.e != null) {
 				// construct the assignment to the expression
-				AssignmentNode a = new AssignmentNode(getFileName(), getLine());
 				NameNode n = new NameNode(getFileName(), getLine());
 				n.primaryName = d.id.name;
-				a.left = n;
-				a.type = AssignmentNode.ASSIGN;
-				a.right = d.init.e;
+
+				// the type is null here
+				AssignmentNode a = new AssignmentNode(getFileName(), getLine(), n, d.init.e, null);
 
 				// compile the created expression.
 				InterFunction func = new InterFunction();
@@ -70,5 +69,13 @@ public class FieldDeclarationNode extends NodeImpl {
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		/* Nothing to do here*/
+	}
+
+	/** places the symbols declared by this field declaration */
+	void putSymbols(SymbolTable classLevel) throws CompileException {
+		String type = isStatic ? "staticField" : "instanceField";
+		for (VariableDecNode variable : variables) {
+			classLevel.putEntry(variable.id.name, type, getFileName(), getLine());
+		}
 	}
 }

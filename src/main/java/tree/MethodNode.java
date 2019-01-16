@@ -62,4 +62,8 @@ public class MethodNode {
 	}
 
 
+	public void putSymbols(SymbolTable classLevel) throws CompileException {
+		classLevel.putEntry(dec.name, isStatic ? "staticMethod" : "instanceMethod",
+			dec.getFileName(), dec.getLine());
+	}
 }

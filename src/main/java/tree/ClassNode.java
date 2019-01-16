@@ -73,14 +73,11 @@ public class ClassNode extends NodeImpl implements TypeDecNode {
 			f.setImplements(this.interfaces);
 			
 		}
-		
-		// place fields first -- used in symbol table
-		body.sort((ClassBodyNode e1, ClassBodyNode e2) -> {
-			if (e1.field != null) { 
-				return -1;
-			}
-			return 0;
-		});
+
+		// put the symbols for this class into the symbol table
+		for (ClassBodyNode c : body) {
+			c.putSymbols(classLevel);
+		}
 		
 		// fields / methods -- each one gets new register allocator and function.
 		SymbolTable syms = new SymbolTable(classLevel, SymbolTable.className);
