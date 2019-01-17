@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 
@@ -41,7 +42,7 @@ public class EnumNode extends NodeImpl implements TypeDecNode {
 		}
 		for (int i = 0; i < values.size(); i++) {
 			String id = values.get(i);
-			f.addField("int", id, true, String.valueOf(i));
+			f.addField(Types.INT, id, true, String.valueOf(i));
 		}
 		return f;
 	}

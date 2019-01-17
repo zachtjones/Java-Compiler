@@ -77,7 +77,7 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 	@Override
 	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
 		// if the type of the register is java/*, use JNI
-		if (obj.typeFull.startsWith("java/")) {
+		if (obj.getType().getClassName(fileName, line).startsWith("java/")) {
 
 			final X64RegisterOperand objReg = obj.toX64();
 

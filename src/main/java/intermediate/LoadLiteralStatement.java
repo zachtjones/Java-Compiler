@@ -26,7 +26,7 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 
 		value = literalValue; // or set to something else later.
 		if (literalValue.charAt(0) == '"') {
-			r = regAlloc.getNext(Types.fromFullyQualifiedClass("java/lang/String"));
+			r = regAlloc.getNext(Types.STRING);
 		} else if (literalValue.charAt(0) == '\'') {
 			r = regAlloc.getNext(Types.CHAR); // chars are 16-bit
 		} else if (literalValue.equals("true")) {
@@ -77,8 +77,7 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 
 	@Override
 	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
-		switch (r.typeFull) {
-		case "boolean":
+		if (r.getType() == Types.BOOLEAN) {
 			if (value.equals("true")) {
 				function.addInstruction(
 					new MoveInstruction(
@@ -94,16 +93,14 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 					)
 				);
 			}
-			break;
-		case "byte":
+		} else if (r.getType() == Types.BYTE) {
 			function.addInstruction(
 				new MoveInstruction(
 					new Immediate(Byte.parseByte(value)),
 					r.toX64()
 				)
 			);
-			break;
-		case "char":
+		} else if (r.getType() == Types.CHAR) {
 			function.addInstruction(
 				new MoveInstruction(
 					// there is a char literal allows by the GNU as, but will just use the byte number
@@ -111,43 +108,28 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 					r.toX64()
 				)
 			);
-			break;
-		case "short":
+		} else if (r.getType() == Types.SHORT) {
 			function.addInstruction(
 				new MoveInstruction(
 					new Immediate(Short.parseShort(value)),
 					r.toX64()
 				)
 			);
-			break;
-		case "int":
+		} else if (r.getType() == Types.INT) {
 			function.addInstruction(
 				new MoveInstruction(
 					new Immediate(Integer.parseInt(value)),
 					r.toX64()
 				)
 			);
-			break;
-		case "long":
+		} else if (r.getType() == Types.LONG) {
 			function.addInstruction(
 				new MoveInstruction(
 					new Immediate(Long.parseLong(value)),
 					r.toX64()
 				)
 			);
-			break;
-		case "double":
-			// TODO maybe a float/double to long bits, then it can be part of the assembly
-			throw new CompileException("Floating point literals not implemented yet", "", -1);
-		case "null":
-			function.addInstruction(
-				new MoveInstruction(
-					new Immediate(0), // null is literal 0
-					r.toX64()
-				)
-			);
-			break;
-		case "java/lang/String":
+		} else if (r.getType().getIntermediateRepresentation().equals(Types.STRING.getIntermediateRepresentation())) {
 			// trim off the " and the beginning and the end, insert into data segment
 			String label = assemblyFile.insertDataString(value.substring(1, value.length() - 1));
 
@@ -162,8 +144,9 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 
 			// NewStringUTF(JNIEnv, %temp) -> result
 			addNewStringUTF_JNI(function, chars, r);
-
-			break;
+		} else {
+			// float and double
+			throw new CompileException("Floating point literals not implemented yet", "", -1);
 		}
 	}
 }

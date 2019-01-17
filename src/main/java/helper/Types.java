@@ -31,6 +31,8 @@ public class Types {
 	/** this represents a type that represents a class */
 	public static final Types CLASS = new Types("", false);
 
+	public static final Types STRING = Types.fromFullyQualifiedClass("java/lang/String");
+
 
 	/** Creates a types instance from the fully qualified class name */
 	public static Types fromFullyQualifiedClass(String className) {

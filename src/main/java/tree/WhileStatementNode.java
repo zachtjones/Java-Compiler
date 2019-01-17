@@ -2,7 +2,7 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import intermediate.BranchStatmentFalse;
+import intermediate.BranchStatementFalse;
 import intermediate.InterFunction;
 import intermediate.JumpStatement;
 import intermediate.LabelStatement;
@@ -34,7 +34,7 @@ public class WhileStatementNode extends NodeImpl implements StatementNode {
 		expression.compile(s, f);
 		
 		// if false, goto end
-		f.statements.add(new BranchStatmentFalse(endLbl, f.allocator.getLast(), getFileName(), getLine()));
+		f.statements.add(new BranchStatementFalse(endLbl, f.allocator.getLast(), getFileName(), getLine()));
 		
 		// compile in the block
 		statement.compile(s, f);

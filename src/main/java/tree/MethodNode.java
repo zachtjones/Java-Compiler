@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 
@@ -16,7 +17,7 @@ public class MethodNode {
     public boolean isFinal;
     public boolean isNative;
     public boolean isSynchronized;
-    public ResultTypeNode resultType;
+    public Types resultType;
 
     public MethodDeclaratorNode dec;
     public ArrayList<NameNode> throwsList;

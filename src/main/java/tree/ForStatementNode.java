@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import intermediate.BranchStatmentFalse;
+import intermediate.BranchStatementFalse;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
 
@@ -51,7 +51,7 @@ public class ForStatementNode extends NodeImpl implements StatementNode {
 		
 		// conditional branch to end
 		// if false (zero) take the branch.
-		f.statements.add(new BranchStatmentFalse(endLabel, f.allocator.getLast(), getFileName(), getLine()));
+		f.statements.add(new BranchStatementFalse(endLabel, f.allocator.getLast(), getFileName(), getLine()));
 		
 		// compile in the body
 		block.compile(newTable, f);

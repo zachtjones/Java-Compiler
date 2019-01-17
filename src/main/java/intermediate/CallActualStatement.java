@@ -2,6 +2,7 @@ package intermediate;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import helper.CompileException;
 import helper.Types;
@@ -59,31 +60,28 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 		
 		if (returnVal != null) {
 			// fill in the return type
-			InterFile e = JavaCompiler.parseAndCompile(obj.getType(), fileName, line);
-			String returnType = e.getReturnType(name, args);
+			InterFile e = JavaCompiler.parseAndCompile(obj.getType().getClassName(fileName, line), fileName, line);
+			Types returnType = e.getReturnType(name, args);
 
 			if (returnType == null) {
-				StringBuilder signature = new StringBuilder(name + "(");
-				for (int i = 0; i < args.length; i++) {
-					signature.append(args[i].typeFull);
-					if (i != args.length - 1) {
-						signature.append(',');
-					}
-				}
-				signature.append(")");
-				throw new CompileException("no method found with signature, " + signature.toString()
+				final String signature = name + "(" +
+					Arrays.stream(args)
+					.map(i -> i.getType().getIntermediateRepresentation())
+					.collect(Collectors.joining()) + ")";
+
+				throw new CompileException("no method found with signature, " + signature
 				+ ", referenced", fileName, line);
 			}
 
-			returnVal.typeFull = returnType;
-			regs.put(returnVal, returnVal.typeFull);
+			returnVal.setType(returnType);
+			regs.put(returnVal, returnType);
 		}
 	}
 
 	@Override
 	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
 		// if the type of the register is java/*, use JNI
-		if (obj.typeFull.startsWith("java/")) {
+		if (obj.getType().getClassName(fileName, line).startsWith("java/")) {
 
 			final X64RegisterOperand objReg = obj.toX64();
 

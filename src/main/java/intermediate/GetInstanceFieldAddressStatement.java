@@ -8,8 +8,8 @@ import helper.UsageCheck;
 import main.JavaCompiler;
 
 public class GetInstanceFieldAddressStatement implements InterStatement {
-	Register instance;
-	String fieldName;
+	private Register instance;
+	private String fieldName;
 	
 	Register result;
 	
@@ -42,11 +42,11 @@ public class GetInstanceFieldAddressStatement implements InterStatement {
 		
 		UsageCheck.verifyDefined(instance, regs, fileName, line);
 		// the type of the object
-		String type = instance.typeFull;
+		String type = instance.getType().getClassName(fileName, line);
 		
 		InterFile object = JavaCompiler.parseAndCompile(type, fileName, line);
-		String resultType = object.getInstFieldType(fieldName, fileName, line);
+		Types resultType = object.getInstFieldType(fieldName, fileName, line);
 		
-		regs.put(result, resultType + "*"); // address is a pointer type
+		regs.put(result, Types.pointerOf(resultType)); // address is a pointer type
 	}
 }

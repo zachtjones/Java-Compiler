@@ -3,7 +3,7 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import helper.Types;
-import intermediate.BranchStatmentFalse;
+import intermediate.BranchStatementFalse;
 import intermediate.ChooseStatement;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
@@ -30,7 +30,7 @@ public class ConditionalAndExpressionNode extends NodeImpl implements Expression
 		LabelStatement end = new LabelStatement("L_" + f.allocator.getNextLabel());
 		Register leftResult = f.allocator.getLast();
 		// if left is false, jump to end
-		f.statements.add(new BranchStatmentFalse(end, leftResult, getFileName(), getLine()));
+		f.statements.add(new BranchStatementFalse(end, leftResult, getFileName(), getLine()));
 		
 		// compile in right half
 		right.compile(s, f);
