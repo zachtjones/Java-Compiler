@@ -50,9 +50,9 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 		
 		// get the field type for the static field.
 		InterFile object = JavaCompiler.parseAndCompile(className, fileName, line);
-		String type = object.getStatFieldType(fieldName, fileName, line);
+		Types type = object.getStatFieldType(fieldName, fileName, line);
 		
-		result.typeFull = type;
+		result.setType(type);
 		regs.put(result, type);
 	}
 

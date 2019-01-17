@@ -7,6 +7,8 @@ import helper.Types;
 import tree.NameNode;
 import x64.X64File;
 
+import static helper.Types.fromFullyQualifiedClass;
+
 public class InterFile {
 	private String name;
 	private InterStructure staticPart;
@@ -46,7 +48,7 @@ public class InterFile {
 	 * @param value The default value of the field.
 	 * false if it is instance-based.
 	 */
-	public void addField(String type, String name, boolean isStatic, String value) {
+	public void addField(Types type, String name, boolean isStatic, String value) {
 		if (isStatic) {
 			this.staticPart.addMember(type, name, value);
 		} else {
@@ -147,7 +149,7 @@ public class InterFile {
 
 			// load this pointer (call super on this)
 			RegisterAllocator ra = new RegisterAllocator();
-			Register thisPointer = ra.getNext(Types.fromFullyQualifiedClass(this.name));
+			Register thisPointer = ra.getNext(fromFullyQualifiedClass(this.name));
 			d.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
 			Register voidReg = ra.getNext(Types.VOID);
 			//  superclass of this object.
@@ -164,7 +166,7 @@ public class InterFile {
 	public void typeCheck() throws CompileException {
 		
 		for (InterFunction f : functions) {
-			f.typeCheck(name);
+			f.typeCheck(fromFullyQualifiedClass(name));
 		}
 	}
 
@@ -174,7 +176,7 @@ public class InterFile {
 	 * @return The JIL representation of the type
 	 * @throws CompileException if the field doesn't exist, or there is a problem checking it.
 	 */
-	public String getInstFieldType(String fieldName, String fileName, int line) throws CompileException {
+	public Types getInstFieldType(String fieldName, String fileName, int line) throws CompileException {
 		return instancePart.getFieldType(fieldName, fileName, line);
 	}
 
@@ -184,7 +186,7 @@ public class InterFile {
 	 * @return The JIL representation of the type
 	 * @throws CompileException if the field doesn't exist, or there is a problem checking it.
 	 */
-	public String getStatFieldType(String fieldName, String fileName, int line) throws CompileException {
+	public Types getStatFieldType(String fieldName, String fileName, int line) throws CompileException {
 		return staticPart.getFieldType(fieldName, fileName, line);
 	}
 

@@ -65,7 +65,7 @@ public class ConstructorNode {
 
 		// add the parameters
 		for (ParamNode p : this.params) {
-			func.paramTypes.add(p.type.interRep());
+			func.paramTypes.add(p.type);
 			func.paramNames.add(p.id.name);
 			if (p.isVarargs) {
 				if (func.lastArgVarargs) { // can only have one argument varargs, and as to be last
@@ -80,7 +80,7 @@ public class ConstructorNode {
 					throw new CompileException("the variable arguments can onlybe on the last paramter.",
 						fileName, line);
 			}
-			newTable.putEntry(p.id.name, p.type.interRep(), fileName, line);
+			newTable.putEntry(p.id.name, p.type, fileName, line);
 		}
 		
 		// throws the throws list
@@ -93,7 +93,6 @@ public class ConstructorNode {
 		// TODO func.statements.add(new );
 		
 		// compile the block
-		CompileHistory c = new CompileHistory();
 		for (BlockStatementNode b : this.code) {
 			b.compile(newTable, func);
 		}

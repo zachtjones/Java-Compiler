@@ -2,10 +2,11 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFunction;
 
 public class ParamNode extends NodeImpl {
-    public TypeNode type;
+    public Types type;
     public VariableIdNode id;
     public boolean isVarargs; // if it is the ...
     

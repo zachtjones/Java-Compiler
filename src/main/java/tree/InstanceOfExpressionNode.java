@@ -2,6 +2,7 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InstanceOfStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
@@ -28,7 +29,7 @@ public class InstanceOfExpressionNode extends NodeImpl implements Expression {
 		// test if value is the instance of the class
 		String className = right.getILRep();
 		
-		Register result = f.allocator.getNext(Register.BOOLEAN);
+		Register result = f.allocator.getNext(Types.BOOLEAN);
 		
 		f.statements.add(new InstanceOfStatement(value, className, result, getFileName(), getLine()));
 	}

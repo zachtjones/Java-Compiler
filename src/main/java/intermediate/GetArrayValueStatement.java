@@ -37,12 +37,9 @@ public class GetArrayValueStatement implements InterStatement {
 		UsageCheck.verifyDefined(index, regs, fileName, line);
 		
 		// make sure the type of the array ends in []
-		if (!array.typeFull.endsWith("[]")) {
-			throw new CompileException("can't index type: " + array.typeFull, fileName, line);
-		}
+		Types resultingType = array.getType().removeArray(fileName, line);
+		array.setType(resultingType);
 
-		result.typeFull = array.typeFull.substring(0, array.typeFull.length() - 2);
-
-		regs.put(result, result.typeFull);
+		regs.put(result, resultingType);
 	}
 }

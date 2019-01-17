@@ -3,26 +3,27 @@ package intermediate;
 import java.util.ArrayList;
 
 import helper.CompileException;
+import helper.Types;
 
 public class InterStructure {
 	
 	private boolean isInstance;
-	private ArrayList<String> types;
+	private ArrayList<Types> types;
 	private ArrayList<String> names;
 	private ArrayList<String> values; // null's can be in here if not set initial value.
 
 	public InterStructure(boolean isInstance) {
 		this.isInstance = isInstance;
-		this.types = new ArrayList<String>();
-		this.names = new ArrayList<String>();
-		this.values = new ArrayList<String>();
+		this.types = new ArrayList<>();
+		this.names = new ArrayList<>();
+		this.values = new ArrayList<>();
 	}
 
-	public void addMember(String type, String name) {
+	public void addMember(Types type, String name) {
 		addMember(type, name, null);
 	}
 	
-	public void addMember(String type, String name, String value) {
+	public void addMember(Types type, String name, String value) {
 		this.types.add(type);
 		this.names.add(name);
 		this.values.add(value);
@@ -61,7 +62,7 @@ public class InterStructure {
 	}
 
 	/** Gets the type for the structure field, throwing a compile exception if problem. */
-	public String getFieldType(String fieldName, String fileName, int line) throws CompileException {
+	public Types getFieldType(String fieldName, String fileName, int line) throws CompileException {
 		for (int i = 0; i < names.size(); i++) {
 			if (fieldName.equals(names.get(i))) {
 				return types.get(i);

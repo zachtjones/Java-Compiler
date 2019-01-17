@@ -42,6 +42,16 @@ public class Types {
 		return new Types("[" + typeOfArray.rep, false);
 	}
 
+	/** Removes an array dimension, returning the new type. If it can't be removed, throws a CompileException */
+	public Types removeArray(String fileName, int line) throws CompileException {
+		if (rep.charAt(0) == '[') {
+			return new Types(rep.substring(1), isPrimitive);
+		} else {
+			throw new CompileException("Trying to get array element from non-array type: " + rep, fileName, line);
+		}
+	}
+
+
 	/** returns the JNI representation for this type, which is the same as what is printed in the IL */
 	public String getIntermediateRepresentation() {
 		return rep;

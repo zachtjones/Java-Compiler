@@ -8,8 +8,8 @@ import helper.UsageCheck;
 import main.JavaCompiler;
 
 public class GetInstanceFieldStatement implements InterStatement {
-	Register instance;
-	String fieldName;
+	private Register instance;
+	private String fieldName;
 	
 	Register result;
 	
@@ -45,7 +45,7 @@ public class GetInstanceFieldStatement implements InterStatement {
 		Types type = instance.getType();
 		
 		InterFile object = JavaCompiler.parseAndCompile(type, fileName, line);
-		String resultType = object.getInstFieldType(fieldName, fileName, line);
+		Types resultType = object.getInstFieldType(fieldName, fileName, line);
 		
 		regs.put(result, resultType);
 	}
