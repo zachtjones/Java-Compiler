@@ -3,6 +3,7 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 import x64.X64File;
 import x64.X64Function;
 
@@ -13,8 +14,8 @@ public interface InterStatement {
 	 * @param params A mapping of the defined parameters to their typeNames.
 	 * @param func The function that the statement is in.
 	 * @throws CompileException If there is a type error. */
-	void typeCheck(HashMap<Register, String> regs,
-			HashMap<String, String> locals, HashMap<String, String> params, 
+	void typeCheck(HashMap<Register, Types> regs,
+			HashMap<String, Types> locals, HashMap<String, Types> params,
 			InterFunction func) throws CompileException;
 
 	/**

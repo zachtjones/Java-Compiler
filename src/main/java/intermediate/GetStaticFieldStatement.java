@@ -3,6 +3,7 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 import main.JavaCompiler;
 import x64.*;
 import x64.instructions.MoveInstruction;
@@ -44,8 +45,8 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		
 		// get the field type for the static field.
 		InterFile object = JavaCompiler.parseAndCompile(className, fileName, line);

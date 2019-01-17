@@ -3,6 +3,7 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 
 public class SetConditionStatement implements InterStatement {
 	public static final int GREATEREQUAL = 0;
@@ -13,8 +14,8 @@ public class SetConditionStatement implements InterStatement {
 	public static final int NOTEQUAL = 5;
 	
 	int type;
-	Register left;
-	Register right;
+	private Register left;
+	private Register right;
 	Register result;
 	
 	private final String fileName;
@@ -49,8 +50,8 @@ public class SetConditionStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		
 		if (type != NOTEQUAL && type != EQUAL) { // == and != can be used with objects
 			// type is a relational only defined on primitives
@@ -59,7 +60,7 @@ public class SetConditionStatement implements InterStatement {
 						+ " != are only defined on primitves.", fileName, line);
 			}
 		}
-		result.typeFull = "boolean";
-		regs.put(result, result.typeFull);
+		result.setType(Types.BOOLEAN);
+		regs.put(result, Types.BOOLEAN);
 	}
 }

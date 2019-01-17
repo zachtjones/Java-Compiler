@@ -3,6 +3,7 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 import helper.UsageCheck;
 
 public class GetArrayValueStatement implements InterStatement {
@@ -29,8 +30,8 @@ public class GetArrayValueStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		
 		UsageCheck.verifyDefined(array, regs, fileName, line);
 		UsageCheck.verifyDefined(index, regs, fileName, line);

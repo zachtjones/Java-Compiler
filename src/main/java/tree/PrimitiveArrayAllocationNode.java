@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.CreateArrayStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
@@ -36,7 +37,7 @@ public class PrimitiveArrayAllocationNode extends NodeImpl implements Expression
 		if (expressions.size() == 1) {
 			expressions.get(0).compile(s, f);
 			Register size = f.allocator.getLast();
-			Register result = f.allocator.getNext("unknown");
+			Register result = f.allocator.getNext(Types.UNKNOWN);
 			f.statements.add(new CreateArrayStatement(size, type.toString(), result));
 		} else {
 			// TODO handle multi-dimensional arrays.

@@ -6,7 +6,6 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
-import intermediate.RegisterAllocator;
 
 public class ConstructorNode {
     public boolean isPublic;
@@ -63,8 +62,7 @@ public class ConstructorNode {
 		
 		// symbol table for parameters
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.parameter);
-		RegisterAllocator r = new RegisterAllocator();
-		
+
 		// add the parameters
 		for (ParamNode p : this.params) {
 			func.paramTypes.add(p.type.interRep());

@@ -6,7 +6,7 @@ import intermediate.Register;
 
 public class UsageCheck {
 
-	public static void verifyDefined(Register r, HashMap<Register, String> regs, String fileName, int line)
+	public static void verifyDefined(Register r, HashMap<Register, Types> regs, String fileName, int line)
 			throws CompileException {
 		
 		if (!regs.containsKey(r)) {

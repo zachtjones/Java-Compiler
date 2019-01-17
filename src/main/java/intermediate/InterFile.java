@@ -3,6 +3,7 @@ package intermediate;
 import java.util.ArrayList;
 
 import helper.CompileException;
+import helper.Types;
 import tree.NameNode;
 import x64.X64File;
 
@@ -146,10 +147,9 @@ public class InterFile {
 
 			// load this pointer (call super on this)
 			RegisterAllocator ra = new RegisterAllocator();
-			Register thisPointer = ra.getNext(Register.REFERENCE);
-			thisPointer.typeFull = name;
+			Register thisPointer = ra.getNext(Types.fromFullyQualifiedClass(this.name));
 			d.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
-			Register voidReg = ra.getNext(Register.VOID);
+			Register voidReg = ra.getNext(Types.VOID);
 			//  superclass of this object.
 			// add in the call to it's init
 			c = new CallActualStatement(thisPointer, superNode.primaryName, "<init>", args, voidReg,

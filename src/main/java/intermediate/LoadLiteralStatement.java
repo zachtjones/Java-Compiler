@@ -1,6 +1,7 @@
 package intermediate;
 
 import helper.CompileException;
+import helper.Types;
 import x64.X64File;
 import x64.X64Function;
 import x64.instructions.LoadEffectiveAddressInstruction;
@@ -25,33 +26,33 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 
 		value = literalValue; // or set to something else later.
 		if (literalValue.charAt(0) == '"') {
-			r = regAlloc.getNext(Register.REFERENCE);
+			r = regAlloc.getNext(Types.UNKNOWN);
 		} else if (literalValue.charAt(0) == '\'') {
-			r = regAlloc.getNext(Register.CHAR); // chars are 16-bit
+			r = regAlloc.getNext(Types.CHAR); // chars are 16-bit
 		} else if (literalValue.equals("true")) {
-			r = regAlloc.getNext(Register.BOOLEAN);
+			r = regAlloc.getNext(Types.BOOLEAN);
 		} else if (literalValue.equals("false")) {
-			r = regAlloc.getNext(Register.BOOLEAN);
+			r = regAlloc.getNext(Types.BOOLEAN);
 		} else if (literalValue.equals("null")) {
-			r = regAlloc.getNext(Register.NULL);
+			r = regAlloc.getNext(Types.UNKNOWN);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'f') {
-			r = regAlloc.getNext(Register.FLOAT);
+			r = regAlloc.getNext(Types.FLOAT);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'F') {
-			r = regAlloc.getNext(Register.FLOAT);
+			r = regAlloc.getNext(Types.FLOAT);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'd') {
-			r = regAlloc.getNext(Register.DOUBLE);
+			r = regAlloc.getNext(Types.DOUBLE);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'D') {
-			r = regAlloc.getNext(Register.DOUBLE);
+			r = regAlloc.getNext(Types.DOUBLE);
 		} else if (literalValue.contains(".")) {
 			// default floating point number is double
-			r = regAlloc.getNext(Register.DOUBLE);
+			r = regAlloc.getNext(Types.DOUBLE);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'l') {
-			r = regAlloc.getNext(Register.LONG);
+			r = regAlloc.getNext(Types.LONG);
 		} else if (literalValue.charAt(literalValue.length() - 1) == 'L') {
-			r = regAlloc.getNext(Register.LONG);
+			r = regAlloc.getNext(Types.LONG);
 		} else {
 			// should be an int (bytes & shorts don't have literals)
-			r = regAlloc.getNext(Register.INT);
+			r = regAlloc.getNext(Types.INT);
 			try {
 				Integer.parseInt(literalValue);
 			} catch(NumberFormatException e) {
@@ -68,8 +69,8 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+			HashMap<String, Types> params, InterFunction func) throws CompileException {
 
 		if (!r.isPrimitive()) {
 			r.typeFull = "java/lang/String";

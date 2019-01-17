@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 
@@ -62,7 +63,7 @@ public class ClassNode extends NodeImpl implements TypeDecNode {
 		}
 		
 		// place the class name in the symbol table (used for static fields)
-		classLevel.putEntry(name, "className", getFileName(), getLine());
+		classLevel.putEntry(name, Types.CLASS, getFileName(), getLine());
 		
 		// define the super classes and interfaces
 		//   - treated the same way (kind of)

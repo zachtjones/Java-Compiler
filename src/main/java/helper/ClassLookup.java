@@ -65,7 +65,7 @@ public class ClassLookup {
 		for (String i : items.values()) {
 			// can't add it twice
 			if (classLevel.lookupThisScope(i) == -1)
-				classLevel.putEntry(i, "class", fileName, -1);
+				classLevel.putEntry(i, Types.CLASS, fileName, -1);
 		}
 	}
 

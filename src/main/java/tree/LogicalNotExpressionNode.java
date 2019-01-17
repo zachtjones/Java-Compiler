@@ -2,8 +2,8 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFunction;
-import intermediate.Register;
 import intermediate.UnaryOpStatement;
 
 /** ! expr */
@@ -25,6 +25,6 @@ public class LogicalNotExpressionNode extends NodeImpl implements Expression {
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		expr.compile(s, f);
 		f.statements.add(new UnaryOpStatement(f.allocator.getLast(),
-				f.allocator.getNext(Register.BYTE), UnaryOpStatement.LOGNOT, getFileName(), getLine()));
+				f.allocator.getNext(Types.BYTE), UnaryOpStatement.LOGNOT, getFileName(), getLine()));
 	}
 }

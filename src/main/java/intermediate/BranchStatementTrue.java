@@ -3,11 +3,12 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 import helper.UsageCheck;
 
 /** branch when register is not equal to 0. */
 public class BranchStatementTrue implements InterStatement {
-	LabelStatement destination;
+	private LabelStatement destination;
 	Register r; // uses a byte register
 	
 	private final String fileName;
@@ -28,13 +29,13 @@ public class BranchStatementTrue implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, 
-			HashMap<String, String> locals, HashMap<String, String> params,
+	public void typeCheck(HashMap<Register, Types> regs,
+			HashMap<String, Types> locals, HashMap<String, Types> params,
 			InterFunction func) throws CompileException {
 		
 		UsageCheck.verifyDefined(r, regs, fileName, line);
-		if (r.type != Register.BOOLEAN) {
-			throw new CompileException("cannot convert from: " + r.typeFull + " to boolean.",
+		if (r.getType() != Types.BOOLEAN) {
+			throw new CompileException("cannot convert from: " + r.getType() + " to boolean.",
 					fileName, line);
 		}
 	}

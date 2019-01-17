@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 
@@ -16,7 +17,7 @@ public class FieldDeclarationNode extends NodeImpl {
 	public boolean isTransient;
 	public boolean isVolatile;
 
-	public TypeNode type;
+	public Types type;
 	public ArrayList<VariableDecNode> variables = new ArrayList<>();
 
     public FieldDeclarationNode(String fileName, int line) {
@@ -36,15 +37,14 @@ public class FieldDeclarationNode extends NodeImpl {
 	public void compile(InterFile f, SymbolTable syms) throws CompileException {
 		// add the type declarations to the instance structure, and the
 		//  initial values to the instance init
-		String typeRep = type.interRep();
 		for (VariableDecNode d : variables) {
 			// fix: String[] id[] -> String[][] id;
-			StringBuilder temp = new StringBuilder(typeRep);
+			StringBuilder temp = new StringBuilder(type.interRep());
 			for (int i = 0; i < d.id.numDimensions; i++) {
 				temp.append("[]");
 			}
 			f.addField(temp.toString(), d.id.name, isStatic);
-			syms.putEntry(d.id.name, typeRep, getFileName(), getLine());
+			syms.putEntry(d.id.name, type.interRep(), getFileName(), getLine());
 
 			// add the initial values if any
 			if (d.init != null && d.init.e != null) {

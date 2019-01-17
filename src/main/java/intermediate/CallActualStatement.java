@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
 import x64.X64File;
@@ -49,8 +50,8 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		
 		for (Register r : args) {
 			UsageCheck.verifyDefined(r, regs, fileName, line);
@@ -58,7 +59,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 		
 		if (returnVal != null) {
 			// fill in the return type
-			InterFile e = JavaCompiler.parseAndCompile(obj.typeFull, fileName, line);
+			InterFile e = JavaCompiler.parseAndCompile(obj.getType(), fileName, line);
 			String returnType = e.getReturnType(name, args);
 
 			if (returnType == null) {

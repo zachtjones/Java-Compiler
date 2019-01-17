@@ -2,7 +2,9 @@ package intermediate;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import tree.Expression;
+import tree.NodeImpl;
 import tree.SymbolTable;
 import x64.Instruction;
 import x64.operands.X64PreservedRegister;
@@ -17,56 +19,34 @@ import static x64.operands.X64RegisterOperand.of;
  * @author zach jones
  *
  */
-public class Register implements Expression {
+public class Register extends NodeImpl implements Expression {
 	
 	public static final int BOOLEAN = 0;
 	public static final int BYTE = 1;
-	public static final int CHAR = 2;
-	public static final int SHORT = 3;
-	public static final int INT = 4;
-	public static final int LONG = 5;
-	public static final int FLOAT = 6;
-	public static final int DOUBLE = 7;
 	public static final int REFERENCE = 8;
-	public static final int NULL = 9;
-	public static final int LABEL = 10;
-	public static final int VOID = 11;
-	
-	public int num;
-	public int type;
-	
-	/** The type's fully qualified name, set on type checking. */
-	public String typeFull;
-	
-	private final String fileName;
-	private final int line;
-	
-	public Register(int num, int type, String fileName, int line) {
+
+	int num;
+	private Types type;
+
+	public Register(int num, Types type, String fileName, int line) {
+		super(fileName, line);
 		this.num = num;
 		this.type = type;
-		this.fileName = fileName;
-		this.line = line;
 	}
 	
 	@Override
 	public String toString() {
-		if (typeFull == null) {
-			switch(type) {
-			case BOOLEAN: return "%t" + num;
-			case BYTE: return "%b" + num;
-			case CHAR: return "%c" + num;
-			case SHORT: return "%s" + num;
-			case INT: return "%i" + num;
-			case LONG: return "%l" + num;
-			case FLOAT: return "%f" + num;
-			case DOUBLE: return "%d" + num;
-			case REFERENCE: return "%r" + num;
-			case VOID: return "%v" + num;
-			}
-			return "unknown register type: " + type;
-		} else {
-			return "%" + num + "<" + typeFull + ">";
-		}
+		return "%" + type.getIntermediateRepresentation() + num;
+	}
+
+	/** gets the type of this register */
+	public Types getType() {
+		return type;
+	}
+
+	/** sets the type of this register */
+	public void setType(Types type) {
+		this.type = type;
 	}
 
 	/**
@@ -76,52 +56,19 @@ public class Register implements Expression {
 	 * @param second The Register constant type of the second item.
 	 * @return The Register constant type of the result.
 	 */
-	public static int getLarger(int first, int second) {
+	public static Types getLarger(Types first, Types second) {
 		if (first == second) return first;
-		if (first == DOUBLE || second == DOUBLE) return DOUBLE;
-		if (first == FLOAT || second == FLOAT) return FLOAT;
-		if (first == LONG || second == LONG) return LONG;
-		if (first == INT || second == INT) return INT;
-		if (first == SHORT || second == SHORT) return SHORT;
-		return BYTE;
+		if (first == Types.DOUBLE || second == Types.DOUBLE) return Types.DOUBLE;
+		if (first == Types.FLOAT || second == Types.FLOAT) return Types.FLOAT;
+		if (first == Types.LONG || second == Types.LONG) return Types.LONG;
+		if (first == Types.INT || second == Types.INT) return Types.INT;
+		if (first == Types.SHORT || second == Types.SHORT) return Types.SHORT;
+		return Types.BYTE;
 	}
 	
 	/** Helper function if this register holds a primitive value. */
 	public boolean isPrimitive() {
-		return type != REFERENCE;
-	}
-	
-	/** Fills in the typeFull for primitive types. */
-	public void setPrimitiveName() {
-		switch(type) {
-		case BOOLEAN: 
-			typeFull = "boolean";
-			break;
-		case BYTE: 
-			typeFull = "byte";
-			break;
-		case CHAR:
-			typeFull = "char";
-			break;
-		case SHORT:
-			typeFull = "short";
-			break;
-		case INT:
-			typeFull = "int";
-			break;
-		case LONG:
-			typeFull = "long";
-			break;
-		case DOUBLE:
-			typeFull = "double";
-			break;
-		case NULL:
-			typeFull = "null";
-			break;
-		case VOID:
-			typeFull = "void";
-			break;
-		}
+		return type.isPrimitive();
 	}
 
 	@Override
@@ -133,7 +80,7 @@ public class Register implements Expression {
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// make a copy statement so the result can be gotten with r.getLast()
 		Register result = f.allocator.getNext(type);
-		f.statements.add(new CopyStatement(this, result, fileName, line));
+		f.statements.add(new CopyStatement(this, result, getFileName(), getLine()));
 	}
 	
 	@Override
@@ -152,42 +99,9 @@ public class Register implements Expression {
 		}
 	}
 
-	@Override
-	public String getFileName() { // required by Expression, but not needed here
-		return "";
-	}
-
-	@Override
-	public int getLine() {
-		// return -1, line doesn't exist
-		return -1;
-	}
-
 	/** Returns the instruction size that is suitable for this instruction, for the x64 architecture */
 	public Instruction.Size x64Type() {
-		switch(type) {
-			case BOOLEAN:
-			case BYTE:
-				return Instruction.Size.BYTE;
-
-			case CHAR:
-			case SHORT:
-				return Instruction.Size.WORD;
-
-			case INT:
-				return Instruction.Size.LONG;
-
-			case LONG:
-				return Instruction.Size.QUAD;
-
-			case FLOAT:
-				return Instruction.Size.SINGLE;
-
-			case DOUBLE:
-				return Instruction.Size.DOUBLE;
-		}
-		// references / nulls
-		return Instruction.Size.QUAD;
+		return type.x64Type();
     }
 
     /** Converts this intermediate language register to the x64 assembly type. */

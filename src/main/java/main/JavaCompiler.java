@@ -13,6 +13,9 @@ import tree.*;
 import intermediate.*;
 import x64.X64File;
 
+import static helper.Types.arrayOf;
+import static helper.Types.fromFullyQualifiedClass;
+
 public class JavaCompiler {
 
 	/** Holds all parsed & compiled files */
@@ -109,8 +112,9 @@ public class JavaCompiler {
 		}
 
 		InterFile mainClass = null;
-		final Register argsArray = new Register(0, Register.REFERENCE, "auto-generated", -1);
-		argsArray.typeFull = "java/lang/String[]";
+		final Register argsArray = new Register(0,
+			arrayOf(fromFullyQualifiedClass("java/lang/String")), "auto-generated", -1);
+
 		for (InterFile f : files) {
 			if (f.getReturnType("main", new Register[]{argsArray}) != null) {
 				mainClass = f;

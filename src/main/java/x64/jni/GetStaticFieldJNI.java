@@ -1,7 +1,6 @@
 package x64.jni;
 
 import intermediate.Register;
-import x64.SymbolNames;
 import x64.X64Function;
 import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
@@ -21,7 +20,7 @@ public interface GetStaticFieldJNI extends CallJNIMethod {
     default void addGetStaticField(X64Function function, X64RegisterOperand classReg,
                                    X64RegisterOperand fieldIDReg, Register result) {
 
-        final String fieldType = SymbolNames.getJNISignatureFromILType(result.typeFull);
+        final String fieldType = result.getType().getIntermediateRepresentation();
 
         // load the args
         // arg1 = JNI
