@@ -26,7 +26,7 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 
 		value = literalValue; // or set to something else later.
 		if (literalValue.charAt(0) == '"') {
-			r = regAlloc.getNext(Types.UNKNOWN);
+			r = regAlloc.getNext(Types.fromFullyQualifiedClass("java/lang/String"));
 		} else if (literalValue.charAt(0) == '\'') {
 			r = regAlloc.getNext(Types.CHAR); // chars are 16-bit
 		} else if (literalValue.equals("true")) {
@@ -71,13 +71,8 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 	@Override
 	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
 			HashMap<String, Types> params, InterFunction func) throws CompileException {
-
-		if (!r.isPrimitive()) {
-			r.typeFull = "java/lang/String";
-		} else {
-			r.setPrimitiveName();
-		}
-		regs.put(r, r.typeFull);
+		// only literal class is already set in constructor
+		regs.put(r, r.getType());
 	}
 
 	@Override

@@ -2,8 +2,10 @@ package intermediate;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import helper.CompileException;
+import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
 import x64.X64File;
@@ -38,7 +40,7 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 	public String toString() {
 		// use the Arrays.toString and remove '[' and ']', also handle no return
 		String leftPart = "callVirtual " + obj + " " + name + "(" + 
-		Arrays.toString(args).replaceAll("\\[|\\]", "") + ")";
+		Arrays.toString(args).replaceAll("[\\[\\]]", "") + ")";
 		if (returnVal != null) {
 			return leftPart + " -> " + returnVal + ";";	
 		} else {
@@ -47,8 +49,8 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		
 		for (Register r : args) {
 			UsageCheck.verifyDefined(r, regs, fileName, line);
@@ -56,24 +58,19 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 		
 		if (returnVal != null) {
 			// fill in the return type
-			InterFile e = JavaCompiler.parseAndCompile(obj.typeFull, fileName, line);
-			String returnType = e.getReturnType(name, args);
+			InterFile e = JavaCompiler.parseAndCompile(obj.getType().getClassName(fileName, line), fileName, line);
+			Types returnType = e.getReturnType(name, args);
 			
 			if (returnType == null) {
-				StringBuilder signature = new StringBuilder(name + "(");
-				for (int i = 0; i < args.length; i++) {
-					signature.append(args[i].typeFull);
-					if (i != args.length - 1) {
-						signature.append(',');
-					}
-				}
-				signature.append(")");
-				throw new CompileException("no method found with signature, " + signature.toString()
+				String signature = Arrays.stream(args)
+					.map(i -> i.getType().getIntermediateRepresentation())
+					.collect(Collectors.joining());
+				throw new CompileException("no method found with signature, " + signature
 						+ ", referenced", fileName, line);
 			}
 			
-			returnVal.typeFull = returnType;
-			regs.put(returnVal, returnVal.typeFull);
+			returnVal.setType(returnType);
+			regs.put(returnVal, returnType);
 		}
 	}
 

@@ -8,7 +8,7 @@ public class TypeChecker {
 	 * Verifies that you can assign source to target.
 	 * @throws CompileException if subclassName is not the same as className or a subclass of it.
 	 */
-	public static void canAssign(String target, String source, String fileName, int line)
+	public static void canAssign(Types target, Types source, String fileName, int line)
 			throws CompileException {
 		
 		if (target.equals(source)) {

@@ -1,6 +1,7 @@
 package javaLibrary;
 
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 
@@ -95,12 +96,12 @@ public class JavaLibraryLookup {
 
                     final String name = matcher.group(2);
                     boolean isStatic = Arrays.asList(modifiers).contains("static");
-                    f.addField(type, name, isStatic);
+                    f.addField(Types.fromFullyQualifiedClass(type), name, isStatic);
                 }
             } else {
 
                 final InterFunction function = new InterFunction();
-                function.returnType = split[1];
+                function.returnType = Types.fromFullyQualifiedClass(split[1]);
                 boolean isStatic = Arrays.asList(modifiers).contains("static");
                 function.isInstance = !isStatic;
 
@@ -110,7 +111,7 @@ public class JavaLibraryLookup {
                     rest = String.join(" ", Arrays.copyOfRange(split, 1, split.length));
 
                     // return type is the class, name <init>
-                    function.returnType = fullyQualified;
+                    function.returnType = Types.fromFullyQualifiedClass(fullyQualified);
                     function.name = "<init>";
 
                 } else {
@@ -173,7 +174,7 @@ public class JavaLibraryLookup {
                         .replace("../", "");
 
                 final String name = matcher.group(2);
-                function.paramTypes.add(type);
+                function.paramTypes.add(Types.fromFullyQualifiedClass(type));
                 function.paramNames.add(name);
             }
         }

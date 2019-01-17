@@ -3,11 +3,12 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 import main.JavaCompiler;
 
 public class GetStaticFieldAddressStatement implements InterStatement {
-	String className;
-	String fieldName;
+	private String className;
+	private String fieldName;
 	Register result;
 	
 	private final String fileName;
@@ -36,12 +37,12 @@ public class GetStaticFieldAddressStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		// get the field type for the static field.
 		InterFile object = JavaCompiler.parseAndCompile(className, fileName, line);
-		String type = object.getStatFieldType(fieldName, fileName, line);
+		Types type = object.getStatFieldType(fieldName, fileName, line);
 
-		regs.put(result, type + "*");
+		regs.put(result, Types.pointerOf(type));
 	}
 }

@@ -2,6 +2,7 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.SetConditionStatement;
@@ -29,7 +30,7 @@ public class NotEqualityExpressionNode extends NodeImpl implements Expression {
 		right.compile(s, f);
 		Register rightResult = f.allocator.getLast();
 		
-		Register result = f.allocator.getNext(Register.BYTE);
+		Register result = f.allocator.getNext(Types.BYTE);
 		
 		// do a compare
 		f.statements.add(new SetConditionStatement(

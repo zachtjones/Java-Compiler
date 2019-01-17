@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 
@@ -58,7 +59,7 @@ public class ConstructorNode {
 		func.name = "<init>";
 		func.isInstance = true;
 		// returns object name
-		func.returnType = name;
+		func.returnType = Types.fromFullyQualifiedClass(name);
 		
 		// symbol table for parameters
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.parameter);

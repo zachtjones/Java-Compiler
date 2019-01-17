@@ -4,12 +4,13 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.TypeChecker;
+import helper.Types;
 import helper.UsageCheck;
 
 /** PutLocal name = %register */
 public class PutLocalStatement implements InterStatement {
 	Register r;
-	String localName;
+	private String localName;
 	
 	private final String fileName;
 	private final int line;
@@ -32,14 +33,14 @@ public class PutLocalStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		
 		UsageCheck.verifyDefined(r, regs, fileName, line);
 		if (!locals.containsKey(localName)) {
 			throw new CompileException("local variable: " + localName + " is not defined.",
 					fileName, line);
 		}
-		TypeChecker.canAssign(locals.get(localName), r.typeFull, fileName, line);
+		TypeChecker.canAssign(locals.get(localName), r.getType(), fileName, line);
 	}
 }

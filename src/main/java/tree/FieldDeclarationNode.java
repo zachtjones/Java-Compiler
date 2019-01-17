@@ -43,7 +43,7 @@ public class FieldDeclarationNode extends NodeImpl {
 			for (int i = 0; i < d.id.numDimensions; i++) {
 				temp = Types.arrayOf(temp);
 			}
-			f.addField(temp.toString(), d.id.name, isStatic);
+			f.addField(temp, d.id.name, isStatic);
 			syms.putEntry(d.id.name, temp, getFileName(), getLine());
 
 			// add the initial values if any

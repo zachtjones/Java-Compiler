@@ -51,7 +51,7 @@ public class AssignmentNode extends NodeImpl implements StatementExprNode, Expre
 			
 			// the result of an assign is the expression on the right
 			// this allows for x = y = 5;
-			Register result = f.allocator.getNext(rightResult.type);
+			Register result = f.allocator.getNext(rightResult.getType());
 			f.statements.add(new CopyStatement(rightResult, result, getFileName(), getLine()));
 		} else {
 			// dissolve the compound assignment down to left = left OPERATION right

@@ -47,7 +47,7 @@ public class MethodNode {
 		}
 		
 		func.isInstance = !isStatic;
-		func.returnType = resultType.toString();
+		func.returnType = resultType;
 		
 		// TODO - final and synchronized, ... modifiers
 		

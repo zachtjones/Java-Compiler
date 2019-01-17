@@ -12,7 +12,7 @@ import x64.X64Function;
 public class InterFunction {
 	
 	public String name;
-	public String returnType;
+	public Types returnType;
 	public boolean isInstance; // instance or static
 	public boolean isInit; // static init or instance init
 	

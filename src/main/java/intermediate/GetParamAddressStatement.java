@@ -38,6 +38,6 @@ public class GetParamAddressStatement implements InterStatement {
 			throw new CompileException("Error: " + localName + " not a parameter.", fileName, line);
 		}
 		
-		regs.put(r, params.get(localName) + "*");
+		regs.put(r, Types.pointerOf(params.get(localName)));
 	}
 }

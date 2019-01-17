@@ -44,7 +44,7 @@ public class GetInstanceFieldStatement implements InterStatement {
 		// the type of the object
 		Types type = instance.getType();
 		
-		InterFile object = JavaCompiler.parseAndCompile(type, fileName, line);
+		InterFile object = JavaCompiler.parseAndCompile(type.getClassName(fileName, line), fileName, line);
 		Types resultType = object.getInstFieldType(fieldName, fileName, line);
 		
 		regs.put(result, resultType);

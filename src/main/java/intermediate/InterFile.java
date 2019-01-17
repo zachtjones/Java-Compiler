@@ -36,7 +36,7 @@ public class InterFile {
 	 * @param isStatic true if the field is static, 
 	 * false if it is instance-based.
 	 */
-	public void addField(String type, String name, boolean isStatic) {
+	public void addField(Types type, String name, boolean isStatic) {
 		addField(type, name, isStatic, null);
 	}
 
@@ -140,7 +140,7 @@ public class InterFile {
 			// add the name and return type
 			d.name = "<init>";
 			d.isInstance = true;
-			d.returnType = "void";
+			d.returnType = Types.VOID;
 
 			// add the only statement, super();
 			d.statements = new ArrayList<>();
@@ -196,7 +196,7 @@ public class InterFile {
 	 * @param args The array of arguments.
 	 * @return The return object type, or null if there's no method with that signature
 	 */
-	public String getReturnType(String name, Register[] args) {
+	public Types getReturnType(String name, Register[] args) {
 		for (InterFunction f : functions) {
 			if (f.name.equals(name) && f.paramTypes.size() == args.length) {
 				boolean matchedAll = true;

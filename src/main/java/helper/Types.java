@@ -51,6 +51,27 @@ public class Types {
 		}
 	}
 
+	/** Creates a new type that is a pointer to the argument */
+	public static Types pointerOf(Types type) {
+		return new Types("*" + type.rep, false);
+	}
+
+	/** Dereferences this pointer type, throwing an CompileException if this isn't a pointer */
+	public Types dereferencePointer(String fileName, int line) throws CompileException {
+		if (rep.charAt(0) == '*') {
+			return new Types(rep.substring(1), isPrimitive);
+		} else {
+			throw new CompileException("Trying to dereference pointer from non-pointer type: " + rep, fileName, line);
+		}
+	}
+
+	/** Returns the fully qualified class name from this Type, throwing a CompileException if not a class. */
+	public String getClassName(String fileName, int line) throws CompileException {
+		if (rep.charAt(0) == 'L' && rep.charAt(rep.length() - 1) == ';') {
+			return rep.substring(1, rep.length() - 1);
+		}
+		throw new CompileException("Trying to get a class out of non-class type", fileName, line);
+	}
 
 	/** returns the JNI representation for this type, which is the same as what is printed in the IL */
 	public String getIntermediateRepresentation() {
