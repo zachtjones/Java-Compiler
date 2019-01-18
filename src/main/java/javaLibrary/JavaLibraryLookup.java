@@ -96,7 +96,7 @@ public class JavaLibraryLookup {
 
                     final String name = matcher.group(2);
                     boolean isStatic = Arrays.asList(modifiers).contains("static");
-                    f.addField(Types.fromFullyQualifiedClass(type), name, isStatic);
+                    f.addField(Types.fromJavaRepresentation(type), name, isStatic);
                 }
             } else {
 

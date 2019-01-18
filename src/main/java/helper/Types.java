@@ -52,6 +52,22 @@ public class Types {
 		return new Types("[" + typeOfArray.rep, false);
 	}
 
+	/** Creates a type from the java representation
+	 * @param type "void", "short", ... or a class name with the slashes separating the parts. */
+	public static Types fromJavaRepresentation(String type) {
+		switch (type) {
+			case "void": return VOID;
+			case "byte": return BYTE;
+			case "char": return CHAR;
+			case "short": return SHORT;
+			case "int": return INT;
+			case "long": return LONG;
+			case "float": return FLOAT;
+			case "double": return DOUBLE;
+		}
+		return Types.fromFullyQualifiedClass(type);
+	}
+
 	/** Removes an array dimension, returning the new type. If it can't be removed, throws a CompileException */
 	public Types removeArray(String fileName, int line) throws CompileException {
 		if (isArrayType()) {
@@ -150,5 +166,10 @@ public class Types {
 	public boolean equals(Object o) {
 		return o instanceof Types &&
 			((Types)o).getIntermediateRepresentation().equals(this.getIntermediateRepresentation());
+	}
+
+	@Override
+	public String toString() {
+		return getIntermediateRepresentation();
 	}
 }
