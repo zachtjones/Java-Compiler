@@ -71,7 +71,11 @@ public class Types {
 
 	/** Creates a types instance from the Class instance, obtained via classLoader reflection. */
 	public static Types fromReflection(Class<?> type) {
-		return new Types(type.getName().replace('.', '/'), type.isPrimitive());
+		if (type.isPrimitive()) {
+			return fromJavaRepresentation(type.getName());
+		} else {
+			return Types.fromFullyQualifiedClass(type.getName().replace('.', '/'));
+		}
 	}
 
 	/** Removes an array dimension, returning the new type. If it can't be removed, throws a CompileException */
