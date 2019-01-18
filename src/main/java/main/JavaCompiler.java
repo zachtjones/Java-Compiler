@@ -38,7 +38,7 @@ public class JavaCompiler {
 		}
 
 		if (fullyQualifiedName.startsWith("java/")) {
-			return JavaLibraryLookup.getLibraryFile(fullyQualifiedName);
+			return JavaLibraryLookup.getLibraryFile(fullyQualifiedName, fileName, line);
 		}
 
 		final String newFileName = rootDir + fullyQualifiedName + ".java";

@@ -57,6 +57,7 @@ public class Types {
 	public static Types fromJavaRepresentation(String type) {
 		switch (type) {
 			case "void": return VOID;
+			case "boolean": return BOOLEAN;
 			case "byte": return BYTE;
 			case "char": return CHAR;
 			case "short": return SHORT;
@@ -66,6 +67,11 @@ public class Types {
 			case "double": return DOUBLE;
 		}
 		return Types.fromFullyQualifiedClass(type);
+	}
+
+	/** Creates a types instance from the Class instance, obtained via classLoader reflection. */
+	public static Types fromReflection(Class<?> type) {
+		return new Types(type.getName().replace('.', '/'), type.isPrimitive());
 	}
 
 	/** Removes an array dimension, returning the new type. If it can't be removed, throws a CompileException */
