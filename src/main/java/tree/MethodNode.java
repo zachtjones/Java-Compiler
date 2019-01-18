@@ -25,7 +25,7 @@ public class MethodNode {
     
 	
 	public void resolveImports(ClassLookup c) throws CompileException {
-		resultType.resolveImports(c, dec.getFileName(), dec.getLine());
+		resultType = resultType.resolveImports(c, dec.getFileName(), dec.getLine());
 		dec.resolveImports(c);
 		if (throwsList != null) {
 			for (NameNode n : throwsList) {

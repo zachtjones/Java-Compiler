@@ -19,7 +19,7 @@ public class LocalVariableDecNode extends NodeImpl {
     
 	@Override
 	public void resolveImports(ClassLookup c) throws CompileException {
-		type.resolveImports(c, getFileName(), getLine());
+		type = type.resolveImports(c, getFileName(), getLine());
 		for (VariableDecNode d : declarators) {
 			if (d.init != null) {
 				d.init.resolveImports(c);

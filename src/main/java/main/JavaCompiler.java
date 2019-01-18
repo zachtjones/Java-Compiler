@@ -122,7 +122,7 @@ public class JavaCompiler {
 
 		// enforce there is a `static void main(String[] args)`
 		if (mainClass == null) {
-			throw new CompileException("There is not a main method in the files given.", c.fileName, 0);
+			throw new CompileException("There is not a main method in the files given.", file, 0);
 		}
 
 		// compile to the native code - starting with the java -> native class

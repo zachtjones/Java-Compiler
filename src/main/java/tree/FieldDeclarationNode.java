@@ -25,7 +25,7 @@ public class FieldDeclarationNode extends NodeImpl {
     }
 
 	public void resolveImports(ClassLookup c) throws CompileException {
-		type.resolveImports(c, getFileName(), getLine());
+		type = type.resolveImports(c, getFileName(), getLine());
 	}
 
 	/**
