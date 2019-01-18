@@ -9,10 +9,6 @@ import helper.UsageCheck;
 /** dest = src1 OP src2 */
 public class BinaryOpStatement implements InterStatement {
 
-	public static final int LSHIFT = 0;
-	public static final int RSHIFTARITH = 1; // sign-filled
-	public static final int RSHIFTLOG = 2; // 0 filled.
-
 	private Register src1;
 	private Register src2;
 	private Register dest;
