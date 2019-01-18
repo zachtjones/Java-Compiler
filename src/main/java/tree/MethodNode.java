@@ -64,7 +64,7 @@ public class MethodNode {
 
 
 	public void putSymbols(SymbolTable classLevel) throws CompileException {
-		classLevel.putEntry(dec.name, isStatic ? "staticMethod" : "instanceMethod",
+		classLevel.putEntry(dec.name, isStatic ? Types.STATIC_FUNCTION : Types.INSTANCE_FUNCTION,
 			dec.getFileName(), dec.getLine());
 	}
 }

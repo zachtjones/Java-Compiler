@@ -8,13 +8,11 @@ import java.util.HashMap;
 import helper.ClassLookup;
 import helper.CompileException;
 import helper.ProcessRunner;
+import helper.Types;
 import javaLibrary.JavaLibraryLookup;
 import tree.*;
 import intermediate.*;
 import x64.X64File;
-
-import static helper.Types.arrayOf;
-import static helper.Types.fromFullyQualifiedClass;
 
 public class JavaCompiler {
 
@@ -112,11 +110,12 @@ public class JavaCompiler {
 		}
 
 		InterFile mainClass = null;
-		final Register argsArray = new Register(0,
-			arrayOf(fromFullyQualifiedClass("java/lang/String")), "auto-generated", -1);
+
+		final ArrayList<Types> arg = new ArrayList<>();
+		arg.add(Types.arrayOf(Types.STRING));
 
 		for (InterFile f : files) {
-			if (f.getReturnType("main", new Register[]{argsArray}) != null) {
+			if (f.getReturnType("main", arg) != null) {
 				mainClass = f;
 			}
 		}

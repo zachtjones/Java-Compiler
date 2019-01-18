@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import tree.*;
 import java.util.ArrayList;
 import java.nio.charset.Charset;
+import helper.Types;
 
 // hide the warnings from dead code -- there's no way to block it
 @SuppressWarnings("unused")
@@ -570,39 +571,38 @@ BlockNode StaticInitializer() :
  * Type, name and expression syntax follows.
  */
 
-TypeNode Type() :
+Types Type() :
 {
-    TypeNode t = new TypeNode(fileName, token.beginLine);
+    Types t;
+    NameNode n;
 }
 {
-    ( t.primitive=PrimitiveType() | t.name=Name() )
-    ( <LBRACKET> <RBRACKET>{ t.arrayDims++; } )*
+    ( t=PrimitiveType() | n=Name() { t = Types.fromFullyQualifiedClass(n.primaryName); } )
+    ( <LBRACKET> <RBRACKET>{ t = Types.arrayOf(t); } )*
     { return t; }
 }
 
-PrimitiveTypeNode PrimitiveType() :
+Types PrimitiveType() :
+{}
 {
-    PrimitiveTypeNode t = new PrimitiveTypeNode(fileName, token.beginLine);
-}
-{
-    <BOOLEAN> { t.type = PrimitiveTypeNode.BOOLEAN; return t; }
-|   <CHAR> { t.type = PrimitiveTypeNode.CHAR; return t; }
-|   <BYTE> { t.type = PrimitiveTypeNode.BYTE; return t; }
-|   <SHORT> { t.type = PrimitiveTypeNode.SHORT; return t; }
-|   <INT> { t.type = PrimitiveTypeNode.INT; return t; }
-|   <LONG> { t.type = PrimitiveTypeNode.LONG; return t; }
-|   <FLOAT> { t.type = PrimitiveTypeNode.FLOAT; return t; }
-|   <DOUBLE> { t.type = PrimitiveTypeNode.DOUBLE; return t; }
+    <BOOLEAN> { return Types.BOOLEAN; }
+|   <CHAR> { return Types.CHAR; }
+|   <BYTE> { return Types.BYTE; }
+|   <SHORT> { return Types.SHORT; }
+|   <INT> { return Types.INT; }
+|   <LONG> { return Types.LONG; }
+|   <FLOAT> { return Types.FLOAT; }
+|   <DOUBLE> { return Types.DOUBLE; }
 }
 
-ResultTypeNode ResultType() :
+Types ResultType() :
 {
-    ResultTypeNode r = new ResultTypeNode(fileName, token.beginLine);
+    Types r;
 }
 {
-  <VOID> { r.isVoid = true; return r; }
+  <VOID> { return Types.VOID; }
 |
-  r.type=Type() { return r; }
+  r=Type() { return r; }
 }
 
 NameNode Name() :
@@ -885,7 +885,7 @@ Expression InstanceOfExpression() :
 {
     InstanceOfExpressionNode e = new InstanceOfExpressionNode(fileName, token.beginLine);
     Expression temp;
-    TypeNode t;
+    Types t;
 }
 {
     temp=RelationalExpression()
@@ -1139,6 +1139,7 @@ Expression PostfixExpression() :
 Expression CastExpression() :
 {
     PrimitiveCastExpressionNode p = new PrimitiveCastExpressionNode(fileName, token.beginLine);
+    NameNode t;
     ObjectCastExpressionNode o = new ObjectCastExpressionNode(fileName, token.beginLine);
 }
 {
@@ -1150,10 +1151,11 @@ Expression CastExpression() :
         return p;
     }
 |
-    "(" o.type=Name()
+    "(" t=Name()
     ( "[" "]" { o.arrayDims++; })* ")"
     o.expr=UnaryExpressionNotPlusMinus()
     {
+        o.type = Types.fromFullyQualifiedClass(t.primaryName);
         return o;
     }
 }
@@ -1284,7 +1286,7 @@ Expression AllocationExpression() :
 {
     Expression temp;
     ArrayList<Expression> list;
-    PrimitiveTypeNode p;
+    Types p;
     NameNode n;
     ArgumentExpressionNode args;
 }
@@ -1309,7 +1311,7 @@ Expression AllocationExpression() :
     | list=ArrayDimensions()
     {
         ObjectArrayAllocationNode o = new ObjectArrayAllocationNode(fileName, token.beginLine);
-        o.type = n;
+        o.type = Types.fromFullyQualifiedClass(n.primaryName);
         o.expressions = list;
         return o;
     } )

@@ -34,6 +34,6 @@ public class ReturnRegStatement implements InterStatement {
 			throw new CompileException("Can't return an expression from void function.", fileName, line);
 		}
 		UsageCheck.verifyDefined(r, regs, fileName, line);
-		TypeChecker.canAssign(func.returnType, r.getType(), fileName, line);
+		TypeChecker.canDirectlyAssign(func.returnType, r.getType(), fileName, line);
 	}
 }

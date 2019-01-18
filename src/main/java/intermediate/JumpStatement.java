@@ -3,10 +3,11 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 
 /** jump LABEL; */
 public class JumpStatement implements InterStatement {
-	LabelStatement label;
+	private final LabelStatement label;
 	
 	public JumpStatement(LabelStatement label) {
 		this.label = label;
@@ -17,8 +18,8 @@ public class JumpStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		
 		// nothing needed
 	}

@@ -11,7 +11,7 @@ import intermediate.Register;
 
 /** new type[expression or empty] ... */
 public class PrimitiveArrayAllocationNode extends NodeImpl implements Expression {
-    public PrimitiveTypeNode type;
+    public Types type;
     public ArrayList<Expression> expressions; // never empty list, but can have null in the list
     
     public PrimitiveArrayAllocationNode(String fileName, int line) {
@@ -38,7 +38,7 @@ public class PrimitiveArrayAllocationNode extends NodeImpl implements Expression
 			expressions.get(0).compile(s, f);
 			Register size = f.allocator.getLast();
 			Register result = f.allocator.getNext(Types.UNKNOWN);
-			f.statements.add(new CreateArrayStatement(size, type.toString(), result));
+			f.statements.add(new CreateArrayStatement(size, type, result));
 		} else {
 			// TODO handle multi-dimensional arrays.
 			throw new CompileException("Multi-dimensional array creation not done yet.", "", -1);

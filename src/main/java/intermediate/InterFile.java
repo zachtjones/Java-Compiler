@@ -1,6 +1,6 @@
 package intermediate;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import helper.CompileException;
 import helper.Types;
@@ -18,6 +18,9 @@ public class InterFile {
 	private ArrayList<NameNode> implementsNodes;
 	private NameNode superNode;
 
+	/** name -> Map of list of args to return value */
+	private final Map<String, Map<List<Types>, Types>> typesOfFunctions;
+
 	/**
 	 * Creates an intermediate file, given the name
 	 * @param name The name, such as java/util/Scanner
@@ -27,6 +30,7 @@ public class InterFile {
 		this.staticPart = new InterStructure(false);
 		this.instancePart = new InterStructure(true);
 		this.functions = new ArrayList<>();
+		typesOfFunctions = new HashMap<>();
 	}
 
 	/**
@@ -167,7 +171,12 @@ public class InterFile {
 		
 		for (InterFunction f : functions) {
 			f.typeCheck(fromFullyQualifiedClass(name));
+			// add it to the set
+			Map<List<Types>, Types> existing = typesOfFunctions.getOrDefault(f.name, new HashMap<>());
+			existing.put(f.paramTypes, f.returnType);
+			typesOfFunctions.putIfAbsent(f.name, existing);
 		}
+
 	}
 
 	/**
@@ -196,20 +205,9 @@ public class InterFile {
 	 * @param args The array of arguments.
 	 * @return The return object type, or null if there's no method with that signature
 	 */
-	public Types getReturnType(String name, Register[] args) {
-		for (InterFunction f : functions) {
-			if (f.name.equals(name) && f.paramTypes.size() == args.length) {
-				boolean matchedAll = true;
-				for (int i = 0; i < args.length; i++) {
-					if (!args[i].typeFull.equals(f.paramTypes.get(i))) {
-						matchedAll = false;
-					}
-				}
-				if (matchedAll) {
-					return f.returnType;
-				}
-			}
-			// TODO the ... on args and inheritance
+	public Types getReturnType(String name, ArrayList<Types> args) {
+		if (typesOfFunctions.containsKey(name)) {
+			return typesOfFunctions.get(name).get(args);
 		}
 		return null;
 	}

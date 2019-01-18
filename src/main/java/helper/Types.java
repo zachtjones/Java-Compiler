@@ -22,15 +22,23 @@ public class Types {
 	public static final Types FLOAT = new Types("F", true);
 	public static final Types DOUBLE = new Types("D", true);
 
+	/** this represents that the type is a literal null value */
+	public static final Types NULL = new Types("<null>", false);
+
 	/** this represents that the type isn't known yet, will be resolved at type checking */
-	public static final Types UNKNOWN = new Types("", false);
+	public static final Types UNKNOWN = new Types("<unknown>", false);
 
 	/** this represents a type that is used to hold a label, registers shouldn't have this type. */
-	public static final Types LABEL = new Types("", false);
+	public static final Types LABEL = new Types("<label>", false);
 
 	/** this represents a type that represents a class */
-	public static final Types CLASS = new Types("", false);
+	public static final Types CLASS = new Types("<class>", false);
 
+	public static final Types STATIC_FUNCTION = new Types("<static_func>", false);
+
+	public static final Types INSTANCE_FUNCTION = new Types("<instance_func>", false);
+
+	/** this is shorthand for Types.fromFullyQualifiedClass("java/lang/String") */
 	public static final Types STRING = Types.fromFullyQualifiedClass("java/lang/String");
 
 
@@ -111,5 +119,16 @@ public class Types {
 
 	public void resolveImports(ClassLookup c) {
 		throw new RuntimeException("Types.java do the resolve imports thing");
+	}
+
+	@Override
+	public int hashCode() {
+		return getIntermediateRepresentation().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof Types &&
+			((Types)o).getIntermediateRepresentation().equals(this.getIntermediateRepresentation());
 	}
 }

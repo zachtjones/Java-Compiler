@@ -1,5 +1,6 @@
 package intermediate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
@@ -59,7 +60,10 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 		if (returnVal != null) {
 			// fill in the return type
 			InterFile e = JavaCompiler.parseAndCompile(obj.getType().getClassName(fileName, line), fileName, line);
-			Types returnType = e.getReturnType(name, args);
+
+			ArrayList<Types> argsList = new ArrayList<>();
+			Arrays.stream(args).map(Register::getType).forEachOrdered(argsList::add);
+			Types returnType = e.getReturnType(name, argsList);
 			
 			if (returnType == null) {
 				String signature = Arrays.stream(args)

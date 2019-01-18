@@ -4,12 +4,13 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.TypeChecker;
+import helper.Types;
 import helper.UsageCheck;
 
 /** store %src at %addr */
 public class StoreAddressStatement implements InterStatement {
-	Register src;
-	Register addr;
+	private Register src;
+	private Register addr;
 	
 	private final String fileName;
 	private final int line;
@@ -27,8 +28,8 @@ public class StoreAddressStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		
 		UsageCheck.verifyDefined(addr, regs, fileName, line);
 		UsageCheck.verifyDefined(src, regs, fileName, line);

@@ -38,7 +38,7 @@ public class GetLocalAddressStatement implements InterStatement {
 			throw new CompileException("local variable: " + localName + " is not defined.",
 					fileName, line);
 		}
-		TypeChecker.canAssign(locals.get(localName), r.getType(), fileName, line);
+		TypeChecker.canDirectlyAssign(locals.get(localName), r.getType(), fileName, line);
 		
 		// define the register
 		r.setType(Types.pointerOf(locals.get(localName)));

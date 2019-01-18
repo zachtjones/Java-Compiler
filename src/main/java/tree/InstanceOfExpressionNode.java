@@ -10,7 +10,7 @@ import intermediate.Register;
 /* left instanceof right */
 public class InstanceOfExpressionNode extends NodeImpl implements Expression {
     public Expression left;
-    public TypeNode right;
+    public Types right;
     
     public InstanceOfExpressionNode(String fileName, int line) {
     	super(fileName, line);
@@ -27,7 +27,7 @@ public class InstanceOfExpressionNode extends NodeImpl implements Expression {
 		left.compile(s, f);
 		Register value = f.allocator.getLast();
 		// test if value is the instance of the class
-		String className = right.getILRep();
+		String className = right.getClassName(getFileName(), getLine());
 		
 		Register result = f.allocator.getNext(Types.BOOLEAN);
 		
