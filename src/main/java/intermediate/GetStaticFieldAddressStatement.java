@@ -43,6 +43,7 @@ public class GetStaticFieldAddressStatement implements InterStatement {
 		InterFile object = JavaCompiler.parseAndCompile(className, fileName, line);
 		Types type = object.getStatFieldType(fieldName, fileName, line);
 
-		regs.put(result, Types.pointerOf(type));
+		result.setType(Types.pointerOf(type));
+		regs.put(result, result.getType());
 	}
 }

@@ -140,7 +140,7 @@ public class InterFile {
 			}
 		}
 		if (!hasOne && superNode != null) {
-			InterFunction d = new InterFunction();
+			InterFunction d = new InterFunction(name);
 			// add the name and return type
 			d.name = "<init>";
 			d.isInstance = true;

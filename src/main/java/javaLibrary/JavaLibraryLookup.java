@@ -80,7 +80,7 @@ public class JavaLibraryLookup {
 
             // methods -- again don't need to know the contents, just the signatures
             for (Method method : methods) {
-                InterFunction function = new InterFunction();
+                InterFunction function = new InterFunction(fullyQualified);
                 function.name = method.getName();
                 function.returnType = Types.fromReflection(method.getReturnType());
 

@@ -26,9 +26,11 @@ public class InterFunction {
 
 	public final RegisterAllocator allocator;
 	public final CompileHistory history;
+
+	public final String parentClass;
 	
 	
-	public InterFunction() {
+	public InterFunction(String fromClass) {
 		this.paramTypes = new ArrayList<>();
 		this.paramNames = new ArrayList<>();
 		this.throwsList = new ArrayList<>();
@@ -36,6 +38,7 @@ public class InterFunction {
 
 		allocator = new RegisterAllocator();
 		history = new CompileHistory();
+		parentClass = fromClass;
 	}
 	
 	@Override

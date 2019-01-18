@@ -19,10 +19,12 @@ public class SymbolTable {
 	/** The scope level of this symbol table */
 	private final int scopeLevel;
 	
-	// places where the symbol is defined
+	// places where the symbol is defined -- valid values of scope level
 	public static final int className = 0;
 	public static final int parameter = 1;
 	public static final int local = 2;
+	public static final int staticFields = 3;
+	public static final int instanceFields = 4;
 	
 	// hash map of identifier to the type
 	private HashMap<String, Types> entries;

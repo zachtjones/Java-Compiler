@@ -42,7 +42,7 @@ public class MethodNode {
 	 * @throws CompileException If there is a compilation error.
 	 */
 	public void compile(InterFile f, SymbolTable syms) throws CompileException {
-		InterFunction func = new InterFunction();
+		InterFunction func = new InterFunction(f.getName());
 		if (isNative) {
 			throw new CompileException("native methods not implemented yet.", "", -1);
 		}
