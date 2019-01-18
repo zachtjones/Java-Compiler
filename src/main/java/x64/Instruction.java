@@ -13,7 +13,7 @@ public interface Instruction {
         BYTE('b'), WORD('w'), LONG('l'), QUAD('q'),
 
         // floating-point numbers
-        SINGLE('s'), DOUBLE('d'), TEN('t');
+        SINGLE('s'), DOUBLE('d');
 
         public char size;
         Size(char suffix) {

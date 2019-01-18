@@ -2,6 +2,7 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.SetConditionStatement;
@@ -29,7 +30,7 @@ public class LessThanEqualExpressionNode extends NodeImpl implements Expression 
 		Register rightResult = f.allocator.getLast();
 		
 		// add in the condition
-		Register result = f.allocator.getNext(Register.BOOLEAN);
+		Register result = f.allocator.getNext(Types.BOOLEAN);
 		f.statements.add(new SetConditionStatement(
 			SetConditionStatement.LESSEQUAL, leftResult, rightResult, result, getFileName(), getLine()));
 	}

@@ -4,12 +4,13 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFunction;
 import intermediate.PutLocalStatement;
 import intermediate.StartScopeStatement;
 
 public class LocalVariableDecNode extends NodeImpl {
-    public TypeNode type;
+    public Types type;
     public ArrayList<VariableDecNode> declarators;
     
     public LocalVariableDecNode(String fileName, int line) {
@@ -18,7 +19,7 @@ public class LocalVariableDecNode extends NodeImpl {
     
 	@Override
 	public void resolveImports(ClassLookup c) throws CompileException {
-		type.resolveImports(c);
+		type = type.resolveImports(c, getFileName(), getLine());
 		for (VariableDecNode d : declarators) {
 			if (d.init != null) {
 				d.init.resolveImports(c);
@@ -30,8 +31,8 @@ public class LocalVariableDecNode extends NodeImpl {
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		// place in symbol table and add intermediate code
 		for (VariableDecNode d : declarators) {
-			s.putEntry(d.id.name, type.interRep(), getFileName(), getLine());
-			f.statements.add(new StartScopeStatement(d.id.name, type.interRep()));
+			s.putEntry(d.id.name, type, getFileName(), getLine());
+			f.statements.add(new StartScopeStatement(d.id.name, type));
 			if (d.init != null) {
 				// put in the code to compute initial value.
 				d.init.compile(s, f);

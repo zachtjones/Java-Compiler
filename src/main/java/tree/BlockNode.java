@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.EndScopeStatement;
 import intermediate.InterFunction;
 
@@ -32,7 +33,7 @@ public class BlockNode extends NodeImpl implements StatementNode {
 			b.compile(newTable, f);
 		}
 		// remove all new symbols from the table
-		HashMap<String, String> entries = s.getCurrentEntries();
+		HashMap<String, Types> entries = s.getCurrentEntries();
 		entries.forEach((name, type) ->
 			f.statements.add(new EndScopeStatement(name))
 		);

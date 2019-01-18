@@ -1,7 +1,6 @@
 package x64.jni;
 
 import intermediate.Register;
-import x64.SymbolNames;
 import x64.X64Function;
 import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
@@ -51,7 +50,7 @@ public interface CallMethodJNI extends CallJNIMethod {
 
         // Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...) -> returnVal
         // determine which type of object it is:
-        final String nativeType = SymbolNames.getJNISignatureFromILType(returnVal.typeFull);
+        final String nativeType = returnVal.getType().getIntermediateRepresentation();
         final JNIOffsets offset = getCallMethodOffset(nativeType);
 
         addCallJNI(function, offset, returnVal.toX64());

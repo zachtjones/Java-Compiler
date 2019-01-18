@@ -2,7 +2,7 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import intermediate.BranchStatmentFalse;
+import intermediate.BranchStatementFalse;
 import intermediate.InterFunction;
 import intermediate.JumpStatement;
 import intermediate.LabelStatement;
@@ -37,7 +37,7 @@ public class IfStatementNode extends NodeImpl implements StatementNode {
 		// start with the expression
 		expression.compile(newTable, f);
 		// branch if == 0 to else (false)
-		f.statements.add(new BranchStatmentFalse(elseLbl, f.allocator.getLast(), getFileName(), getLine()));
+		f.statements.add(new BranchStatementFalse(elseLbl, f.allocator.getLast(), getFileName(), getLine()));
 		
 		// compile in the true part
 		statement.compile(newTable, f);

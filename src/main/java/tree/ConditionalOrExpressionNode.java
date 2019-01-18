@@ -2,6 +2,7 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.BranchStatementTrue;
 import intermediate.ChooseStatement;
 import intermediate.InterFunction;
@@ -40,7 +41,7 @@ public class ConditionalOrExpressionNode extends NodeImpl implements Expression 
 		f.statements.add(end);
 
 		// keep in SSA, need choose statement
-		Register newReg = f.allocator.getNext(Register.BOOLEAN); // result is boolean
+		Register newReg = f.allocator.getNext(Types.BOOLEAN); // result is boolean
 		f.statements.add(new ChooseStatement(leftResult, rightResult, newReg, getFileName(), getLine()));
 	}
 

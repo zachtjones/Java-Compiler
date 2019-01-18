@@ -2,10 +2,11 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFunction;
 
 public class ParamNode extends NodeImpl {
-    public TypeNode type;
+    public Types type;
     public VariableIdNode id;
     public boolean isVarargs; // if it is the ...
     
@@ -15,7 +16,7 @@ public class ParamNode extends NodeImpl {
     
 	@Override
 	public void resolveImports(ClassLookup c) throws CompileException {
-		type.resolveImports(c);
+		type = type.resolveImports(c, getFileName(), getLine());
 	}
 
 	@Override

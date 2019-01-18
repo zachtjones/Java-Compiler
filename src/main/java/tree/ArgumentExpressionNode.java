@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.CallVirtualStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
@@ -44,7 +45,7 @@ public class ArgumentExpressionNode extends NodeImpl implements Expression {
 		
 		// add in the call virtual statement
 		f.statements.add(new CallVirtualStatement(obj, name, result,
-				f.allocator.getNext(Register.REFERENCE), getFileName(), getLine()));
+				f.allocator.getNext(Types.UNKNOWN), getFileName(), getLine()));
 	}
 
 }

@@ -23,7 +23,7 @@ public class UnaryMinusExpressionNode extends NodeImpl implements Expression {
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
 		expr.compile(s, f);
 		Register exprResult = f.allocator.getLast();
-		Register result = f.allocator.getNext(exprResult.type);
+		Register result = f.allocator.getNext(exprResult.getType());
 		f.statements.add(new UnaryOpStatement(exprResult, result, '-', getFileName(), getLine()));
 	}
 }

@@ -23,7 +23,7 @@ public interface GetStaticFieldIdJNI extends GetIdJNI {
     default X64RegisterOperand addGetStaticFieldIdJNICall(Register type, String fieldName,
             X64RegisterOperand classReg, X64File assemblyFile, X64Function function) {
 
-        final String signature = SymbolNames.getJNISignatureFromILType(type.typeFull);
+        final String signature = type.getType().getIntermediateRepresentation();
 
         return addGetIdJNICall(GET_STATIC_FIELD_ID, fieldName, signature, assemblyFile, function, classReg);
     }

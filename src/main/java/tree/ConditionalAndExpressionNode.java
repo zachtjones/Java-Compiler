@@ -2,7 +2,8 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import intermediate.BranchStatmentFalse;
+import helper.Types;
+import intermediate.BranchStatementFalse;
 import intermediate.ChooseStatement;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
@@ -29,7 +30,7 @@ public class ConditionalAndExpressionNode extends NodeImpl implements Expression
 		LabelStatement end = new LabelStatement("L_" + f.allocator.getNextLabel());
 		Register leftResult = f.allocator.getLast();
 		// if left is false, jump to end
-		f.statements.add(new BranchStatmentFalse(end, leftResult, getFileName(), getLine()));
+		f.statements.add(new BranchStatementFalse(end, leftResult, getFileName(), getLine()));
 		
 		// compile in right half
 		right.compile(s, f);
@@ -38,7 +39,7 @@ public class ConditionalAndExpressionNode extends NodeImpl implements Expression
 		f.statements.add(end);
 
 		// keep in SSA, need choose statement
-		Register newReg = f.allocator.getNext(Register.BOOLEAN); // result is boolean
+		Register newReg = f.allocator.getNext(Types.BOOLEAN); // result is boolean
 		f.statements.add(new ChooseStatement(leftResult, rightResult, newReg, getFileName(), getLine()));
 	}
 }

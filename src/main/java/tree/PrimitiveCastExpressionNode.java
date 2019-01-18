@@ -2,12 +2,13 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFunction;
 
 /** (type[]...)expr */
 public class PrimitiveCastExpressionNode extends NodeImpl implements Expression {
     public Expression expr;
-    public PrimitiveTypeNode type;
+    public Types type;
     public int arrayDims = 0;
     
     public PrimitiveCastExpressionNode(String fileName, int line) {
@@ -17,7 +18,7 @@ public class PrimitiveCastExpressionNode extends NodeImpl implements Expression 
     @Override
 	public void resolveImports(ClassLookup c) throws CompileException {
 		expr.resolveImports(c);
-		type.resolveImports(c);
+		type = type.resolveImports(c, getFileName(), getLine());
 	}
 
 	@Override

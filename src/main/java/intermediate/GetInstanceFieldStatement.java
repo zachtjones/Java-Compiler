@@ -3,12 +3,13 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
 
 public class GetInstanceFieldStatement implements InterStatement {
-	Register instance;
-	String fieldName;
+	private Register instance;
+	private String fieldName;
 	
 	Register result;
 	
@@ -36,15 +37,15 @@ public class GetInstanceFieldStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 
 		UsageCheck.verifyDefined(instance, regs, fileName, line);
 		// the type of the object
-		String type = instance.typeFull;
+		Types type = instance.getType();
 		
-		InterFile object = JavaCompiler.parseAndCompile(type, fileName, line);
-		String resultType = object.getInstFieldType(fieldName, fileName, line);
+		InterFile object = JavaCompiler.parseAndCompile(type.getClassName(fileName, line), fileName, line);
+		Types resultType = object.getInstFieldType(fieldName, fileName, line);
 		
 		regs.put(result, resultType);
 	}

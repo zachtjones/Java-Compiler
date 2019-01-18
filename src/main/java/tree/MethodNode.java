@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 
@@ -16,7 +17,7 @@ public class MethodNode {
     public boolean isFinal;
     public boolean isNative;
     public boolean isSynchronized;
-    public ResultTypeNode resultType;
+    public Types resultType;
 
     public MethodDeclaratorNode dec;
     public ArrayList<NameNode> throwsList;
@@ -24,7 +25,7 @@ public class MethodNode {
     
 	
 	public void resolveImports(ClassLookup c) throws CompileException {
-		resultType.resolveImports(c);
+		resultType = resultType.resolveImports(c, dec.getFileName(), dec.getLine());
 		dec.resolveImports(c);
 		if (throwsList != null) {
 			for (NameNode n : throwsList) {
@@ -47,7 +48,7 @@ public class MethodNode {
 		}
 		
 		func.isInstance = !isStatic;
-		func.returnType = resultType.toString();
+		func.returnType = resultType;
 		
 		// TODO - final and synchronized, ... modifiers
 		
@@ -63,7 +64,7 @@ public class MethodNode {
 
 
 	public void putSymbols(SymbolTable classLevel) throws CompileException {
-		classLevel.putEntry(dec.name, isStatic ? "staticMethod" : "instanceMethod",
+		classLevel.putEntry(dec.name, isStatic ? Types.STATIC_FUNCTION : Types.INSTANCE_FUNCTION,
 			dec.getFileName(), dec.getLine());
 	}
 }

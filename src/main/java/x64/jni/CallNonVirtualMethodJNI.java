@@ -1,7 +1,6 @@
 package x64.jni;
 
 import intermediate.Register;
-import x64.SymbolNames;
 import x64.X64Function;
 import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.MoveInstruction;
@@ -78,7 +77,7 @@ public interface CallNonVirtualMethodJNI {
 
         // mov CallNonVirtual<Type>Method(%javaEnvOne), %temp
         final X64RegisterOperand temp = function.getNextQuadRegister();
-        final String nativeType = SymbolNames.getJNISignatureFromILType(returnVal.typeFull);
+        final String nativeType = returnVal.getType().getIntermediateRepresentation();
         function.addInstruction(
             new MoveInstruction(
                 new RegisterRelativePointer(getCallNonVirtualMethodOffset(nativeType), temp2),

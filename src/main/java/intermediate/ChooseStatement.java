@@ -3,6 +3,7 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 
 /**
  * Represents a SSA choose between statement.
@@ -32,8 +33,8 @@ public class ChooseStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		
 		// TODO left and right have to have common superclass, and the result
 		//   is that common superclass
@@ -42,11 +43,11 @@ public class ChooseStatement implements InterStatement {
 		if (!src1.isPrimitive() || !src2.isPrimitive()) {
 			System.out.println("Choose statements type checking not complete for reference types");
 		}
-		if ( ! src1.typeFull.equals(src2.typeFull)) {
+		if ( ! src1.getType().getIntermediateRepresentation().equals(src2.getType().getIntermediateRepresentation())) {
 			throw new CompileException("in the choose statement, the types were different. "
 					+ "Add code to see if they are convertible.", fileName, line);
 		}
-		result.typeFull = src1.typeFull;
-		regs.put(result, result.typeFull);
+		result.setType(src1.getType());
+		regs.put(result, result.getType());
 	}
 }

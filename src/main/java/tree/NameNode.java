@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.GetInstanceFieldAddressStatement;
 import intermediate.GetInstanceFieldStatement;
 import intermediate.GetLocalAddressStatement;
@@ -49,13 +50,14 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 		if (!primaryName.contains(".")) {
 			// on the right side, get the result
 			int tableLookup = s.lookup(primaryName);
-			String type;
+
 			if (tableLookup == -1) {
 				throw new CompileException("symbol: '" + primaryName + "' not found.",
 						getFileName(), getLine());
-			} else {
-				type = s.getType(primaryName);
 			}
+
+			final Types type = s.getType(primaryName);
+
 			if (tableLookup == SymbolTable.local) {
 				Register result = f.allocator.getNext(type);
 				f.statements.add(new GetLocalStatement(result, primaryName, getFileName(), getLine()));
@@ -64,7 +66,7 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 				f.statements.add(new GetParamStatement(result, primaryName, getFileName(), getLine()));
 			} else { // assume static/instance field / method
 				// load 'this' pointer
-				Register thisPointer = f.allocator.getNext(Register.REFERENCE);
+				Register thisPointer = f.allocator.getNext(Types.UNKNOWN);
 				f.statements.add(new GetParamStatement(thisPointer, "this", getFileName(), getLine()));
 				
 				// load the field from 'this' pointer
@@ -80,11 +82,11 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 			int tableLookup = s.lookup(split[0]);
 			if (tableLookup == SymbolTable.className) {
 				// get the static field, then do the chain of instance fields
-				Register result = f.allocator.getNext(Register.REFERENCE);
+				Register result = f.allocator.getNext(Types.UNKNOWN);
 				f.statements.add(new GetStaticFieldStatement(split[0], split[1], result, getFileName(), getLine()));
 				f.history.setName(split[1]);
 				for (int i = 2; i < split.length; i++) {
-					Register temp3 = f.allocator.getNext(Register.REFERENCE);
+					Register temp3 = f.allocator.getNext(Types.UNKNOWN);
 					f.history.setName(split[i]);
 					f.statements.add(new GetInstanceFieldStatement(result, split[i], temp3,
 							getFileName(), getLine()));
@@ -100,7 +102,7 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 				Register result = f.allocator.getLast();
 				
 				for (int i = 1; i < split.length; i++) {
-					Register temp3 = f.allocator.getNext(Register.REFERENCE);
+					Register temp3 = f.allocator.getNext(Types.UNKNOWN);
 					f.history.setName(split[i]);
 					f.statements.add(new GetInstanceFieldStatement(result, split[i], temp3,
 							getFileName(), getLine()));
@@ -127,7 +129,7 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 				throw new CompileException("symbol: '" + primaryName + "' not defined.",
 						getFileName(), getLine());
 			}
-			String type = s.getType(primaryName);
+			final Types type = s.getType(primaryName);
 			 
 			if (tableLookup == SymbolTable.local) {
 				Register result = f.allocator.getNext(type);
@@ -137,7 +139,7 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 				f.statements.add(new GetParamAddressStatement(result, primaryName, getFileName(), getLine()));
 			} else if (tableLookup == SymbolTable.className){
 				// load 'this' pointer
-				Register thisPointer = f.allocator.getNext(Register.REFERENCE);
+				Register thisPointer = f.allocator.getNext(Types.UNKNOWN);
 				f.statements.add(new GetParamStatement(thisPointer, "this", getFileName(), getLine()));
 				
 				// load the field from 'this' pointer

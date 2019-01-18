@@ -2,6 +2,7 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.GetArrayValueStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
@@ -26,7 +27,7 @@ public class ArrayIndexExpressionNode extends NodeImpl implements Expression, LV
 		expr.compile(s, f);
 		Register index = f.allocator.getLast();
 		// load the memory at the address
-		Register result = f.allocator.getNext("unknown");
+		Register result = f.allocator.getNext(Types.UNKNOWN);
 		f.statements.add(new GetArrayValueStatement(array, index, result, getFileName(), getLine()));
 	}
 
@@ -39,7 +40,7 @@ public class ArrayIndexExpressionNode extends NodeImpl implements Expression, LV
 		expr.compile(s, f);
 		Register index = f.allocator.getLast();
 		// load the memory at the address
-		Register result = f.allocator.getNext("unknown");
+		Register result = f.allocator.getNext(Types.UNKNOWN);
 		f.statements.add(new GetArrayValueStatement(array, index, result, getFileName(), getLine()));
 	}
 

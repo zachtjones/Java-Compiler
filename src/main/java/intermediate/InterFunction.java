@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 import tree.CompileHistory;
 import x64.X64File;
 import x64.X64Function;
@@ -11,11 +12,11 @@ import x64.X64Function;
 public class InterFunction {
 	
 	public String name;
-	public String returnType;
+	public Types returnType;
 	public boolean isInstance; // instance or static
 	public boolean isInit; // static init or instance init
 	
-	public ArrayList<String> paramTypes;
+	public ArrayList<Types> paramTypes;
 	public ArrayList<String> paramNames;
 	public boolean lastArgVarargs;
 	
@@ -94,11 +95,11 @@ public class InterFunction {
 	/** Type checks all the statements. 
 	 * @param className	The fully qualified name for the InterFile. 
 	 * @throws CompileException If there is an error with type checking.*/
-	public void typeCheck(String className) throws CompileException {
-		HashMap<Register, String> definitions = new HashMap<>();
-		HashMap<String, String> locals = new HashMap<>();
+	public void typeCheck(Types className) throws CompileException {
+		HashMap<Register, Types> definitions = new HashMap<>();
+		HashMap<String, Types> locals = new HashMap<>();
 		// define parameters and fill it in.
-		HashMap<String, String> params = new HashMap<>();
+		HashMap<String, Types> params = new HashMap<>();
 		for (int i = 0; i < paramTypes.size(); i++) {
 			params.put(paramNames.get(i), paramTypes.get(i));
 		}

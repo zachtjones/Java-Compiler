@@ -23,6 +23,6 @@ public class BitwiseNotExpressionNode extends NodeImpl implements Expression {
 		expr.compile(s, f);
 		// take bitwise not of the result.
 		f.statements.add(new UnaryOpStatement(f.allocator.getLast(),
-				f.allocator.getNext(f.allocator.getLast().type), '~', getFileName(), getLine()));
+				f.allocator.getNext(f.allocator.getLast().getType()), '~', getFileName(), getLine()));
 	}
 }

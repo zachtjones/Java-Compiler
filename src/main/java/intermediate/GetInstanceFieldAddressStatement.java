@@ -3,12 +3,13 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
 
 public class GetInstanceFieldAddressStatement implements InterStatement {
-	Register instance;
-	String fieldName;
+	private Register instance;
+	private String fieldName;
 	
 	Register result;
 	
@@ -36,16 +37,16 @@ public class GetInstanceFieldAddressStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		
 		UsageCheck.verifyDefined(instance, regs, fileName, line);
 		// the type of the object
-		String type = instance.typeFull;
+		String type = instance.getType().getClassName(fileName, line);
 		
 		InterFile object = JavaCompiler.parseAndCompile(type, fileName, line);
-		String resultType = object.getInstFieldType(fieldName, fileName, line);
+		Types resultType = object.getInstFieldType(fieldName, fileName, line);
 		
-		regs.put(result, resultType + "*"); // address is a pointer type
+		regs.put(result, Types.pointerOf(resultType)); // address is a pointer type
 	}
 }

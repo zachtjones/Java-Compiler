@@ -3,14 +3,11 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 import helper.UsageCheck;
 
 /** dest = src1 OP src2 */
 public class BinaryOpStatement implements InterStatement {
-
-	public static final int LSHIFT = 0;
-	public static final int RSHIFTARITH = 1; // sign-filled
-	public static final int RSHIFTLOG = 2; // 0 filled.
 
 	private Register src1;
 	private Register src2;
@@ -38,8 +35,8 @@ public class BinaryOpStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, 
-			HashMap<String, String> locals, HashMap<String, String> params, 
+	public void typeCheck(HashMap<Register, Types> regs,
+			HashMap<String, Types> locals, HashMap<String, Types> params,
 			InterFunction func) throws CompileException {
 		
 		// make sure both sides are in the map
@@ -51,11 +48,8 @@ public class BinaryOpStatement implements InterStatement {
 		//   be converted to concatenation --- result is String
 		if (!src1.isPrimitive() || !src2.isPrimitive()) {
 			type = "CONCAT";
-			dest.type = Register.REFERENCE;
-			dest.typeFull = "java/lang/String";
-		} else {
-			dest.setPrimitiveName(); // should already be set earlier when allocated
+			dest.setType(Types.STRING);
 		}
-		regs.put(dest, dest.typeFull);
+		regs.put(dest, dest.getType());
 	}
 }

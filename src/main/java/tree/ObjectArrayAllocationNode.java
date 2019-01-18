@@ -4,13 +4,14 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.CreateArrayStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 
 /** new type[expression or empty] ... */
 public class ObjectArrayAllocationNode extends NodeImpl implements Expression {
-    public NameNode type;
+    public Types type;
     public ArrayList<Expression> expressions; // never empty list, but can have null in the list
     
     public ObjectArrayAllocationNode(String fileName, int line) {
@@ -36,8 +37,8 @@ public class ObjectArrayAllocationNode extends NodeImpl implements Expression {
    		if (expressions.size() == 1) {
    			expressions.get(0).compile(s, f);
    			Register size = f.allocator.getLast();
-   			Register result = f.allocator.getNext("unknown");
-   			f.statements.add(new CreateArrayStatement(size, type.toString(), result));
+   			Register result = f.allocator.getNext(Types.UNKNOWN);
+   			f.statements.add(new CreateArrayStatement(size, type, result));
    		} else {
    			// TODO handle multi-dimensional arrays.
    			throw new CompileException("Multi-dimensional array creation not done yet.", "", -1);

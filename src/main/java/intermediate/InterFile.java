@@ -1,10 +1,13 @@
 package intermediate;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import helper.CompileException;
+import helper.Types;
 import tree.NameNode;
 import x64.X64File;
+
+import static helper.Types.fromFullyQualifiedClass;
 
 public class InterFile {
 	private String name;
@@ -15,6 +18,9 @@ public class InterFile {
 	private ArrayList<NameNode> implementsNodes;
 	private NameNode superNode;
 
+	/** name -> Map of list of args to return value */
+	private final Map<String, Map<List<Types>, Types>> typesOfFunctions;
+
 	/**
 	 * Creates an intermediate file, given the name
 	 * @param name The name, such as java/util/Scanner
@@ -24,6 +30,7 @@ public class InterFile {
 		this.staticPart = new InterStructure(false);
 		this.instancePart = new InterStructure(true);
 		this.functions = new ArrayList<>();
+		typesOfFunctions = new HashMap<>();
 	}
 
 	/**
@@ -33,7 +40,7 @@ public class InterFile {
 	 * @param isStatic true if the field is static, 
 	 * false if it is instance-based.
 	 */
-	public void addField(String type, String name, boolean isStatic) {
+	public void addField(Types type, String name, boolean isStatic) {
 		addField(type, name, isStatic, null);
 	}
 
@@ -45,7 +52,7 @@ public class InterFile {
 	 * @param value The default value of the field.
 	 * false if it is instance-based.
 	 */
-	public void addField(String type, String name, boolean isStatic, String value) {
+	public void addField(Types type, String name, boolean isStatic, String value) {
 		if (isStatic) {
 			this.staticPart.addMember(type, name, value);
 		} else {
@@ -137,7 +144,7 @@ public class InterFile {
 			// add the name and return type
 			d.name = "<init>";
 			d.isInstance = true;
-			d.returnType = "void";
+			d.returnType = Types.VOID;
 
 			// add the only statement, super();
 			d.statements = new ArrayList<>();
@@ -146,10 +153,9 @@ public class InterFile {
 
 			// load this pointer (call super on this)
 			RegisterAllocator ra = new RegisterAllocator();
-			Register thisPointer = ra.getNext(Register.REFERENCE);
-			thisPointer.typeFull = name;
+			Register thisPointer = ra.getNext(fromFullyQualifiedClass(this.name));
 			d.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
-			Register voidReg = ra.getNext(Register.VOID);
+			Register voidReg = ra.getNext(Types.VOID);
 			//  superclass of this object.
 			// add in the call to it's init
 			c = new CallActualStatement(thisPointer, superNode.primaryName, "<init>", args, voidReg,
@@ -164,8 +170,13 @@ public class InterFile {
 	public void typeCheck() throws CompileException {
 		
 		for (InterFunction f : functions) {
-			f.typeCheck(name);
+			f.typeCheck(fromFullyQualifiedClass(name));
+			// add it to the set
+			Map<List<Types>, Types> existing = typesOfFunctions.getOrDefault(f.name, new HashMap<>());
+			existing.put(f.paramTypes, f.returnType);
+			typesOfFunctions.putIfAbsent(f.name, existing);
 		}
+
 	}
 
 	/**
@@ -174,7 +185,7 @@ public class InterFile {
 	 * @return The JIL representation of the type
 	 * @throws CompileException if the field doesn't exist, or there is a problem checking it.
 	 */
-	public String getInstFieldType(String fieldName, String fileName, int line) throws CompileException {
+	public Types getInstFieldType(String fieldName, String fileName, int line) throws CompileException {
 		return instancePart.getFieldType(fieldName, fileName, line);
 	}
 
@@ -184,7 +195,7 @@ public class InterFile {
 	 * @return The JIL representation of the type
 	 * @throws CompileException if the field doesn't exist, or there is a problem checking it.
 	 */
-	public String getStatFieldType(String fieldName, String fileName, int line) throws CompileException {
+	public Types getStatFieldType(String fieldName, String fileName, int line) throws CompileException {
 		return staticPart.getFieldType(fieldName, fileName, line);
 	}
 
@@ -194,20 +205,9 @@ public class InterFile {
 	 * @param args The array of arguments.
 	 * @return The return object type, or null if there's no method with that signature
 	 */
-	public String getReturnType(String name, Register[] args) {
-		for (InterFunction f : functions) {
-			if (f.name.equals(name) && f.paramTypes.size() == args.length) {
-				boolean matchedAll = true;
-				for (int i = 0; i < args.length; i++) {
-					if (!args[i].typeFull.equals(f.paramTypes.get(i))) {
-						matchedAll = false;
-					}
-				}
-				if (matchedAll) {
-					return f.returnType;
-				}
-			}
-			// TODO the ... on args and inheritance
+	public Types getReturnType(String name, ArrayList<Types> args) {
+		if (typesOfFunctions.containsKey(name)) {
+			return typesOfFunctions.get(name).get(args);
 		}
 		return null;
 	}

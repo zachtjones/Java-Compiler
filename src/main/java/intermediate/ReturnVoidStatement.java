@@ -3,6 +3,7 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 
 /** return; */
 public class ReturnVoidStatement implements InterStatement {
@@ -21,8 +22,8 @@ public class ReturnVoidStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, 
-			HashMap<String, String> locals, HashMap<String, String> params,
+	public void typeCheck(HashMap<Register, Types> regs,
+			HashMap<String, Types> locals, HashMap<String, Types> params,
 			InterFunction func) throws CompileException {
 		
 		if (func.returnType != null) {

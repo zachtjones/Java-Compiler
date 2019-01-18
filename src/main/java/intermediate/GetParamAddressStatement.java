@@ -3,11 +3,12 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 
 /** getLocalAddress %register = name */
 public class GetParamAddressStatement implements InterStatement {
 	Register r;
-	String localName;
+	private String localName;
 	
 	private final String fileName;
 	private final int line;
@@ -30,13 +31,13 @@ public class GetParamAddressStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		
 		if (!params.containsKey(localName)) {
 			throw new CompileException("Error: " + localName + " not a parameter.", fileName, line);
 		}
 		
-		regs.put(r, params.get(localName) + "*");		
+		regs.put(r, Types.pointerOf(params.get(localName)));
 	}
 }

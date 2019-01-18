@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.AllocateClassMemoryStatement;
 import intermediate.CallVirtualStatement;
 import intermediate.CopyStatement;
@@ -27,7 +28,8 @@ public class ConstructorCallNode extends NodeImpl implements Expression {
 
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
-		Register result = f.allocator.getNext(name.primaryName);
+    	Types resultType = Types.fromFullyQualifiedClass(name.primaryName);
+		Register result = f.allocator.getNext(resultType);
 
 		ArrayList<Expression> expressions = args.expressions;
 		// compile in the args
@@ -38,10 +40,10 @@ public class ConstructorCallNode extends NodeImpl implements Expression {
 		}
 		
 		// allocate memory
-		f.statements.add(new AllocateClassMemoryStatement(name.primaryName, result));
+		f.statements.add(new AllocateClassMemoryStatement(resultType, result));
 		
 		// copy
-		Register finalResult = f.allocator.getNext(result.type);
+		Register finalResult = f.allocator.getNext(result.getType());
 		
 		// add in the call virtual statement
 		f.statements.add(new CallVirtualStatement(result, "<init>", results, null,

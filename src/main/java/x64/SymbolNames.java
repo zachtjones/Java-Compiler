@@ -24,37 +24,6 @@ public class SymbolNames {
             .replace('/', '_');
     }
 
-    /** Returns the signature string used in JNI calls, created from the intermediate language type */
-    public static String getJNISignatureFromILType(String typeFull) {
-
-        // [Ljava/lang/Object; for Object[]
-        // [[Ljava/lang/Object; for Object[][]
-
-        // handle the primitives -- see below link for JNI docs
-        // https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html#primitive_types
-        switch (typeFull) {
-            case "boolean": return "Z";
-            case "byte": return "B";
-            case "char": return "C";
-            case "short": return "S";
-            case "int": return "I";
-            case "long": return "J";
-            case "float": return "F";
-            case "double": return "D";
-            case "void": return "V";
-        }
-
-        if (typeFull.contains("]")) {
-            // remove a [] type
-            final String oneLayerLess = typeFull.substring(0, typeFull.length() - 2);
-            return "[" + getJNISignatureFromILType(oneLayerLess);
-        } else {
-            return "L" + typeFull + ";";
-        }
-
-        // TODO: mapping from primitives to their signatures
-    }
-
     /***
      * Returns the label for the method name
      * @param className The class, as in java/lang/Object

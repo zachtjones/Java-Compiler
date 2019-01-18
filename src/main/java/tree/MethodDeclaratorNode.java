@@ -30,8 +30,8 @@ public class MethodDeclaratorNode extends NodeImpl {
 		
 		// s is for the parameters, place them in s
 		for (ParamNode p : params) {
-			s.putEntry(p.id.name, p.type.interRep(), getFileName(), getLine());
-			f.paramTypes.add(p.type.interRep());
+			s.putEntry(p.id.name, p.type, getFileName(), getLine());
+			f.paramTypes.add(p.type);
 			f.paramNames.add(p.id.name);
 			if (p.isVarargs) {
 				if (f.lastArgVarargs) { // can only have one argument varargs, and as to be last

@@ -3,11 +3,12 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 import helper.UsageCheck;
 
 public class CopyStatement implements InterStatement {
-	Register src;
-	Register dest;
+	private final Register src;
+	private final Register dest;
 	
 	private final String fileName;
 	private final int line;
@@ -25,12 +26,12 @@ public class CopyStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		
 		UsageCheck.verifyDefined(src, regs, fileName, line);
-		
-		dest.typeFull = src.typeFull;
-		regs.put(dest, dest.typeFull);
+
+		dest.setType(src.getType());
+		regs.put(dest, dest.getType());
 	}
 }

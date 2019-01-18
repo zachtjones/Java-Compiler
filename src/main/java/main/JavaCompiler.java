@@ -8,6 +8,7 @@ import java.util.HashMap;
 import helper.ClassLookup;
 import helper.CompileException;
 import helper.ProcessRunner;
+import helper.Types;
 import javaLibrary.JavaLibraryLookup;
 import tree.*;
 import intermediate.*;
@@ -37,7 +38,7 @@ public class JavaCompiler {
 		}
 
 		if (fullyQualifiedName.startsWith("java/")) {
-			return JavaLibraryLookup.getLibraryFile(fullyQualifiedName);
+			return JavaLibraryLookup.getLibraryFile(fullyQualifiedName, fileName, line);
 		}
 
 		final String newFileName = rootDir + fullyQualifiedName + ".java";
@@ -109,17 +110,19 @@ public class JavaCompiler {
 		}
 
 		InterFile mainClass = null;
-		final Register argsArray = new Register(0, Register.REFERENCE, "auto-generated", -1);
-		argsArray.typeFull = "java/lang/String[]";
+
+		final ArrayList<Types> arg = new ArrayList<>();
+		arg.add(Types.arrayOf(Types.STRING));
+
 		for (InterFile f : files) {
-			if (f.getReturnType("main", new Register[]{argsArray}) != null) {
+			if (f.getReturnType("main", arg) != null) {
 				mainClass = f;
 			}
 		}
 
 		// enforce there is a `static void main(String[] args)`
 		if (mainClass == null) {
-			throw new CompileException("There is not a main method in the files given.", c.fileName, 0);
+			throw new CompileException("There is not a main method in the files given.", file, 0);
 		}
 
 		// compile to the native code - starting with the java -> native class

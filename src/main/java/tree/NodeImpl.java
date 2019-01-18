@@ -13,7 +13,7 @@ public abstract class NodeImpl implements Node {
 	private final String fileName;
 	private final int line;
 
-	NodeImpl(String fileName, int line) {
+	protected NodeImpl(String fileName, int line) {
 		this.fileName = fileName;
 		this.line = line;
 	}

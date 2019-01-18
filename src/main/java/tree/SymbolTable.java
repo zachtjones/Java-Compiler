@@ -3,6 +3,7 @@ package tree;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.Types;
 
 /**
  * Represents an entry in the symbol table, with a reference to the outer
@@ -14,17 +15,17 @@ public class SymbolTable {
 	public static boolean printOut = false; // change to print the symbol table.
 	
 	/** Reference to an outer scope */
-	public SymbolTable outer;
+	private final SymbolTable outer;
 	/** The scope level of this symbol table */
-	public int scopeLevel;
+	private final int scopeLevel;
 	
-	// types
+	// places where the symbol is defined
 	public static final int className = 0;
 	public static final int parameter = 1;
 	public static final int local = 2;
 	
 	// hash map of identifier to the type
-	private HashMap<String, String> entries;
+	private HashMap<String, Types> entries;
 	
 	public SymbolTable(SymbolTable outer, int scopeLevel) {
 		this.outer = outer;
@@ -37,7 +38,7 @@ public class SymbolTable {
 	 * @param identifier The identifier to find
 	 * @return The scope of the identifier found, or -1 if not found.
 	 */
-	public int lookup(String identifier) {
+	int lookup(String identifier) {
 		int result = lookupThisScope(identifier);
 		if (result == -1 && outer != null) {
 			result = outer.lookup(identifier);
@@ -47,7 +48,7 @@ public class SymbolTable {
 	
 	/**
 	 * Looks up the identifier in the current symbol table only.
-	 * @param identifier
+	 * @param identifier The identifier to find
 	 * @return The scope of the identifier found, or -1 if not found
 	 */
 	public int lookupThisScope(String identifier) {
@@ -63,8 +64,8 @@ public class SymbolTable {
 	 * @param identifier The identifier to find the type of.
 	 * @return A string that is the intermediate file's representation of the type.
 	 */
-	public String getType(String identifier) {
-		String result = entries.get(identifier);
+	Types getType(String identifier) {
+		Types result = entries.get(identifier);
 		if (result == null && outer != null) {
 			result = outer.getType(identifier);
 		}
@@ -79,7 +80,7 @@ public class SymbolTable {
 	 * @param line The line number of the currently compiled expression
 	 * @throws CompileException If the symbol is already defined
 	 */
-	public void putEntry(String identifier, String type, String fileName, int line)
+	public void putEntry(String identifier, Types type, String fileName, int line)
 			throws CompileException {
 		
 		// can't have two variables with same name in same scope
@@ -115,7 +116,7 @@ public class SymbolTable {
 	/**
 	 * Gets all the entries in the current scope only.
 	 */
-	public HashMap<String, String> getCurrentEntries() {
+	HashMap<String, Types> getCurrentEntries() {
 		return entries;
 	}
 }

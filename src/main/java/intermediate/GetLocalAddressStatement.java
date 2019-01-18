@@ -4,10 +4,11 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.TypeChecker;
+import helper.Types;
 
 public class GetLocalAddressStatement implements InterStatement {
 	Register r;
-	String localName;
+	private String localName;
 	
 	private final String fileName;
 	private final int line;
@@ -30,17 +31,17 @@ public class GetLocalAddressStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, String> regs, HashMap<String, String> locals,
-			HashMap<String, String> params, InterFunction func) throws CompileException {
+	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
+						  HashMap<String, Types> params, InterFunction func) throws CompileException {
 		
 		if (!locals.containsKey(localName)) {
 			throw new CompileException("local variable: " + localName + " is not defined.",
 					fileName, line);
 		}
-		TypeChecker.canAssign(locals.get(localName), r.typeFull, fileName, line);
+		TypeChecker.canDirectlyAssign(locals.get(localName), r.getType(), fileName, line);
 		
 		// define the register
-		r.typeFull = locals.get(localName + "*");
-		regs.put(r, r.typeFull);
+		r.setType(Types.pointerOf(locals.get(localName)));
+		regs.put(r, r.getType());
 	}
 }

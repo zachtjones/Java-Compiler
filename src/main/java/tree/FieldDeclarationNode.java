@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 
@@ -16,7 +17,7 @@ public class FieldDeclarationNode extends NodeImpl {
 	public boolean isTransient;
 	public boolean isVolatile;
 
-	public TypeNode type;
+	public Types type;
 	public ArrayList<VariableDecNode> variables = new ArrayList<>();
 
     public FieldDeclarationNode(String fileName, int line) {
@@ -24,7 +25,7 @@ public class FieldDeclarationNode extends NodeImpl {
     }
 
 	public void resolveImports(ClassLookup c) throws CompileException {
-		type.resolveImports(c);
+		type = type.resolveImports(c, getFileName(), getLine());
 	}
 
 	/**
@@ -36,15 +37,14 @@ public class FieldDeclarationNode extends NodeImpl {
 	public void compile(InterFile f, SymbolTable syms) throws CompileException {
 		// add the type declarations to the instance structure, and the
 		//  initial values to the instance init
-		String typeRep = type.interRep();
 		for (VariableDecNode d : variables) {
 			// fix: String[] id[] -> String[][] id;
-			StringBuilder temp = new StringBuilder(typeRep);
+			Types temp = type;
 			for (int i = 0; i < d.id.numDimensions; i++) {
-				temp.append("[]");
+				temp = Types.arrayOf(temp);
 			}
-			f.addField(temp.toString(), d.id.name, isStatic);
-			syms.putEntry(d.id.name, typeRep, getFileName(), getLine());
+			f.addField(temp, d.id.name, isStatic);
+			syms.putEntry(d.id.name, temp, getFileName(), getLine());
 
 			// add the initial values if any
 			if (d.init != null && d.init.e != null) {
@@ -73,7 +73,6 @@ public class FieldDeclarationNode extends NodeImpl {
 
 	/** places the symbols declared by this field declaration */
 	void putSymbols(SymbolTable classLevel) throws CompileException {
-		String type = isStatic ? "staticField" : "instanceField";
 		for (VariableDecNode variable : variables) {
 			classLevel.putEntry(variable.id.name, type, getFileName(), getLine());
 		}

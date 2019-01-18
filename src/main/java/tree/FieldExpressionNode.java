@@ -2,6 +2,7 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.GetInstanceFieldAddressStatement;
 import intermediate.GetInstanceFieldStatement;
 import intermediate.GetParamStatement;
@@ -35,10 +36,10 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 				throw new CompileException("symbol: " + identifier + " is not defined before use.",
 						getFileName(), getLine());
 			}
-			String type = s.getType(identifier);
+			Types type = s.getType(identifier);
 			
 			// load 'this' pointer
-			Register thisPointer = f.allocator.getNext(Register.REFERENCE);
+			Register thisPointer = f.allocator.getNext(Types.UNKNOWN);
 			f.statements.add(new GetParamStatement(thisPointer, "this", getFileName(), getLine()));
 			
 			// load the field from 'this' pointer
@@ -51,7 +52,7 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 			if (tableLookup == SymbolTable.className) {
 				// static lookup
 				f.statements.add(
-						new GetStaticFieldStatement(f.history.getName(), identifier, f.allocator.getNext("unknown"),
+						new GetStaticFieldStatement(f.history.getName(), identifier, f.allocator.getNext(Types.UNKNOWN),
 								getFileName(), getLine()));
 			} else {
 				// instance field of symbol name
@@ -60,7 +61,7 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 				n.primaryName = f.history.getName();
 				n.compile(s, f);
 				Register name = f.allocator.getLast();
-				f.statements.add(new GetInstanceFieldStatement(name, identifier, f.allocator.getNext("unknown"),
+				f.statements.add(new GetInstanceFieldStatement(name, identifier, f.allocator.getNext(Types.UNKNOWN),
 						getFileName(), getLine()));
 			}
 			f.history.setName(identifier);
@@ -81,10 +82,10 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 				throw new CompileException("symbol: " + identifier + " is not defined before use.",
 						getFileName(), getLine());
 			}
-			String type = s.getType(identifier);
+			Types type = s.getType(identifier);
 			
 			// load 'this' pointer
-			Register thisPointer = f.allocator.getNext(Register.REFERENCE);
+			Register thisPointer = f.allocator.getNext(Types.UNKNOWN);
 			f.statements.add(new GetParamStatement(thisPointer, "this", getFileName(), getLine()));
 			
 			// load the field from 'this' pointer
@@ -97,7 +98,7 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 			if (tableLookup == SymbolTable.className) {
 				// static lookup
 				f.statements.add(
-					new GetStaticFieldAddressStatement(f.history.getName(), identifier, f.allocator.getNext("unknown"),
+					new GetStaticFieldAddressStatement(f.history.getName(), identifier, f.allocator.getNext(Types.UNKNOWN),
 							getFileName(), getLine()));
 			} else {
 				// instance field of symbol name
@@ -107,7 +108,7 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 				n.compileAddress(s, f);
 				Register name = f.allocator.getLast();
 				f.statements.add(
-					new GetInstanceFieldAddressStatement(name, identifier, f.allocator.getNext("unknown"),
+					new GetInstanceFieldAddressStatement(name, identifier, f.allocator.getNext(Types.UNKNOWN),
 							getFileName(), getLine()));
 			}
 			f.history.setName(identifier);
