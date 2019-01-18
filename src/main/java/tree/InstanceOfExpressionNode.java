@@ -19,7 +19,7 @@ public class InstanceOfExpressionNode extends NodeImpl implements Expression {
 	@Override
 	public void resolveImports(ClassLookup c) throws CompileException {
 		left.resolveImports(c);
-		right.resolveImports(c);
+		right.resolveImports(c, getFileName(), getLine());
 	}
 
 	@Override

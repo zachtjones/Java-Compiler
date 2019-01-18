@@ -16,7 +16,7 @@ public class ParamNode extends NodeImpl {
     
 	@Override
 	public void resolveImports(ClassLookup c) throws CompileException {
-		type.resolveImports(c);
+		type.resolveImports(c, getFileName(), getLine());
 	}
 
 	@Override

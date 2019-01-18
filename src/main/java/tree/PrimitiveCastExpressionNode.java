@@ -18,7 +18,7 @@ public class PrimitiveCastExpressionNode extends NodeImpl implements Expression 
     @Override
 	public void resolveImports(ClassLookup c) throws CompileException {
 		expr.resolveImports(c);
-		type.resolveImports(c);
+		type.resolveImports(c, getFileName(), getLine());
 	}
 
 	@Override

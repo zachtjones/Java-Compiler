@@ -54,11 +54,16 @@ public class Types {
 
 	/** Removes an array dimension, returning the new type. If it can't be removed, throws a CompileException */
 	public Types removeArray(String fileName, int line) throws CompileException {
-		if (rep.charAt(0) == '[') {
+		if (isArrayType()) {
 			return new Types(rep.substring(1), isPrimitive);
 		} else {
 			throw new CompileException("Trying to get array element from non-array type: " + rep, fileName, line);
 		}
+	}
+
+	/** helper method for determining if this type is an array */
+	private boolean isArrayType() {
+		return rep.charAt(0) == '[';
 	}
 
 	/** Creates a new type that is a pointer to the argument */
@@ -117,8 +122,23 @@ public class Types {
 		return isPrimitive;
 	}
 
-	public void resolveImports(ClassLookup c) {
-		throw new RuntimeException("Types.java do the resolve imports thing");
+	/** Resolves the imports on this type, replacing partially qualified names with fully qualified ones
+	 * @return A Types instance referring to the fully qualified type, as these are immutable */
+	public Types resolveImports(ClassLookup c, String filename, int line) throws CompileException {
+		if (isPrimitive) {
+			return this;
+		}
+
+		// more complicated case: array of class, use recursion to go down levels until a class is reached
+		if (isArrayType()) {
+			return Types.arrayOf(
+				removeArray(filename, line).resolveImports(c, filename, line)
+			);
+		}
+
+		// basic case: class type
+		String className = this.getClassName(filename, line);
+		return fromFullyQualifiedClass(c.getFullName(className));
 	}
 
 	@Override
