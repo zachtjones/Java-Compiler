@@ -101,6 +101,8 @@ public class JavaLibraryLookup {
                 // TODO throws list when exceptions are added to this compiler
             }
 
+            result.typeCheck();
+
             javaCache.put(fullyQualified, result);
             return result;
 
