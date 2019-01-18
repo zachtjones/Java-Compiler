@@ -34,6 +34,6 @@ public class StoreAddressStatement implements InterStatement {
 		UsageCheck.verifyDefined(addr, regs, fileName, line);
 		UsageCheck.verifyDefined(src, regs, fileName, line);
 		
-		TypeChecker.checkAssign(src, addr, fileName, line);
+		TypeChecker.canDirectlyAssign(src.getType(), addr.getType().dereferencePointer(fileName, line), fileName, line);
 	}
 }

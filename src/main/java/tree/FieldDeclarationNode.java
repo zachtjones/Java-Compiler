@@ -44,7 +44,6 @@ public class FieldDeclarationNode extends NodeImpl {
 				temp = Types.arrayOf(temp);
 			}
 			f.addField(temp, d.id.name, isStatic);
-			syms.putEntry(d.id.name, temp, getFileName(), getLine());
 
 			// add the initial values if any
 			if (d.init != null && d.init.e != null) {
@@ -57,7 +56,8 @@ public class FieldDeclarationNode extends NodeImpl {
 
 				// compile the created expression.
 				InterFunction func = new InterFunction();
-				// add instance initializers
+				// add instance initializer
+				func.name = isStatic ? "<clinit>" : "<init>"; // following java .class standard here
 				func.isInit = true;
 				func.isInstance = !isStatic;
 				a.compile(syms, func);

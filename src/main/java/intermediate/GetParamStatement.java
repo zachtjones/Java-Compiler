@@ -47,8 +47,9 @@ public class GetParamStatement implements InterStatement {
 		if (!params.containsKey(localName)) {
 			throw new CompileException("'" + localName + "' not a parameter.", fileName, line);
 		}
-		
-		regs.put(r, params.get(localName));
+
+		r.setType(params.get(localName));
+		regs.put(r, r.getType());
 	}
 
 	@Override

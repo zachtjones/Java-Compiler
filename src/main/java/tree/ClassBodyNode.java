@@ -5,11 +5,6 @@ import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class ClassBodyNode {
     // one of these will be not null
     public BlockNode staticInit;
@@ -40,6 +35,9 @@ public class ClassBodyNode {
 		// pass down
 		if (staticInit != null) {
 			InterFunction func = new InterFunction();
+			func.name = "<clinit>"; // that's what java class files name it (class initializer)
+			func.isInstance = false;
+			func.isInit = true;
 			staticInit.compile(syms, func);
 			f.addFunction(func);
 		} else if (constructor != null) {

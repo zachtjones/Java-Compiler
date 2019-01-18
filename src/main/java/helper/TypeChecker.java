@@ -1,7 +1,5 @@
 package helper;
 
-import intermediate.Register;
-
 public class TypeChecker {
 	
 	/**
@@ -25,32 +23,5 @@ public class TypeChecker {
 
 		throw new CompileException("can't convert directly: " + source + " to: " + target, fileName, line);
 	}
-	
-	/***
-	 * Verifies addrType is a pointer and dataType can be stored at that pointer.
-	 * If it can't, throws a compileException.
-	 * @param dataType The register for the data
-	 * @param addrType The register for the address (should be SOMETHING*)
-	 */
-	public static void checkAssign(Register dataType, Register addrType, String fileName, int line)
-			throws CompileException {
-		
-		// check the type of the address to make sure it's a pointer
-		Types resultType = addrType.getType().dereferencePointer(fileName,line);
 
-		if (addrType.isPrimitive()) {
-			if (dataType.isPrimitive()) {
-				return;
-			} else {
-				throw new CompileException(dataType + " can't be stored at " + addrType, fileName, line);
-			}
-		} else {
-			if (dataType.isPrimitive()) {
-				throw new CompileException(dataType + " can't be stored at " + addrType, fileName, line);
-			}
-		}
-		
-		// both are reference types, check subclass or equal
-		canDirectlyAssign(resultType, dataType.getType(), fileName, line);
-	}
 }

@@ -1,8 +1,8 @@
 // this file is for testing a static and instance field, as well as
 //  minimal method example
 public class BasicClass {
-	public static int a = 1;
-	public int b = 2;
+	public static int a;
+	public int b;
 
 	public void setB(int c) {
 		b = c;
