@@ -6,6 +6,8 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
+import x64.X64File;
+import x64.X64Function;
 
 public class GetInstanceFieldAddressStatement implements InterStatement {
 	private Register instance;
@@ -49,5 +51,11 @@ public class GetInstanceFieldAddressStatement implements InterStatement {
 
 		result.setType(Types.pointerOf(resultType));
 		regs.put(result, result.getType()); // address is a pointer type
+	}
+
+	@Override
+	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+		// handle the details in the store instruction later on
+		function.markRegisterAsInstanceFieldAddress(result, instance, fieldName);
 	}
 }

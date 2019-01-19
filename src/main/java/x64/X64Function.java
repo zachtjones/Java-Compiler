@@ -1,5 +1,6 @@
 package x64;
 
+import intermediate.Register;
 import x64.allocation.RegisterTransformer;
 import x64.directives.ByteAlignment;
 import x64.directives.GlobalSymbol;
@@ -11,9 +12,7 @@ import x64.operands.Immediate;
 import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static x64.allocation.CallingConvention.argumentRegister;
@@ -104,5 +103,25 @@ public class X64Function {
 		return allInstructions.stream()
 				.map(Instruction::toString)
 				.collect(Collectors.joining("\n"));
+	}
+
+	// state-saving code for knowing what to do with the store at things
+	private final Map<Register, Register> instanceFieldAddressInstances = new HashMap<>();
+	private final Map<Register, String> instanceFieldAddressNames = new HashMap<>();
+	public void markRegisterAsInstanceFieldAddress(Register result, Register instance, String fieldName) {
+		instanceFieldAddressInstances.put(result, instance);
+		instanceFieldAddressNames.put(result, fieldName);
+	}
+
+	public boolean registerIsInstanceFieldAddress(Register address) {
+		return instanceFieldAddressInstances.containsKey(address);
+	}
+
+	public String getInstanceFieldAddressName(Register address) {
+		return instanceFieldAddressNames.get(address);
+	}
+
+	public Register getInstanceFieldInstance(Register address) {
+		return instanceFieldAddressInstances.get(address);
 	}
 }

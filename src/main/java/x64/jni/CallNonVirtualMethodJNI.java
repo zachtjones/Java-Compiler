@@ -4,13 +4,14 @@ import intermediate.Register;
 import x64.X64Function;
 import x64.instructions.CallFunctionPointerInstruction;
 import x64.instructions.MoveInstruction;
+import x64.jni.helpers.CallJNIMethod;
 import x64.operands.*;
 
 import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.allocation.CallingConvention.returnValueRegister;
 import static x64.jni.JNIOffsets.getCallNonVirtualMethodOffset;
 
-public interface CallNonVirtualMethodJNI {
+public interface CallNonVirtualMethodJNI extends CallJNIMethod {
 
     /**
      * add the code for the non virtual method call
@@ -75,29 +76,6 @@ public interface CallNonVirtualMethodJNI {
             )
         );
 
-        // mov CallNonVirtual<Type>Method(%javaEnvOne), %temp
-        final X64RegisterOperand temp = function.getNextQuadRegister();
-        final String nativeType = returnVal.getType().getIntermediateRepresentation();
-        function.addInstruction(
-            new MoveInstruction(
-                new RegisterRelativePointer(getCallNonVirtualMethodOffset(nativeType), temp2),
-                temp
-            )
-        );
-
-        // call *%temp
-        function.addInstruction(
-            new CallFunctionPointerInstruction(
-                temp
-            )
-        );
-
-        // mov %RAX, %result
-        function.addInstruction(
-            new MoveInstruction(
-                returnValueRegister(),
-                returnVal.toX64()
-            )
-        );
+        addCallJNI(function, getCallNonVirtualMethodOffset(returnVal.getType()), returnVal.toX64());
     }
 }

@@ -10,7 +10,7 @@ import static x64.allocation.CallingConvention.returnValueRegister;
 
 public interface CallJNIMethod {
 
-    default void addCallJNI(X64Function function, JNIOffsets jniOffset, X64RegisterOperand resultHolder) {
+    default void addCallVoidJNI(X64Function function, JNIOffsets jniOffset) {
 
         // mov %javaEnv*, %javaEnv
         final X64RegisterOperand temp2 = function.getNextQuadRegister();
@@ -36,6 +36,12 @@ public interface CallJNIMethod {
                 temp
             )
         );
+    }
+
+    default void addCallJNI(X64Function function, JNIOffsets jniOffset, X64RegisterOperand resultHolder) {
+
+        // treat like calling void method, then move result to the register
+        addCallVoidJNI(function, jniOffset);
 
         // mov %RAX, %result holder
         function.addInstruction(

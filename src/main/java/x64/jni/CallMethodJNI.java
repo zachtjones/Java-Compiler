@@ -49,9 +49,7 @@ public interface CallMethodJNI extends CallJNIMethod {
         }
 
         // Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...) -> returnVal
-        // determine which type of object it is:
-        final String nativeType = returnVal.getType().getIntermediateRepresentation();
-        final JNIOffsets offset = getCallMethodOffset(nativeType);
+        final JNIOffsets offset = getCallMethodOffset(returnVal.getType());
 
         addCallJNI(function, offset, returnVal.toX64());
     }
