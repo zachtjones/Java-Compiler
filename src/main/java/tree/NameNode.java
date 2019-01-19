@@ -80,6 +80,8 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 				// get the static field, then do the chain of instance fields
 				Register result = f.allocator.getNext(Types.UNKNOWN);
 				f.statements.add(new GetStaticFieldStatement(split[0], split[1], result, getFileName(), getLine()));
+				// store these two names last used
+				f.history.setName(split[0]);
 				f.history.setName(split[1]);
 				for (int i = 2; i < split.length; i++) {
 					Register temp3 = f.allocator.getNext(Types.UNKNOWN);
