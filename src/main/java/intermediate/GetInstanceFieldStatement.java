@@ -6,8 +6,16 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
+import x64.X64File;
+import x64.X64Function;
+import x64.instructions.MoveInstruction;
+import x64.jni.FindClassJNI;
+import x64.jni.GetInstanceFieldIdJNI;
+import x64.jni.GetInstanceFieldJNI;
+import x64.operands.RegisterRelativePointer;
+import x64.operands.X64RegisterOperand;
 
-public class GetInstanceFieldStatement implements InterStatement {
+public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, GetInstanceFieldIdJNI, GetInstanceFieldJNI {
 	private Register instance;
 	private String fieldName;
 	
@@ -48,5 +56,40 @@ public class GetInstanceFieldStatement implements InterStatement {
 		Types resultType = object.getInstFieldType(fieldName, fileName, line);
 		
 		regs.put(result, resultType);
+	}
+
+	@Override
+	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+		final String className = instance.getType().getClassName(fileName, line);
+		if (className.startsWith("java/")) {
+
+			// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
+			//    - name is like: java/lang/String
+			final X64RegisterOperand classReg = addFindClassJNICall(assemblyFile, function, className);
+
+			// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
+			// src holds the type
+			final X64RegisterOperand fieldIDReg =
+				addGetInstanceFieldIdJNICall(instance, fieldName, classReg, assemblyFile, function);
+
+
+			// Step 3. javaEnv -> Get<Type>Field(JNIEnv *env, object, fieldID) -> result
+			addGetInstanceField(function, instance, fieldIDReg, result);
+
+		} else {
+			// parse and compile the object's class, to obtain the offset
+			InterFile objectClass = JavaCompiler.parseAndCompile(
+				instance.getType().getClassName(fileName, line), fileName, line
+			);
+			int fieldOffset = objectClass.getFieldOffset(fieldName);
+
+			// mov field_offset(%instance), result
+			function.addInstruction(
+				new MoveInstruction(
+					new RegisterRelativePointer(fieldOffset, instance.toX64()),
+					result.toX64()
+				)
+			);
+		}
 	}
 }
