@@ -229,4 +229,9 @@ public class InterFile {
 
 		return compiled;
 	}
+
+	/** Returns the offset, in bytes for the fieldName within the structure. */
+	public int getFieldOffset(String fieldName) {
+		return instancePart.getFieldOffset(fieldName);
+	}
 }

@@ -6,6 +6,7 @@ import helper.CompileException;
 import helper.TypeChecker;
 import helper.Types;
 import helper.UsageCheck;
+import main.JavaCompiler;
 import x64.X64File;
 import x64.X64Function;
 import x64.instructions.MoveInstruction;
@@ -22,7 +23,7 @@ public class StoreAddressStatement implements InterStatement, FindClassJNI, GetI
 	
 	private final String fileName;
 	private final int line;
-	
+
 	public StoreAddressStatement(Register src, Register addr, String fileName, int line) {
 		this.src = src;
 		this.addr = addr;
@@ -68,12 +69,17 @@ public class StoreAddressStatement implements InterStatement, FindClassJNI, GetI
 				addSetInstanceField(function, object, fieldIDReg, src);
 
 			} else {
-				// mov %src, field_offset(%instance)
+				// parse and compile the object's class, to obtain the offset
+				InterFile objectClass = JavaCompiler.parseAndCompile(
+					object.getType().getClassName(fileName, line), fileName, line
+				);
+				int fieldOffset = objectClass.getFieldOffset(fieldName);
 
+				// mov %src, field_offset(%instance)
 				function.addInstruction(
 					new MoveInstruction(
 						src.toX64(),
-						new RegisterRelativePointer(function.getFieldOffset(fieldName), object)
+						new RegisterRelativePointer(fieldOffset, object.toX64())
 					)
 				);
 			}

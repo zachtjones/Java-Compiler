@@ -182,4 +182,19 @@ public class Types {
 	public String toString() {
 		return getIntermediateRepresentation();
 	}
+
+	/** Returns the size needed to represent this type (or the pointer size if a class) */
+	public int getX64Size() {
+		if (this.equals(BOOLEAN) || this.equals(BYTE)) {
+			return 1;
+		}
+		if (this.equals(SHORT) || this.equals(CHAR)) {
+			return 2;
+		}
+		if (this.equals(INT) || this.equals(FLOAT)) {
+			return 4;
+		}
+		// float, double, or pointers are 8 bytes
+		return 8;
+	}
 }

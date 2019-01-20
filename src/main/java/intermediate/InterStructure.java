@@ -70,5 +70,26 @@ public class InterStructure {
 		}
 		throw new CompileException("Field " + fieldName + " not present in structure.", fileName, line);
 	}
-	
+
+	/** Returns the offset, in bytes for the fieldName within the structure. */
+	public int getFieldOffset(String fieldName) {
+		int offset = 8; // all structure instances have a virtual function table from the start.
+
+		for (int i = 0; i < names.size(); i++) {
+			String name = names.get(i);
+			Types type = types.get(i);
+
+			int size = type.getX64Size();
+			// advance to the alignment for the size
+			while (offset % size != 0) offset++;
+
+			if (fieldName.equals(name)) {
+				return offset;
+			}
+
+			// advance by the size
+			offset += size;
+		}
+		return offset;
+	}
 }
