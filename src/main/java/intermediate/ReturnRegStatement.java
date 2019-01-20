@@ -6,6 +6,12 @@ import helper.CompileException;
 import helper.TypeChecker;
 import helper.Types;
 import helper.UsageCheck;
+import x64.X64File;
+import x64.X64Function;
+import x64.allocation.CallingConvention;
+import x64.instructions.MoveInstruction;
+
+import static x64.allocation.CallingConvention.returnValueRegister;
 
 /** return register; */
 public class ReturnRegStatement implements InterStatement {
@@ -35,5 +41,15 @@ public class ReturnRegStatement implements InterStatement {
 		}
 		UsageCheck.verifyDefined(r, regs, fileName, line);
 		TypeChecker.canDirectlyAssign(func.returnType, r.getType(), fileName, line);
+	}
+
+	@Override
+	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+		function.addInstruction(
+			new MoveInstruction(
+				r.toX64(),
+				returnValueRegister()
+			)
+		);
 	}
 }

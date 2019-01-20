@@ -105,7 +105,7 @@ public class X64Function {
 				.collect(Collectors.joining("\n"));
 	}
 
-	// state-saving code for knowing what to do with the store at things
+	// state-saving code for knowing what to do with the store at for instance fields
 	private final Map<Register, Register> instanceFieldAddressInstances = new HashMap<>();
 	private final Map<Register, String> instanceFieldAddressNames = new HashMap<>();
 	public void markRegisterAsInstanceFieldAddress(Register result, Register instance, String fieldName) {
@@ -123,5 +123,25 @@ public class X64Function {
 
 	public Register getInstanceFieldInstance(Register address) {
 		return instanceFieldAddressInstances.get(address);
+	}
+
+	// state saving code for knowing what to do with the store at for static fields
+	private final Map<Register, String> staticFieldAddressClasses = new HashMap<>();
+	private final Map<Register, String> staticFieldAddressFields = new HashMap<>();
+	public void markRegisterAsStaticFieldAddress(Register result, String className, String fieldName) {
+		staticFieldAddressClasses.put(result, className);
+		staticFieldAddressFields.put(result, fieldName);
+	}
+
+	public boolean registerIsStaticFieldAddress(Register address) {
+		return staticFieldAddressClasses.containsKey(address);
+	}
+
+	public String getStaticFieldAddressClassName(Register address) {
+		return staticFieldAddressClasses.get(address);
+	}
+
+	public String getStaticFieldAddressFieldName(Register address) {
+		return staticFieldAddressFields.get(address);
 	}
 }

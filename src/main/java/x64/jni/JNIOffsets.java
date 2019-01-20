@@ -31,6 +31,10 @@ public enum JNIOffsets {
     GET_STATIC_CHAR_FIELD(148), GET_STATIC_SHORT_FIELD(149), GET_STATIC_INT_FIELD(150),
     GET_STATIC_LONG_FIELD(151), GET_STATIC_FLOAT_FIELD(152), GET_STATIC_DOUBLE_FIELD(153),
 
+    SET_STATIC_OBJECT_FIELD(154), SET_STATIC_BOOLEAN_FIELD(155), SET_STATIC_BYTE_FIELD(156),
+    SET_STATIC_CHAR_FIELD(157), SET_STATIC_SHORT_FIELD(158), SET_STATIC_INT_FIELD(159),
+    SET_STATIC_LONG_FIELD(160), SET_STATIC_FLOAT_FIELD(161), SET_STATIC_DOUBLE_FIELD(162),
+
     NEW_STRING_UTF(167);
 
     /** Represents the index in the JNI function table */
@@ -84,10 +88,22 @@ public enum JNIOffsets {
     /**
      * Gets the offset for the GetStatic&lt;Type&gt;Field calls
      * @param type The JNI type that is used to determine the offset
-     * @return The integer offset into the virtual function table (the index * pointer size)
+     * @return JNIOffsets instance used for the offset.
      */
     public static JNIOffsets getStaticFieldOffset(Types type) {
         return getStaticFields[getIndexFromType(type)];
+    }
+
+    private static JNIOffsets[] setStaticFields = { SET_STATIC_OBJECT_FIELD, SET_STATIC_BOOLEAN_FIELD,
+        SET_STATIC_BYTE_FIELD, SET_STATIC_CHAR_FIELD, SET_STATIC_SHORT_FIELD, SET_STATIC_INT_FIELD,
+        SET_STATIC_LONG_FIELD, SET_STATIC_FLOAT_FIELD, SET_STATIC_DOUBLE_FIELD };
+    /**
+     * Gets the JNI offsets instance used  for the SetStatic&lt;Type&gt;Field calls
+     * @param type The JNI type that is used to determine the offset
+     * @return JNIOffsets instance used for the offset.
+     */
+    public static JNIOffsets setStaticFieldOffset(Types type) {
+        return setStaticFields[getIndexFromType(type)];
     }
 
     private static JNIOffsets[] callMethods = { CALL_OBJECT_METHOD, CALL_BOOLEAN_METHOD,

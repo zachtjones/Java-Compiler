@@ -10,14 +10,16 @@ import main.JavaCompiler;
 import x64.X64File;
 import x64.X64Function;
 import x64.instructions.MoveInstruction;
-import x64.jni.FindClassJNI;
-import x64.jni.GetInstanceFieldIdJNI;
-import x64.jni.SetInstanceFieldJNI;
+import x64.jni.*;
+import x64.operands.PCRelativeData;
 import x64.operands.RegisterRelativePointer;
 import x64.operands.X64RegisterOperand;
 
 /** store %src at %addr */
-public class StoreAddressStatement implements InterStatement, FindClassJNI, GetInstanceFieldIdJNI, SetInstanceFieldJNI {
+public class StoreAddressStatement implements InterStatement,
+		FindClassJNI, GetInstanceFieldIdJNI, SetInstanceFieldJNI,
+		GetStaticFieldIdJNI, SetStaticFieldJNI {
+
 	private Register src;
 	private Register addr;
 	
@@ -80,6 +82,32 @@ public class StoreAddressStatement implements InterStatement, FindClassJNI, GetI
 					new MoveInstruction(
 						src.toX64(),
 						new RegisterRelativePointer(fieldOffset, object.toX64())
+					)
+				);
+			}
+		} else if (function.registerIsStaticFieldAddress(addr)) {
+			final String fieldName = function.getStaticFieldAddressFieldName(addr);
+			final String className = function.getStaticFieldAddressClassName(addr);
+
+			if (className.startsWith("java/")) {
+
+				// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
+				final X64RegisterOperand classReg = addFindClassJNICall(assemblyFile, function, className);
+
+				// Step 2. fieldID = javaEnv -> GetStaticFieldID(JNIEnv *env, class, char *name, char *sig);
+				// src holds the type
+				final X64RegisterOperand fieldIDReg =
+					addGetStaticFieldIdJNICall(src, fieldName, classReg, assemblyFile, function);
+
+				// Step 3. javaEnv -> SetStatic<Type>Field(JNIEnv *env, class, fieldID, value)
+				addSetStaticField(function, classReg, fieldIDReg, src);
+
+			} else {
+				// mov %src, class_name_field_offset(%rip), src is used in the destination for the data size
+				function.addInstruction(
+					new MoveInstruction(
+						src.toX64(),
+						PCRelativeData.fromField(className, fieldName, src)
 					)
 				);
 			}

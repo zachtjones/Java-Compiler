@@ -5,6 +5,8 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import main.JavaCompiler;
+import x64.X64File;
+import x64.X64Function;
 
 public class GetStaticFieldAddressStatement implements InterStatement {
 	private String className;
@@ -45,5 +47,11 @@ public class GetStaticFieldAddressStatement implements InterStatement {
 
 		result.setType(Types.pointerOf(type));
 		regs.put(result, result.getType());
+	}
+
+	@Override
+	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+		// handle the details in the store instruction later on
+		function.markRegisterAsStaticFieldAddress(result, className, fieldName);
 	}
 }
