@@ -5,6 +5,9 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
+import x64.X64File;
+import x64.X64Function;
+import x64.instructions.MoveInstruction;
 
 public class CopyStatement implements InterStatement {
 	private final Register src;
@@ -33,5 +36,16 @@ public class CopyStatement implements InterStatement {
 
 		dest.setType(src.getType());
 		regs.put(dest, dest.getType());
+	}
+
+	@Override
+	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+		// simple move from source to destination
+		function.addInstruction(
+			new MoveInstruction(
+				src.toX64(),
+				dest.toX64()
+			)
+		);
 	}
 }
