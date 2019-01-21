@@ -3,6 +3,7 @@ package main;
 import helper.CompileException;
 import helper.ProcessRunner;
 import intermediate.InterFile;
+import intermediate.InterStructure;
 import x64.X64File;
 import x64.X64Function;
 import x64.instructions.CallClassMethod;
@@ -36,7 +37,7 @@ public class JavaCompiledMain {
         }
 
         // write the assembly bridge file
-        final X64File bridgeFile = new X64File("main");
+        final X64File bridgeFile = new X64File("main", new InterStructure(false));
         final X64Function bridgeFunction = new X64Function("Main", "mainMethod", 0);
         bridgeFile.addFunction(bridgeFunction);
 

@@ -1,32 +1,34 @@
 // this file is for testing a static and instance field, as well as
 //  minimal method example
 public class BasicClass {
-	public static int a;
-	public int b;
+	public static long a;
+	public long b;
 
-	public void setB(int c) {
+	public void setB(long c) {
 		b = c;
 	}
 
-	public int getB() {
+	public long getB() {
 		return b;
 	}
 
-	public static void setA(int c) {
+	public static void setA(long c) {
 		a = c;
 	}
 
-	public static int getA() {
+	public static long getA() {
 		return a;
 	}
 
 
 	public static void main(String[] args) {
 		//BasicClass temp = new BasicClass();
-		//temp.setB(5);
-		BasicClass.setA(1);
+		//temp.setB(5L);
+		BasicClass.setA(1L);
 
-		//System.out.println("b is: " + temp.getB());
-		System.out.println("a is: " + BasicClass.getA());
+		//System.out.print("b is: ");
+		//System.out.println(temp.getB());
+		System.out.print("a is: ");
+		System.out.println(BasicClass.getA());
 	}
 }

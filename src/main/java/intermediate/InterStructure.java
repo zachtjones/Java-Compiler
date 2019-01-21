@@ -1,6 +1,7 @@
 package intermediate;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 import helper.CompileException;
 import helper.Types;
@@ -91,5 +92,20 @@ public class InterStructure {
 			offset += size;
 		}
 		return offset;
+	}
+
+	/** calls the consumer on each member of this structure */
+	public void forEachMember(Consumer<String> consumer) {
+		for (String name : names) {
+			consumer.accept(name);
+		}
+	}
+
+	/** returns the field size of the member of this structure */
+	public int getFieldSize(String member) {
+		if (names.indexOf(member) != -1) {
+			return types.get(names.indexOf(member)).getX64Size();
+		}
+		return -1;
 	}
 }

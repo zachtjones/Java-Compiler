@@ -221,7 +221,7 @@ public class InterFile {
 
 		// TODO use the inheritance to build to function tables
 
-		X64File compiled = new X64File(this.name);
+		X64File compiled = new X64File(this.name, staticPart);
 
 		for (InterFunction function : functions) {
 			function.compile(compiled);

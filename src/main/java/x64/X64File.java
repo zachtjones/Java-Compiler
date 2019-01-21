@@ -1,8 +1,7 @@
 package x64;
 
-import x64.directives.AscizString;
-import x64.directives.LabelInstruction;
-import x64.directives.SegmentChange;
+import intermediate.InterStructure;
+import x64.directives.*;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -11,6 +10,9 @@ public class X64File {
 
     private final String javaClassName;
     private final String fileName;
+
+    private final ArrayList<Instruction> classFields;
+
     private final ArrayList<X64Function> functions;
 
     private final ArrayList<Instruction> dataStrings;
@@ -20,7 +22,17 @@ public class X64File {
     /** Creates an initially empty x64 assembly file, given the name
      * @param name The java class/interface/enum name, ex: java/lang/String
      */
-    public X64File(String name) {
+    public X64File(String name, InterStructure staticFields) {
+
+        classFields = new ArrayList<>();
+        classFields.add(new SegmentChange(SegmentChange.DATA));
+        staticFields.forEachMember(member -> {
+            int size = staticFields.getFieldSize(member);
+            classFields.add(new ByteAlignment(size));
+            classFields.add(new LabelInstruction(SymbolNames.getFieldName(name, member)));
+            classFields.add(new SpaceDirective(size));
+        });
+
         javaClassName = name;
         // use the java -> native pattern, escaping _ in package names
         fileName = name.replace("_", "_1").replace('/', '_') + ".s";
@@ -67,7 +79,11 @@ public class X64File {
 
     @Override
     public String toString() {
-        return functions.stream()
+        return classFields.stream()
+                .map(Instruction::toString)
+                .collect(Collectors.joining("\n"))
+            + "\n\n" +
+            functions.stream()
                 .map(X64Function::toString)
                 .collect(Collectors.joining("\n\n"))
                 + '\n' +

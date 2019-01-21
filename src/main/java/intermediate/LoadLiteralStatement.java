@@ -34,22 +34,22 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 		} else if (literalValue.equals("false")) {
 			r = regAlloc.getNext(Types.BOOLEAN);
 		} else if (literalValue.equals("null")) {
-			r = regAlloc.getNext(Types.UNKNOWN);
-		} else if (literalValue.charAt(literalValue.length() - 1) == 'f') {
+			r = regAlloc.getNext(Types.NULL);
+		} else if (getLastLetter() == 'f' || getLastLetter() == 'F') {
 			r = regAlloc.getNext(Types.FLOAT);
-		} else if (literalValue.charAt(literalValue.length() - 1) == 'F') {
-			r = regAlloc.getNext(Types.FLOAT);
-		} else if (literalValue.charAt(literalValue.length() - 1) == 'd') {
+			removeLastLetter();
+
+		} else if (getLastLetter() == 'd' || getLastLetter() == 'D') {
 			r = regAlloc.getNext(Types.DOUBLE);
-		} else if (literalValue.charAt(literalValue.length() - 1) == 'D') {
-			r = regAlloc.getNext(Types.DOUBLE);
+			removeLastLetter();
+
 		} else if (literalValue.contains(".")) {
 			// default floating point number is double
 			r = regAlloc.getNext(Types.DOUBLE);
-		} else if (literalValue.charAt(literalValue.length() - 1) == 'l') {
+		} else if (getLastLetter() == 'l' || getLastLetter() == 'L') {
 			r = regAlloc.getNext(Types.LONG);
-		} else if (literalValue.charAt(literalValue.length() - 1) == 'L') {
-			r = regAlloc.getNext(Types.LONG);
+			removeLastLetter();
+
 		} else {
 			// should be an int (bytes & shorts don't have literals)
 			r = regAlloc.getNext(Types.INT);
@@ -60,6 +60,16 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 						fileName, line);
 			}
 		}
+	}
+
+	/** Gets the last letter of the value field */
+	private char getLastLetter() {
+		return value.charAt(value.length() - 1);
+	}
+
+	/** Removes the last letter from value */
+	private void removeLastLetter() {
+		value = value.substring(0, value.length() - 1);
 	}
 
 	
