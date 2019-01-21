@@ -24,7 +24,14 @@ public enum JNIOffsets {
     SET_INSTANCE_OBJECT_FIELD(104), SET_INSTANCE_BOOLEAN_FIELD(105), SET_INSTANCE_BYTE_FIELD(106),
     SET_INSTANCE_CHAR_FIELD(107), SET_INSTANCE_SHORT_FIELD(108), SET_INSTANCE_INT_FIELD(109),
     SET_INSTANCE_LONG_FIELD(110), SET_INSTANCE_FLOAT_FIELD(111), SET_INSTANCE_DOUBLE_FIELD(112),
-    
+
+    GET_STATIC_METHOD_ID(113),
+
+    CALL_STATIC_OBJECT_METHOD(114), CALL_STATIC_BOOLEAN_METHOD(117), CALL_STATIC_BYTE_METHOD(120),
+    CALL_STATIC_CHAR_METHOD(123), CALL_STATIC_SHORT_METHOD(126), CALL_STATIC_INT_METHOD(129),
+    CALL_STATIC_LONG_METHOD(132), CALL_STATIC_FLOAT_METHOD(135), CALL_STATIC_DOUBLE_METHOD(138),
+    CALL_STATIC_VOID_METHOD(141),
+
     GET_STATIC_FIELD_ID(144),
 
     GET_STATIC_OBJECT_FIELD(145), GET_STATIC_BOOLEAN_FIELD(146), GET_STATIC_BYTE_FIELD(147),
@@ -130,5 +137,18 @@ public enum JNIOffsets {
      */
     public static JNIOffsets getCallNonVirtualMethodOffset(Types type) {
         return callNonVirtualMethods[getIndexFromType(type)];
+    }
+
+    private static JNIOffsets[] callStaticMethods = { CALL_STATIC_OBJECT_METHOD,
+        CALL_STATIC_BOOLEAN_METHOD, CALL_STATIC_BYTE_METHOD, CALL_STATIC_CHAR_METHOD,
+        CALL_STATIC_SHORT_METHOD, CALL_STATIC_INT_METHOD, CALL_STATIC_LONG_METHOD,
+        CALL_STATIC_FLOAT_METHOD, CALL_STATIC_DOUBLE_METHOD, CALL_STATIC_VOID_METHOD };
+    /**
+     * Gets the offset for the CallStatic&lt;Type&gt;Method calls
+     * @param type The JNI type that is used to determine the offset
+     * @return The JNIOffsets instance that corresponds to that type passed in
+     */
+    public static JNIOffsets getCallStaticMethodOffset(Types type) {
+        return callStaticMethods[getIndexFromType(type)];
     }
 }

@@ -4,17 +4,25 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
-import x64.jni.CallNonVirtualMethodJNI;
+import x64.X64File;
+import x64.X64Function;
+import x64.instructions.CallClassMethod;
+import x64.instructions.MoveInstruction;
+import x64.jni.CallStaticMethodJNI;
 import x64.jni.FindClassJNI;
-import x64.jni.GetMethodIdJNI;
+import x64.jni.GetStaticMethodIdJNI;
+import x64.operands.X64RegisterOperand;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+import static x64.allocation.CallingConvention.argumentRegister;
+import static x64.allocation.CallingConvention.returnValueRegister;
+
 /** Represents a function call without a lookup. */
-public class CallStaticStatement implements InterStatement, FindClassJNI, GetMethodIdJNI, CallNonVirtualMethodJNI {
+public class CallStaticStatement implements InterStatement, FindClassJNI, GetStaticMethodIdJNI, CallStaticMethodJNI {
 	private final String className;
 	private final String functionName;
 	private final Register[] args;
@@ -69,6 +77,51 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetMet
 
 			returnVal.setType(returnType);
 			regs.put(returnVal, returnType);
+		}
+	}
+
+	@Override
+	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+		// if the type of the register is java/*, use JNI
+		if (className.startsWith("java/")) {
+
+			// clazz = FindClass
+			final X64RegisterOperand clazz = addFindClassJNICall(assemblyFile, function, className);
+
+			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
+			final X64RegisterOperand methodId =
+				addGetStaticMethodId(assemblyFile, function, clazz, functionName, args, returnVal);
+
+			// result = CallNonVirtual<Type>Method(JNIEnv, clazz, methodID, ...)
+			addCallStaticMethodJNI(function, clazz, methodId, args, returnVal);
+
+		} else {
+
+			// 1. Move the arguments in
+			function.loadJNI1(); // JNIEnv
+
+			// the rest of the args, the actual ones to the method
+			for (int i = 0; i < args.length; i++) {
+				function.addInstruction(
+					new MoveInstruction(
+						args[i].toX64(),
+						argumentRegister(2 + i)
+					)
+				);
+			}
+
+			// 2. call CLASS_NAME_METHOD_NAME
+			function.addInstruction(
+				new CallClassMethod(className, functionName)
+			);
+
+			// 3. mov %rax, result
+			function.addInstruction(
+				new MoveInstruction(
+					returnValueRegister(),
+					returnVal.toX64()
+				)
+			);
 		}
 	}
 }
