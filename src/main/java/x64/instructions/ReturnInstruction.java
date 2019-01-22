@@ -27,6 +27,6 @@ public class ReturnInstruction implements Instruction {
 
     @Override
     public String toString() {
-        return "\tretq";
+        return "\tret";
     }
 }
