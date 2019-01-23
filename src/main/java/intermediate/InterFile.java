@@ -234,4 +234,8 @@ public class InterFile {
 	public int getFieldOffset(String fieldName) {
 		return instancePart.getFieldOffset(fieldName);
 	}
+
+	public int getClassSize() {
+		return instancePart.getTotalSize();
+	}
 }

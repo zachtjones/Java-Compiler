@@ -1,10 +1,12 @@
 package x64;
 
+import x64.allocation.CallingConvention;
+
 public class SymbolNames {
 
-    public static String getFieldName(String javaClass, String javaField) {
+	public static String getFieldName(String javaClass, String javaField) {
         final String prefix; // dependent on OS, windows has no leading underscores
-        if (System.getProperty("os.name").contains("Win")) {
+        if (CallingConvention.isMicrosoft) {
             prefix = "Java_";
         } else {
             prefix = "_Java_";

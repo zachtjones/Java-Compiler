@@ -108,4 +108,19 @@ public class InterStructure {
 		}
 		return -1;
 	}
+
+	/** returns the total size needed to store instances of this structure */
+	public int getTotalSize() {
+		int offset = 8; // all structure instances have a virtual function table from the start.
+
+		for (Types type : types) {
+			int size = type.getX64Size();
+			// advance to the alignment for the size
+			while (offset % size != 0) offset++;
+
+			// advance by the size
+			offset += size;
+		}
+		return offset;
+	}
 }

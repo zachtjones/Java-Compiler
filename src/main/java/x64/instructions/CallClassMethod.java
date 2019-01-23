@@ -19,6 +19,10 @@ public class CallClassMethod implements Instruction {
         label = SymbolNames.getMethodName(className, name);
     }
 
+    public CallClassMethod(String label) {
+        this.label = label;
+    }
+
     @Override
     public boolean isCalling() {
         return true;
