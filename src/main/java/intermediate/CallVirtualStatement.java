@@ -11,10 +11,15 @@ import helper.UsageCheck;
 import main.JavaCompiler;
 import x64.X64File;
 import x64.X64Function;
+import x64.instructions.CallClassMethod;
+import x64.instructions.MoveInstruction;
 import x64.jni.CallMethodJNI;
 import x64.jni.GetMethodIdJNI;
 import x64.jni.GetObjectClassJNI;
 import x64.operands.X64RegisterOperand;
+
+import static x64.allocation.CallingConvention.argumentRegister;
+import static x64.allocation.CallingConvention.returnValueRegister;
 
 /** Represents a function call via v-table lookup. */
 public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, GetMethodIdJNI, CallMethodJNI {
@@ -81,7 +86,8 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 	@Override
 	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
 		// if the type of the register is java/*, use JNI
-		if (obj.getType().getClassName(fileName, line).startsWith("java/")) {
+		final String classname = obj.getType().getClassName(fileName, line);
+		if (classname.startsWith("java/")) {
 
 			final X64RegisterOperand objReg = obj.toX64();
 
@@ -97,7 +103,29 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 
 		} else {
 			// TODO requires adding the virtual function tables to the system of files
-			throw new CompileException("V-table lookup not implemented yet.", fileName, line);
+
+			// call class_method(JNI, object, ...args)
+			function.loadJNI1();
+
+			function.addInstruction(
+				new MoveInstruction(obj.toX64(), argumentRegister(2))
+			);
+
+			// the rest of the args
+			for (int i = 0; i < args.length; i++) {
+				function.addInstruction(
+					new MoveInstruction(args[i].toX64(), argumentRegister(3 + i))
+				);
+			}
+
+			// call
+			function.addInstruction(new CallClassMethod(classname, name));
+
+			// move result -- unless null (meaning void method)
+			if (returnVal != null)
+				function.addInstruction(
+					new MoveInstruction(returnValueRegister(), returnVal.toX64())
+				);
 		}
 	}
 }
