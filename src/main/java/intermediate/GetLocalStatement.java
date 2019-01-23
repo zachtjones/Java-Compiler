@@ -4,6 +4,10 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
+import x64.X64File;
+import x64.X64Function;
+import x64.instructions.MoveInstruction;
+import x64.operands.X64RegisterOperand;
 
 /** getLocal %register = name */
 public class GetLocalStatement implements InterStatement {
@@ -42,5 +46,15 @@ public class GetLocalStatement implements InterStatement {
 		// define the register
 		r.setType(locals.get(localName));
 		regs.put(r, r.getType());
+	}
+
+	@Override
+	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+		final X64RegisterOperand source = function.getLocalVariable(localName);
+
+		// move the register over
+		function.addInstruction(
+			new MoveInstruction(source, r.toX64())
+		);
 	}
 }

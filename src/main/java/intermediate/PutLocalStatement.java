@@ -6,6 +6,10 @@ import helper.CompileException;
 import helper.TypeChecker;
 import helper.Types;
 import helper.UsageCheck;
+import x64.X64File;
+import x64.X64Function;
+import x64.instructions.MoveInstruction;
+import x64.operands.X64RegisterOperand;
 
 /** PutLocal name = %register */
 public class PutLocalStatement implements InterStatement {
@@ -42,5 +46,15 @@ public class PutLocalStatement implements InterStatement {
 					fileName, line);
 		}
 		TypeChecker.canDirectlyAssign(locals.get(localName), r.getType(), fileName, line);
+	}
+
+	@Override
+	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+		final X64RegisterOperand destination = function.getLocalVariable(localName);
+
+		// copy the result over to the destination
+		function.addInstruction(
+			new MoveInstruction(r.toX64(), destination)
+		);
 	}
 }
