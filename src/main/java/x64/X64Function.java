@@ -144,4 +144,14 @@ public class X64Function {
 	public String getStaticFieldAddressFieldName(Register address) {
 		return staticFieldAddressFields.get(address);
 	}
+
+	// state saving code for knowing what to do with the get/set local variables
+	private final Map<String, X64RegisterOperand> locals = new HashMap<>();
+	public void markRegisterAsLocalVariable(String name, X64RegisterOperand allocated) {
+		locals.put(name, allocated);
+	}
+
+	public X64RegisterOperand getLocalVariable(String name) {
+		return locals.get(name);
+	}
 }
