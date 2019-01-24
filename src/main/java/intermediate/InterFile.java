@@ -96,10 +96,8 @@ public class InterFile {
 		result.append(staticPart.toString());
 
 		// functions
-		if (functions.size() != 0) {
-			for (InterFunction f : functions) {
-				result.append(f.toString());
-			}
+		for (InterFunction f : functions) {
+			result.append(f.toString());
 		}
 
 		return result.toString();
