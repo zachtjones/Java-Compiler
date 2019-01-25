@@ -11,7 +11,7 @@ import static x64.operands.X64NativeRegister.*;
 public class CallingConvention {
 
 	/** holds if this system is a Microsoft system, so that we don't need repeated system property lookups */
-	private static final boolean isMicrosoft = System.getProperty("os.name").contains("Windows");
+	public static final boolean isMicrosoft = System.getProperty("os.name").contains("Windows");
 
 	private static final X64RegisterOperand[] argsSystemV = { RDI, RSI, RDX, RCX, R8, R9 };
 	private static final X64RegisterOperand[] argsMicrosoft = { RCX, RDX, R8, R9 };
@@ -54,5 +54,10 @@ public class CallingConvention {
 	/** returns true if the caller need to allocate 32 bytes (4 registers) for the callee to store it's args */
 	public static boolean needsToAllocate32BytesForArgs() {
 		return isMicrosoft;
+	}
+
+	/** returns the string used in the call instruction for a c library function*/
+	public static String libraryFunc(String function) {
+		return (isMicrosoft ? "" : "_") + function;
 	}
 }

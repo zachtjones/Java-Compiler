@@ -6,6 +6,9 @@ import helper.CompileException;
 import helper.TypeChecker;
 import helper.Types;
 import helper.UsageCheck;
+import x64.X64Context;
+import x64.instructions.MoveInstruction;
+import x64.operands.X64RegisterOperand;
 
 /** PutLocal name = %register */
 public class PutLocalStatement implements InterStatement {
@@ -42,5 +45,15 @@ public class PutLocalStatement implements InterStatement {
 					fileName, line);
 		}
 		TypeChecker.canDirectlyAssign(locals.get(localName), r.getType(), fileName, line);
+	}
+
+	@Override
+	public void compile(X64Context context) throws CompileException {
+		final X64RegisterOperand destination = context.getLocalVariable(localName);
+
+		// copy the result over to the destination
+		context.addInstruction(
+			new MoveInstruction(r.toX64(), destination)
+		);
 	}
 }

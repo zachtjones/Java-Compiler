@@ -8,12 +8,9 @@ import x64.directives.SegmentChange;
 import x64.instructions.*;
 import x64.operands.X64NativeRegister;
 import x64.operands.Immediate;
-import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static x64.allocation.CallingConvention.argumentRegister;
@@ -27,11 +24,7 @@ public class X64Function {
 	private ArrayList<Instruction> contents = new ArrayList<>();
 	private final ArrayList<Instruction> epilogue = new ArrayList<>();
 
-	private int nextFreeRegister;
-
-	public final X64RegisterOperand javaEnvPointer;
-
-	public X64Function(String javaClass, String javaMethod, int nextFreeRegister) {
+	public X64Function(String javaClass, String javaMethod, X64RegisterOperand jniEnvPointer) {
 
 		prologue.add(new SegmentChange(SegmentChange.TEXT));
 		final String symbolName = SymbolNames.getFieldName(javaClass, javaMethod);
@@ -39,14 +32,10 @@ public class X64Function {
 		prologue.add(new ByteAlignment(16));
 		prologue.add(new LabelInstruction(symbolName));
 
-		this.nextFreeRegister = nextFreeRegister;
-		
-		javaEnvPointer = this.getNextQuadRegister();
-
 		// save the first argument, the java environment pointer to a dedicated virtual register.
-		contents.add(new MoveInstruction(argumentRegister(1), javaEnvPointer));
+		contents.add(new MoveInstruction(argumentRegister(1), jniEnvPointer));
 
-		epilogue.add(new ReturnInstruction());
+		epilogue.add(ReturnInstruction.instance);
 	}
 
 	/** Adds an instruction to this function */
@@ -54,16 +43,7 @@ public class X64Function {
 		this.contents.add(instruction);
 	}
 
-	/** Loads the JNI pointer into the first argument */
-	public void loadJNI1() {
-		addInstruction(new MoveInstruction(javaEnvPointer, argumentRegister(1)));
-	}
 
-	/** Returns the next pseudo register available that is a quad-word size (64-bit) */
-	public X64RegisterOperand getNextQuadRegister() {
-		nextFreeRegister++;
-		return of(new X64PreservedRegister(nextFreeRegister, Instruction.Size.QUAD));
-	}
 
 	/** Allocates the registers, transforming pseudo-registers to real ones */
 	void allocateRegisters() {

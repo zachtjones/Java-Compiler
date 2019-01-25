@@ -1,9 +1,0 @@
-// file: EnumTest.jil
-
-structure static
-	int RED = 0;
-	int BLUE = 1;
-	int GREEN = 2;
-end structure
-
-

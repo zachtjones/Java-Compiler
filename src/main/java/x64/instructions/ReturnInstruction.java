@@ -1,32 +1,19 @@
 package x64.instructions;
 
 import x64.Instruction;
-import x64.allocation.RegistersUsed;
-import x64.operands.X64NativeRegister;
-import x64.operands.X64PreservedRegister;
-
-import java.util.Map;
 
 /** Represents the simple return instruction, which pops the return address & jumps back. */
 public class ReturnInstruction implements Instruction {
 
-    @Override
-    public boolean isCalling() {
-        return false;
-    }
+    /** represents the instance of a return instruction.
+     * Since all are identical, there's no need to create a bunch*/
+    public final static ReturnInstruction instance = new ReturnInstruction();
 
-    @Override
-    public void markRegisters(int i, RegistersUsed usedRegs) {
-        // doesn't use registers
-    }
-
-    @Override
-    public void allocateRegisters(Map<X64PreservedRegister, X64NativeRegister> mapping) {
-        // same reasoning as markRegisters
-    }
+    /** prevent creation outside this class */
+    private ReturnInstruction() {}
 
     @Override
     public String toString() {
-        return "\tretq";
+        return "\tret";
     }
 }

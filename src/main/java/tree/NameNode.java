@@ -5,15 +5,7 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import helper.Types;
-import intermediate.GetInstanceFieldAddressStatement;
-import intermediate.GetInstanceFieldStatement;
-import intermediate.GetLocalAddressStatement;
-import intermediate.GetLocalStatement;
-import intermediate.GetParamAddressStatement;
-import intermediate.GetParamStatement;
-import intermediate.GetStaticFieldStatement;
-import intermediate.InterFunction;
-import intermediate.Register;
+import intermediate.*;
 
 public class NameNode extends NodeImpl implements Expression, LValue {
 	public String primaryName;
@@ -64,7 +56,11 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 			} else if (tableLookup == SymbolTable.parameter) {
 				Register result = f.allocator.getNext(type);
 				f.statements.add(new GetParamStatement(result, primaryName, getFileName(), getLine()));
-			} else { // assume static/instance field / method
+			}  else if (tableLookup == SymbolTable.staticFields) {
+				// static field
+				Register result = f.allocator.getNext(type);
+				f.statements.add(new GetStaticFieldStatement(f.parentClass, primaryName, result, getFileName(), getLine()));
+			} else if (tableLookup == SymbolTable.instanceFields) {
 				// load 'this' pointer
 				Register thisPointer = f.allocator.getNext(Types.UNKNOWN);
 				f.statements.add(new GetParamStatement(thisPointer, "this", getFileName(), getLine()));
@@ -84,6 +80,8 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 				// get the static field, then do the chain of instance fields
 				Register result = f.allocator.getNext(Types.UNKNOWN);
 				f.statements.add(new GetStaticFieldStatement(split[0], split[1], result, getFileName(), getLine()));
+				// store these two names last used
+				f.history.setName(split[0]);
 				f.history.setName(split[1]);
 				for (int i = 2; i < split.length; i++) {
 					Register temp3 = f.allocator.getNext(Types.UNKNOWN);
@@ -137,8 +135,12 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 			} else if (tableLookup == SymbolTable.parameter) {
 				Register result = f.allocator.getNext(type);
 				f.statements.add(new GetParamAddressStatement(result, primaryName, getFileName(), getLine()));
-			} else if (tableLookup == SymbolTable.className){
-				// load 'this' pointer
+			} else if (tableLookup == SymbolTable.staticFields) {
+				// static field
+				Register result = f.allocator.getNext(type);
+				f.statements.add(new GetStaticFieldAddressStatement(f.parentClass, primaryName, result, getFileName(), getLine()));
+			} else if (tableLookup == SymbolTable.instanceFields) {
+				// instance field: load 'this' pointer
 				Register thisPointer = f.allocator.getNext(Types.UNKNOWN);
 				f.statements.add(new GetParamStatement(thisPointer, "this", getFileName(), getLine()));
 				
@@ -146,6 +148,8 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 				Register result = f.allocator.getNext(type);
 				f.statements.add(new GetInstanceFieldAddressStatement(thisPointer, primaryName, result,
 						getFileName(), getLine()));
+			} else {
+				throw new CompileException("unsure what to do here", "NameNode.java", 152);
 			}
 			// don't do anything
 		} else {

@@ -1,6 +1,7 @@
 package intermediate;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 import helper.CompileException;
 import helper.Types;
@@ -70,5 +71,56 @@ public class InterStructure {
 		}
 		throw new CompileException("Field " + fieldName + " not present in structure.", fileName, line);
 	}
-	
+
+	/** Returns the offset, in bytes for the fieldName within the structure. */
+	public int getFieldOffset(String fieldName) {
+		int offset = 8; // all structure instances have a virtual function table from the start.
+
+		for (int i = 0; i < names.size(); i++) {
+			String name = names.get(i);
+			Types type = types.get(i);
+
+			int size = type.getX64Size();
+			// advance to the alignment for the size
+			while (offset % size != 0) offset++;
+
+			if (fieldName.equals(name)) {
+				return offset;
+			}
+
+			// advance by the size
+			offset += size;
+		}
+		return offset;
+	}
+
+	/** calls the consumer on each member of this structure */
+	public void forEachMember(Consumer<String> consumer) {
+		for (String name : names) {
+			consumer.accept(name);
+		}
+	}
+
+	/** returns the field size of the member of this structure */
+	public int getFieldSize(String member) {
+		if (names.indexOf(member) != -1) {
+			return types.get(names.indexOf(member)).getX64Size();
+		}
+		return -1;
+	}
+
+	/** returns the total size needed to store instances of this structure */
+	public int getTotalSize() {
+		int offset = 8; // all structure instances have a virtual function table from the start.
+
+		for (Types type : types) {
+			int size = type.getX64Size();
+			// advance to the alignment for the size
+			while (offset % size != 0) offset++;
+
+			// advance by the size
+			offset += size;
+		}
+		return offset;
+	}
 }

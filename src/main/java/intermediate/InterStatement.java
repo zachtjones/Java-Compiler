@@ -4,8 +4,7 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
-import x64.X64File;
-import x64.X64Function;
+import x64.X64Context;
 
 public interface InterStatement {
 	/** Replaces all reference types with their fully qualified name 
@@ -21,12 +20,11 @@ public interface InterStatement {
 	/**
 	 * Compiles this statement down to the assembly level for x64,
 	 * with the only catch being unlimited temporary registers.
-	 * @param assemblyFile The assembly file for more context, used in adding data segment parts.
-	 * @param function The x64 function to add the instructions to.
+	 * @param context The context for the compilation
 	 * @throws CompileException If there is an error compiling, note that this should only happen for statements
 	 * not implemented yet.
 	 */
-	default void compile(X64File assemblyFile, X64Function function) throws CompileException {
+	default void compile(X64Context context) throws CompileException {
 		throw new CompileException("compiling to x64 not done for " + this, "", -1);
 	}
 }

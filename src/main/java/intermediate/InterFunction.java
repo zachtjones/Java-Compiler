@@ -6,8 +6,8 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import tree.CompileHistory;
+import x64.X64Context;
 import x64.X64File;
-import x64.X64Function;
 
 public class InterFunction {
 	
@@ -26,9 +26,11 @@ public class InterFunction {
 
 	public final RegisterAllocator allocator;
 	public final CompileHistory history;
+
+	public final String parentClass;
 	
 	
-	public InterFunction() {
+	public InterFunction(String fromClass) {
 		this.paramTypes = new ArrayList<>();
 		this.paramNames = new ArrayList<>();
 		this.throwsList = new ArrayList<>();
@@ -36,6 +38,7 @@ public class InterFunction {
 
 		allocator = new RegisterAllocator();
 		history = new CompileHistory();
+		parentClass = fromClass;
 	}
 	
 	@Override
@@ -121,14 +124,13 @@ public class InterFunction {
     public void compile(X64File assemblyFile) throws CompileException {
 
         // TODO the name mangled args to allow for method overloading
-		X64Function function = new X64Function(assemblyFile.getJavaName(), name, allocator.getNextLabel());
+		X64Context context = new X64Context(assemblyFile, allocator, name);
 
         // add the instructions for the statements -> x64
         for (InterStatement statement : statements) {
-            statement.compile(assemblyFile, function);
+            statement.compile(context);
         }
 
-        assemblyFile.addFunction(function);
-
+        context.addFunctionToFile();
     }
 }

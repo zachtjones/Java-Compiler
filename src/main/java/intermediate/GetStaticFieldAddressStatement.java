@@ -5,6 +5,7 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import main.JavaCompiler;
+import x64.X64Context;
 
 public class GetStaticFieldAddressStatement implements InterStatement {
 	private String className;
@@ -43,6 +44,13 @@ public class GetStaticFieldAddressStatement implements InterStatement {
 		InterFile object = JavaCompiler.parseAndCompile(className, fileName, line);
 		Types type = object.getStatFieldType(fieldName, fileName, line);
 
-		regs.put(result, Types.pointerOf(type));
+		result.setType(Types.pointerOf(type));
+		regs.put(result, result.getType());
+	}
+
+	@Override
+	public void compile(X64Context context) throws CompileException {
+		// handle the details in the store instruction later on
+		context.markRegisterAsStaticFieldAddress(result, className, fieldName);
 	}
 }

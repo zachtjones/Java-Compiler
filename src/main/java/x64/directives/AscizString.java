@@ -1,6 +1,6 @@
 package x64.directives;
 
-public class AscizString extends Directive {
+public class AscizString implements Directive {
 
     private String content;
 

@@ -96,10 +96,8 @@ public class InterFile {
 		result.append(staticPart.toString());
 
 		// functions
-		if (functions.size() != 0) {
-			for (InterFunction f : functions) {
-				result.append(f.toString());
-			}
+		for (InterFunction f : functions) {
+			result.append(f.toString());
 		}
 
 		return result.toString();
@@ -139,28 +137,31 @@ public class InterFile {
 				hasOne = true;
 			}
 		}
-		if (!hasOne && superNode != null) {
-			InterFunction d = new InterFunction();
+		if (!hasOne) {
+			InterFunction d = new InterFunction(name);
 			// add the name and return type
 			d.name = "<init>";
 			d.isInstance = true;
 			d.returnType = Types.VOID;
 
+			// TODO call to super (that's pretty complicated since the test classes extend object)
+			// in order to call a superclass that is part of the java library, have to do some sort of
+			//  re-arrangement of the field order
+
 			// add the only statement, super();
-			d.statements = new ArrayList<>();
-			CallActualStatement c;
-			Register[] args = new Register[0];
+			//CallActualStatement c;
+			//Register[] args = new Register[0];
 
 			// load this pointer (call super on this)
-			RegisterAllocator ra = new RegisterAllocator();
-			Register thisPointer = ra.getNext(fromFullyQualifiedClass(this.name));
-			d.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
-			Register voidReg = ra.getNext(Types.VOID);
+			//RegisterAllocator ra = new RegisterAllocator();
+			//Register thisPointer = ra.getNext(fromFullyQualifiedClass(this.name));
+			//d.statements.add(new GetParamStatement(thisPointer, "this", fileName, line));
+			//Register voidReg = ra.getNext(Types.VOID);
 			//  superclass of this object.
 			// add in the call to it's init
-			c = new CallActualStatement(thisPointer, superNode.primaryName, "<init>", args, voidReg,
-				fileName, line);
-			d.statements.add(c);
+			//CallActualStatement c = new CallActualStatement(thisPointer, superNode.primaryName, "<init>",
+			// args, voidReg, fileName, line);
+			//d.statements.add(c);
 			functions.add(d);
 		}
 	}
@@ -221,12 +222,21 @@ public class InterFile {
 
 		// TODO use the inheritance to build to function tables
 
-		X64File compiled = new X64File(this.name);
+		X64File compiled = new X64File(this.name, staticPart);
 
 		for (InterFunction function : functions) {
 			function.compile(compiled);
 		}
 
 		return compiled;
+	}
+
+	/** Returns the offset, in bytes for the fieldName within the structure. */
+	public int getFieldOffset(String fieldName) {
+		return instancePart.getFieldOffset(fieldName);
+	}
+
+	public int getClassSize() {
+		return instancePart.getTotalSize();
 	}
 }

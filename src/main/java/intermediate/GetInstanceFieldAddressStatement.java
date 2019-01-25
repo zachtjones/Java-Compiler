@@ -6,6 +6,7 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
+import x64.X64Context;
 
 public class GetInstanceFieldAddressStatement implements InterStatement {
 	private Register instance;
@@ -46,7 +47,14 @@ public class GetInstanceFieldAddressStatement implements InterStatement {
 		
 		InterFile object = JavaCompiler.parseAndCompile(type, fileName, line);
 		Types resultType = object.getInstFieldType(fieldName, fileName, line);
-		
-		regs.put(result, Types.pointerOf(resultType)); // address is a pointer type
+
+		result.setType(Types.pointerOf(resultType));
+		regs.put(result, result.getType()); // address is a pointer type
+	}
+
+	@Override
+	public void compile(X64Context context) throws CompileException {
+		// handle the details in the store instruction later on
+		context.markRegisterAsInstanceFieldAddress(result, instance, fieldName);
 	}
 }

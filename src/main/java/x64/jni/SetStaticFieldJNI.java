@@ -8,24 +8,24 @@ import x64.operands.X64RegisterOperand;
 
 import static x64.allocation.CallingConvention.argumentRegister;
 
-public interface GetStaticFieldJNI extends CallJNIMethod {
+public interface SetStaticFieldJNI extends CallJNIMethod {
 
     /**
      * Adds the code result = GetStatic&lt;Type&gt;Field(JNI, class, fieldId)
-     * @param context The x64 function to add the instructions to
+     * @param function The x64 function to add the instructions to
      * @param classReg The x64 register holding the result of FindClass
      * @param fieldIDReg The x64 register holding the result of GetStaticFieldId
-     * @param result The IL Register that is used for the type and the returned value.
+     * @param value The IL Register that holds the value to set
      */
-    default void addGetStaticField(X64Context context, X64RegisterOperand classReg,
-                                   X64RegisterOperand fieldIDReg, Register result) {
+    default void addSetStaticField(X64Context function, X64RegisterOperand classReg,
+                                   X64RegisterOperand fieldIDReg, Register value) {
 
         // load the args
         // arg1 = JNI
-        context.loadJNI1();
+        function.loadJNI1();
 
         // arg2 = class reference
-        context.addInstruction(
+        function.addInstruction(
             new MoveInstruction(
                 classReg,
                 argumentRegister(2)
@@ -33,14 +33,23 @@ public interface GetStaticFieldJNI extends CallJNIMethod {
         );
 
         // arg3 = field ID
-        context.addInstruction(
+        function.addInstruction(
             new MoveInstruction(
                 fieldIDReg,
                 argumentRegister(3)
             )
         );
 
-        final JNIOffsets functionToCall = JNIOffsets.getStaticFieldOffset(result.getType());
-        addCallJNI(context, functionToCall, result.toX64());
+        // arg4 = value
+        function.addInstruction(
+            new MoveInstruction(
+                value.toX64(),
+                argumentRegister(4)
+            )
+        );
+
+        final JNIOffsets functionToCall = JNIOffsets.setStaticFieldOffset(value.getType());
+
+        addCallVoidJNI(function, functionToCall);
     }
 }

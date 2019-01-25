@@ -1,7 +1,6 @@
 package x64.jni.helpers;
 
-import x64.X64File;
-import x64.X64Function;
+import x64.X64Context;
 import x64.instructions.LoadEffectiveAddressInstruction;
 import x64.instructions.MoveInstruction;
 import x64.jni.JNIOffsets;
@@ -17,13 +16,13 @@ public interface GetIdJNI extends CallJNIMethod {
      * This interface is created as a helper for those specific ones
      * Returns the allocated register for the methodId/fieldId */
     default X64RegisterOperand addGetIdJNICall(JNIOffsets jniOffset, String fieldOrMethodName, String signature,
-            X64File assemblyFile, X64Function function, X64RegisterOperand classReg) {
+                                               X64Context context, X64RegisterOperand classReg) {
 
         // mov %javaEnvOne, %arg1
-        function.loadJNI1();
+        context.loadJNI1();
 
         // mov %classReg, %arg2
-        function.addInstruction(
+        context.addInstruction(
             new MoveInstruction(
                 classReg,
                 argumentRegister(2)
@@ -31,8 +30,8 @@ public interface GetIdJNI extends CallJNIMethod {
         );
 
         // add field name to the data strings -> %arg3
-        String fieldNameLabel = assemblyFile.insertDataString(fieldOrMethodName);
-        function.addInstruction(
+        String fieldNameLabel = context.insertDataString(fieldOrMethodName);
+        context.addInstruction(
             new LoadEffectiveAddressInstruction(
                 PCRelativeData.pointerFromLabel(fieldNameLabel),
                 argumentRegister(3)
@@ -40,8 +39,8 @@ public interface GetIdJNI extends CallJNIMethod {
         );
 
         // add the signature of the field type -> %arg4
-        final String fieldTypeLabel = assemblyFile.insertDataString(signature);
-        function.addInstruction(
+        final String fieldTypeLabel = context.insertDataString(signature);
+        context.addInstruction(
             new LoadEffectiveAddressInstruction(
                 PCRelativeData.pointerFromLabel(fieldTypeLabel),
                 argumentRegister(4)
@@ -49,8 +48,8 @@ public interface GetIdJNI extends CallJNIMethod {
         );
 
         // call the method, storing result in fieldIDReg
-        final X64RegisterOperand fieldIDReg = function.getNextQuadRegister();
-        addCallJNI(function, jniOffset, fieldIDReg);
+        final X64RegisterOperand fieldIDReg = context.getNextQuadRegister();
+        addCallJNI(context, jniOffset, fieldIDReg);
 
         return fieldIDReg;
     }

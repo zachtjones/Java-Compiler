@@ -7,6 +7,8 @@ import x64.operands.X64RegisterOperand;
 
 import java.util.*;
 
+import static x64.allocation.CallingConvention.argumentRegister;
+
 public class RegisterTransformer {
 
 	private final ArrayList<Instruction> initialContents;
@@ -103,8 +105,9 @@ public class RegisterTransformer {
 		}
 
 		// add another one if there are an even number used -- might add one already in the set
+		// since we just need to preserve one, do one of the arguments
 		while (usedPreservedRegs.size() % 2 == 0) {
-			usedPreservedRegs.add(getNextPreserved());
+			usedPreservedRegs.add(argumentRegister(1).nativeOne);
 		}
 
 		return usedPreservedRegs;

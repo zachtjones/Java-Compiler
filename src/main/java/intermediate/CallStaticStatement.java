@@ -1,10 +1,5 @@
 package intermediate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.stream.Collectors;
-
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
@@ -12,31 +7,35 @@ import main.JavaCompiler;
 import x64.X64Context;
 import x64.instructions.CallClassMethod;
 import x64.instructions.MoveInstruction;
-import x64.jni.CallNonVirtualMethodJNI;
+import x64.jni.CallStaticMethodJNI;
 import x64.jni.FindClassJNI;
-import x64.jni.GetMethodIdJNI;
+import x64.jni.GetStaticMethodIdJNI;
 import x64.operands.X64RegisterOperand;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.allocation.CallingConvention.returnValueRegister;
 
 /** Represents a function call without a lookup. */
-public class CallActualStatement implements InterStatement, FindClassJNI, GetMethodIdJNI, CallNonVirtualMethodJNI {
-	private final Register obj;
+public class CallStaticStatement implements InterStatement, FindClassJNI, GetStaticMethodIdJNI, CallStaticMethodJNI {
 	private final String className;
-	String name;
+	private final String functionName;
 	private final Register[] args;
 	private final Register returnVal;
-	
+
 	private final String fileName;
 	private final int line;
-	
-	public CallActualStatement(Register obj, String className, String name, Register[] args, 
-			Register returnVal, String fileName, int line) {
-		
-		this.obj = obj;
+
+
+	public CallStaticStatement(String className, String functionName, Register[] args,
+							   Register returnVal, String fileName, int line) {
+
 		this.className = className;
-		this.name = name;
+		this.functionName = functionName;
 		this.args = args;
 		this.returnVal = returnVal;
 		this.fileName = fileName;
@@ -46,7 +45,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 	@Override
 	public String toString() {
 		// use the Arrays.toString and remove '[' and ']'
-		return "call " + obj + " " + className + '.' + name + "(" 
+		return "callStatic " + className + '.' + functionName + "("
 				+ Arrays.toString(args).replaceAll("[]\\[]", "") + ") -> " + returnVal + ";";
 	}
 
@@ -60,13 +59,13 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 		
 		if (returnVal != null) {
 			// fill in the return type
-			InterFile e = JavaCompiler.parseAndCompile(obj.getType().getClassName(fileName, line), fileName, line);
+			InterFile e = JavaCompiler.parseAndCompile(className, fileName, line);
 			ArrayList<Types> argsList = new ArrayList<>();
 			Arrays.stream(args).map(Register::getType).forEachOrdered(argsList::add);
-			Types returnType = e.getReturnType(name, argsList);
+			Types returnType = e.getReturnType(functionName, argsList);
 
 			if (returnType == null) {
-				final String signature = name + "(" +
+				final String signature = functionName + "(" +
 					Arrays.stream(args)
 					.map(i -> i.getType().getIntermediateRepresentation())
 					.collect(Collectors.joining()) + ")";
@@ -83,46 +82,36 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 	@Override
 	public void compile(X64Context context) throws CompileException {
 		// if the type of the register is java/*, use JNI
-		if (obj.getType().getClassName(fileName, line).startsWith("java/")) {
-
-			final X64RegisterOperand objReg = obj.toX64();
+		if (className.startsWith("java/")) {
 
 			// clazz = FindClass
 			final X64RegisterOperand clazz = addFindClassJNICall(context, className);
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
 			final X64RegisterOperand methodId =
-				addGetMethodId(context, clazz, name, args, returnVal);
+				addGetStaticMethodId(context, clazz, functionName, args, returnVal);
 
-			// result = CallNonVirtual<Type>Method(JNIEnv, obj, methodID, ...)
-			addCallNonVirtualMethodJNI(context, clazz, objReg, methodId, args, returnVal);
+			// result = CallNonVirtual<Type>Method(JNIEnv, clazz, methodID, ...)
+			addCallStaticMethodJNI(context, clazz, methodId, args, returnVal);
 
 		} else {
 
 			// 1. Move the arguments in
 			context.loadJNI1(); // JNIEnv
 
-			// object
-			context.addInstruction(
-				new MoveInstruction(
-					obj.toX64(),
-					argumentRegister(2)
-				)
-			);
-
-			// the rest of the args
+			// the rest of the args, the actual ones to the method
 			for (int i = 0; i < args.length; i++) {
 				context.addInstruction(
 					new MoveInstruction(
 						args[i].toX64(),
-						argumentRegister(3 + i)
+						argumentRegister(2 + i)
 					)
 				);
 			}
 
 			// 2. call CLASS_NAME_METHOD_NAME
 			context.addInstruction(
-				new CallClassMethod(className, name)
+				new CallClassMethod(className, functionName)
 			);
 
 			// 3. mov %rax, result

@@ -9,11 +9,11 @@ import java.util.Map;
 public class RegisterRelativePointer implements SourceOperand, DestinationOperand {
 
     private final int offset;
-    private X64RegisterOperand javaEnvPointer;
+    private X64RegisterOperand register;
 
-    public RegisterRelativePointer(int offset, X64RegisterOperand javaEnvPointer) {
+    public RegisterRelativePointer(int offset, X64RegisterOperand register) {
         this.offset = offset;
-        this.javaEnvPointer = javaEnvPointer;
+        this.register = register;
     }
 
     @Override
@@ -23,21 +23,21 @@ public class RegisterRelativePointer implements SourceOperand, DestinationOperan
 
     @Override
     public String toString() {
-        return offset + "(" + javaEnvPointer.toString() + ")";
+        return offset + "(" + register.toString() + ")";
     }
 
     @Override
     public void markUsed(int i, RegistersUsed usedRegs) {
-        javaEnvPointer.markUsed(i, usedRegs);
+        register.markUsed(i, usedRegs);
     }
 
     @Override
     public void swapOut(Map<X64PreservedRegister, X64NativeRegister> mapping) {
-        javaEnvPointer.swapOut(mapping);
+        register.swapOut(mapping);
     }
 
     @Override
     public void markDefined(int i, RegistersUsed usedRegs) {
-        javaEnvPointer.markDefined(i, usedRegs);
+        register.markDefined(i, usedRegs);
     }
 }

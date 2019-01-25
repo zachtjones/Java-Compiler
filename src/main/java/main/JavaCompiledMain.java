@@ -3,8 +3,10 @@ package main;
 import helper.CompileException;
 import helper.ProcessRunner;
 import intermediate.InterFile;
+import intermediate.InterStructure;
+import intermediate.RegisterAllocator;
+import x64.X64Context;
 import x64.X64File;
-import x64.X64Function;
 import x64.instructions.CallClassMethod;
 
 import java.io.File;
@@ -36,14 +38,14 @@ public class JavaCompiledMain {
         }
 
         // write the assembly bridge file
-        final X64File bridgeFile = new X64File("main");
-        final X64Function bridgeFunction = new X64Function("Main", "mainMethod", 0);
-        bridgeFile.addFunction(bridgeFunction);
+        final X64File bridgeFile = new X64File("Main", new InterStructure(false));
+        final X64Context context = new X64Context(bridgeFile, new RegisterAllocator(), "mainMethod");
 
-        bridgeFunction.addInstruction(
+        context.addInstruction(
             new CallClassMethod(mainClass.getName(), "main")
         );
 
+        context.addFunctionToFile();
         bridgeFile.allocateRegisters();
 
         FileWriter.writeToOutput(OutputDirs.ASSEMBLY, "Main.s", bridgeFile.toString());

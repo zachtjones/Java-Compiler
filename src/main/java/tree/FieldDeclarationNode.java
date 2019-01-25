@@ -44,7 +44,6 @@ public class FieldDeclarationNode extends NodeImpl {
 				temp = Types.arrayOf(temp);
 			}
 			f.addField(temp, d.id.name, isStatic);
-			syms.putEntry(d.id.name, temp, getFileName(), getLine());
 
 			// add the initial values if any
 			if (d.init != null && d.init.e != null) {
@@ -56,8 +55,9 @@ public class FieldDeclarationNode extends NodeImpl {
 				AssignmentNode a = new AssignmentNode(getFileName(), getLine(), n, d.init.e, null);
 
 				// compile the created expression.
-				InterFunction func = new InterFunction();
-				// add instance initializers
+				InterFunction func = new InterFunction(f.getName());
+				// add instance initializer
+				func.name = isStatic ? "<clinit>" : "<init>"; // following java .class standard here
 				func.isInit = true;
 				func.isInstance = !isStatic;
 				a.compile(syms, func);
@@ -72,9 +72,11 @@ public class FieldDeclarationNode extends NodeImpl {
 	}
 
 	/** places the symbols declared by this field declaration */
-	void putSymbols(SymbolTable classLevel) throws CompileException {
+	void putSymbols(SymbolTable staticFields, SymbolTable instanceFields) throws CompileException {
+		// choose which one to place them in
+		SymbolTable choice = isStatic ? staticFields : instanceFields;
 		for (VariableDecNode variable : variables) {
-			classLevel.putEntry(variable.id.name, type, getFileName(), getLine());
+			choice.putEntry(variable.id.name, type, getFileName(), getLine());
 		}
 	}
 }

@@ -8,17 +8,17 @@ import x64.operands.X64RegisterOperand;
 
 import static x64.allocation.CallingConvention.argumentRegister;
 
-public interface GetStaticFieldJNI extends CallJNIMethod {
+public interface SetInstanceFieldJNI extends CallJNIMethod {
 
     /**
      * Adds the code result = GetStatic&lt;Type&gt;Field(JNI, class, fieldId)
      * @param context The x64 function to add the instructions to
-     * @param classReg The x64 register holding the result of FindClass
+     * @param objReg The x64 register holding the result of FindClass
      * @param fieldIDReg The x64 register holding the result of GetStaticFieldId
-     * @param result The IL Register that is used for the type and the returned value.
+     * @param value The IL Register that holds the value to set
      */
-    default void addGetStaticField(X64Context context, X64RegisterOperand classReg,
-                                   X64RegisterOperand fieldIDReg, Register result) {
+    default void addSetInstanceField(X64Context context, Register objReg,
+								   X64RegisterOperand fieldIDReg, Register value) {
 
         // load the args
         // arg1 = JNI
@@ -27,7 +27,7 @@ public interface GetStaticFieldJNI extends CallJNIMethod {
         // arg2 = class reference
         context.addInstruction(
             new MoveInstruction(
-                classReg,
+                objReg.toX64(),
                 argumentRegister(2)
             )
         );
@@ -40,7 +40,16 @@ public interface GetStaticFieldJNI extends CallJNIMethod {
             )
         );
 
-        final JNIOffsets functionToCall = JNIOffsets.getStaticFieldOffset(result.getType());
-        addCallJNI(context, functionToCall, result.toX64());
+        // arg4 = value
+        context.addInstruction(
+            new MoveInstruction(
+                value.toX64(),
+                argumentRegister(4)
+            )
+        );
+
+        final JNIOffsets functionToCall = JNIOffsets.setInstanceFieldOffset(value.getType());
+
+        addCallVoidJNI(context, functionToCall);
     }
 }

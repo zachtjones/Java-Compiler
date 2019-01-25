@@ -4,8 +4,7 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
-import x64.X64File;
-import x64.X64Function;
+import x64.X64Context;
 import x64.instructions.MoveInstruction;
 
 import static x64.allocation.CallingConvention.argumentRegister;
@@ -47,16 +46,17 @@ public class GetParamStatement implements InterStatement {
 		if (!params.containsKey(localName)) {
 			throw new CompileException("'" + localName + "' not a parameter.", fileName, line);
 		}
-		
-		regs.put(r, params.get(localName));
+
+		r.setType(params.get(localName));
+		regs.put(r, r.getType());
 	}
 
 	@Override
-	public void compile(X64File assemblyFile, X64Function function) {
+	public void compile(X64Context context) {
 
 		// the args are as follows: JNI, obj/class, actual args
 		if (localName.equals("this")) {
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					argumentRegister(2),
 					r.toX64()
@@ -64,9 +64,11 @@ public class GetParamStatement implements InterStatement {
 			);
 		} else {
 			// localName is guaranteed to be in the list, as type checking was performed
-			int paramIndex = 3 + func.paramNames.indexOf(localName);
+			// 1st arg: JNI, 2nd arg: object, 3+ the rest
+			// if this is static, 2+ can be the rest
+			int paramIndex = (func.isInstance ? 3 : 2) + func.paramNames.indexOf(localName);
 
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					argumentRegister(paramIndex),
 					r.toX64()

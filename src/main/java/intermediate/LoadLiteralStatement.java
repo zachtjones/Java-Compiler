@@ -2,8 +2,7 @@ package intermediate;
 
 import helper.CompileException;
 import helper.Types;
-import x64.X64File;
-import x64.X64Function;
+import x64.X64Context;
 import x64.instructions.LoadEffectiveAddressInstruction;
 import x64.instructions.MoveInstruction;
 import x64.jni.NewStringUTF_JNI;
@@ -34,22 +33,22 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 		} else if (literalValue.equals("false")) {
 			r = regAlloc.getNext(Types.BOOLEAN);
 		} else if (literalValue.equals("null")) {
-			r = regAlloc.getNext(Types.UNKNOWN);
-		} else if (literalValue.charAt(literalValue.length() - 1) == 'f') {
+			r = regAlloc.getNext(Types.NULL);
+		} else if (getLastLetter() == 'f' || getLastLetter() == 'F') {
 			r = regAlloc.getNext(Types.FLOAT);
-		} else if (literalValue.charAt(literalValue.length() - 1) == 'F') {
-			r = regAlloc.getNext(Types.FLOAT);
-		} else if (literalValue.charAt(literalValue.length() - 1) == 'd') {
+			removeLastLetter();
+
+		} else if (getLastLetter() == 'd' || getLastLetter() == 'D') {
 			r = regAlloc.getNext(Types.DOUBLE);
-		} else if (literalValue.charAt(literalValue.length() - 1) == 'D') {
-			r = regAlloc.getNext(Types.DOUBLE);
+			removeLastLetter();
+
 		} else if (literalValue.contains(".")) {
 			// default floating point number is double
 			r = regAlloc.getNext(Types.DOUBLE);
-		} else if (literalValue.charAt(literalValue.length() - 1) == 'l') {
+		} else if (getLastLetter() == 'l' || getLastLetter() == 'L') {
 			r = regAlloc.getNext(Types.LONG);
-		} else if (literalValue.charAt(literalValue.length() - 1) == 'L') {
-			r = regAlloc.getNext(Types.LONG);
+			removeLastLetter();
+
 		} else {
 			// should be an int (bytes & shorts don't have literals)
 			r = regAlloc.getNext(Types.INT);
@@ -60,6 +59,16 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 						fileName, line);
 			}
 		}
+	}
+
+	/** Gets the last letter of the value field */
+	private char getLastLetter() {
+		return value.charAt(value.length() - 1);
+	}
+
+	/** Removes the last letter from value */
+	private void removeLastLetter() {
+		value = value.substring(0, value.length() - 1);
 	}
 
 	
@@ -76,17 +85,17 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 	}
 
 	@Override
-	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+	public void compile(X64Context context) throws CompileException {
 		if (r.getType() == Types.BOOLEAN) {
 			if (value.equals("true")) {
-				function.addInstruction(
+				context.addInstruction(
 					new MoveInstruction(
 						new Immediate(1),
 						r.toX64()
 					)
 				);
 			} else {
-				function.addInstruction(
+				context.addInstruction(
 					new MoveInstruction(
 						new Immediate(0),
 						r.toX64()
@@ -94,14 +103,14 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 				);
 			}
 		} else if (r.getType() == Types.BYTE) {
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					new Immediate(Byte.parseByte(value)),
 					r.toX64()
 				)
 			);
 		} else if (r.getType() == Types.CHAR) {
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					// there is a char literal allows by the GNU as, but will just use the byte number
 					new Immediate(value.charAt(0)),
@@ -109,21 +118,21 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 				)
 			);
 		} else if (r.getType() == Types.SHORT) {
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					new Immediate(Short.parseShort(value)),
 					r.toX64()
 				)
 			);
 		} else if (r.getType() == Types.INT) {
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					new Immediate(Integer.parseInt(value)),
 					r.toX64()
 				)
 			);
 		} else if (r.getType() == Types.LONG) {
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					new Immediate(Long.parseLong(value)),
 					r.toX64()
@@ -131,11 +140,11 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 			);
 		} else if (r.getType().getIntermediateRepresentation().equals(Types.STRING.getIntermediateRepresentation())) {
 			// trim off the " and the beginning and the end, insert into data segment
-			String label = assemblyFile.insertDataString(value.substring(1, value.length() - 1));
+			String label = context.insertDataString(value.substring(1, value.length() - 1));
 
 			// leaq LABEL(%rip), %temp
-			X64RegisterOperand chars = function.getNextQuadRegister();
-			function.addInstruction(
+			X64RegisterOperand chars = context.getNextQuadRegister();
+			context.addInstruction(
 				new LoadEffectiveAddressInstruction(
 					pointerFromLabel(label),
 					chars
@@ -143,7 +152,7 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 			);
 
 			// NewStringUTF(JNIEnv, %temp) -> result
-			addNewStringUTF_JNI(function, chars, r);
+			addNewStringUTF_JNI(context, chars, r);
 		} else {
 			// float and double
 			throw new CompileException("Floating point literals not implemented yet", "", -1);

@@ -1,6 +1,6 @@
 package x64.directives;
 
-public class ByteAlignment extends Directive {
+public class ByteAlignment implements Directive {
 
     private final int alignment;
 

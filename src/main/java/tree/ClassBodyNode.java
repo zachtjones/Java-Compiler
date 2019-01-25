@@ -5,11 +5,6 @@ import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class ClassBodyNode {
     // one of these will be not null
     public BlockNode staticInit;
@@ -39,7 +34,10 @@ public class ClassBodyNode {
 	public void compile(InterFile f, SymbolTable syms) throws CompileException {
 		// pass down
 		if (staticInit != null) {
-			InterFunction func = new InterFunction();
+			InterFunction func = new InterFunction(f.getName());
+			func.name = "<clinit>"; // that's what java class files name it (class initializer)
+			func.isInstance = false;
+			func.isInit = true;
 			staticInit.compile(syms, func);
 			f.addFunction(func);
 		} else if (constructor != null) {
@@ -52,11 +50,11 @@ public class ClassBodyNode {
 	}
 
 	/** Places the symbols if needed into the class level symbol table. */
-	public void putSymbols(SymbolTable classLevel) throws CompileException {
+	public void putSymbols(SymbolTable classLevel, SymbolTable staticFields, SymbolTable instanceFields) throws CompileException {
 		if (method != null) {
 			method.putSymbols(classLevel);
 		} else if (field != null) {
-			field.putSymbols(classLevel);
+			field.putSymbols(staticFields, instanceFields);
 		}
 	}
 }

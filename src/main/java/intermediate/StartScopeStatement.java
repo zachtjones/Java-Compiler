@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
+import x64.X64Context;
+import x64.operands.X64RegisterOperand;
 
 /** Represents the starting of a scope of a local variable. */
 public class StartScopeStatement implements InterStatement {
@@ -32,5 +34,12 @@ public class StartScopeStatement implements InterStatement {
 		// checking if it is already defined is not necessary since this is done
 		//  at high level code (AST -> Compile)
 		locals.put(name, type);
+	}
+
+	@Override
+	public void compile(X64Context context) throws CompileException {
+		// TODO other sized registers
+		X64RegisterOperand allocated = context.getNextQuadRegister();
+		context.markRegisterAsLocalVariable(name, allocated);
 	}
 }

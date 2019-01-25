@@ -22,13 +22,15 @@ public interface Instruction {
     }
 
     /** Returns true if and only if this instruction is a variety of call */
-    boolean isCalling();
+    default boolean isCalling() {
+        return false;
+    }
 
     /** Call the methods for the marking the registers as used / defined. */
-    void markRegisters(int i, RegistersUsed usedRegs);
+    default void markRegisters(int i, RegistersUsed usedRegs) {}
 
     /** Swaps out the X64Preserved registers to their allocated one */
-    void allocateRegisters(Map<X64PreservedRegister, X64NativeRegister> mapping);
+    default void allocateRegisters(Map<X64PreservedRegister, X64NativeRegister> mapping) {}
 
     /** Represents how this instruction should be represented in x64 assembly */
     String toString();

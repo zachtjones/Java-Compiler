@@ -23,11 +23,6 @@ public abstract class BinaryInstruction implements Instruction {
     }
 
     @Override
-    public boolean isCalling() {
-        return false;
-    }
-
-    @Override
     public void markRegisters(int i, RegistersUsed usedRegs) {
         source.markUsed(i, usedRegs);
         destination.markDefined(i, usedRegs);

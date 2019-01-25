@@ -19,12 +19,12 @@ public class PCRelativeData implements SourceOperand, DestinationOperand {
     }
 
     /** Convenience method for creating a PC relative data from the label */
-    public static SourceOperand pointerFromLabel(String label) {
+    public static PCRelativeData pointerFromLabel(String label) {
         return new PCRelativeData(label, Instruction.Size.QUAD);
     }
 
     /** Convenience method for creating a reference to a field in a class, using the Register as the size. */
-    public static SourceOperand fromField(String className, String fieldName, Register result) {
+    public static PCRelativeData fromField(String className, String fieldName, Register result) {
         final String symbolName = SymbolNames.getFieldName(className, fieldName);
         final Instruction.Size size = result.x64Type();
         return new PCRelativeData(symbolName, size);
