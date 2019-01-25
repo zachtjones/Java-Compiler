@@ -68,48 +68,55 @@ public class X64Context {
 		return enclosingFile.insertDataString(content);
 	}
 
-	// state-saving code for knowing what to do with the store at for instance fields
+	/** Marks a register as holding an instance field address. */
 	public void markRegisterAsInstanceFieldAddress(Register result, Register instance, String fieldName) {
 		instanceFieldAddressInstances.put(result, instance);
 		instanceFieldAddressNames.put(result, fieldName);
 	}
 
+	/** returns if the register holds an instance field address */
 	public boolean registerIsInstanceFieldAddress(Register address) {
 		return instanceFieldAddressInstances.containsKey(address);
 	}
 
+	/** returns the instance field address' field name. */
 	public String getInstanceFieldAddressName(Register address) {
 		return instanceFieldAddressNames.get(address);
 	}
 
+	/** returns the instance field address' register that holds the object */
 	public Register getInstanceFieldInstance(Register address) {
 		return instanceFieldAddressInstances.get(address);
 	}
 
-	// state saving code for knowing what to do with the store at for static fields
-
+	/** Marks a register as a static field address. */
 	public void markRegisterAsStaticFieldAddress(Register result, String className, String fieldName) {
 		staticFieldAddressClasses.put(result, className);
 		staticFieldAddressFields.put(result, fieldName);
 	}
 
+	/** returns true if the registers is marked as a static field address */
 	public boolean registerIsStaticFieldAddress(Register address) {
 		return staticFieldAddressClasses.containsKey(address);
 	}
 
+	/** returns the static field address' class name */
 	public String getStaticFieldAddressClassName(Register address) {
 		return staticFieldAddressClasses.get(address);
 	}
 
+	/** returns the static field address' field name */
 	public String getStaticFieldAddressFieldName(Register address) {
 		return staticFieldAddressFields.get(address);
 	}
 
-	// state saving code for knowing what to do with the get/set local variables
+	/** Marks the register as a local variable */
 	public void markRegisterAsLocalVariable(String name, X64RegisterOperand allocated) {
 		locals.put(name, allocated);
 	}
 
+	/** returns the local variable's register that holds it's value (used for get/set)
+	 * There isn't a need for an is local variable, since intermediate language is already type checked. */
 	public X64RegisterOperand getLocalVariable(String name) {
 		return locals.get(name);
 	}
