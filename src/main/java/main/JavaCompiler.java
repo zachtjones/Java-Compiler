@@ -163,6 +163,9 @@ public class JavaCompiler {
 
 		final ProcessRunner.ProcessResult gccResult = gcc.run();
 		if (gccResult.getExitCode() != 0) {
+			System.err.println("gcc exit code: " + gccResult.getExitCode());
+			System.err.println("gcc error output: '" + gccResult.getError() + "'");
+			System.err.println("gcc output: '" + gccResult.getOutput() + "'");
 			throw new CompileException("gcc failed, error is: " + gccResult.getError(), "", -1);
 		}
 
