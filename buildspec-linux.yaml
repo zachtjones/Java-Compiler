@@ -1,0 +1,38 @@
+version: 0.2
+
+#env:
+  #variables:
+  # key: "value"
+  # key: "value"
+  #parameter-store:
+  # key: "value"
+# key: "value"
+
+phases:
+  install:
+    commands:
+      - apt-get install -y build-essential
+      - gcc --version
+
+  pre_build:
+    commands:
+      - mvn -B clean compile
+
+  build:
+    commands:
+      - mvn -B test jacoco:report
+
+  #post_build:
+  #commands:
+  # - command
+  # - command
+#artifacts:
+#files:
+# - location
+# - location
+#name: $(date +%Y-%m-%d)
+#discard-paths: yes
+#base-directory: location
+#cache:
+#paths:
+# - paths
