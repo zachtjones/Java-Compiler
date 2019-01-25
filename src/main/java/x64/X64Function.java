@@ -35,7 +35,7 @@ public class X64Function {
 		// save the first argument, the java environment pointer to a dedicated virtual register.
 		contents.add(new MoveInstruction(argumentRegister(1), jniEnvPointer));
 
-		epilogue.add(new ReturnInstruction());
+		epilogue.add(ReturnInstruction.instance);
 	}
 
 	/** Adds an instruction to this function */

@@ -1,6 +1,6 @@
 package x64.directives;
 
-public class SegmentChange extends Directive {
+public class SegmentChange implements Directive {
 
     public static final String TEXT = "text";
     public static final String DATA = "data";
