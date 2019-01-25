@@ -4,8 +4,7 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
-import x64.X64File;
-import x64.X64Function;
+import x64.X64Context;
 import x64.instructions.MoveInstruction;
 
 import static x64.allocation.CallingConvention.argumentRegister;
@@ -53,11 +52,11 @@ public class GetParamStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64File assemblyFile, X64Function function) {
+	public void compile(X64Context context) {
 
 		// the args are as follows: JNI, obj/class, actual args
 		if (localName.equals("this")) {
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					argumentRegister(2),
 					r.toX64()
@@ -69,7 +68,7 @@ public class GetParamStatement implements InterStatement {
 			// if this is static, 2+ can be the rest
 			int paramIndex = (func.isInstance ? 3 : 2) + func.paramNames.indexOf(localName);
 
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					argumentRegister(paramIndex),
 					r.toX64()

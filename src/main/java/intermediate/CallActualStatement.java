@@ -9,8 +9,7 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
-import x64.X64File;
-import x64.X64Function;
+import x64.X64Context;
 import x64.instructions.CallClassMethod;
 import x64.instructions.MoveInstruction;
 import x64.jni.CallNonVirtualMethodJNI;
@@ -82,29 +81,29 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 	}
 
 	@Override
-	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+	public void compile(X64Context context) throws CompileException {
 		// if the type of the register is java/*, use JNI
 		if (obj.getType().getClassName(fileName, line).startsWith("java/")) {
 
 			final X64RegisterOperand objReg = obj.toX64();
 
 			// clazz = FindClass
-			final X64RegisterOperand clazz = addFindClassJNICall(assemblyFile, function, className);
+			final X64RegisterOperand clazz = addFindClassJNICall(context, className);
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
 			final X64RegisterOperand methodId =
-				addGetMethodId(assemblyFile, function, clazz, name, args, returnVal);
+				addGetMethodId(context, clazz, name, args, returnVal);
 
 			// result = CallNonVirtual<Type>Method(JNIEnv, obj, methodID, ...)
-			addCallNonVirtualMethodJNI(function, clazz, objReg, methodId, args, returnVal);
+			addCallNonVirtualMethodJNI(context, clazz, objReg, methodId, args, returnVal);
 
 		} else {
 
 			// 1. Move the arguments in
-			function.loadJNI1(); // JNIEnv
+			context.loadJNI1(); // JNIEnv
 
 			// object
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					obj.toX64(),
 					argumentRegister(2)
@@ -113,7 +112,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 
 			// the rest of the args
 			for (int i = 0; i < args.length; i++) {
-				function.addInstruction(
+				context.addInstruction(
 					new MoveInstruction(
 						args[i].toX64(),
 						argumentRegister(3 + i)
@@ -122,12 +121,12 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			}
 
 			// 2. call CLASS_NAME_METHOD_NAME
-			function.addInstruction(
+			context.addInstruction(
 				new CallClassMethod(className, name)
 			);
 
 			// 3. mov %rax, result
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					returnValueRegister(),
 					returnVal.toX64()

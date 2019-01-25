@@ -6,8 +6,7 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
-import x64.X64File;
-import x64.X64Function;
+import x64.X64Context;
 
 public class GetInstanceFieldAddressStatement implements InterStatement {
 	private Register instance;
@@ -54,8 +53,8 @@ public class GetInstanceFieldAddressStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+	public void compile(X64Context context) throws CompileException {
 		// handle the details in the store instruction later on
-		function.markRegisterAsInstanceFieldAddress(result, instance, fieldName);
+		context.markRegisterAsInstanceFieldAddress(result, instance, fieldName);
 	}
 }

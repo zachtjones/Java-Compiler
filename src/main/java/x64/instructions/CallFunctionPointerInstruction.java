@@ -5,7 +5,6 @@ import x64.allocation.RegistersUsed;
 import x64.operands.SourceOperand;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
-import x64.operands.X64RegisterOperand;
 
 import java.util.Map;
 

@@ -9,8 +9,7 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
-import x64.X64File;
-import x64.X64Function;
+import x64.X64Context;
 import x64.instructions.CallClassMethod;
 import x64.instructions.MoveInstruction;
 import x64.jni.CallMethodJNI;
@@ -84,7 +83,7 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 	}
 
 	@Override
-	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+	public void compile(X64Context context) throws CompileException {
 		// if the type of the register is java/*, use JNI
 		final String classname = obj.getType().getClassName(fileName, line);
 		if (classname.startsWith("java/")) {
@@ -92,38 +91,37 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 			final X64RegisterOperand objReg = obj.toX64();
 
 			// clazz = GetClass
-			final X64RegisterOperand clazz = addGetObjectClass(function, objReg);
+			final X64RegisterOperand clazz = addGetObjectClass(context, objReg);
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
-			X64RegisterOperand methodId =
-				addGetMethodId(assemblyFile, function, clazz, name, args, returnVal);
+			X64RegisterOperand methodId = addGetMethodId(context, clazz, name, args, returnVal);
 
 			// result = Call<Type>Method(JNIEnv, obj, methodID, ...)
-			addCallMethodJNI(function, objReg, methodId, args, returnVal);
+			addCallMethodJNI(context, objReg, methodId, args, returnVal);
 
 		} else {
 			// TODO requires adding the virtual function tables to the system of files
 
 			// call class_method(JNI, object, ...args)
-			function.loadJNI1();
+			context.loadJNI1();
 
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(obj.toX64(), argumentRegister(2))
 			);
 
 			// the rest of the args
 			for (int i = 0; i < args.length; i++) {
-				function.addInstruction(
+				context.addInstruction(
 					new MoveInstruction(args[i].toX64(), argumentRegister(3 + i))
 				);
 			}
 
 			// call
-			function.addInstruction(new CallClassMethod(classname, name));
+			context.addInstruction(new CallClassMethod(classname, name));
 
 			// move result -- unless null (meaning void method)
 			if (returnVal != null)
-				function.addInstruction(
+				context.addInstruction(
 					new MoveInstruction(returnValueRegister(), returnVal.toX64())
 				);
 		}

@@ -57,7 +57,7 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 	}
 
 	@Override
-	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+	public void compile(X64Context context) throws CompileException {
 		if (className.startsWith("java/")) {
 
 			// the flag on the register that is returned that it is a JNI register is based on the type,
@@ -66,19 +66,19 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 
 			// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
 			//    - name is like: java/lang/String
-			final X64RegisterOperand classReg = addFindClassJNICall(assemblyFile, function, className);
+			final X64RegisterOperand classReg = addFindClassJNICall(context, className);
 
 			// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
 			final X64RegisterOperand fieldIDReg =
-				addGetStaticFieldIdJNICall(result, fieldName, classReg, assemblyFile, function);
+				addGetStaticFieldIdJNICall(result, fieldName, classReg, context);
 
 
 			// Step 3. result = javaEnv -> GetStatic<Type>Field(JNIEnv *env, class, fieldID)
-			addGetStaticField(function, classReg, fieldIDReg, result);
+			addGetStaticField(context, classReg, fieldIDReg, result);
 
 		} else {
 			// mov CLASS_NAME_FIELD_NAME(%rip), %destination
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					fromField(className, fieldName, result),
 					result.toX64()

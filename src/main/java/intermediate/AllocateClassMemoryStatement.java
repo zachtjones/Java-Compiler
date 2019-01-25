@@ -3,8 +3,7 @@ package intermediate;
 import helper.CompileException;
 import helper.Types;
 import main.JavaCompiler;
-import x64.X64File;
-import x64.X64Function;
+import x64.X64Context;
 import x64.allocation.CallingConvention;
 import x64.instructions.CallClassMethod;
 import x64.instructions.MoveInstruction;
@@ -44,23 +43,23 @@ public class AllocateClassMemoryStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+	public void compile(X64Context context) throws CompileException {
 		// malloc (size_of class' instance structure) -> result
 		InterFile temp = JavaCompiler.parseAndCompile(type.getClassName("", -1), "", -1);
 		int size = temp.getClassSize();
-		function.addInstruction(
+		context.addInstruction(
 			new MoveInstruction(
 				new Immediate(size),
 				argumentRegister(1)
 			)
 		);
 
-		function.addInstruction(
+		context.addInstruction(
 			new CallClassMethod(CallingConvention.libraryFunc("malloc"))
 		);
 
 		// move returned value
-		function.addInstruction(
+		context.addInstruction(
 			new MoveInstruction(
 				returnValueRegister(),
 				result.toX64()

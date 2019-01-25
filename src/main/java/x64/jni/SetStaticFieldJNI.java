@@ -1,7 +1,7 @@
 package x64.jni;
 
 import intermediate.Register;
-import x64.X64Function;
+import x64.X64Context;
 import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.X64RegisterOperand;
@@ -17,8 +17,8 @@ public interface SetStaticFieldJNI extends CallJNIMethod {
      * @param fieldIDReg The x64 register holding the result of GetStaticFieldId
      * @param value The IL Register that holds the value to set
      */
-    default void addSetStaticField(X64Function function, X64RegisterOperand classReg,
-									 X64RegisterOperand fieldIDReg, Register value) {
+    default void addSetStaticField(X64Context function, X64RegisterOperand classReg,
+                                   X64RegisterOperand fieldIDReg, Register value) {
 
         // load the args
         // arg1 = JNI

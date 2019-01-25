@@ -2,8 +2,7 @@ package intermediate;
 
 import helper.CompileException;
 import helper.Types;
-import x64.X64File;
-import x64.X64Function;
+import x64.X64Context;
 import x64.instructions.LoadEffectiveAddressInstruction;
 import x64.instructions.MoveInstruction;
 import x64.jni.NewStringUTF_JNI;
@@ -86,17 +85,17 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 	}
 
 	@Override
-	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+	public void compile(X64Context context) throws CompileException {
 		if (r.getType() == Types.BOOLEAN) {
 			if (value.equals("true")) {
-				function.addInstruction(
+				context.addInstruction(
 					new MoveInstruction(
 						new Immediate(1),
 						r.toX64()
 					)
 				);
 			} else {
-				function.addInstruction(
+				context.addInstruction(
 					new MoveInstruction(
 						new Immediate(0),
 						r.toX64()
@@ -104,14 +103,14 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 				);
 			}
 		} else if (r.getType() == Types.BYTE) {
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					new Immediate(Byte.parseByte(value)),
 					r.toX64()
 				)
 			);
 		} else if (r.getType() == Types.CHAR) {
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					// there is a char literal allows by the GNU as, but will just use the byte number
 					new Immediate(value.charAt(0)),
@@ -119,21 +118,21 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 				)
 			);
 		} else if (r.getType() == Types.SHORT) {
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					new Immediate(Short.parseShort(value)),
 					r.toX64()
 				)
 			);
 		} else if (r.getType() == Types.INT) {
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					new Immediate(Integer.parseInt(value)),
 					r.toX64()
 				)
 			);
 		} else if (r.getType() == Types.LONG) {
-			function.addInstruction(
+			context.addInstruction(
 				new MoveInstruction(
 					new Immediate(Long.parseLong(value)),
 					r.toX64()
@@ -141,11 +140,11 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 			);
 		} else if (r.getType().getIntermediateRepresentation().equals(Types.STRING.getIntermediateRepresentation())) {
 			// trim off the " and the beginning and the end, insert into data segment
-			String label = assemblyFile.insertDataString(value.substring(1, value.length() - 1));
+			String label = context.insertDataString(value.substring(1, value.length() - 1));
 
 			// leaq LABEL(%rip), %temp
-			X64RegisterOperand chars = function.getNextQuadRegister();
-			function.addInstruction(
+			X64RegisterOperand chars = context.getNextQuadRegister();
+			context.addInstruction(
 				new LoadEffectiveAddressInstruction(
 					pointerFromLabel(label),
 					chars
@@ -153,7 +152,7 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 			);
 
 			// NewStringUTF(JNIEnv, %temp) -> result
-			addNewStringUTF_JNI(function, chars, r);
+			addNewStringUTF_JNI(context, chars, r);
 		} else {
 			// float and double
 			throw new CompileException("Floating point literals not implemented yet", "", -1);

@@ -4,8 +4,7 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
-import x64.X64File;
-import x64.X64Function;
+import x64.X64Context;
 import x64.operands.X64RegisterOperand;
 
 /** Represents the starting of a scope of a local variable. */
@@ -38,9 +37,9 @@ public class StartScopeStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+	public void compile(X64Context context) throws CompileException {
 		// TODO other sized registers
-		X64RegisterOperand allocated = function.getNextQuadRegister();
-		function.markRegisterAsLocalVariable(name, allocated);
+		X64RegisterOperand allocated = context.getNextQuadRegister();
+		context.markRegisterAsLocalVariable(name, allocated);
 	}
 }

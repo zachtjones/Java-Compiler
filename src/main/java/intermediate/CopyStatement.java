@@ -5,8 +5,7 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
-import x64.X64File;
-import x64.X64Function;
+import x64.X64Context;
 import x64.instructions.MoveInstruction;
 
 public class CopyStatement implements InterStatement {
@@ -39,9 +38,9 @@ public class CopyStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64File assemblyFile, X64Function function) throws CompileException {
+	public void compile(X64Context context) throws CompileException {
 		// simple move from source to destination
-		function.addInstruction(
+		context.addInstruction(
 			new MoveInstruction(
 				src.toX64(),
 				dest.toX64()
