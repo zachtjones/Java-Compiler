@@ -13,9 +13,9 @@ phases:
     commands:
       - add-apt-repository ppa:ubuntu-toolchain-r/test
       - apt-get update
-      - apt-get install gcc-7
+      - apt-get install gcc-7 -y
       - gcc --version
-      - sudo update-alternatives --remove-all gcc
+      - sudo update-alternatives --remove-all gcc -y
       - gcc --version
 
   pre_build:
