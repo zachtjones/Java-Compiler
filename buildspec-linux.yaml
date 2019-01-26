@@ -15,7 +15,7 @@ phases:
       - apt-get update
       - apt-get install gcc-7 -y
       - gcc --version
-      - sudo update-alternatives --remove-all gcc
+      - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 90
       - gcc --version
 
   pre_build:
