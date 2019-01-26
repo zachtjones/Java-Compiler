@@ -4,6 +4,8 @@ import helper.ProcessRunner;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -20,6 +22,7 @@ class TestGCC {
 		ProcessRunner gcc = new ProcessRunner(
 			"gcc",
 			"-fPIC",
+			"--save-temps",
 			"shared-library.c",
 			"-shared",
 			"-o", System.mapLibraryName("Main")
@@ -31,6 +34,11 @@ class TestGCC {
 		System.err.println(result.getError());
 
 		assertThat(result.getExitCode()).as("exit code for gcc is 0").isEqualTo(0);
+
+		// print out the resulting assembly generated
+		String assembly = String.join("\n",
+			Files.readAllLines(Paths.get("temp", "assembled", "shared-library.s")));
+		System.out.println(assembly);
 
 		// move the Main.java class over and compile it
 		String mainJava = FileReader.readResourcesFile("Main.java");
