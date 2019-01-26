@@ -142,7 +142,7 @@ public class JavaCompiler {
 		final ProcessRunner gcc = new ProcessRunner(
 			"gcc",
 			"-fpic", // force position independent code (for shared library)
-			"-mcmodel=large", // use 64-bit addresses
+			"-m64", // use 64-bit addresses
 			"-shared",
 			"-o",
 			"../assembled/" + entryCode.getLibraryName(),
