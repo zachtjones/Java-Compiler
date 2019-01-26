@@ -19,6 +19,7 @@ class TestGCC {
 
 		ProcessRunner gcc = new ProcessRunner(
 			"gcc",
+			"-fPIC",
 			"shared-library.c",
 			"-shared",
 			"-o", System.mapLibraryName("Main")
