@@ -141,7 +141,7 @@ public class JavaCompiler {
 
 		final ProcessRunner gcc = new ProcessRunner(
 			"gcc",
-			"-fpic", // force position independent code (for shared library)
+			"-fPIC", // force position independent code (for shared library)
 			"-m64", // use 64-bit addresses
 			"-shared",
 			"-o",

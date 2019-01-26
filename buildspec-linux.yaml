@@ -11,7 +11,9 @@ version: 0.2
 phases:
   install:
     commands:
-      - apt-get install -y build-essential
+      - apt-get install gcc-7
+      - gcc --version
+      - sudo update-alternatives --remove-all gcc
       - gcc --version
 
   pre_build:
