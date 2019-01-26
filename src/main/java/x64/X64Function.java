@@ -1,10 +1,8 @@
 package x64;
 
+import x64.allocation.CallingConvention;
 import x64.allocation.RegisterTransformer;
-import x64.directives.ByteAlignment;
-import x64.directives.GlobalSymbol;
-import x64.directives.LabelInstruction;
-import x64.directives.SegmentChange;
+import x64.directives.*;
 import x64.instructions.*;
 import x64.operands.X64NativeRegister;
 import x64.operands.Immediate;
@@ -13,8 +11,7 @@ import x64.operands.X64RegisterOperand;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static x64.allocation.CallingConvention.argumentRegister;
-import static x64.allocation.CallingConvention.needsToAllocate32BytesForArgs;
+import static x64.allocation.CallingConvention.*;
 import static x64.operands.X64NativeRegister.RSP;
 import static x64.operands.X64RegisterOperand.of;
 
@@ -29,6 +26,11 @@ public class X64Function {
 		prologue.add(new SegmentChange(SegmentChange.TEXT));
 		final String symbolName = SymbolNames.getFieldName(javaClass, javaMethod);
 		prologue.add(new GlobalSymbol(symbolName));
+		// linux define
+		// .type Symbol_Name, @function
+		if (!isMicrosoft && !isMac) {
+			prologue.add(new TypeDirective(symbolName));
+		}
 		prologue.add(new ByteAlignment(16));
 		prologue.add(new LabelInstruction(symbolName));
 
