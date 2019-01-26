@@ -6,10 +6,10 @@ public class SymbolNames {
 
 	public static String getFieldName(String javaClass, String javaField) {
         final String prefix; // dependent on OS, windows has no leading underscores
-        if (CallingConvention.isMicrosoft) {
-            prefix = "Java_";
-        } else {
+        if (CallingConvention.isMac) {
             prefix = "_Java_";
+        } else {
+            prefix = "Java_";
         }
         // use the JNI syntax
         return prefix + escape(javaClass) + "_" + escape(javaField);

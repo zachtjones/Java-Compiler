@@ -12,6 +12,8 @@ public class CallingConvention {
 
 	/** holds if this system is a Microsoft system, so that we don't need repeated system property lookups */
 	public static final boolean isMicrosoft = System.getProperty("os.name").contains("Windows");
+	/** holds if this system is a Mac OS system, so that we don't need repeated system property lookups */
+	public static boolean isMac = System.getProperty("os.name").contains("Mac");
 
 	private static final X64RegisterOperand[] argsSystemV = { RDI, RSI, RDX, RCX, R8, R9 };
 	private static final X64RegisterOperand[] argsMicrosoft = { RCX, RDX, R8, R9 };
@@ -20,6 +22,7 @@ public class CallingConvention {
 	private static final X64RegisterOperand[] preservedMicrosoft = { RBX, RBP, RDI, RSI, R12, R13, R14, R15 };
 
 	private static final X64RegisterOperand[] extraTemps = { R10, R11 };
+
 
 	/**
 	 * Returns the x64 native register that is mapped to that argument.
