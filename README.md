@@ -1,9 +1,14 @@
 # Java Compiler
+
+![Build status](
+https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiRFZCd1JOMnJPaHpxeUkwSVFBTUdyZG5WOGVGT0NnT0tqKzlyMXJwYUkyaUlLMXE4YlFkOG9ONkZTM3lmZ3VLdGVUSURrZU8vb1FQRUozZkE3N3BPSHB3PSIsIml2UGFyYW1ldGVyU3BlYyI6InluZ214NDlHa3BVS21IcU8iLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master
+)
+
 This is a Java program used to compile Java files into native code.
 Instead of using a complete java library implementation, this uses the Java Native Interface for calling
 Java library methods.
 
-The supported output languages are x86-64 and AMD64.
+The supported output language is x86-64 / AMD64.
 
 ## Prerequisites
  - java/javac 8+ in the path
