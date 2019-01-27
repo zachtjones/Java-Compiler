@@ -168,9 +168,6 @@ public class JavaCompiler {
 			System.err.println("gcc output: '" + gccResult.getOutput() + "'");
 			throw new CompileException("gcc failed, error is: " + gccResult.getError(), "", -1);
 		}
-
-		System.out.println("Done, results are in the temp/assembled folder.");
-		System.out.println("Invoke the program: `java -Djava.library.path=\".\" Main` from the temp folder");
 	}
 
 	private static void usage() {

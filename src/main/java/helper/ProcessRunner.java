@@ -76,6 +76,8 @@ public class ProcessRunner {
             } catch (InterruptedException | IOException e) {
                 exitCode = Integer.MIN_VALUE;
             }
+            System.out.println(out.toString());
+            System.err.println(err.toString());
         }
 
         /** helper method to capture all the result from a process output,
