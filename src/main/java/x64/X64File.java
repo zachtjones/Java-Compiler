@@ -4,7 +4,6 @@ import intermediate.InterStructure;
 import x64.directives.*;
 
 import java.util.ArrayList;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class X64File {
