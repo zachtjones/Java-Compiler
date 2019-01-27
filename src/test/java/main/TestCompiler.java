@@ -87,7 +87,7 @@ class WhenItCompilesAndRuns extends Stage<WhenItCompilesAndRuns> {
 
     @SuppressWarnings("UnusedReturnValue") // used by jGiven
     WhenItCompilesAndRuns itRuns() {
-        ProcessRunner runner = new ProcessRunner("java", "\"-Djava.library.path=.\"", "Main");
+        ProcessRunner runner = new ProcessRunner("java", "-Djava.library.path=.", "Main");
         runner.setDirectory(new File(OutputDirs.ASSEMBLED.location));
         ProcessRunner.ProcessResult results = runner.run();
         output = results.getOutput();
