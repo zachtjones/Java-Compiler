@@ -4,6 +4,7 @@ import intermediate.InterStructure;
 import x64.directives.*;
 
 import java.util.ArrayList;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class X64File {
@@ -84,8 +85,10 @@ public class X64File {
                 .map(X64Function::toString)
                 .collect(Collectors.joining("\n\n"))
                 + '\n' +
-        dataStrings.stream()
+            dataStrings.stream()
                 .map(Instruction::toString)
-                .collect(Collectors.joining("\n"));
+                .collect(Collectors.joining("\n"))
+            + '\n' +
+            StackMarkings.instance.toString();
     }
 }

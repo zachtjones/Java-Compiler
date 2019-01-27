@@ -15,6 +15,10 @@ public class CallingConvention {
 	/** holds if this system is a Mac OS system, so that we don't need repeated system property lookups */
 	public static boolean isMac = System.getProperty("os.name").contains("Mac");
 
+	/** holds if this system is a linux type.
+	 * Only one and exactly one of isMicrosoft, isMac, or isLinux will be true */
+	public static boolean isLinux = !isMicrosoft && !isMac;
+
 	private static final X64RegisterOperand[] argsSystemV = { RDI, RSI, RDX, RCX, R8, R9 };
 	private static final X64RegisterOperand[] argsMicrosoft = { RCX, RDX, R8, R9 };
 
