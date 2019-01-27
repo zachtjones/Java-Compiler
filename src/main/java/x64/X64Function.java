@@ -1,6 +1,5 @@
 package x64;
 
-import x64.allocation.CallingConvention;
 import x64.allocation.RegisterTransformer;
 import x64.directives.*;
 import x64.instructions.*;
@@ -21,7 +20,7 @@ public class X64Function {
 	private ArrayList<Instruction> contents = new ArrayList<>();
 	private final ArrayList<Instruction> epilogue = new ArrayList<>();
 
-	public X64Function(String javaClass, String javaMethod, X64RegisterOperand jniEnvPointer) {
+	X64Function(String javaClass, String javaMethod, X64RegisterOperand jniEnvPointer) {
 
 		prologue.add(new SegmentChange(SegmentChange.TEXT));
 		final String symbolName = SymbolNames.getFieldName(javaClass, javaMethod);
