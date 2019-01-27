@@ -27,7 +27,6 @@ public class CallingConvention {
 
 	private static final X64RegisterOperand[] extraTemps = { R10, R11 };
 
-
 	/**
 	 * Returns the x64 native register that is mapped to that argument.
 	 * @param num 1 for the first argument, 2 for the second, ...
