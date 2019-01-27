@@ -16,7 +16,7 @@ public class CallClassMethod implements Instruction {
     }
 
     public CallClassMethod(String label) {
-        this.label = label + "@PLT";
+        this.label = label; // I guess we don't need the @PLT for a c-library function
     }
 
     @Override

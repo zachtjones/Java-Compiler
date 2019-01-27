@@ -120,7 +120,7 @@ class ThenExpectedOutputIs extends Stage<ThenExpectedOutputIs> {
     }
 
     ThenExpectedOutputIs theExitCodeIs(int value) {
-        assertThat(exitCode).isEqualTo(value);
+        assertThat(exitCode).as("exit code, error message: ", errOutput).isEqualTo(value);
         return self();
     }
 }
