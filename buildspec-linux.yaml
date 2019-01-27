@@ -11,11 +11,11 @@ version: 0.2
 phases:
   install:
     commands:
-      - add-apt-repository ppa:ubuntu-toolchain-r/test
-      - apt-get update
-      - apt-get install gcc-7 -y
-      - gcc --version
-      - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 90
+      #- add-apt-repository ppa:ubuntu-toolchain-r/test
+      #- apt-get update
+      #- apt-get install gcc-7 -y
+      #- gcc --version
+      #- update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 90
       - gcc --version
 
   pre_build:
