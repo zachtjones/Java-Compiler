@@ -25,7 +25,7 @@ phases:
   build:
     commands:
       - mvn -B test jacoco:report
-      - "awk -F, \"{ instructions += $4 + $5; covered += $5 } END { print 100*covered/instructions }\" target/site/jacoco/jacoco.csv > coverage.txt"
+      - "awk -F, '{ instructions += $4 + $5; covered += $5 } END { print 100*covered/instructions }' target/site/jacoco/jacoco.csv > coverage.txt"
       - cat coverage.txt
   #post_build:
   #commands:
