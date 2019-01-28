@@ -24,20 +24,4 @@ phases:
 
   build:
     commands:
-      - mvn -B test jacoco:report
-      - "awk -F, '{ instructions += $4 + $5; covered += $5 } END { printf \"%.1f\", 100*covered/instructions }' target/site/jacoco/jacoco.csv > coverage.txt"
-      - cat coverage.txt
-  #post_build:
-  #commands:
-  # - command
-  # - command
-#artifacts:
-#files:
-# - location
-# - location
-#name: $(date +%Y-%m-%d)
-#discard-paths: yes
-#base-directory: location
-#cache:
-#paths:
-# - paths
+      - mvn -B test
