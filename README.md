@@ -4,6 +4,10 @@
 https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiRFZCd1JOMnJPaHpxeUkwSVFBTUdyZG5WOGVGT0NnT0tqKzlyMXJwYUkyaUlLMXE4YlFkOG9ONkZTM3lmZ3VLdGVUSURrZU8vb1FQRUozZkE3N3BPSHB3PSIsIml2UGFyYW1ldGVyU3BlYyI6InluZ214NDlHa3BVS21IcU8iLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master
 )
 
+![Coverage report](
+https://s3.amazonaws.com/java-compiler-badges/coverage-report.svg
+)
+
 This is a Java program used to compile Java files into native code.
 Instead of using a complete java library implementation, this uses the Java Native Interface for calling
 Java library methods.
