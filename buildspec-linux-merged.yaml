@@ -36,6 +36,7 @@ phases:
       - sed -e '/NUM/{r coverage.txt' -e 'd}' coverage-template.svg > coverage-report.svg
       # upload template to s3
       - aws s3 cp coverage-report.svg s3://java-compiler-badges
+      - aws s3api put-object-acl --bucket java-compiler --key coverage-report.svg --acl public-read
 
 #artifacts:
 #files:

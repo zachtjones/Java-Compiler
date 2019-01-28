@@ -1,7 +1,7 @@
 # Java Compiler
 
 ![Build status](
-https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiRFZCd1JOMnJPaHpxeUkwSVFBTUdyZG5WOGVGT0NnT0tqKzlyMXJwYUkyaUlLMXE4YlFkOG9ONkZTM3lmZ3VLdGVUSURrZU8vb1FQRUozZkE3N3BPSHB3PSIsIml2UGFyYW1ldGVyU3BlYyI6InluZ214NDlHa3BVS21IcU8iLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master
+https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiZlQycVNFMGV4NEdDOGI4MWo1TDBFVXFERWdVZk80WCtGUnV1MHZtcmQvRVlXQ0g3eCtvaDlsK3FwRVRNQjF0Zm5GVHdSTDlNaU5hbWQ1ZmNqMGdyN3hBPSIsIml2UGFyYW1ldGVyU3BlYyI6IjVHWHdEY09EZjlicVlYUUYiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master
 )
 
 ![Coverage report](
