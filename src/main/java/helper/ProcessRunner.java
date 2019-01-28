@@ -42,6 +42,7 @@ public class ProcessRunner {
      * @return The class holding the String from output stream, error stream, and exit code.
      */
     public ProcessResult run() {
+        System.out.println("running: " + args.toString());
         return new ProcessResult(args, directory);
     }
 
@@ -75,6 +76,8 @@ public class ProcessRunner {
             } catch (InterruptedException | IOException e) {
                 exitCode = Integer.MIN_VALUE;
             }
+            System.out.println(out.toString());
+            System.err.println(err.toString());
         }
 
         /** helper method to capture all the result from a process output,

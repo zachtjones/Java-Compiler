@@ -7,8 +7,6 @@ import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
 import x64.X64Context;
-import x64.X64File;
-import x64.X64Function;
 import x64.instructions.MoveInstruction;
 import x64.jni.FindClassJNI;
 import x64.jni.GetInstanceFieldIdJNI;

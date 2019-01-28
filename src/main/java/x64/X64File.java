@@ -84,8 +84,10 @@ public class X64File {
                 .map(X64Function::toString)
                 .collect(Collectors.joining("\n\n"))
                 + '\n' +
-        dataStrings.stream()
+            dataStrings.stream()
                 .map(Instruction::toString)
-                .collect(Collectors.joining("\n"));
+                .collect(Collectors.joining("\n"))
+            + '\n' +
+            StackMarkings.instance.toString();
     }
 }

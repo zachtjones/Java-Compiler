@@ -141,8 +141,9 @@ public class JavaCompiler {
 
 		final ProcessRunner gcc = new ProcessRunner(
 			"gcc",
+			"-fPIC", // force position independent code (for shared library)
+			"-m64", // use 64-bit addresses
 			"-shared",
-			"--save-temps",
 			"-o",
 			"../assembled/" + entryCode.getLibraryName(),
 			"Main.s" // other ones added to this list
@@ -162,11 +163,11 @@ public class JavaCompiler {
 
 		final ProcessRunner.ProcessResult gccResult = gcc.run();
 		if (gccResult.getExitCode() != 0) {
+			System.err.println("gcc exit code: " + gccResult.getExitCode());
+			System.err.println("gcc error output: '" + gccResult.getError() + "'");
+			System.err.println("gcc output: '" + gccResult.getOutput() + "'");
 			throw new CompileException("gcc failed, error is: " + gccResult.getError(), "", -1);
 		}
-
-		System.out.println("Done, results are in the temp/assembled folder.");
-		System.out.println("Invoke the program: `java -Djava.library.path=\".\" Main` from the temp folder");
 	}
 
 	private static void usage() {

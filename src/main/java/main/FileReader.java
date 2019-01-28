@@ -1,6 +1,7 @@
 package main;
 
 import java.io.*;
+import java.util.stream.Collectors;
 
 public class FileReader {
 
@@ -17,10 +18,7 @@ public class FileReader {
         }
         // actually have to read character by character because we need to know if the file ends in a new line
         //  or not, but we don't need the specific characters
-        try {
-            return new String(is.readAllBytes());
-        } catch (IOException e) {
-            return "";
-        }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        return reader.lines().collect(Collectors.joining("\n"));
     }
 }

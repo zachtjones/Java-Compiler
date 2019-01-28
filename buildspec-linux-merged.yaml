@@ -1,0 +1,50 @@
+version: 0.2
+
+#env:
+  #variables:
+  # key: "value"
+  # key: "value"
+  #parameter-store:
+  # key: "value"
+# key: "value"
+
+phases:
+  install:
+    commands:
+      # uncomment if we need a later version of gcc, gcc-4 is already there
+      #- add-apt-repository ppa:ubuntu-toolchain-r/test
+      #- apt-get update
+      #- apt-get install gcc-7 -y
+      #- gcc --version
+      #- update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 90
+      - gcc --version
+
+  pre_build:
+    commands:
+      - mvn -B clean compile
+
+  build:
+    commands:
+      - mvn -B test jacoco:report
+
+  post_build:
+    commands:
+      # extract coverage data
+      - "awk -F, '{ instructions += $4 + $5; covered += $5 } END { printf \"%.1f\", 100*covered/instructions }' target/site/jacoco/jacoco.csv > coverage.txt"
+      - cat coverage.txt
+      # generate the template
+      - sed -e '/NUM/{r coverage.txt' -e 'd}' coverage-template.svg > coverage-report.svg
+      # upload template to s3
+      - aws s3 cp coverage-report.svg s3://java-compiler-badges
+      - aws s3api put-object-acl --bucket java-compiler-badges --key coverage-report.svg --acl public-read
+
+#artifacts:
+#files:
+# - location
+# - location
+#name: $(date +%Y-%m-%d)
+#discard-paths: yes
+#base-directory: location
+#cache:
+#paths:
+# - paths
