@@ -104,7 +104,7 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 				context.addInstruction(
 					new MoveInstruction(
 						args[i].toX64(),
-						argumentRegister(2 + i)
+						context.argumentRegister(2 + i)
 					)
 				);
 			}
