@@ -1,6 +1,7 @@
 package x64.allocation;
 
 import x64.Instruction;
+import x64.X64Context;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
@@ -17,7 +18,12 @@ public class RegisterTransformer {
 
 	private final Deque<X64NativeRegister> initialTemps;
 
-	public RegisterTransformer(ArrayList<Instruction> contents) {
+	/***
+	 * Creates a register transformer, used to transform pseudo registers into real ones.
+	 * @param contents The contents of the function.
+	 * @param context The context to which the function was created.
+	 */
+	public RegisterTransformer(ArrayList<Instruction> contents, X64Context context) {
 		this.initialContents = contents;
 
 		preservedOnes = new ArrayDeque<>();
@@ -30,6 +36,11 @@ public class RegisterTransformer {
 		for (X64RegisterOperand op : CallingConvention.temporaryRegisters()) {
 			temporaryOnes.add(op.nativeOne);
 			initialTemps.add(op.nativeOne);
+		}
+		for (int i = context.getHighestArgUsed() + 1; i < CallingConvention.argumentRegisterCount(); i++) {
+			final X64NativeRegister nativeOne = CallingConvention.argumentRegister(i).nativeOne;
+			temporaryOnes.add(nativeOne);
+			initialTemps.add(nativeOne);
 		}
 	}
 
