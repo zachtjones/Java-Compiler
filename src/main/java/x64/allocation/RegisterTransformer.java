@@ -72,6 +72,15 @@ public class RegisterTransformer {
 		Map<X64PreservedRegister, X64NativeRegister> mapping = new HashMap<>();
 
 		for (int i = 0; i < initialContents.size(); i++) {
+			// we can use a register on both operands of the instruction
+			// if a preserved register is last used on the current line:
+			// - add the native register associated with it back to the stacks
+			if (lastUsedLines.containsKey(i)) {
+				final X64PreservedRegister doneWith = lastUsedLines.get(i);
+
+				doneWithRegister(mapping.get(doneWith));
+			}
+
 			// if the instruction defines a X64PreservedRegister, then:
 			// 1. add it to the map of currentUsed
 			// 2. pop from the stack
@@ -81,14 +90,6 @@ public class RegisterTransformer {
 				X64NativeRegister replacement =
 					usedRegs.canBeTemporary(using) ? getNextTemporary() : getNextPreserved();
 				mapping.put(using, replacement);
-			}
-
-			// if a preserved register is last used on the current line:
-			// - add the native register associated with it back to the stacks
-			if (lastUsedLines.containsKey(i)) {
-				final X64PreservedRegister doneWith = lastUsedLines.get(i);
-
-				doneWithRegister(mapping.get(doneWith));
 			}
 		}
 
