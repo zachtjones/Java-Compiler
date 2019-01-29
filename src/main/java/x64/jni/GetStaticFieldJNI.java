@@ -28,7 +28,7 @@ public interface GetStaticFieldJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 classReg,
-                argumentRegister(2)
+                context.argumentRegister(2)
             )
         );
 
@@ -36,7 +36,7 @@ public interface GetStaticFieldJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 fieldIDReg,
-                argumentRegister(3)
+                context.argumentRegister(3)
             )
         );
 

@@ -6,7 +6,6 @@ import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.X64RegisterOperand;
 
-import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.jni.JNIOffsets.getCallMethodOffset;
 
 public interface CallMethodJNI extends CallJNIMethod {
@@ -25,7 +24,7 @@ public interface CallMethodJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 objReg,
-                argumentRegister(2)
+                context.argumentRegister(2)
             )
         );
 
@@ -33,7 +32,7 @@ public interface CallMethodJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 methodId,
-                argumentRegister(3)
+                context.argumentRegister(3)
             )
         );
 
@@ -44,7 +43,7 @@ public interface CallMethodJNI extends CallJNIMethod {
             context.addInstruction(
                 new MoveInstruction(
                     args[i].toX64(),
-                    argumentRegister(i + 4)
+                    context.argumentRegister(i + 4)
                 )
             );
         }

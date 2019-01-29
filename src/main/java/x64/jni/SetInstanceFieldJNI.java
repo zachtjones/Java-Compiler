@@ -28,7 +28,7 @@ public interface SetInstanceFieldJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 objReg.toX64(),
-                argumentRegister(2)
+                context.argumentRegister(2)
             )
         );
 
@@ -36,7 +36,7 @@ public interface SetInstanceFieldJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 fieldIDReg,
-                argumentRegister(3)
+                context.argumentRegister(3)
             )
         );
 
@@ -44,7 +44,7 @@ public interface SetInstanceFieldJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 value.toX64(),
-                argumentRegister(4)
+                context.argumentRegister(4)
             )
         );
 

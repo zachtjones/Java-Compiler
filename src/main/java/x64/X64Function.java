@@ -19,8 +19,10 @@ public class X64Function {
 	private final ArrayList<Instruction> prologue = new ArrayList<>();
 	private ArrayList<Instruction> contents = new ArrayList<>();
 	private final ArrayList<Instruction> epilogue = new ArrayList<>();
+	private final X64Context context;
 
-	X64Function(String javaClass, String javaMethod, X64RegisterOperand jniEnvPointer) {
+	X64Function(String javaClass, String javaMethod, X64RegisterOperand jniEnvPointer, X64Context context) {
+		this.context = context;
 
 		prologue.add(new SegmentChange(SegmentChange.TEXT));
 		final String symbolName = SymbolNames.getFieldName(javaClass, javaMethod);
@@ -48,7 +50,7 @@ public class X64Function {
 
 	/** Allocates the registers, transforming pseudo-registers to real ones */
 	void allocateRegisters() {
-		Set<X64NativeRegister> usedRegs = new RegisterTransformer(contents).allocate();
+		Set<X64NativeRegister> usedRegs = new RegisterTransformer(contents, context).allocate();
 
 		// build up the push @ beginning / pop before return for used registers
 		for (X64NativeRegister usedReg : usedRegs) {

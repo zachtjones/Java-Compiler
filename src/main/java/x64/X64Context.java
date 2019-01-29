@@ -2,6 +2,7 @@ package x64;
 
 import intermediate.Register;
 import intermediate.RegisterAllocator;
+import x64.allocation.CallingConvention;
 import x64.instructions.MoveInstruction;
 import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
@@ -9,7 +10,6 @@ import x64.operands.X64RegisterOperand;
 import java.util.HashMap;
 import java.util.Map;
 
-import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.operands.X64RegisterOperand.of;
 
 /**
@@ -29,18 +29,32 @@ public class X64Context {
 	private final Map<Register, String> staticFieldAddressFields = new HashMap<>();
 	private final Map<String, X64RegisterOperand> locals = new HashMap<>();
 
+	/** Returns the highest number of argument register used */
+	private int highestArgUsed = 1; // reserve the JNI register as always used
+
 	public X64Context(X64File enclosingFile, RegisterAllocator allocator, String functionName) {
 
 		this.enclosingFile = enclosingFile;
 		this.nextRegister = allocator.getNextLabel();
 		this.jniPointer = getNextQuadRegister();
-		this.function = new X64Function(enclosingFile.getJavaName(), functionName, jniPointer);
+		this.function = new X64Function(enclosingFile.getJavaName(), functionName, jniPointer, this);
+	}
+
+	/** Wrapper for CallingConvention.argumentRegister, used to keep track of highest number used */
+	public X64RegisterOperand argumentRegister(int number) {
+		highestArgUsed = Math.max(number, highestArgUsed);
+		return CallingConvention.argumentRegister(number);
 	}
 
 	/** Returns the next pseudo register available that is a quad-word size (64-bit) */
 	public X64RegisterOperand getNextQuadRegister() {
 		nextRegister++;
 		return of(new X64PreservedRegister(nextRegister, Instruction.Size.QUAD));
+	}
+
+	/** returns the argument number that is the highest number used */
+	public int getHighestArgUsed() {
+		return highestArgUsed;
 	}
 
 	/** Loads the JNI pointer into the first argument */

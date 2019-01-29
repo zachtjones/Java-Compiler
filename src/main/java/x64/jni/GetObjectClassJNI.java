@@ -26,7 +26,7 @@ public interface GetObjectClassJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 object,
-                argumentRegister(2)
+                context.argumentRegister(2)
             )
         );
 

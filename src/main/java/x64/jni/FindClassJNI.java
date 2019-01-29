@@ -1,7 +1,6 @@
 package x64.jni;
 
 import x64.X64Context;
-import x64.allocation.CallingConvention;
 import x64.instructions.LoadEffectiveAddressInstruction;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.*;
@@ -28,7 +27,7 @@ public interface FindClassJNI extends CallJNIMethod {
         context.addInstruction(
             new LoadEffectiveAddressInstruction(
                 pointerFromLabel(label),
-                CallingConvention.argumentRegister(2)
+                context.argumentRegister(2)
             )
         );
 
