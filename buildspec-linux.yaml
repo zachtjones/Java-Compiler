@@ -25,3 +25,8 @@ phases:
   build:
     commands:
       - mvn -B test
+
+artifacts:
+  files:
+    # shows assembly, the linked program, crash logs if present, ...
+    - 'temp/**/*'
