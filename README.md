@@ -1,8 +1,10 @@
 # Java Compiler
 
-![Build status](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiZlQycVNFMGV4NEdDOGI4MWo1TDBFVXFERWdVZk80WCtGUnV1MHZtcmQvRVlXQ0g3eCtvaDlsK3FwRVRNQjF0Zm5GVHdSTDlNaU5hbWQ1ZmNqMGdyN3hBPSIsIml2UGFyYW1ldGVyU3BlYyI6IjVHWHdEY09EZjlicVlYUUYiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
-
-![Coverage report](https://s3.amazonaws.com/java-compiler-badges/coverage-report.svg)
+<p>
+    AWS Linux build details:
+    <img src="https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiZlQycVNFMGV4NEdDOGI4MWo1TDBFVXFERWdVZk80WCtGUnV1MHZtcmQvRVlXQ0g3eCtvaDlsK3FwRVRNQjF0Zm5GVHdSTDlNaU5hbWQ1ZmNqMGdyN3hBPSIsIml2UGFyYW1ldGVyU3BlYyI6IjVHWHdEY09EZjlicVlYUUYiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master" alt="aws build status"/>
+    <img src="https://s3.amazonaws.com/java-compiler-badges/coverage-report.svg" alt="aws coverage number" />
+</p>
 
 This is a Java program used to compile Java files into native code.
 Instead of using a complete java library implementation, this uses the Java Native Interface for calling
