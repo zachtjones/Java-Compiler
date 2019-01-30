@@ -14,8 +14,6 @@ import x64.operands.PCRelativeData;
 import x64.operands.RegisterRelativePointer;
 import x64.operands.X64RegisterOperand;
 
-import static x64.allocation.CallingConvention.isLinux;
-
 /** store %src at %addr */
 public class StoreAddressStatement implements InterStatement,
 		FindClassJNI, GetInstanceFieldIdJNI, SetInstanceFieldJNI,
@@ -105,12 +103,10 @@ public class StoreAddressStatement implements InterStatement,
 
 			} else {
 				// mov %src, class_name_field_offset(%rip), src is used in the destination for the data size
-				// linux requires explicitly declaring the field as global offset table, program counter relative.
-				final String suffix = isLinux ? "@GOTPCREL" : "";
 				context.addInstruction(
 					new MoveInstruction(
 						src.toX64(),
-						PCRelativeData.fromField(className, fieldName + suffix, src)
+						PCRelativeData.fromField(className, fieldName, src)
 					)
 				);
 			}
