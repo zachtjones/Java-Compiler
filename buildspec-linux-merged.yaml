@@ -33,10 +33,10 @@ phases:
       - "awk -F, '{ instructions += $4 + $5; covered += $5 } END { printf \"%.1f\", 100*covered/instructions }' target/site/jacoco/jacoco.csv > coverage.txt"
       - cat coverage.txt
       # generate the template
-      - sed -e '/NUM/{r coverage.txt' -e 'd}' coverage-template.svg > coverage-report.svg
+      - sed -e '/NUM/{r coverage.txt' -e 'd}' coverage-template.svg > coverageReport.svg
       # upload template to s3
-      - aws s3 cp coverage-report.svg s3://java-compiler-badges --metadata-directive REPLACE --cache-control max-age=0
-      - aws s3api put-object-acl --bucket java-compiler-badges --key coverage-report.svg --acl public-read
+      - aws s3 cp coverageReport.svg s3://java-compiler-badges --metadata-directive REPLACE --cache-control no-cache
+      - aws s3api put-object-acl --bucket java-compiler-badges --key coverageReport.svg --acl public-read
 
 #artifacts:
 #files:
