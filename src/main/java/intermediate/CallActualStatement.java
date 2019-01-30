@@ -106,7 +106,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			context.addInstruction(
 				new MoveInstruction(
 					obj.toX64(),
-					argumentRegister(2)
+					context.argumentRegister(2)
 				)
 			);
 
@@ -115,7 +115,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 				context.addInstruction(
 					new MoveInstruction(
 						args[i].toX64(),
-						argumentRegister(3 + i)
+						context.argumentRegister(3 + i)
 					)
 				);
 			}

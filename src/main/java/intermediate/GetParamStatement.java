@@ -58,7 +58,7 @@ public class GetParamStatement implements InterStatement {
 		if (localName.equals("this")) {
 			context.addInstruction(
 				new MoveInstruction(
-					argumentRegister(2),
+					context.argumentRegister(2),
 					r.toX64()
 				)
 			);
@@ -70,7 +70,7 @@ public class GetParamStatement implements InterStatement {
 
 			context.addInstruction(
 				new MoveInstruction(
-					argumentRegister(paramIndex),
+					context.argumentRegister(paramIndex),
 					r.toX64()
 				)
 			);

@@ -50,7 +50,7 @@ public class AllocateClassMemoryStatement implements InterStatement {
 		context.addInstruction(
 			new MoveInstruction(
 				new Immediate(size),
-				argumentRegister(1)
+				context.argumentRegister(1)
 			)
 		);
 

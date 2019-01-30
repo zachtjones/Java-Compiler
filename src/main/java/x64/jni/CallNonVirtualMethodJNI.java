@@ -6,7 +6,6 @@ import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.*;
 
-import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.jni.JNIOffsets.getCallNonVirtualMethodOffset;
 
 public interface CallNonVirtualMethodJNI extends CallJNIMethod {
@@ -33,7 +32,7 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 objReg,
-                argumentRegister(2)
+                context.argumentRegister(2)
             )
         );
 
@@ -41,7 +40,7 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 classReg,
-                argumentRegister(3)
+                context.argumentRegister(3)
             )
         );
 
@@ -49,7 +48,7 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 methodId,
-                argumentRegister(4)
+                context.argumentRegister(4)
             )
         );
 
@@ -59,7 +58,7 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
             context.addInstruction(
                 new MoveInstruction(
                     args[i].toX64(),
-                    argumentRegister(i + 5)
+                    context.argumentRegister(i + 5)
                 )
             );
         }

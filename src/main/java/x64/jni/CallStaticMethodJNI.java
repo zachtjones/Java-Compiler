@@ -32,7 +32,7 @@ public interface CallStaticMethodJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 classReg,
-                argumentRegister(2)
+                context.argumentRegister(2)
             )
         );
 
@@ -40,7 +40,7 @@ public interface CallStaticMethodJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 methodId,
-                argumentRegister(3)
+                context.argumentRegister(3)
             )
         );
 
@@ -50,7 +50,7 @@ public interface CallStaticMethodJNI extends CallJNIMethod {
             context.addInstruction(
                 new MoveInstruction(
                     args[i].toX64(),
-                    argumentRegister(i + 4)
+                    context.argumentRegister(i + 4)
                 )
             );
         }

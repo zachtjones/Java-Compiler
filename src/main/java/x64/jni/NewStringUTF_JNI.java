@@ -26,7 +26,7 @@ public interface NewStringUTF_JNI extends CallJNIMethod {
 		context.addInstruction(
 			new MoveInstruction(
 				chars,
-				CallingConvention.argumentRegister(2)
+				context.argumentRegister(2)
 			)
 		);
 

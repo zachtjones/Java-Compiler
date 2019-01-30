@@ -17,7 +17,6 @@ import x64.jni.GetMethodIdJNI;
 import x64.jni.GetObjectClassJNI;
 import x64.operands.X64RegisterOperand;
 
-import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.allocation.CallingConvention.returnValueRegister;
 
 /** Represents a function call via v-table lookup. */
@@ -106,13 +105,13 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 			context.loadJNI1();
 
 			context.addInstruction(
-				new MoveInstruction(obj.toX64(), argumentRegister(2))
+				new MoveInstruction(obj.toX64(), context.argumentRegister(2))
 			);
 
 			// the rest of the args
 			for (int i = 0; i < args.length; i++) {
 				context.addInstruction(
-					new MoveInstruction(args[i].toX64(), argumentRegister(3 + i))
+					new MoveInstruction(args[i].toX64(), context.argumentRegister(3 + i))
 				);
 			}
 

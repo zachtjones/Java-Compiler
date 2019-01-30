@@ -41,6 +41,11 @@ public class CallingConvention {
 		}
 	}
 
+	/** returns the number of dedicated registers for arguments */
+	public static int argumentRegisterCount() {
+		return isMicrosoft ? 4 : 6;
+	}
+
 	/** returns the register operand that is used for holding return values */
 	public static X64RegisterOperand returnValueRegister() {
 		// both System V and Microsoft are same
@@ -64,6 +69,6 @@ public class CallingConvention {
 
 	/** returns the string used in the call instruction for a c library function*/
 	public static String libraryFunc(String function) {
-		return (isMicrosoft ? "" : "_") + function;
+		return (isMac ? "_" : "") + function;
 	}
 }

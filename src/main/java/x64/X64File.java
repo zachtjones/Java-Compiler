@@ -11,7 +11,7 @@ public class X64File {
     private final String javaClassName;
     private final String fileName;
 
-    private final ArrayList<CommonSymbol> classFields;
+    private final ArrayList<Instruction> dataSection;
 
     private final ArrayList<X64Function> functions;
 
@@ -24,10 +24,14 @@ public class X64File {
      */
     public X64File(String name, InterStructure staticFields) {
 
-        classFields = new ArrayList<>();
+        dataSection = new ArrayList<>();
+        dataSection.add(new SegmentChange(SegmentChange.DATA));
+
         staticFields.forEachMember(member -> {
             int size = staticFields.getFieldSize(member);
-            classFields.add(new CommonSymbol(SymbolNames.getFieldName(name, member), size));
+            dataSection.add(new ByteAlignment(size));
+            dataSection.add(new LabelInstruction(SymbolNames.getFieldName(name, member)));
+            dataSection.add(new SpaceDirective(size));
         });
 
         javaClassName = name;
@@ -76,7 +80,7 @@ public class X64File {
 
     @Override
     public String toString() {
-        return classFields.stream()
+        return dataSection.stream()
                 .map(Instruction::toString)
                 .collect(Collectors.joining("\n"))
             + "\n\n" +

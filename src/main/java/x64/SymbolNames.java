@@ -1,17 +1,13 @@
 package x64;
 
-import x64.allocation.CallingConvention;
+import static x64.allocation.CallingConvention.isMac;
 
 public class SymbolNames {
 
 	public static String getFieldName(String javaClass, String javaField) {
-        final String prefix; // dependent on OS, windows has no leading underscores
-        if (CallingConvention.isMac) {
-            prefix = "_Java_";
-        } else {
-            prefix = "Java_";
-        }
-        // use the JNI syntax
+        // dependent on OS, mac os has leading underscores
+        final String prefix = isMac ? "_Java_" : "Java_";
+
         return prefix + escape(javaClass) + "_" + escape(javaField);
     }
 
@@ -33,7 +29,7 @@ public class SymbolNames {
      * @return The label that is used to call to go to this method
      */
     public static String getMethodName(String className, String name) {
-        // TODO include the args into the mangled signature
         return getFieldName(className, name);
+        // TODO include the args into the mangled signature
     }
 }

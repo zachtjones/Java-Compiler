@@ -25,7 +25,7 @@ public interface GetIdJNI extends CallJNIMethod {
         context.addInstruction(
             new MoveInstruction(
                 classReg,
-                argumentRegister(2)
+                context.argumentRegister(2)
             )
         );
 
@@ -34,7 +34,7 @@ public interface GetIdJNI extends CallJNIMethod {
         context.addInstruction(
             new LoadEffectiveAddressInstruction(
                 PCRelativeData.pointerFromLabel(fieldNameLabel),
-                argumentRegister(3)
+                context.argumentRegister(3)
             )
         );
 
@@ -43,7 +43,7 @@ public interface GetIdJNI extends CallJNIMethod {
         context.addInstruction(
             new LoadEffectiveAddressInstruction(
                 PCRelativeData.pointerFromLabel(fieldTypeLabel),
-                argumentRegister(4)
+                context.argumentRegister(4)
             )
         );
 
