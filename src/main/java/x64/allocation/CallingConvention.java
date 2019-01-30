@@ -69,6 +69,6 @@ public class CallingConvention {
 
 	/** returns the string used in the call instruction for a c library function*/
 	public static String libraryFunc(String function) {
-		return (isMicrosoft ? "" : "_") + function;
+		return (isMac ? "_" : "") + function;
 	}
 }
