@@ -1,18 +1,17 @@
 package x64;
 
-import x64.allocation.CallingConvention;
+import static x64.allocation.CallingConvention.isLinux;
+import static x64.allocation.CallingConvention.isMac;
 
 public class SymbolNames {
 
 	public static String getFieldName(String javaClass, String javaField) {
-        final String prefix; // dependent on OS, windows has no leading underscores
-        if (CallingConvention.isMac) {
-            prefix = "_Java_";
-        } else {
-            prefix = "Java_";
-        }
-        // use the JNI syntax
-        return prefix + escape(javaClass) + "_" + escape(javaField);
+        // dependent on OS, windows has no leading underscores
+        final String prefix = isMac ? "_Java_" : "Java_";
+
+        // linux requires explicitly declaring the field as global offset table, program counter relative.
+        String suffix = isLinux ? "@GOTPCREL" : "";
+        return prefix + escape(javaClass) + "_" + escape(javaField) + suffix;
     }
 
     /** Escapes the name suitable for the name of the assembly / C function */
@@ -34,6 +33,9 @@ public class SymbolNames {
      */
     public static String getMethodName(String className, String name) {
         // TODO include the args into the mangled signature
-        return getFieldName(className, name);
+        // dependent on OS, windows has no leading underscores
+        final String prefix = isMac ? "_Java_" : "Java_";
+
+        return prefix + escape(className) + "_" + escape(name);
     }
 }
