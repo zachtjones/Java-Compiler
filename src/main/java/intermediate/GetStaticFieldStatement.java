@@ -12,6 +12,7 @@ import x64.jni.GetStaticFieldIdJNI;
 import x64.jni.GetStaticFieldJNI;
 import x64.operands.X64RegisterOperand;
 
+import static x64.allocation.CallingConvention.isLinux;
 import static x64.operands.PCRelativeData.fromField;
 
 public class GetStaticFieldStatement implements InterStatement, FindClassJNI, GetStaticFieldIdJNI, GetStaticFieldJNI {
@@ -78,9 +79,11 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 
 		} else {
 			// mov CLASS_NAME_FIELD_NAME(%rip), %destination
+			// linux requires explicitly declaring the field as global offset table, program counter relative.
+			final String suffix = isLinux ? "@GOTPCREL" : "";
 			context.addInstruction(
 				new MoveInstruction(
-					fromField(className, fieldName, result),
+					fromField(className, fieldName + suffix, result),
 					result.toX64()
 				)
 			);
