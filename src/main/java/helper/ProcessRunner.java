@@ -1,5 +1,8 @@
 package helper;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,14 +12,14 @@ import java.util.List;
  * Helper class to create a process, run it, and get the results.
  */
 public class ProcessRunner {
-    private final List<String> args;
+    @NotNull private final List<String> args;
 
-    private File directory;
+    @Nullable private File directory;
 
     /** Creates a process runner, with the first one being the program to run, the rest being the arguments to
      * the running process.
      * @param args A list, the first of which is the process/file to run, followed by the arguments */
-    public ProcessRunner(String... args) {
+    public ProcessRunner(@NotNull String... args) {
         this.args = new ArrayList<>();
         this.args.addAll(Arrays.asList(args));
     }
@@ -25,7 +28,7 @@ public class ProcessRunner {
      * Adds another argument to the process that will be run.
      * @param arg The String argument.
      */
-    public void addArg(String arg) {
+    public void addArg(@NotNull String arg) {
         this.args.add(arg);
     }
 
@@ -33,7 +36,7 @@ public class ProcessRunner {
      * Sets the working directory of the current process.
      * @param directory The file that is the directory to run.
      */
-    public void setDirectory(File directory) {
+    public void setDirectory(@NotNull File directory) {
         this.directory = directory;
     }
 
@@ -47,11 +50,11 @@ public class ProcessRunner {
     }
 
     public static class ProcessResult {
-        private final StringBuilder out;
-        private final StringBuilder err;
+        @NotNull private final StringBuilder out;
+        @NotNull private final StringBuilder err;
         private int exitCode;
 
-        ProcessResult(List<String> args, File currentDirectory) {
+        ProcessResult(@NotNull List<String> args, @Nullable File currentDirectory) {
             out = new StringBuilder();
             err = new StringBuilder();
 
@@ -83,7 +86,7 @@ public class ProcessRunner {
         /** helper method to capture all the result from a process output,
          * filling in result with each line.
          * Note that the lines are filled in with the \n character */
-        private void runWith(InputStream processOutput, StringBuilder result) {
+        private void runWith(@NotNull InputStream processOutput, @NotNull StringBuilder result) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(processOutput))) {
                 String line;
                 while ((line = reader.readLine()) != null) {

@@ -1,13 +1,14 @@
 package helper;
 
+import org.jetbrains.annotations.NotNull;
 import x64.Instruction;
 
 public class Types {
 
-	private final String rep;
+	@NotNull private final String rep;
 	private final boolean isPrimitive;
 
-	private Types(String rep, boolean isPrimitive) {
+	private Types(@NotNull String rep, boolean isPrimitive) {
 		this.rep = rep;
 		this.isPrimitive = isPrimitive;
 	}
@@ -54,7 +55,7 @@ public class Types {
 
 	/** Creates a type from the java representation
 	 * @param type "void", "short", ... or a class name with the slashes separating the parts. */
-	public static Types fromJavaRepresentation(String type) {
+	private static Types fromJavaRepresentation(@NotNull String type) {
 		switch (type) {
 			case "void": return VOID;
 			case "boolean": return BOOLEAN;
@@ -70,7 +71,7 @@ public class Types {
 	}
 
 	/** Creates a types instance from the Class instance, obtained via classLoader reflection. */
-	public static Types fromReflection(Class<?> type) {
+	public static Types fromReflection(@NotNull Class<?> type) {
 		if (type.isPrimitive()) {
 			return fromJavaRepresentation(type.getName());
 		} else {
@@ -79,7 +80,7 @@ public class Types {
 	}
 
 	/** Removes an array dimension, returning the new type. If it can't be removed, throws a CompileException */
-	public Types removeArray(String fileName, int line) throws CompileException {
+	public Types removeArray(@NotNull String fileName, int line) throws CompileException {
 		if (isArrayType()) {
 			return new Types(rep.substring(1), isPrimitive);
 		} else {
@@ -93,12 +94,12 @@ public class Types {
 	}
 
 	/** Creates a new type that is a pointer to the argument */
-	public static Types pointerOf(Types type) {
+	public static Types pointerOf(@NotNull Types type) {
 		return new Types("*" + type.rep, false);
 	}
 
 	/** Dereferences this pointer type, throwing an CompileException if this isn't a pointer */
-	public Types dereferencePointer(String fileName, int line) throws CompileException {
+	public Types dereferencePointer(@NotNull String fileName, int line) throws CompileException {
 		if (rep.charAt(0) == '*') {
 			return new Types(rep.substring(1), isPrimitive);
 		} else {
@@ -107,7 +108,7 @@ public class Types {
 	}
 
 	/** Returns the fully qualified class name from this Type, throwing a CompileException if not a class. */
-	public String getClassName(String fileName, int line) throws CompileException {
+	public String getClassName(@NotNull String fileName, int line) throws CompileException {
 		if (rep.charAt(0) == 'L' && rep.charAt(rep.length() - 1) == ';') {
 			return rep.substring(1, rep.length() - 1);
 		}
@@ -150,7 +151,7 @@ public class Types {
 
 	/** Resolves the imports on this type, replacing partially qualified names with fully qualified ones
 	 * @return A Types instance referring to the fully qualified type, as these are immutable */
-	public Types resolveImports(ClassLookup c, String filename, int line) throws CompileException {
+	public Types resolveImports(@NotNull ClassLookup c, @NotNull String filename, int line) throws CompileException {
 		if (isPrimitive) {
 			return this;
 		}
