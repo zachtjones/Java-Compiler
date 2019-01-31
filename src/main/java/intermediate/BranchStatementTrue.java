@@ -5,6 +5,7 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
+import org.jetbrains.annotations.NotNull;
 
 /** branch when register is not equal to 0. */
 public class BranchStatementTrue implements InterStatement {
@@ -29,9 +30,9 @@ public class BranchStatementTrue implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs,
-			HashMap<String, Types> locals, HashMap<String, Types> params,
-			InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs,
+						  @NotNull HashMap<String, Types> locals, @NotNull HashMap<String, Types> params,
+						  @NotNull InterFunction func) throws CompileException {
 		
 		UsageCheck.verifyDefined(r, regs, fileName, line);
 		if (r.getType() != Types.BOOLEAN) {

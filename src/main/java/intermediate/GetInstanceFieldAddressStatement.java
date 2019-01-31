@@ -6,6 +6,7 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
+import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 
 public class GetInstanceFieldAddressStatement implements InterStatement {
@@ -38,8 +39,8 @@ public class GetInstanceFieldAddressStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		UsageCheck.verifyDefined(instance, regs, fileName, line);
 		// the type of the object
@@ -53,7 +54,7 @@ public class GetInstanceFieldAddressStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64Context context) throws CompileException {
+	public void compile(@NotNull X64Context context) throws CompileException {
 		// handle the details in the store instruction later on
 		context.markRegisterAsInstanceFieldAddress(result, instance, fieldName);
 	}

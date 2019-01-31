@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
+import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.instructions.MoveInstruction;
 import x64.operands.X64RegisterOperand;
@@ -34,8 +35,8 @@ public class GetLocalStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		if (!locals.containsKey(localName)) {
 			throw new CompileException("local variable: " + localName + " is not defined.",
@@ -48,7 +49,7 @@ public class GetLocalStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64Context context) throws CompileException {
+	public void compile(@NotNull X64Context context) throws CompileException {
 		final X64RegisterOperand source = context.getLocalVariable(localName);
 
 		// move the register over

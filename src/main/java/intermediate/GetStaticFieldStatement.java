@@ -5,6 +5,7 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import main.JavaCompiler;
+import org.jetbrains.annotations.NotNull;
 import x64.*;
 import x64.instructions.MoveInstruction;
 import x64.jni.FindClassJNI;
@@ -45,8 +46,8 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		// get the field type for the static field.
 		InterFile object = JavaCompiler.parseAndCompile(className, fileName, line);
@@ -57,7 +58,7 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 	}
 
 	@Override
-	public void compile(X64Context context) throws CompileException {
+	public void compile(@NotNull X64Context context) throws CompileException {
 		if (className.startsWith("java/")) {
 
 			// the flag on the register that is returned that it is a JNI register is based on the type,

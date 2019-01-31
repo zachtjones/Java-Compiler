@@ -6,6 +6,7 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
+import org.jetbrains.annotations.NotNull;
 
 public class InstanceOfStatement implements InterStatement {
 	
@@ -28,8 +29,8 @@ public class InstanceOfStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		UsageCheck.verifyDefined(source, regs, fileName, line);
 		// verify the class exists

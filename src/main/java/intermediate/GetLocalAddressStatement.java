@@ -5,6 +5,7 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.TypeChecker;
 import helper.Types;
+import org.jetbrains.annotations.NotNull;
 
 public class GetLocalAddressStatement implements InterStatement {
 	Register r;
@@ -31,8 +32,8 @@ public class GetLocalAddressStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		if (!locals.containsKey(localName)) {
 			throw new CompileException("local variable: " + localName + " is not defined.",

@@ -6,6 +6,7 @@ import helper.CompileException;
 import helper.TypeChecker;
 import helper.Types;
 import helper.UsageCheck;
+import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.instructions.MoveInstruction;
 import x64.operands.X64RegisterOperand;
@@ -36,8 +37,8 @@ public class PutLocalStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		UsageCheck.verifyDefined(r, regs, fileName, line);
 		if (!locals.containsKey(localName)) {
@@ -48,7 +49,7 @@ public class PutLocalStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64Context context) throws CompileException {
+	public void compile(@NotNull X64Context context) throws CompileException {
 		final X64RegisterOperand destination = context.getLocalVariable(localName);
 
 		// copy the result over to the destination

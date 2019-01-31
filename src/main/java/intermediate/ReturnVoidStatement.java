@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
+import org.jetbrains.annotations.NotNull;
 
 /** return; */
 public class ReturnVoidStatement implements InterStatement {
@@ -22,9 +23,9 @@ public class ReturnVoidStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs,
-			HashMap<String, Types> locals, HashMap<String, Types> params,
-			InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs,
+						  @NotNull HashMap<String, Types> locals, @NotNull HashMap<String, Types> params,
+						  @NotNull InterFunction func) throws CompileException {
 		
 		if (func.returnType != null) {
 			throw new CompileException("can't return void on non-void function", fileName, line);

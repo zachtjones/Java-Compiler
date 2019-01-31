@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
+import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.operands.X64RegisterOperand;
 
@@ -28,8 +29,8 @@ public class StartScopeStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-			HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		// checking if it is already defined is not necessary since this is done
 		//  at high level code (AST -> Compile)
@@ -37,7 +38,7 @@ public class StartScopeStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64Context context) throws CompileException {
+	public void compile(@NotNull X64Context context) throws CompileException {
 		// TODO other sized registers
 		X64RegisterOperand allocated = context.getNextQuadRegister();
 		context.markRegisterAsLocalVariable(name, allocated);

@@ -9,6 +9,7 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
+import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.instructions.CallClassMethod;
 import x64.instructions.MoveInstruction;
@@ -51,8 +52,8 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		for (Register r : args) {
 			UsageCheck.verifyDefined(r, regs, fileName, line);
@@ -81,7 +82,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 	}
 
 	@Override
-	public void compile(X64Context context) throws CompileException {
+	public void compile(@NotNull X64Context context) throws CompileException {
 		// if the type of the register is java/*, use JNI
 		if (obj.getType().getClassName(fileName, line).startsWith("java/")) {
 

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
+import org.jetbrains.annotations.NotNull;
 
 /** dest = src1 OP src2 */
 public class BinaryOpStatement implements InterStatement {
@@ -35,9 +36,9 @@ public class BinaryOpStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs,
-			HashMap<String, Types> locals, HashMap<String, Types> params,
-			InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs,
+						  @NotNull HashMap<String, Types> locals, @NotNull HashMap<String, Types> params,
+						  @NotNull InterFunction func) throws CompileException {
 		
 		// make sure both sides are in the map
 		UsageCheck.verifyDefined(src1, regs, fileName, line);

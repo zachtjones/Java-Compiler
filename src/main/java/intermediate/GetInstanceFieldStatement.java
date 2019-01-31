@@ -6,6 +6,7 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
+import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.instructions.MoveInstruction;
 import x64.jni.FindClassJNI;
@@ -44,8 +45,8 @@ public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, 
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 
 		UsageCheck.verifyDefined(instance, regs, fileName, line);
 		// the type of the object
@@ -58,7 +59,7 @@ public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, 
 	}
 
 	@Override
-	public void compile(X64Context context) throws CompileException {
+	public void compile(@NotNull X64Context context) throws CompileException {
 		final String className = instance.getType().getClassName(fileName, line);
 		if (className.startsWith("java/")) {
 
