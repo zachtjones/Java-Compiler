@@ -10,6 +10,7 @@ import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
 import x64.instructions.CallClassMethod;
 import x64.instructions.MoveInstruction;
@@ -18,22 +19,21 @@ import x64.jni.FindClassJNI;
 import x64.jni.GetMethodIdJNI;
 import x64.operands.X64RegisterOperand;
 
-import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.allocation.CallingConvention.returnValueRegister;
 
 /** Represents a function call without a lookup. */
 public class CallActualStatement implements InterStatement, FindClassJNI, GetMethodIdJNI, CallNonVirtualMethodJNI {
-	private final Register obj;
-	private final String className;
-	String name;
-	private final Register[] args;
-	private final Register returnVal;
+	@NotNull private final Register obj;
+	@NotNull private final String className;
+	@NotNull final String name;
+	@NotNull private final Register[] args;
+	@Nullable private final Register returnVal;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
-	public CallActualStatement(Register obj, String className, String name, Register[] args, 
-			Register returnVal, String fileName, int line) {
+	public CallActualStatement(@NotNull Register obj, @NotNull String className, @NotNull String name,
+			@NotNull Register[] args, @Nullable Register returnVal, @NotNull String fileName, int line) {
 		
 		this.obj = obj;
 		this.className = className;

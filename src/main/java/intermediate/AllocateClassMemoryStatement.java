@@ -12,20 +12,19 @@ import x64.operands.Immediate;
 
 import java.util.HashMap;
 
-import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.allocation.CallingConvention.returnValueRegister;
 
 public class AllocateClassMemoryStatement implements InterStatement {
 
-	private final Types type;
-	private final Register result;
+	@NotNull private final Types type;
+	@NotNull private final Register result;
 
 	/**
 	 * Represents an allocation of memory for a class instance.
 	 * @param type The fully-qualified class name.
 	 * @param result The register to hold a reference to the memory allocated.
 	 */
-	public AllocateClassMemoryStatement(Types type, Register result) {
+	public AllocateClassMemoryStatement(@NotNull Types type, @NotNull Register result) {
 		this.type = type;
 		this.result = result;
 	}
@@ -36,8 +35,8 @@ public class AllocateClassMemoryStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(@NotNull HashMap<Register, Types> regs,
-						  @NotNull HashMap<String, Types> locals, @NotNull HashMap<String, Types> params, @NotNull InterFunction func) {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) {
 		
 		result.setType(type);
 		regs.put(result, type);

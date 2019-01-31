@@ -10,17 +10,17 @@ import org.jetbrains.annotations.NotNull;
 /** dest = src1 OP src2 */
 public class BinaryOpStatement implements InterStatement {
 
-	private Register src1;
-	private Register src2;
-	private Register dest;
-	String type;
+	@NotNull private final Register src1;
+	@NotNull private final Register src2;
+	@NotNull private final Register dest;
+	@NotNull private String type;
 
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
 	/** Creates a binary operation of the type specified statement */
-	public BinaryOpStatement(Register src1, Register src2, Register dest, String type,
-			String fileName, int line) {
+	public BinaryOpStatement(@NotNull Register src1, @NotNull Register src2, @NotNull Register dest,
+							 @NotNull String type, @NotNull String fileName, int line) {
 		this.src1 = src1;
 		this.src2 = src2;
 		this.dest = dest;

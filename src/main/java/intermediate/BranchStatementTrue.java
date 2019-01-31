@@ -9,15 +9,15 @@ import org.jetbrains.annotations.NotNull;
 
 /** branch when register is not equal to 0. */
 public class BranchStatementTrue implements InterStatement {
-	private LabelStatement destination;
-	Register r; // uses a byte register
+	@NotNull private final LabelStatement destination;
+	@NotNull Register r; // uses a byte register
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
 	/** Creates a branch statement (conditional jump) when registerNum != 0. */
-	public BranchStatementTrue(LabelStatement destination, Register r,
-			String fileName, int line) {
+	public BranchStatementTrue(@NotNull LabelStatement destination, @NotNull Register r,
+							   @NotNull String fileName, int line) {
 		this.destination = destination;
 		this.r = r;
 		this.fileName = fileName;

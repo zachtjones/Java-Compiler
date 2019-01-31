@@ -10,6 +10,7 @@ import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
 import x64.instructions.CallClassMethod;
 import x64.instructions.MoveInstruction;
@@ -22,16 +23,16 @@ import static x64.allocation.CallingConvention.returnValueRegister;
 
 /** Represents a function call via v-table lookup. */
 public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, GetMethodIdJNI, CallMethodJNI {
-	private final Register obj;
-	String name;
-	private final Register[] args;
-	private final Register returnVal;
+	@NotNull private final Register obj;
+	@NotNull private final String name;
+	@NotNull private final Register[] args;
+	@Nullable private final Register returnVal;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
-	public CallVirtualStatement(Register obj, String name, Register[] args, Register returnVal,
-			String fileName, int line) {
+	public CallVirtualStatement(@NotNull Register obj, @NotNull String name, @NotNull Register[] args,
+								@Nullable Register returnVal, @NotNull String fileName, int line) {
 		
 		this.obj = obj;
 		this.name = name;
