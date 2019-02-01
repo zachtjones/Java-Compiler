@@ -50,7 +50,7 @@ public class ArgumentExpressionNode extends NodeImpl implements Expression {
 		// determine if static function call or instance function call
 		final String name = className != null ? className : functionName;
 
-		if (Types.CLASS.equals(s.getType(name))) {
+		if (Types.CLASS.equals(s.getType(name)) && className != null) {
 			// static function call
 			f.statements.add(new CallStaticStatement(className, functionName, args,
 				f.allocator.getNext(Types.UNKNOWN), getFileName(), getLine()));

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public class BitwiseNotExpressionNode extends NodeImpl implements Expression {
     public Expression expr;
 
-    public BitwiseNotExpressionNode(String fileName, int line) {
+    public BitwiseNotExpressionNode(@NotNull String fileName, int line) {
     	super(fileName, line);
     }
 
@@ -24,6 +24,7 @@ public class BitwiseNotExpressionNode extends NodeImpl implements Expression {
 		expr.compile(s, f);
 		// take bitwise not of the result.
 		f.statements.add(new UnaryOpStatement(f.allocator.getLast(),
-				f.allocator.getNext(f.allocator.getLast().getType()), '~', getFileName(), getLine()));
+				f.allocator.getNext(f.allocator.getLast().getType()), UnaryOpStatement.BITNOT,
+			getFileName(), getLine()));
 	}
 }

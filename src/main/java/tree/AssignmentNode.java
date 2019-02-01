@@ -11,11 +11,11 @@ import org.jetbrains.annotations.NotNull;
 /** left type right */
 public class AssignmentNode extends NodeImpl implements StatementExprNode, Expression {
 
-	public Expression left;
-	public BinaryOperation type;
-	public Expression right;
+	private final Expression left;
+	private final BinaryOperation type;
+	private final Expression right;
 
-    public AssignmentNode(String fileName, int line, Expression left, Expression right, BinaryOperation type) {
+    public AssignmentNode(@NotNull String fileName, int line, Expression left, Expression right, BinaryOperation type) {
     	super(fileName, line);
     	this.left = left;
     	this.right = right;

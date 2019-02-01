@@ -33,7 +33,7 @@ public class PrimaryExpressionNode extends NodeImpl implements Expression, LValu
 	}
 
 	@Override
-	public void compileAddress(SymbolTable s, InterFunction f) throws CompileException {
+	public void compileAddress(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// compile the address of the last part
 		prefix.compile(s, f);
 		for (int i = 0; i < suffixes.size(); i++) {

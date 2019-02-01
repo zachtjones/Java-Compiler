@@ -1,5 +1,7 @@
 package tree;
 
+import org.jetbrains.annotations.NotNull;
+
 /** These are the non short-circuiting binary operations (+ - / * % ^ & &lt;&lt; &gt;&gt; &gt;&gt;&gt;) */
 public enum BinaryOperation {
 	ADD("+"), SUBTRACT("-"),
@@ -13,7 +15,7 @@ public enum BinaryOperation {
 	}
 
 	/** returns the java representation of this binary operation */
-	public String getRepresentation() {
+	@NotNull public String getRepresentation() {
 		return rep;
 	}
 }

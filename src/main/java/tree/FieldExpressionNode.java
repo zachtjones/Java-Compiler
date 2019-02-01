@@ -73,7 +73,7 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 	}
 
 	@Override
-	public void compileAddress(SymbolTable s, InterFunction f)
+	public void compileAddress(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 		if (f.history.wasThisLast()) {
 			// check symbol table -- declared in the same compilation unit

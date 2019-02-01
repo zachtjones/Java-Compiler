@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public class ArrayIndexExpressionNode extends NodeImpl implements Expression, LValue {
     public Expression expr;
 
-    public ArrayIndexExpressionNode(String fileName, int line) {
+    public ArrayIndexExpressionNode(@NotNull String fileName, int line) {
     	super(fileName, line);
     }
 
@@ -33,7 +33,7 @@ public class ArrayIndexExpressionNode extends NodeImpl implements Expression, LV
 	}
 
 	@Override
-	public void compileAddress(SymbolTable s, InterFunction f)
+	public void compileAddress(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 		
 		Register array = f.allocator.getLast();

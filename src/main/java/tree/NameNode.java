@@ -113,7 +113,7 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 	}
 
 	@Override
-	public void compileAddress(SymbolTable s, InterFunction f) throws CompileException {
+	public void compileAddress(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		
 		if (generics != null) {
 			throw new CompileException("Generics compiling not supported yet.", getFileName(), getLine());

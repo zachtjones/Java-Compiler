@@ -12,7 +12,7 @@ public class BinaryExpressionNode extends NodeImpl implements Expression {
 	private final Expression right;
 	private final BinaryOperation op;
 
-	public BinaryExpressionNode(String fileName, int line, Expression left, Expression right, BinaryOperation op) {
+	public BinaryExpressionNode(@NotNull String fileName, int line, Expression left, Expression right, BinaryOperation op) {
 		super(fileName, line);
 		this.left = left;
 		this.right = right;
