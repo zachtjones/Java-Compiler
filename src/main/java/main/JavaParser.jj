@@ -1464,15 +1464,15 @@ BlockStatementNode BlockStatement() :
 
 LocalVariableDecNode LocalVariableDeclaration() :
 {
-    LocalVariableDecNode d = new LocalVariableDecNode(fileName, token.beginLine);
-    d.declarators = new ArrayList<VariableDecNode>();
+    Types type;
+    ArrayList<VariableDecNode> declarations = new ArrayList<VariableDecNode>();
     VariableDecNode temp;
 }
 {
-    d.type=Type() temp=VariableDeclarator() { d.declarators.add(temp); }
-    ( <COMMA> temp=VariableDeclarator() { d.declarators.add(temp); })*
+    type=Type() temp=VariableDeclarator() { declarations.add(temp); }
+    ( <COMMA> temp=VariableDeclarator() { declarations.add(temp); })*
     {
-        return d;
+        return new LocalVariableDecNode(fileName, token.beginLine, type, declarations);
     }
 }
 

@@ -11,17 +11,20 @@ import intermediate.StartScopeStatement;
 import org.jetbrains.annotations.NotNull;
 
 public class LocalVariableDecNode extends NodeImpl implements StatementNode {
-    public Types type;
-    public ArrayList<VariableDecNode> declarators;
+    @NotNull private Types type;
+    @NotNull private final ArrayList<VariableDecNode> declarations;
     
-    public LocalVariableDecNode(String fileName, int line) {
+    public LocalVariableDecNode(String fileName, int line, @NotNull Types type,
+								@NotNull ArrayList<VariableDecNode> declarations) {
     	super(fileName, line);
+    	this.type = type;
+    	this.declarations = declarations;
     }
     
 	@Override
 	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		type = type.resolveImports(c, getFileName(), getLine());
-		for (VariableDecNode d : declarators) {
+		for (VariableDecNode d : declarations) {
 			if (d.init != null) {
 				d.init.resolveImports(c);
 			}
@@ -31,7 +34,7 @@ public class LocalVariableDecNode extends NodeImpl implements StatementNode {
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// place in symbol table and add intermediate code
-		for (VariableDecNode d : declarators) {
+		for (VariableDecNode d : declarations) {
 			s.putEntry(d.id.name, type, getFileName(), getLine());
 			f.statements.add(new StartScopeStatement(d.id.name, type));
 			if (d.init != null) {
