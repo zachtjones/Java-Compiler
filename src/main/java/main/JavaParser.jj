@@ -1447,16 +1447,16 @@ BlockNode Block() :
 
 BlockStatementNode BlockStatement() :
 {
-    BlockStatementNode b = new BlockStatementNode(fileName, token.beginLine);
+    BlockStatementNode b;
 }
 {
     LOOKAHEAD(Type() <IDENTIFIER>)
-    b.dec=LocalVariableDeclaration() <SEMICOLON>
+    b=LocalVariableDeclaration() <SEMICOLON>
     {
         return b;
     }
 |
-    b.statement=Statement()
+    b=Statement()
     {
         return b;
     }
