@@ -7,6 +7,7 @@ import helper.CompileException;
 import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class FieldDeclarationNode extends NodeImpl {
 	public boolean isPublic;
@@ -24,7 +25,7 @@ public class FieldDeclarationNode extends NodeImpl {
     	super(fileName, line);
     }
 
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		type = type.resolveImports(c, getFileName(), getLine());
 	}
 
@@ -67,7 +68,7 @@ public class FieldDeclarationNode extends NodeImpl {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		/* Nothing to do here*/
 	}
 

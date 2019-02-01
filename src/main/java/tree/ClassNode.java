@@ -7,6 +7,7 @@ import helper.CompileException;
 import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 /** This represents a class in the tree
 * @author Zach Jones
@@ -29,7 +30,7 @@ public class ClassNode extends NodeImpl implements TypeDecNode {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		if (superclass != null) {
 			superclass.resolveImports(c);
 		} else {
@@ -55,7 +56,7 @@ public class ClassNode extends NodeImpl implements TypeDecNode {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// this method should not be called.
 	}
 

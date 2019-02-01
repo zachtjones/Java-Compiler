@@ -10,6 +10,7 @@ import intermediate.CallVirtualStatement;
 import intermediate.CopyStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
+import org.jetbrains.annotations.NotNull;
 
 /** new Name (args) */
 public class ConstructorCallNode extends NodeImpl implements Expression {
@@ -21,13 +22,13 @@ public class ConstructorCallNode extends NodeImpl implements Expression {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		name.resolveImports(c);
 		args.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
     	Types resultType = Types.fromFullyQualifiedClass(name.primaryName);
 		Register result = f.allocator.getNext(resultType);
 

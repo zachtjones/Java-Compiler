@@ -3,6 +3,7 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 /** expr ++ */
 public class PostIncrementExpressionNode extends NodeImpl implements StatementExprNode, Expression {
@@ -13,12 +14,12 @@ public class PostIncrementExpressionNode extends NodeImpl implements StatementEx
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		expr.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// construct an AssignmentNode:  expr += 1;
 		LiteralExpressionNode literal = new LiteralExpressionNode(getFileName(), getLine());
 		literal.value = "1";

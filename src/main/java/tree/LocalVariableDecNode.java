@@ -8,6 +8,7 @@ import helper.Types;
 import intermediate.InterFunction;
 import intermediate.PutLocalStatement;
 import intermediate.StartScopeStatement;
+import org.jetbrains.annotations.NotNull;
 
 public class LocalVariableDecNode extends NodeImpl {
     public Types type;
@@ -18,7 +19,7 @@ public class LocalVariableDecNode extends NodeImpl {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		type = type.resolveImports(c, getFileName(), getLine());
 		for (VariableDecNode d : declarators) {
 			if (d.init != null) {
@@ -28,7 +29,7 @@ public class LocalVariableDecNode extends NodeImpl {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// place in symbol table and add intermediate code
 		for (VariableDecNode d : declarators) {
 			s.putEntry(d.id.name, type, getFileName(), getLine());

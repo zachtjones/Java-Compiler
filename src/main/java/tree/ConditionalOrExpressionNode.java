@@ -8,6 +8,7 @@ import intermediate.ChooseStatement;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
 import intermediate.Register;
+import org.jetbrains.annotations.NotNull;
 
 /** Chain of || of the operands */
 public class ConditionalOrExpressionNode extends NodeImpl implements Expression {
@@ -19,13 +20,13 @@ public class ConditionalOrExpressionNode extends NodeImpl implements Expression 
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		left.resolveImports(c);
 		right.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f)
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 		
 		left.compile(s, f);

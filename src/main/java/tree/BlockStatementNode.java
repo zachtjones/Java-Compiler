@@ -3,6 +3,7 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockStatementNode extends NodeImpl {
     // only one of these is not null
@@ -14,7 +15,7 @@ public class BlockStatementNode extends NodeImpl {
     }
 
     @Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		// pass down
     	if (statement != null) {
     		statement.resolveImports(c);
@@ -24,7 +25,7 @@ public class BlockStatementNode extends NodeImpl {
 	}
     
     @Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// pass down -- local variable declaration puts an entry
     	if (statement != null) {
     		statement.compile(s, f);

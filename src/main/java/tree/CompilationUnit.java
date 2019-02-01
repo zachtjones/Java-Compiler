@@ -6,6 +6,7 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 /** Represents a CompilationUnit, that is a source file.
 *  @author Zach Jones */
@@ -21,7 +22,7 @@ public class CompilationUnit extends NodeImpl implements Node {
     }
 
     @Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		// pass down to the types to do
 		for (TypeDecNode t : types) {
 			t.resolveImports(c);
@@ -29,7 +30,7 @@ public class CompilationUnit extends NodeImpl implements Node {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// don't call this method.
 	}
 

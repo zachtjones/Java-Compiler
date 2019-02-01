@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class SwitchStatementNode extends NodeImpl implements StatementNode {
     public Expression expression;
@@ -17,7 +18,7 @@ public class SwitchStatementNode extends NodeImpl implements StatementNode {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		expression.resolveImports(c);
 		for (int i = 0; i < labels.size(); i++) {
 			labels.get(i).resolveImports(c);
@@ -28,7 +29,7 @@ public class SwitchStatementNode extends NodeImpl implements StatementNode {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f)
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 		
 		throw new CompileException("Switch statement compiling not implemented yet.", getFileName(), getLine());

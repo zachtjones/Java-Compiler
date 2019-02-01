@@ -6,6 +6,7 @@ import helper.Types;
 import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.SetConditionStatement;
+import org.jetbrains.annotations.NotNull;
 
 /** left < right */
 public class LessThanExpressionNode extends NodeImpl implements Expression {
@@ -17,13 +18,13 @@ public class LessThanExpressionNode extends NodeImpl implements Expression {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		left.resolveImports(c);
 		right.resolveImports(c);
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		left.compile(s, f);
 		Register leftResult = f.allocator.getLast();
 		

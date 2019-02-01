@@ -10,6 +10,7 @@ import intermediate.GetStaticFieldAddressStatement;
 import intermediate.GetStaticFieldStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
+import org.jetbrains.annotations.NotNull;
 
 /** Represents accessing a field of an object. */
 public class FieldExpressionNode extends NodeImpl implements Expression, LValue {
@@ -20,12 +21,12 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		// identifier is a variable name, don't need to resolve imports
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f)
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 		
 		if (f.history.wasThisLast()) {

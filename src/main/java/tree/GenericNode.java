@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class GenericNode extends NodeImpl implements Node {
 
@@ -25,7 +26,7 @@ public class GenericNode extends NodeImpl implements Node {
 	}
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		if (hookSuper != null) {
 			for (NameNode n : hookSuper)
 				n.resolveImports(c);
@@ -40,7 +41,7 @@ public class GenericNode extends NodeImpl implements Node {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// TODO Auto-generated method stub
 		
 	}

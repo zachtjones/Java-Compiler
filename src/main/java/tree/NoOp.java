@@ -4,6 +4,7 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 /** Represents a do-nothing operation*/
 public class NoOp extends NodeImpl implements Expression, StatementNode, TypeDecNode {
@@ -13,10 +14,10 @@ public class NoOp extends NodeImpl implements Expression, StatementNode, TypeDec
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {}
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {}
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {}
 
 	@Override
 	public InterFile compile(String packageName, SymbolTable classLevel) throws CompileException {

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class ForInitNode extends NodeImpl {
 	// either this, or the second
@@ -17,7 +18,7 @@ public class ForInitNode extends NodeImpl {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		if (dec != null) {
 			dec.resolveImports(c);
 		} else {
@@ -28,7 +29,7 @@ public class ForInitNode extends NodeImpl {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		if (dec != null) {
 			dec.compile(s, f);
 		} else {

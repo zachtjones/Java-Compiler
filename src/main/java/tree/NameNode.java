@@ -6,6 +6,7 @@ import helper.ClassLookup;
 import helper.CompileException;
 import helper.Types;
 import intermediate.*;
+import org.jetbrains.annotations.NotNull;
 
 public class NameNode extends NodeImpl implements Expression, LValue {
 	public String primaryName;
@@ -16,7 +17,7 @@ public class NameNode extends NodeImpl implements Expression, LValue {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		//System.out.print("Replace: " + primaryName);
 		if (primaryName != null)
 			primaryName = c.getFullName(primaryName);
@@ -33,7 +34,7 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		if (generics != null) {
 			throw new CompileException("Generics compiling not supported yet.", getFileName(), getLine());
 			// TODO

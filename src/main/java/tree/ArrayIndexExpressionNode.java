@@ -6,6 +6,7 @@ import helper.Types;
 import intermediate.GetArrayValueStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
+import org.jetbrains.annotations.NotNull;
 
 /** [ expr ] */
 public class ArrayIndexExpressionNode extends NodeImpl implements Expression, LValue {
@@ -16,12 +17,12 @@ public class ArrayIndexExpressionNode extends NodeImpl implements Expression, LV
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		expr.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		Register array = f.allocator.getLast();
 		// get the index
 		expr.compile(s, f);

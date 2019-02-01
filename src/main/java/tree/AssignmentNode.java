@@ -6,6 +6,7 @@ import intermediate.CopyStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.StoreAddressStatement;
+import org.jetbrains.annotations.NotNull;
 
 /** left type right */
 public class AssignmentNode extends NodeImpl implements StatementExprNode, Expression {
@@ -22,13 +23,13 @@ public class AssignmentNode extends NodeImpl implements StatementExprNode, Expre
     }
 	
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		left.resolveImports(c);
 		right.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f)
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 		
 		if (type == null) {

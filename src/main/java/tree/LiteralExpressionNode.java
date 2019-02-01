@@ -4,6 +4,7 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.LoadLiteralStatement;
+import org.jetbrains.annotations.NotNull;
 
 public class LiteralExpressionNode extends NodeImpl implements Expression {
 	
@@ -14,12 +15,12 @@ public class LiteralExpressionNode extends NodeImpl implements Expression {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		// nothing to do
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// the IL code does the work here
 		f.statements.add(new LoadLiteralStatement(value, f.allocator, getFileName(), getLine()));
 	}

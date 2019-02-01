@@ -3,6 +3,7 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents the partial implementation of a Node in the parse tree.
@@ -10,20 +11,21 @@ import intermediate.InterFunction;
  */
 public abstract class NodeImpl implements Node {
 
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 
-	protected NodeImpl(String fileName, int line) {
+	protected NodeImpl(@NotNull String fileName, int line) {
 		this.fileName = fileName;
 		this.line = line;
 	}
 
 	@Override
-	public abstract void resolveImports(ClassLookup c) throws CompileException;
+	public abstract void resolveImports(@NotNull ClassLookup c) throws CompileException;
 
 	@Override
-	public abstract void compile(SymbolTable s, InterFunction f) throws CompileException;
+	public abstract void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException;
 
+	@NotNull
 	@Override
 	public final String getFileName() {
 		return this.fileName;

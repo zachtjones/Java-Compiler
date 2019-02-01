@@ -9,6 +9,7 @@ import intermediate.CallStaticStatement;
 import intermediate.CallVirtualStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
+import org.jetbrains.annotations.NotNull;
 
 /** ( expressions * )
 * This is the second part of a function call, the arguments list. */
@@ -16,19 +17,19 @@ public class ArgumentExpressionNode extends NodeImpl implements Expression {
     /** The expressions to evaluate before the function call. Could be empty, but will not be null. */
     public ArrayList<Expression> expressions = new ArrayList<>();
 
-    public ArgumentExpressionNode(String fileName, int line) {
+    public ArgumentExpressionNode(@NotNull String fileName, int line) {
     	super(fileName, line);
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		for (Expression e : expressions) {
 			e.resolveImports(c);
 		}
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 
 		// remove the getInstanceField part always added in from NameNode (in case it's a field)
 		f.statements.remove(f.statements.size() - 1);

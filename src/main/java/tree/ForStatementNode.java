@@ -7,6 +7,7 @@ import helper.CompileException;
 import intermediate.BranchStatementFalse;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
+import org.jetbrains.annotations.NotNull;
 
 public class ForStatementNode extends NodeImpl implements StatementNode {
     // these 3 are all optional, so could be null
@@ -21,7 +22,7 @@ public class ForStatementNode extends NodeImpl implements StatementNode {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		init.resolveImports(c);
 		condition.resolveImports(c);
 		for (StatementExprNode s : update) {
@@ -31,7 +32,7 @@ public class ForStatementNode extends NodeImpl implements StatementNode {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// create a new scope
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.local);
 		

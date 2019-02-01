@@ -6,6 +6,7 @@ import intermediate.BranchStatementFalse;
 import intermediate.InterFunction;
 import intermediate.JumpStatement;
 import intermediate.LabelStatement;
+import org.jetbrains.annotations.NotNull;
 
 public class IfStatementNode extends NodeImpl implements StatementNode {
     public Expression expression;
@@ -17,7 +18,7 @@ public class IfStatementNode extends NodeImpl implements StatementNode {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		expression.resolveImports(c);
 		statement.resolveImports(c);
 		if (elsePart != null) {
@@ -26,7 +27,7 @@ public class IfStatementNode extends NodeImpl implements StatementNode {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// create new scope
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.local);
 		

@@ -7,6 +7,7 @@ import helper.CompileException;
 import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class EnumNode extends NodeImpl implements TypeDecNode {
     public String name;
@@ -17,12 +18,12 @@ public class EnumNode extends NodeImpl implements TypeDecNode {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		// nothing needed
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// nothing needed either -- only simple enum's supported.
 		// this method should not be called, since you call the compile(String) one instead.
 	}

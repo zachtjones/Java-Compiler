@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class TryStatementNode extends NodeImpl implements StatementNode {
 	
@@ -20,7 +21,7 @@ public class TryStatementNode extends NodeImpl implements StatementNode {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		block.resolveImports(c);
 		for (int i = 0; i < catchParams.size(); i++) {
 			catchParams.get(i).resolveImports(c);
@@ -32,7 +33,7 @@ public class TryStatementNode extends NodeImpl implements StatementNode {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		throw new CompileException("try statements not implemented yet.", getFileName(), getLine());
 		// TODO
 	}

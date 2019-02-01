@@ -3,6 +3,7 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class ImportNode extends NodeImpl implements Node {
     public NameNode name;
@@ -13,12 +14,12 @@ public class ImportNode extends NodeImpl implements Node {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		// don't resolve import node's names, that doesn't make any sense.
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// don't need to resolve imports any more, as they are already done.
 	}
 }

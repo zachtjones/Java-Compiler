@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class MethodDeclaratorNode extends NodeImpl {
     public String name;
@@ -17,14 +18,14 @@ public class MethodDeclaratorNode extends NodeImpl {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		for (ParamNode p : params) {
 			p.resolveImports(c);
 		}
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 
 		// s is for the parameters, place them in s
 		for (ParamNode p : params) {

@@ -4,6 +4,7 @@ import helper.ClassLookup;
 import helper.CompileException;
 import helper.Types;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class LabeledStatementNode extends NodeImpl implements StatementNode {
     public String name;
@@ -14,12 +15,12 @@ public class LabeledStatementNode extends NodeImpl implements StatementNode {
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		statement.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// put the label into the table
 		s.putEntry(name, Types.LABEL, getFileName(), getLine());
 		
