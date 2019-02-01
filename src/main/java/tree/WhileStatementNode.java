@@ -9,11 +9,14 @@ import intermediate.LabelStatement;
 import org.jetbrains.annotations.NotNull;
 
 public class WhileStatementNode extends NodeImpl implements StatementNode {
-    public Expression expression;
-    public StatementNode statement;
+    @NotNull private final Expression expression;
+    @NotNull private final StatementNode statement;
 
-    public WhileStatementNode(String fileName, int line) {
+    public WhileStatementNode(@NotNull String fileName, int line, @NotNull Expression expression,
+							  @NotNull StatementNode statement) {
     	super(fileName, line);
+    	this.expression = expression;
+    	this.statement = statement;
     }
     
 	@Override

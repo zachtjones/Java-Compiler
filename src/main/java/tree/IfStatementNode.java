@@ -7,14 +7,19 @@ import intermediate.InterFunction;
 import intermediate.JumpStatement;
 import intermediate.LabelStatement;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class IfStatementNode extends NodeImpl implements StatementNode {
-    public Expression expression;
-    public StatementNode statement;
-    public StatementNode elsePart;
+    @NotNull private final Expression expression;
+    @NotNull private final StatementNode statement;
+    @Nullable private final StatementNode elsePart;
     
-    public IfStatementNode(String fileName, int line) {
+    public IfStatementNode(@NotNull String fileName, int line, @NotNull Expression expression,
+						   @NotNull StatementNode statement, @Nullable StatementNode elsePart) {
     	super(fileName, line);
+    	this.expression = expression;
+    	this.statement = statement;
+    	this.elsePart = elsePart;
     }
     
 	@Override

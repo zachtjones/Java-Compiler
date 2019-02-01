@@ -1555,37 +1555,41 @@ IfStatementNode IfStatement() :
  * as the second if is part of the last expression thing.
  */
 {
-    IfStatementNode i = new IfStatementNode(fileName, token.beginLine);
+    Expression expr;
+    StatementNode truePart;
+    StatementNode falsePart = null;
 }
 {
-    <IF> <LPAREN> i.expression=Expression() <RPAREN>
-    i.statement=Statement() [ LOOKAHEAD(1) <ELSE> i.elsePart=Statement() ]
+    <IF> <LPAREN> expr=Expression() <RPAREN>
+    truePart=Statement() [ LOOKAHEAD(1) <ELSE> falsePart=Statement() ]
     {
-        return i;
+        return new IfStatementNode(fileName, token.beginLine, expr, truePart, falsePart);
     }
 }
 
 WhileStatementNode WhileStatement() :
 {
-    WhileStatementNode w = new WhileStatementNode(fileName, token.beginLine);
+    Expression expression;
+    StatementNode statement;
 }
 {
-    <WHILE> <LPAREN> w.expression=Expression() <RPAREN>
-    w.statement=Statement()
+    <WHILE> <LPAREN> expression=Expression() <RPAREN>
+    statement=Statement()
     {
-        return w;
+        return new WhileStatement(fileName, token.beginLine, expression, statement);
     }
 }
 
 DoStatementNode DoStatement() :
 {
-    DoStatementNode d = new DoStatementNode(fileName, token.beginLine);
+    Expression expression;
+    StatementNode statement;
 }
 {
-    <DO> d.statement=Statement() <WHILE> <LPAREN>
-    d.expression=Expression() <RPAREN> <SEMICOLON>
+    <DO> statement=Statement() <WHILE> <LPAREN>
+    expression=Expression() <RPAREN> <SEMICOLON>
     {
-        return d;
+        return new DoStatementNode(fileName, token.beginLine, expression, statement);
     }
 }
 

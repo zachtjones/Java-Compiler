@@ -9,11 +9,15 @@ import org.jetbrains.annotations.NotNull;
 
 /** do { statement } while (expression); */
 public class DoStatementNode extends NodeImpl implements StatementNode {
-    public StatementNode statement;
-    public Expression expression;
+    @NotNull private final StatementNode statement;
+    @NotNull private final Expression expression;
 
-    public DoStatementNode(String fileName, int line) {
+    public DoStatementNode(@NotNull String fileName, int line, @NotNull StatementNode statement,
+						   @NotNull Expression expression) {
+
     	super(fileName, line);
+    	this.statement = statement;
+    	this.expression = expression;
     }
     
 	@Override
