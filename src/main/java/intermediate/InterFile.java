@@ -7,19 +7,19 @@ import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import tree.NameNode;
 import x64.X64File;
 
 import static helper.Types.fromFullyQualifiedClass;
 
 public class InterFile {
 	@NotNull private final String name;
-	@NotNull private String superClass;
-	private InterStructure staticPart;
-	private InterStructure instancePart;
-	private ArrayList<InterFunction> functions;
+	@NotNull private final String superClass;
+	@NotNull private final ArrayList<String> implementsClasses;
 
-	private ArrayList<NameNode> implementsNodes;
+	@NotNull private final InterStructure staticPart;
+	@NotNull private final InterStructure instancePart;
+	@NotNull private final ArrayList<InterFunction> functions;
+
 
 	/** name -> Map of list of args to return value */
 	private final Map<String, Map<List<Types>, Types>> typesOfFunctions;
@@ -29,9 +29,12 @@ public class InterFile {
 	 * @param name The name, such as java/util/Scanner
 	 * @param superClass The name of the superclass, same form as name.
 	 */
-	public InterFile(@NotNull String name, @NotNull String superClass) {
+	public InterFile(@NotNull String name, @NotNull String superClass,
+					 @NotNull ArrayList<String> implementsClasses) {
+
 		this.name = name;
 		this.superClass = superClass;
+		this.implementsClasses = implementsClasses;
 		this.staticPart = new InterStructure(false);
 		this.instancePart = new InterStructure(true);
 		this.functions = new ArrayList<>();
@@ -83,12 +86,11 @@ public class InterFile {
 		result.append('\n');
 
 		// interfaces
-		if (this.implementsNodes != null) {
+		if (!implementsClasses.isEmpty()) {
 			result.append("implements ");
-			for (NameNode n : this.implementsNodes) {
-				result.append(n.primaryName);
-				result.append(' ');
-			}
+			result.append(
+				String.join(", ", implementsClasses)
+			);
 			result.append('\n');
 		}
 
@@ -104,14 +106,6 @@ public class InterFile {
 		}
 
 		return result.toString();
-	}
-
-	/**
-	 * Sets the list of Names that this IL file implements
-	 * @param names The list of NameNode's
-	 */
-	public void setImplements(ArrayList<NameNode> names) {
-		this.implementsNodes = names;
 	}
 
 	/**
@@ -181,7 +175,8 @@ public class InterFile {
 	 * @return The JIL representation of the type
 	 * @throws CompileException if the field doesn't exist, or there is a problem checking it.
 	 */
-	public Types getInstFieldType(String fieldName, String fileName, int line) throws CompileException {
+	@NotNull
+	Types getInstFieldType(String fieldName, String fileName, int line) throws CompileException {
 		return instancePart.getFieldType(fieldName, fileName, line);
 	}
 
@@ -191,7 +186,8 @@ public class InterFile {
 	 * @return The JIL representation of the type
 	 * @throws CompileException if the field doesn't exist, or there is a problem checking it.
 	 */
-	public Types getStatFieldType(String fieldName, String fileName, int line) throws CompileException {
+	@NotNull
+	Types getStatFieldType(String fieldName, String fileName, int line) throws CompileException {
 		return staticPart.getFieldType(fieldName, fileName, line);
 	}
 
@@ -223,6 +219,7 @@ public class InterFile {
 	 * @return The X64 assembly file.
 	 * @throws CompileException If there is a problem converting the IL to the assembly.
 	 */
+	@NotNull
 	public X64File compileX64() throws CompileException {
 
 		// TODO use the inheritance to build to function tables
@@ -237,11 +234,12 @@ public class InterFile {
 	}
 
 	/** Returns the offset, in bytes for the fieldName within the structure. */
-	public int getFieldOffset(String fieldName) {
+	int getFieldOffset(String fieldName) {
 		return instancePart.getFieldOffset(fieldName);
 	}
 
-	public int getClassSize() {
+	/** Returns the size of the instance field table in bytes */
+	int getClassSize() {
 		return instancePart.getTotalSize();
 	}
 }

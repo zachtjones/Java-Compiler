@@ -40,6 +40,8 @@ public class ClassNode extends NodeImpl implements TypeDecNode {
 			for (NameNode n : interfaces) {
 				n.resolveImports(c);
 			}	
+		} else {
+			interfaces = new ArrayList<>();
 		}
 		for (ClassBodyNode b : body) {
 			b.resolveImports(c);
@@ -58,23 +60,18 @@ public class ClassNode extends NodeImpl implements TypeDecNode {
 	}
 
 	public InterFile compile(String packageName, SymbolTable classLevel) throws CompileException {
+    	ArrayList<NameNode> extendsNodes = isInterface ? supers : interfaces;
+    	ArrayList<String> extendsNames = new ArrayList<>();
+    	extendsNodes.forEach(i -> extendsNames.add(i.primaryName));
 		InterFile f;
 		if (packageName != null) {
-			f = new InterFile(packageName + "/" + name, superclass.primaryName);
+			f = new InterFile(packageName + "/" + name, superclass.primaryName, extendsNames);
 		} else {
-			f = new InterFile(name, superclass.primaryName);
+			f = new InterFile(name, superclass.primaryName, extendsNames);
 		}
 		
 		// place the class name in the symbol table (used for static fields)
 		classLevel.putEntry(name, Types.CLASS, getFileName(), getLine());
-		
-		// define the super classes and interfaces
-		//   - treated the same way (kind of)
-		if (this.isInterface) {
-			f.setImplements(this.supers);
-		} else {
-			f.setImplements(this.interfaces);
-		}
 
 		// put the symbols for this class into the symbol table
 		SymbolTable staticFields = new SymbolTable(classLevel, SymbolTable.staticFields);

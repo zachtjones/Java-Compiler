@@ -36,9 +36,9 @@ public class EnumNode extends NodeImpl implements TypeDecNode {
 	public InterFile compile(String packageName, SymbolTable classLevel) {
 		InterFile f;
 		if (packageName != null) {
-			f = new InterFile(packageName + "." + name, "java/lang/Enum");
+			f = new InterFile(packageName + "." + name, "java/lang/Enum", new ArrayList<>());
 		} else {
-			f = new InterFile(name, "java/lang/Enum");
+			f = new InterFile(name, "java/lang/Enum", new ArrayList<>());
 		}
 		for (int i = 0; i < values.size(); i++) {
 			String id = values.get(i);

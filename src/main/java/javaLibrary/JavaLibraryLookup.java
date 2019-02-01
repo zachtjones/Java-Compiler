@@ -50,23 +50,19 @@ public class JavaLibraryLookup {
             Class<?> classFound = JavaLibraryLookup.class.getClassLoader()
                 .loadClass(fullyQualified.replace('/','.'));
 
-            Class<?> superClass = classFound.getSuperclass();
+            String superClass = classFound.getSuperclass().getCanonicalName();
+
             Class<?>[] interfacesImplemented = classFound.getInterfaces();
+            // interfaces
+            ArrayList<String> interfaces = new ArrayList<>();
+            for (Class<?> implemented : interfacesImplemented) {
+                interfaces.add(implemented.getCanonicalName());
+            }
+
             Field[] fields = classFound.getDeclaredFields();
             Method[] methods = classFound.getMethods();
 
-            InterFile result = new InterFile(fullyQualified, superClass.getCanonicalName());
-
-
-
-            // interfaces
-            ArrayList<NameNode> interfaces = new ArrayList<>();
-            for (Class<?> implemented : interfacesImplemented) {
-                NameNode interfaceNode = new NameNode(fileName, line);
-                interfaceNode.primaryName = implemented.getCanonicalName();
-                interfaces.add(interfaceNode);
-            }
-            result.setImplements(interfaces);
+            InterFile result = new InterFile(fullyQualified, superClass, interfaces);
 
             // fields -- since this is just used for type checking,
             // we don't need to know the field's initial value if it has one
