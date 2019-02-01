@@ -4,7 +4,6 @@ import helper.CompileException;
 import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
-import tree.NameNode;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -73,9 +72,8 @@ public class JavaLibraryLookup {
 
             // methods -- again don't need to know the contents, just the signatures
             for (Method method : methods) {
-                InterFunction function = new InterFunction(fullyQualified);
-                function.name = method.getName();
-                function.returnType = Types.fromReflection(method.getReturnType());
+                Types returnType = Types.fromReflection(method.getReturnType());
+                InterFunction function = new InterFunction(fullyQualified, method.getName(), returnType);
 
                 ArrayList<Types> arguments = new ArrayList<>();
                 for (Class<?> argType : method.getParameterTypes()) {

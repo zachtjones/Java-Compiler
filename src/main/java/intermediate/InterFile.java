@@ -120,18 +120,13 @@ public class InterFile {
 	 * Generates the default constructor if needed.
 	 */
 	public void generateDefaultConstructor(@NotNull String fileName, int line) {
-		boolean hasOne = false;
-		for (InterFunction i : functions) {
-			if (i.name.equals("<init>")) {
-				hasOne = true;
-			}
-		}
+
+		boolean hasOne = functions.stream().anyMatch(InterFunction::isConstructor);
+
 		if (!hasOne) {
-			InterFunction d = new InterFunction(name);
+			InterFunction d = new InterFunction(name, "<init>", Types.VOID);
 			// add the name and return type
-			d.name = "<init>";
 			d.isInstance = true;
-			d.returnType = Types.VOID;
 
 			// TODO call to super (that's pretty complicated since the test classes extend object)
 			// in order to call a superclass that is part of the java library, have to do some sort of

@@ -42,14 +42,13 @@ public class MethodNode {
 	 * @throws CompileException If there is a compilation error.
 	 */
 	public void compile(InterFile f, SymbolTable syms) throws CompileException {
-		InterFunction func = new InterFunction(f.getName());
+		InterFunction func = new InterFunction(f.getName(), dec.name, resultType);
 		if (isNative) {
 			throw new CompileException("native methods not implemented yet.", "", -1);
 		}
 		
 		func.isInstance = !isStatic;
-		func.returnType = resultType;
-		
+
 		// TODO - final and synchronized, ... modifiers
 		
 		// create new scope, use the declaratorNode to add to the new scope
@@ -63,7 +62,7 @@ public class MethodNode {
 	}
 
 
-	public void putSymbols(SymbolTable classLevel) throws CompileException {
+	void putSymbols(SymbolTable classLevel) throws CompileException {
 		classLevel.putEntry(dec.name, isStatic ? Types.STATIC_FUNCTION : Types.INSTANCE_FUNCTION,
 			dec.getFileName(), dec.getLine());
 	}

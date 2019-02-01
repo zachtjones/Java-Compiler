@@ -54,10 +54,10 @@ public class FieldDeclarationNode extends NodeImpl {
 				// the type is null here
 				AssignmentNode a = new AssignmentNode(getFileName(), getLine(), n, d.init.e, null);
 
-				// compile the created expression.
-				InterFunction func = new InterFunction(f.getName());
 				// add instance initializer
-				func.name = isStatic ? "<clinit>" : "<init>"; // following java .class standard here
+				final String name = isStatic ? "<clinit>" : "<init>"; // following java .class standard here
+				// compile the created expression.
+				InterFunction func = new InterFunction(f.getName(), name, Types.VOID);
 				func.isInit = true;
 				func.isInstance = !isStatic;
 				a.compile(syms, func);

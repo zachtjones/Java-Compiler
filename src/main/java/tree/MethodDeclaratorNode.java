@@ -25,9 +25,7 @@ public class MethodDeclaratorNode extends NodeImpl {
 
 	@Override
 	public void compile(SymbolTable s, InterFunction f) throws CompileException {
-		// set the name
-		f.name = name;
-		
+
 		// s is for the parameters, place them in s
 		for (ParamNode p : params) {
 			s.putEntry(p.id.name, p.type, getFileName(), getLine());

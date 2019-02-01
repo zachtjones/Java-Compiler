@@ -54,13 +54,10 @@ public class ConstructorNode {
 	 */
 	public void compile(InterFile f, SymbolTable s) throws CompileException {
 		// TODO, handle super(...) or this(...)   (Issue #16)
-		// name is <init>
-		InterFunction func = new InterFunction(f.getName());
-		func.name = "<init>";
+		// name is <init>, returns void
+		InterFunction func = new InterFunction(f.getName(), "<init>", Types.VOID);
 		func.isInstance = true;
-		// returns object name
-		func.returnType = Types.fromFullyQualifiedClass(name);
-		
+
 		// symbol table for parameters
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.parameter);
 
