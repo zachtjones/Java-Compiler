@@ -10,13 +10,13 @@ import x64.X64Context;
 import x64.instructions.MoveInstruction;
 
 public class CopyStatement implements InterStatement {
-	private final Register src;
-	private final Register dest;
+	@NotNull private final Register src;
+	@NotNull private final Register dest;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
-	public CopyStatement(Register src, Register dest, String fileName, int line) {
+	public CopyStatement(@NotNull Register src, @NotNull Register dest, @NotNull String fileName, int line) {
 		this.src = src;
 		this.dest = dest;
 		this.fileName = fileName;

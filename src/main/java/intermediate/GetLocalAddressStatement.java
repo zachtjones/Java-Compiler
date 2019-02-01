@@ -8,10 +8,10 @@ import helper.Types;
 import org.jetbrains.annotations.NotNull;
 
 public class GetLocalAddressStatement implements InterStatement {
-	Register r;
-	private String localName;
+	@NotNull private final Register r;
+	@NotNull private String localName;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
 	/**
@@ -19,7 +19,8 @@ public class GetLocalAddressStatement implements InterStatement {
 	 * @param r The register to set containing the address
 	 * @param localName The local variable to get.
 	 */
-	public GetLocalAddressStatement(Register r, String localName, String fileName, int line) {
+	public GetLocalAddressStatement(@NotNull Register r, @NotNull String localName,
+									@NotNull String fileName, int line) {
 		this.r = r;
 		this.localName = localName;
 		this.fileName = fileName;

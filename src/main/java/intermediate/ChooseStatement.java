@@ -13,13 +13,13 @@ import org.jetbrains.annotations.NotNull;
  * @author zach jones
  */
 public class ChooseStatement implements InterStatement {
-	Register src1, src2, result;
+	@NotNull private Register src1, src2, result;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
-	public ChooseStatement(Register src1, Register src2, Register result,
-			String fileName, int line) {
+	public ChooseStatement(@NotNull Register src1, @NotNull Register src2, @NotNull Register result,
+						   @NotNull String fileName, int line) {
 		
 		this.src1 = src1;
 		this.src2 = src2;

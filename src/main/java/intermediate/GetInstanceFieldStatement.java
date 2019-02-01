@@ -16,12 +16,12 @@ import x64.operands.RegisterRelativePointer;
 import x64.operands.X64RegisterOperand;
 
 public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, GetInstanceFieldIdJNI, GetInstanceFieldJNI {
-	private Register instance;
-	private String fieldName;
+	@NotNull private Register instance;
+	@NotNull private String fieldName;
 	
-	Register result;
+	@NotNull private Register result;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
 	/**
@@ -29,8 +29,8 @@ public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, 
 	 * @param instance The instance's register holding it's value.
 	 * @param fieldName The field's name.
 	 */
-	public GetInstanceFieldStatement(Register instance, String fieldName, Register result,
-			String fileName, int line) {
+	public GetInstanceFieldStatement(@NotNull Register instance, @NotNull String fieldName, @NotNull Register result,
+									 @NotNull String fileName, int line) {
 		this.instance = instance;
 		this.fieldName = fieldName;
 		this.result = result;

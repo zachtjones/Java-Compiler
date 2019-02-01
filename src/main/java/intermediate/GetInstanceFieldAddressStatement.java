@@ -10,12 +10,12 @@ import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 
 public class GetInstanceFieldAddressStatement implements InterStatement {
-	private Register instance;
-	private String fieldName;
+	@NotNull private Register instance;
+	@NotNull private String fieldName;
 	
-	Register result;
+	@NotNull private final Register result;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
 	/**
@@ -23,8 +23,9 @@ public class GetInstanceFieldAddressStatement implements InterStatement {
 	 * @param instance The instance's register holding it's value.
 	 * @param fieldName The field's name.
 	 */
-	public GetInstanceFieldAddressStatement(Register instance, String fieldName, Register result,
-			String fileName, int line) {
+	public GetInstanceFieldAddressStatement(@NotNull Register instance, @NotNull String fieldName,
+											@NotNull Register result,
+											@NotNull String fileName, int line) {
 		this.instance = instance;
 		this.fieldName = fieldName;
 		this.result = result;

@@ -8,13 +8,13 @@ import org.jetbrains.annotations.NotNull;
 
 /** Represents the ending of a scope of a local variable. */
 public class EndScopeStatement implements InterStatement {
-	String name;
+	@NotNull private final String name;
 	
 	/**
 	 * Constructs a local variable scope ending statement.
 	 * @param name The name of the local variable.
 	 */
-	public EndScopeStatement(String name) {
+	public EndScopeStatement(@NotNull String name) {
 		this.name = name;
 	}
 

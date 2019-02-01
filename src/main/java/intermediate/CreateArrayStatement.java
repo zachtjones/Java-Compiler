@@ -8,9 +8,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class CreateArrayStatement implements InterStatement {
 
-	private Register size;
-	Types type;
-	Register result;
+	@NotNull private Register size;
+	@NotNull private final Types type;
+	@NotNull private final Register result;
 
 	/**
 	 * A statement that creates an array of the type specified.
@@ -18,7 +18,7 @@ public class CreateArrayStatement implements InterStatement {
 	 * @param type The type of the elements the array contains.
 	 * @param result The Register that should hold the result of the creation.
 	 */
-	public CreateArrayStatement(Register size, Types type, Register result) {
+	public CreateArrayStatement(@NotNull Register size, @NotNull Types type, @NotNull Register result) {
 		this.size = size;
 		this.type = type;
 		this.result = result;

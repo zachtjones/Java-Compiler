@@ -9,16 +9,16 @@ import org.jetbrains.annotations.NotNull;
 
 public class GetArrayValueAddressStatement implements InterStatement {
 	
-	Register array, index, result;
+	@NotNull private Register array, index, result;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 
 	/**
 	 * Represents getting a value's address out of an array.
 	 */
-	public GetArrayValueAddressStatement(Register array, Register index, Register result,
-			String fileName, int line) {
+	public GetArrayValueAddressStatement(@NotNull Register array, @NotNull Register index, @NotNull Register result,
+										 @NotNull String fileName, int line) {
 		this.array = array;
 		this.index = index;
 		this.result = result;
