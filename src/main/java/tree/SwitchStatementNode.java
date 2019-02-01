@@ -8,23 +8,22 @@ import intermediate.InterFunction;
 import org.jetbrains.annotations.NotNull;
 
 public class SwitchStatementNode extends NodeImpl implements StatementNode {
-    public Expression expression;
-    // these next two are same length
-    public ArrayList<SwitchLabelNode> labels;
-    public ArrayList<ArrayList<BlockStatementNode> > statements;
+    @NotNull private final Expression expression;
+	@NotNull private final ArrayList<SwitchStatementPart> parts;
     
-    public SwitchStatementNode(String fileName, int line) {
+    public SwitchStatementNode(@NotNull String fileName, int line,
+							   @NotNull Expression expression,
+							   @NotNull ArrayList<SwitchStatementPart> parts) {
     	super(fileName, line);
+    	this.parts = parts;
+    	this.expression = expression;
     }
 
 	@Override
 	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		expression.resolveImports(c);
-		for (int i = 0; i < labels.size(); i++) {
-			labels.get(i).resolveImports(c);
-			for (BlockStatementNode b : statements.get(i)) {
-				b.resolveImports(c);
-			}
+		for (SwitchStatementPart part : parts) {
+			part.resolveImports(c);
 		}
 	}
 
@@ -33,13 +32,5 @@ public class SwitchStatementNode extends NodeImpl implements StatementNode {
 			throws CompileException {
 		
 		throw new CompileException("Switch statement compiling not implemented yet.", getFileName(), getLine());
-		
-		/*expression.compile(s, 0, null);
-		for (int i = 0; i < labels.size(); i++) {
-			labels.get(i).compile(s, 0, null);
-			for (BlockStatementNode b : statements.get(i)) {
-				b.compile(s, 0, null);
-			}
-		}*/
 	}
 }

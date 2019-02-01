@@ -4,13 +4,14 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SwitchLabelNode extends NodeImpl {
-    public Expression expression;
-    public boolean isDefault; // if default, no expression
-    
-    public SwitchLabelNode(String fileName, int line) {
+    @Nullable private final Expression expression; // if "default", no expression
+
+    public SwitchLabelNode(String fileName, int line, @Nullable Expression expression) {
     	super(fileName, line);
+    	this.expression = expression;
     }
     
 	@Override

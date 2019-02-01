@@ -664,7 +664,6 @@ ArrayList<NameNode> BoundList() :
 }
 {
     temp=Name(){ n.add(temp); }
-    // choice conflict since name could go to '&' somehow -- TODO
     ( <BIT_AND> temp=Name() { n.add(temp); } )*
     {
         return n;
@@ -1516,38 +1515,35 @@ StatementExprNode StatementExpression() :
 
 SwitchStatementNode SwitchStatement() :
 {
-    SwitchStatementNode s = new SwitchStatementNode(fileName, token.beginLine);
-    s.labels = new ArrayList<SwitchLabelNode>();
-    s.statements = new ArrayList<ArrayList<BlockStatementNode>>();
-    SwitchLabelNode temp;
-    BlockStatementNode temp2;
-    ArrayList<BlockStatementNode> currStatements = new ArrayList<BlockStatementNode>();
-    /* This rule is a bit funky as you can have a variable number of statements
-      in each labeled thing */
+    Expression expression; // switch(expression)
+    ArrayList<SwitchStatementPart> parts = new ArrayList<SwitchStatementPart>(); // label: (Statements)*
+
+    SwitchLabelNode tempLabel;
+    ArrayList<BlockStatementNode> statements = new ArrayList<BlockStatementNode>();
+    BlockStatementNode tempExpression;
 }
 {
-    <SWITCH> <LPAREN> s.expression=Expression() <RPAREN> <LBRACE>
-        ( temp=SwitchLabel() { s.labels.add(temp); }
-            ( temp2=BlockStatement() { currStatements.add(temp2); } )*
+    <SWITCH> <LPAREN> expression=Expression() <RPAREN> <LBRACE>
+        ( tempLabel=SwitchLabel()
+            ( tempExpression=BlockStatement() { statements.add(tempExpression); } )*
             {
-                s.statements.add(currStatements);
-                currStatements = new ArrayList<BlockStatementNode>();
+                parts.add(new SwitchStatementPart(fileName, token.beginLine, tempLabel, statements));
             }
         )*
     <RBRACE>
     {
-        return s;
+        return new SwitchStatementNode(fileName, token.beginLine, expression, parts);
     }
 }
 
 SwitchLabelNode SwitchLabel() :
 {
-    SwitchLabelNode s = new SwitchLabelNode(fileName, token.beginLine);
+    Expression expr;
 }
 {
-  <CASE> s.expression=Expression() <COLON> { return s; }
+  <CASE> expr=Expression() <COLON> { return new SwitchLabelNode(fileName, token.beginLine, expr); }
 |
-  <_DEFAULT> <COLON> { s.isDefault=true; return s; }
+  <_DEFAULT> <COLON> { return new SwitchLabelNode(fileName, token.beginLine, null); }
 }
 
 IfStatementNode IfStatement() :
