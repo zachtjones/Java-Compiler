@@ -1,6 +1,7 @@
 package main;
 
 import helper.CompileException;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -14,7 +15,7 @@ public class FileWriter {
      * @param content The content to write as a string (platform default encoding).
      * @throws CompileException If there is an error writing to the file
 =     */
-    public static void writeToOutput(OutputDirs directory, String name, String content)
+    public static void writeToOutput(@NotNull OutputDirs directory, @NotNull String name, @NotNull String content)
             throws CompileException {
 
         directory.createDir();

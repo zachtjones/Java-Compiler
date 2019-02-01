@@ -1,5 +1,7 @@
 package main;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
 import java.util.stream.Collectors;
 
@@ -11,7 +13,8 @@ public class FileReader {
      * @param name The file's name in the resources folder.
      * @return The contents of the file, using the platform's new line (CRLF on Windows, LF on Mac)
      */
-    public static String readResourcesFile(String name) {
+    @NotNull
+    public static String readResourcesFile(@NotNull String name) {
         InputStream is = FileReader.class.getClassLoader().getResourceAsStream(name);
         if (is == null) { // resource doesn't exist, treat as empty file
             return "";

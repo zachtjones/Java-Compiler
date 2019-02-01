@@ -5,6 +5,7 @@ import helper.ProcessRunner;
 import intermediate.InterFile;
 import intermediate.InterStructure;
 import intermediate.RegisterAllocator;
+import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.X64File;
 import x64.instructions.CallClassMethod;
@@ -15,10 +16,10 @@ import static main.FileReader.readResourcesFile;
 import static main.FileWriter.writeToOutput;
 
 public class JavaCompiledMain {
-    private final String content;
-    private final InterFile mainClass;
+    @NotNull private final String content;
+    @NotNull private final InterFile mainClass;
 
-    JavaCompiledMain(InterFile mainClass) {
+    JavaCompiledMain(@NotNull InterFile mainClass) {
         content = readResourcesFile("Main.java");
         this.mainClass = mainClass;
     }

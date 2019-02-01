@@ -4,6 +4,7 @@ import helper.CompileException;
 import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -18,8 +19,8 @@ import static main.FileReader.readResourcesFile;
  */
 public class JavaLibraryLookup {
 
-    private static final String[] lines = readResourcesFile("javaLookup.txt").split("\n");
-    private static final Map<String, InterFile> javaCache = new HashMap<>();
+    @NotNull private static final String[] lines = readResourcesFile("javaLookup.txt").split("\n");
+    @NotNull private static final Map<String, InterFile> javaCache = new HashMap<>();
 
     static {
         for (int i = 0; i < lines.length; i++) {
@@ -28,13 +29,16 @@ public class JavaLibraryLookup {
     }
 
     /** Returns the list of fully qualified names of the classes, enums, and interfaces in the package. */
-    public static List<String> getClassesInPackage(String packageName) {
+    @NotNull
+    public static List<String> getClassesInPackage(@NotNull String packageName) {
         return Arrays.stream(lines)
                 .filter(line -> line.startsWith(packageName))
                 .collect(Collectors.toList());
     }
 
-    public static InterFile getLibraryFile(String fullyQualified, String fileName, int line) throws CompileException {
+    @NotNull
+    public static InterFile getLibraryFile(@NotNull String fullyQualified, @NotNull String fileName, int line)
+            throws CompileException {
 
         // use the cache if already there
         if (javaCache.containsKey(fullyQualified)) {

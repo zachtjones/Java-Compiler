@@ -10,6 +10,7 @@ import helper.CompileException;
 import helper.ProcessRunner;
 import helper.Types;
 import javaLibrary.JavaLibraryLookup;
+import org.jetbrains.annotations.NotNull;
 import tree.*;
 import intermediate.*;
 import x64.X64File;
@@ -27,7 +28,7 @@ public class JavaCompiler {
 	 * @param fullyQualifiedName The java class name (ex: java/lang/String)
 	 * @return The Intermediate file representation, or null 
 	 */
-	public static InterFile parseAndCompile(String fullyQualifiedName, String fileName, int line)
+	public static InterFile parseAndCompile(@NotNull String fullyQualifiedName, @NotNull String fileName, int line)
 			throws CompileException {
 		
 		fullyQualifiedName = fullyQualifiedName.replace('.', '/');
