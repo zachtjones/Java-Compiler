@@ -32,6 +32,9 @@ public class ClassNode extends NodeImpl implements TypeDecNode {
 	public void resolveImports(ClassLookup c) throws CompileException {
 		if (superclass != null) {
 			superclass.resolveImports(c);
+		} else {
+			superclass = new NameNode(getFileName(), getLine());
+			superclass.primaryName = "java/lang/Object";
 		}
 		if (interfaces != null) {
 			for (NameNode n : interfaces) {
@@ -57,9 +60,9 @@ public class ClassNode extends NodeImpl implements TypeDecNode {
 	public InterFile compile(String packageName, SymbolTable classLevel) throws CompileException {
 		InterFile f;
 		if (packageName != null) {
-			f = new InterFile(packageName + "/" + name);
+			f = new InterFile(packageName + "/" + name, superclass.primaryName);
 		} else {
-			f = new InterFile(name);
+			f = new InterFile(name, superclass.primaryName);
 		}
 		
 		// place the class name in the symbol table (used for static fields)
@@ -70,9 +73,7 @@ public class ClassNode extends NodeImpl implements TypeDecNode {
 		if (this.isInterface) {
 			f.setImplements(this.supers);
 		} else {
-			f.setExtends(this.superclass);
 			f.setImplements(this.interfaces);
-			
 		}
 
 		// put the symbols for this class into the symbol table

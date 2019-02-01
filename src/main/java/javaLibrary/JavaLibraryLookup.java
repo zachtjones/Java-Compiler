@@ -55,12 +55,9 @@ public class JavaLibraryLookup {
             Field[] fields = classFound.getDeclaredFields();
             Method[] methods = classFound.getMethods();
 
-            InterFile result = new InterFile(fullyQualified);
+            InterFile result = new InterFile(fullyQualified, superClass.getCanonicalName());
 
-            // super classes
-            NameNode superClassNode = new NameNode(fileName, line);
-            superClassNode.primaryName = superClass.getCanonicalName();
-            result.setExtends(superClassNode);
+
 
             // interfaces
             ArrayList<NameNode> interfaces = new ArrayList<>();

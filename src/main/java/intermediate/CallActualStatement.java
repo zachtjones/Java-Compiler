@@ -3,7 +3,6 @@ package intermediate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.stream.Collectors;
 
 import helper.CompileException;
 import helper.Types;
@@ -64,17 +63,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			InterFile e = JavaCompiler.parseAndCompile(obj.getType().getClassName(fileName, line), fileName, line);
 			ArrayList<Types> argsList = new ArrayList<>();
 			Arrays.stream(args).map(Register::getType).forEachOrdered(argsList::add);
-			Types returnType = e.getReturnType(name, argsList);
-
-			if (returnType == null) {
-				final String signature = name + "(" +
-					Arrays.stream(args)
-					.map(i -> i.getType().getIntermediateRepresentation())
-					.collect(Collectors.joining()) + ")";
-
-				throw new CompileException("no method found with signature, " + signature
-				+ ", referenced", fileName, line);
-			}
+			Types returnType = e.getReturnType(name, argsList, fileName, line);
 
 			returnVal.setType(returnType);
 			regs.put(returnVal, returnType);

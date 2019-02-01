@@ -63,17 +63,7 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 			InterFile e = JavaCompiler.parseAndCompile(className, fileName, line);
 			ArrayList<Types> argsList = new ArrayList<>();
 			Arrays.stream(args).map(Register::getType).forEachOrdered(argsList::add);
-			Types returnType = e.getReturnType(functionName, argsList);
-
-			if (returnType == null) {
-				final String signature = functionName + "(" +
-					Arrays.stream(args)
-					.map(i -> i.getType().getIntermediateRepresentation())
-					.collect(Collectors.joining()) + ")";
-
-				throw new CompileException("no method found with signature, " + signature
-				+ ", referenced", fileName, line);
-			}
+			Types returnType = e.getReturnType(functionName, argsList, fileName, line);
 
 			returnVal.setType(returnType);
 			regs.put(returnVal, returnType);

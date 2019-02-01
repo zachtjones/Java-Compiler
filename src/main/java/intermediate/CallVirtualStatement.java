@@ -68,16 +68,8 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 
 			ArrayList<Types> argsList = new ArrayList<>();
 			Arrays.stream(args).map(Register::getType).forEachOrdered(argsList::add);
-			Types returnType = e.getReturnType(name, argsList);
-			
-			if (returnType == null) {
-				String signature = argsList.stream()
-					.map(Types::getIntermediateRepresentation)
-					.collect(Collectors.joining());
-				throw new CompileException("no method in " + e.getName() + " found with signature, " + signature
-						+ ", referenced", fileName, line);
-			}
-			
+			Types returnType = e.getReturnType(name, argsList, fileName, line);
+
 			returnVal.setType(returnType);
 			regs.put(returnVal, returnType);
 		}

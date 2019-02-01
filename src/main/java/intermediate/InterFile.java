@@ -1,10 +1,12 @@
 package intermediate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import tree.NameNode;
 import x64.X64File;
 
@@ -12,12 +14,12 @@ import static helper.Types.fromFullyQualifiedClass;
 
 public class InterFile {
 	@NotNull private final String name;
+	@NotNull private String superClass;
 	private InterStructure staticPart;
 	private InterStructure instancePart;
 	private ArrayList<InterFunction> functions;
 
 	private ArrayList<NameNode> implementsNodes;
-	private NameNode superNode;
 
 	/** name -> Map of list of args to return value */
 	private final Map<String, Map<List<Types>, Types>> typesOfFunctions;
@@ -25,9 +27,11 @@ public class InterFile {
 	/**
 	 * Creates an intermediate file, given the name
 	 * @param name The name, such as java/util/Scanner
+	 * @param superClass The name of the superclass, same form as name.
 	 */
-	public InterFile(@NotNull String name) {
+	public InterFile(@NotNull String name, @NotNull String superClass) {
 		this.name = name;
+		this.superClass = superClass;
 		this.staticPart = new InterStructure(false);
 		this.instancePart = new InterStructure(true);
 		this.functions = new ArrayList<>();
@@ -41,7 +45,7 @@ public class InterFile {
 	 * @param isStatic true if the field is static, 
 	 * false if it is instance-based.
 	 */
-	public void addField(Types type, String name, boolean isStatic) {
+	public void addField(@NotNull Types type, @NotNull String name, boolean isStatic) {
 		addField(type, name, isStatic, null);
 	}
 
@@ -53,7 +57,7 @@ public class InterFile {
 	 * @param value The default value of the field.
 	 * false if it is instance-based.
 	 */
-	public void addField(Types type, String name, boolean isStatic, String value) {
+	public void addField(@NotNull Types type, @NotNull String name, boolean isStatic, @Nullable String value) {
 		if (isStatic) {
 			this.staticPart.addMember(type, name, value);
 		} else {
@@ -74,11 +78,9 @@ public class InterFile {
 		result.append(".jil\n\n");
 
 		// super class
-		if (this.superNode != null) {
-			result.append("super ");
-			result.append(this.superNode.primaryName);
-			result.append('\n');
-		}
+		result.append("super ");
+		result.append(this.superClass);
+		result.append('\n');
 
 		// interfaces
 		if (this.implementsNodes != null) {
@@ -113,25 +115,17 @@ public class InterFile {
 	}
 
 	/**
-	 * Sets the name that this IL file has as a superclass
-	 * @param superclass The NameNode representing the superclass.
-	 */
-	public void setExtends(NameNode superclass) {
-		this.superNode = superclass;
-	}
-
-	/**
 	 * Adds an intermediate file function to the list.
 	 * @param func The IL function.
 	 */
-	public void addFunction(InterFunction func) {
+	public void addFunction(@NotNull InterFunction func) {
 		this.functions.add(func);
 	}
 
 	/**
 	 * Generates the default constructor if needed.
 	 */
-	public void generateDefaultConstructor(String fileName, int line) {
+	public void generateDefaultConstructor(@NotNull String fileName, int line) {
 		boolean hasOne = false;
 		for (InterFunction i : functions) {
 			if (i.name.equals("<init>")) {
@@ -207,11 +201,21 @@ public class InterFile {
 	 * @param args The array of arguments.
 	 * @return The return object type, or null if there's no method with that signature
 	 */
-	public Types getReturnType(String name, ArrayList<Types> args) {
+	@NotNull
+	public Types getReturnType(@NotNull String name, @NotNull ArrayList<Types> args,
+							   @NotNull String fileName, int line) throws CompileException {
+
 		if (typesOfFunctions.containsKey(name)) {
 			return typesOfFunctions.get(name).get(args);
+		} else {
+			final String signature = name + "(" +
+				args.stream()
+					.map(Types::getIntermediateRepresentation)
+					.collect(Collectors.joining()) + ")";
+
+			throw new CompileException("no method found with signature, " + signature
+				+ ", referenced", fileName, line);
 		}
-		return null;
 	}
 
 	/**

@@ -117,9 +117,11 @@ public class JavaCompiler {
 		arg.add(Types.arrayOf(Types.STRING));
 
 		for (InterFile f : files) {
-			if (f.getReturnType("main", arg) != null) {
+			// verify there is a main method
+			try {
+				f.getReturnType("main", arg, f.getName(), -1);
 				mainClass = f;
-			}
+			} catch (CompileException ignored) {}
 		}
 
 		// enforce there is a `static void main(String[] args)`
