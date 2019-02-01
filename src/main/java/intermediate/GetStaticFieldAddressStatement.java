@@ -9,11 +9,11 @@ import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 
 public class GetStaticFieldAddressStatement implements InterStatement {
-	private String className;
-	private String fieldName;
-	Register result;
+	@NotNull private final String className;
+	@NotNull private final String fieldName;
+	@NotNull private final Register result;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
 	/**
@@ -22,8 +22,8 @@ public class GetStaticFieldAddressStatement implements InterStatement {
 	 * @param fieldName The field's name.
 	 * @param register The result register.
 	 */
-	public GetStaticFieldAddressStatement(String className, String fieldName, Register register,
-			String fileName, int line) {
+	public GetStaticFieldAddressStatement(@NotNull String className, @NotNull String fieldName,
+			@NotNull Register register, @NotNull String fileName, int line) {
 		
 		this.className = className;
 		this.fieldName = fieldName;

@@ -13,10 +13,10 @@ import static x64.allocation.CallingConvention.argumentRegister;
 
 /** getParam %register = name */
 public class GetParamStatement implements InterStatement {
-	Register r;
-	private String localName;
+	@NotNull private final Register r;
+	@NotNull private final String localName;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 
 	private InterFunction func;
@@ -26,7 +26,7 @@ public class GetParamStatement implements InterStatement {
 	 * @param r The register number to set
 	 * @param localName The parameter to get.
 	 */
-	public GetParamStatement(Register r, String localName, String fileName, int line) {
+	public GetParamStatement(@NotNull Register r, @NotNull String localName, @NotNull String fileName, int line) {
 		this.r = r;
 		this.localName = localName;
 		this.fileName = fileName;

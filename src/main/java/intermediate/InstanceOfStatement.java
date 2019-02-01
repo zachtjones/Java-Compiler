@@ -10,16 +10,16 @@ import org.jetbrains.annotations.NotNull;
 
 public class InstanceOfStatement implements InterStatement {
 	
-	private Register source;
-	private String ilClassName;
-	private Register result;
+	@NotNull private final Register source;
+	@NotNull private final String ilClassName;
+	@NotNull private final Register result;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
 
-	public InstanceOfStatement(Register source, String ilClassName, Register result, 
-			String fileName, int line) {
+	public InstanceOfStatement(@NotNull Register source, @NotNull String ilClassName, @NotNull Register result,
+							   @NotNull String fileName, int line) {
 		
 		this.source = source;
 		this.ilClassName = ilClassName;
@@ -35,9 +35,6 @@ public class InstanceOfStatement implements InterStatement {
 		UsageCheck.verifyDefined(source, regs, fileName, line);
 		// verify the class exists
 		JavaCompiler.parseAndCompile(ilClassName, fileName, line);
-		
-		// TODO Auto-generated method stub
-
 	}
 	
 	@Override

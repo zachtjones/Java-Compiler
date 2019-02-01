@@ -4,13 +4,14 @@ import java.util.*;
 
 import helper.CompileException;
 import helper.Types;
+import org.jetbrains.annotations.NotNull;
 import tree.NameNode;
 import x64.X64File;
 
 import static helper.Types.fromFullyQualifiedClass;
 
 public class InterFile {
-	private String name;
+	@NotNull private final String name;
 	private InterStructure staticPart;
 	private InterStructure instancePart;
 	private ArrayList<InterFunction> functions;
@@ -25,7 +26,7 @@ public class InterFile {
 	 * Creates an intermediate file, given the name
 	 * @param name The name, such as java/util/Scanner
 	 */
-	public InterFile(String name) {
+	public InterFile(@NotNull String name) {
 		this.name = name;
 		this.staticPart = new InterStructure(false);
 		this.instancePart = new InterStructure(true);
@@ -60,8 +61,8 @@ public class InterFile {
 		}
 	}
 
-	/** Gets the file's name (with package, using '/') as a String.
-	 */
+	/** Gets the file's name (with package, using '/') as a String. */
+	@NotNull
 	public String getName() {
 		return name;
 	}

@@ -16,11 +16,11 @@ import x64.operands.X64RegisterOperand;
 import static x64.operands.PCRelativeData.fromField;
 
 public class GetStaticFieldStatement implements InterStatement, FindClassJNI, GetStaticFieldIdJNI, GetStaticFieldJNI {
-	private final String className;
-	private final String fieldName;
-	Register result;
+	@NotNull private final String className;
+	@NotNull private final String fieldName;
+	@NotNull private final Register result;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
 	/**
@@ -29,8 +29,8 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 	 * @param fieldName The field's name.
 	 * @param register The result register.
 	 */
-	public GetStaticFieldStatement(String className, String fieldName, Register register,
-			String fileName, int line) {
+	public GetStaticFieldStatement(@NotNull String className, @NotNull String fieldName, @NotNull Register register,
+			@NotNull String fileName, int line) {
 		
 		this.className = className;
 		this.fieldName = fieldName;
