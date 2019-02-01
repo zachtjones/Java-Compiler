@@ -8,10 +8,11 @@ import org.jetbrains.annotations.NotNull;
 
 /** ~ expr */
 public class BitwiseNotExpressionNode extends NodeImpl implements Expression {
-    public Expression expr;
+    @NotNull private final Expression expr;
 
-    public BitwiseNotExpressionNode(@NotNull String fileName, int line) {
+    public BitwiseNotExpressionNode(@NotNull String fileName, int line, @NotNull Expression expr) {
     	super(fileName, line);
+    	this.expr = expr;
     }
 
     @Override

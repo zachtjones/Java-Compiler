@@ -1076,9 +1076,7 @@ Expression UnaryExpressionNotPlusMinus() :
     e=UnaryExpression()
     {
         if (type == 0) {
-            BitwiseNotExpressionNode b = new BitwiseNotExpressionNode(fileName, token.beginLine);
-            b.expr = e;
-            return b;
+            return new BitwiseNotExpressionNode(fileName, token.beginLine, e);
         } else {
             LogicalNotExpressionNode l = new LogicalNotExpressionNode(fileName, token.beginLine);
             l.expr = e;
@@ -1435,15 +1433,15 @@ LabeledStatementNode LabeledStatement() :
 
 BlockNode Block() :
 {
-    BlockNode b = new BlockNode(fileName, token.beginLine);
-    b.statements = new ArrayList<BlockStatementNode>();
+    int line = token.beginLine;
+    ArrayList<BlockStatementNode> statements = new ArrayList<BlockStatementNode>();
     BlockStatementNode s;
 }
 {
     <LBRACE> ( s=BlockStatement()
-    { b.statements.add(s); } )* <RBRACE>
+    { statements.add(s); } )* <RBRACE>
     {
-        return b;
+        return new BlockNode(fileName, line, statements);
     }
 }
 

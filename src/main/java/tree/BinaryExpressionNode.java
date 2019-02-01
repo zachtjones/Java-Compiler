@@ -8,11 +8,12 @@ import intermediate.Register;
 import org.jetbrains.annotations.NotNull;
 
 public class BinaryExpressionNode extends NodeImpl implements Expression {
-	private final Expression left;
-	private final Expression right;
-	private final BinaryOperation op;
+	@NotNull private final Expression left;
+	@NotNull private final Expression right;
+	@NotNull private final BinaryOperation op;
 
-	public BinaryExpressionNode(@NotNull String fileName, int line, Expression left, Expression right, BinaryOperation op) {
+	public BinaryExpressionNode(@NotNull String fileName, int line, @NotNull Expression left,
+								@NotNull Expression right, @NotNull BinaryOperation op) {
 		super(fileName, line);
 		this.left = left;
 		this.right = right;

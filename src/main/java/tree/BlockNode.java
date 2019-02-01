@@ -11,10 +11,11 @@ import intermediate.InterFunction;
 import org.jetbrains.annotations.NotNull;
 
 public class BlockNode extends NodeImpl implements StatementNode {
-    public ArrayList<BlockStatementNode> statements;
+    @NotNull private final ArrayList<BlockStatementNode> statements;
 
-    public BlockNode(String fileName, int line) {
+    public BlockNode(@NotNull String fileName, int line, @NotNull ArrayList<BlockStatementNode> statements) {
     	super(fileName, line);
+    	this.statements = statements;
     }
 
 	@Override
