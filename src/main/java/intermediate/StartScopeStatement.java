@@ -10,15 +10,15 @@ import x64.operands.X64RegisterOperand;
 
 /** Represents the starting of a scope of a local variable. */
 public class StartScopeStatement implements InterStatement {
-	private final String name;
-	private final Types type;
+	@NotNull private final String name;
+	@NotNull private final Types type;
 	
 	/**
 	 * Constructs a local variable scope starting statement.
 	 * @param name The name of the local variable.
 	 * @param type The type of the local variable (in IL representation)
 	 */
-	public StartScopeStatement(String name, Types type) {
+	public StartScopeStatement(@NotNull String name, @NotNull Types type) {
 		this.name = name;
 		this.type = type;
 	}

@@ -15,12 +15,12 @@ import static x64.allocation.CallingConvention.returnValueRegister;
 /** return register; */
 public class ReturnRegStatement implements InterStatement {
 
-	private final Register r;
+	@NotNull private final Register r;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
-	public ReturnRegStatement(Register regNum, String fileName, int line) {
+	public ReturnRegStatement(@NotNull Register regNum, @NotNull String fileName, int line) {
 		this.r = regNum;
 		this.fileName = fileName;
 		this.line = line;
@@ -35,7 +35,7 @@ public class ReturnRegStatement implements InterStatement {
 	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
 						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
-		if (func.returnType == null) {
+		if (func.returnType.equals(Types.VOID)) {
 			throw new CompileException("Can't return an expression from void function.", fileName, line);
 		}
 		UsageCheck.verifyDefined(r, regs, fileName, line);

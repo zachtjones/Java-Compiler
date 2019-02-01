@@ -7,9 +7,9 @@ import helper.Types;
 import org.jetbrains.annotations.NotNull;
 
 public class LabelStatement implements InterStatement {
-	String name;
+	@NotNull public final String name;
 	
-	public LabelStatement(String name) {
+	public LabelStatement(@NotNull String name) {
 		this.name = name;
 	}
 	

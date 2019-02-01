@@ -1,16 +1,17 @@
 package intermediate;
 
 import helper.Types;
+import org.jetbrains.annotations.NotNull;
 
 public class RegisterAllocator {
-	private Register curr = new Register(0, Types.UNKNOWN, "", -1);
-	private Register before = new Register(0, Types.UNKNOWN, "", -1);
+	@NotNull private Register curr = new Register(0, Types.UNKNOWN, "", -1);
+	@NotNull private Register before = new Register(0, Types.UNKNOWN, "", -1);
 
 	/**
 	 * Gets the next register (of the type specified)
 	 * @param type A Types instance that is the intermediate file's representation.
 	 */
-	public Register getNext(Types type) {
+	public Register getNext(@NotNull Types type) {
 		before = curr;
 		// this one won't get Compile called on
 		curr = new Register(curr.num + 1, type, "", -1);

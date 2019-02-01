@@ -8,9 +8,9 @@ import org.jetbrains.annotations.NotNull;
 
 /** jump LABEL; */
 public class JumpStatement implements InterStatement {
-	private final LabelStatement label;
+	@NotNull private final LabelStatement label;
 	
-	public JumpStatement(LabelStatement label) {
+	public JumpStatement(@NotNull LabelStatement label) {
 		this.label = label;
 	}
 	

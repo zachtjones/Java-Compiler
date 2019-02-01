@@ -17,12 +17,12 @@ import static x64.operands.PCRelativeData.pointerFromLabel;
 /** load 10 into %i12; load "hello, world" into %r4, ... */
 public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 
-	public String value;
+	@NotNull public String value;
 	// 4 types of literals: char, String, long, double.
-	public Register r;
+	@NotNull public final Register r;
 	
-	public LoadLiteralStatement(String literalValue, RegisterAllocator regAlloc,
-			String fileName, int line) throws CompileException {
+	public LoadLiteralStatement(@NotNull String literalValue, @NotNull RegisterAllocator regAlloc,
+			@NotNull String fileName, int line) throws CompileException {
 
 		value = literalValue; // or set to something else later.
 		if (literalValue.charAt(0) == '"') {

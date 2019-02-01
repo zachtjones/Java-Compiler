@@ -20,13 +20,14 @@ public class StoreAddressStatement implements InterStatement,
 		FindClassJNI, GetInstanceFieldIdJNI, SetInstanceFieldJNI,
 		GetStaticFieldIdJNI, SetStaticFieldJNI {
 
-	private Register src;
-	private Register addr;
+	@NotNull private final Register src;
+	@NotNull private final Register addr;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 
-	public StoreAddressStatement(Register src, Register addr, String fileName, int line) {
+	public StoreAddressStatement(@NotNull Register src, @NotNull Register addr,
+								 @NotNull String fileName, int line) {
 		this.src = src;
 		this.addr = addr;
 		this.fileName = fileName;

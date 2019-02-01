@@ -5,13 +5,15 @@ import java.util.function.Consumer;
 
 import helper.CompileException;
 import helper.Types;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class InterStructure {
 	
 	private boolean isInstance;
-	private ArrayList<Types> types;
-	private ArrayList<String> names;
-	private ArrayList<String> values; // null's can be in here if not set initial value.
+	@NotNull private final ArrayList<Types> types;
+	@NotNull private final ArrayList<String> names;
+	@NotNull private final ArrayList<String> values; // null's can be in here if not set initial value.
 
 	public InterStructure(boolean isInstance) {
 		this.isInstance = isInstance;
@@ -20,28 +22,17 @@ public class InterStructure {
 		this.values = new ArrayList<>();
 	}
 
-	public void addMember(Types type, String name) {
-		addMember(type, name, null);
-	}
-	
-	public void addMember(Types type, String name, String value) {
+	void addMember(@NotNull Types type, @NotNull String name, @Nullable String value) {
 		this.types.add(type);
 		this.names.add(name);
 		this.values.add(value);
 	}
 
-	public boolean hasMembers() {
-		return !this.types.isEmpty();
-	}
-	
+	@Override
 	public String toString() {
-		if (!hasMembers()) return "";
+		if (this.types.isEmpty()) return "";
 		StringBuilder result = new StringBuilder();
-		if (this.isInstance) {
-			result.append("structure instance\n");
-		} else {
-			result.append("structure static\n");
-		}
+		result.append(isInstance ? "structure instance\n" : "structure static\n");
 		
 		for (int i = 0; i < types.size(); i++) {
 			result.append('\t');
@@ -63,7 +54,8 @@ public class InterStructure {
 	}
 
 	/** Gets the type for the structure field, throwing a compile exception if problem. */
-	public Types getFieldType(String fieldName, String fileName, int line) throws CompileException {
+	@NotNull
+	Types getFieldType(String fieldName, String fileName, int line) throws CompileException {
 		for (int i = 0; i < names.size(); i++) {
 			if (fieldName.equals(names.get(i))) {
 				return types.get(i);
@@ -73,7 +65,7 @@ public class InterStructure {
 	}
 
 	/** Returns the offset, in bytes for the fieldName within the structure. */
-	public int getFieldOffset(String fieldName) {
+	int getFieldOffset(@NotNull String fieldName) {
 		int offset = 8; // all structure instances have a virtual function table from the start.
 
 		for (int i = 0; i < names.size(); i++) {
@@ -95,14 +87,14 @@ public class InterStructure {
 	}
 
 	/** calls the consumer on each member of this structure */
-	public void forEachMember(Consumer<String> consumer) {
+	public void forEachMember(@NotNull Consumer<String> consumer) {
 		for (String name : names) {
 			consumer.accept(name);
 		}
 	}
 
 	/** returns the field size of the member of this structure */
-	public int getFieldSize(String member) {
+	public int getFieldSize(@NotNull String member) {
 		if (names.indexOf(member) != -1) {
 			return types.get(names.indexOf(member)).getX64Size();
 		}
@@ -110,7 +102,7 @@ public class InterStructure {
 	}
 
 	/** returns the total size needed to store instances of this structure */
-	public int getTotalSize() {
+	int getTotalSize() {
 		int offset = 8; // all structure instances have a virtual function table from the start.
 
 		for (Types type : types) {

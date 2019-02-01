@@ -9,12 +9,12 @@ import org.jetbrains.annotations.NotNull;
 
 /** throw REGISTER */
 public class ThrowStatement implements InterStatement {
-	Register r;
+	@NotNull private final Register r;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
-	public ThrowStatement(Register r, String fileName, int line) {
+	public ThrowStatement(@NotNull Register r, @NotNull String fileName, int line) {
 		this.r = r;
 		this.fileName = fileName;
 		this.line = line;

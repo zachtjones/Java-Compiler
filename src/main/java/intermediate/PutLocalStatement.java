@@ -13,10 +13,10 @@ import x64.operands.X64RegisterOperand;
 
 /** PutLocal name = %register */
 public class PutLocalStatement implements InterStatement {
-	Register r;
-	private String localName;
+	@NotNull private final Register r;
+	@NotNull private String localName;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
 	/**
@@ -24,7 +24,7 @@ public class PutLocalStatement implements InterStatement {
 	 * @param r The register to use it's value
 	 * @param localName The local variable to set.
 	 */
-	public PutLocalStatement(Register r, String localName, String fileName, int line) {
+	public PutLocalStatement(@NotNull Register r, @NotNull String localName, @NotNull String fileName, int line) {
 		this.r = r;
 		this.localName = localName;
 		this.fileName = fileName;
