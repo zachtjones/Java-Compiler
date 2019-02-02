@@ -10,7 +10,7 @@ import intermediate.PutLocalStatement;
 import intermediate.StartScopeStatement;
 import org.jetbrains.annotations.NotNull;
 
-public class LocalVariableDecNode extends NodeImpl implements StatementNode {
+public class LocalVariableDecNode extends NodeImpl implements StatementNode, ForInitNode {
     @NotNull private Types type;
     @NotNull private final ArrayList<VariableDecNode> declarations;
     

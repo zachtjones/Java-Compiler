@@ -4,14 +4,15 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ContinueStatementNode extends NodeImpl implements StatementNode {
-    // could be null, name of loop to continue
-    public String name;
+    @Nullable private final String name; // label to continue
 
-    public ContinueStatementNode(String fileName, int line) {
+    public ContinueStatementNode(@NotNull String fileName, int line, @Nullable String name) {
     	super(fileName, line);
-    }
+		this.name = name;
+	}
 
 	@Override
 	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
@@ -20,7 +21,6 @@ public class ContinueStatementNode extends NodeImpl implements StatementNode {
 
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
-		// nothing needed, same as break statement thing
-		// TODO handle if there's a name
+		throw new CompileException("continue not implemented yet", "", -1);
 	}
 }

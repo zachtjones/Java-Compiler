@@ -8,10 +8,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class LiteralExpressionNode extends NodeImpl implements Expression {
 	
-    public String value;
+    @NotNull private final String value;
     
-    public LiteralExpressionNode(String fileName, int line) {
+    public LiteralExpressionNode(String fileName, int line, @NotNull String value) {
     	super(fileName, line);
+    	this.value = value;
     }
 
 	@Override

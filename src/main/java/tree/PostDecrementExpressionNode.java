@@ -21,8 +21,7 @@ public class PostDecrementExpressionNode extends NodeImpl implements StatementEx
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// construct an AssignmentNode:  expr -= 1;
-		LiteralExpressionNode literal = new LiteralExpressionNode(getFileName(), getLine());
-		literal.value = "1";
+		LiteralExpressionNode literal = new LiteralExpressionNode(getFileName(), getLine(), "1");
 
 		AssignmentNode n = new AssignmentNode(getFileName(), getLine(), expr, literal, BinaryOperation.SUBTRACT);
 		// compile it

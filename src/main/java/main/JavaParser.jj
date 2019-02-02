@@ -1243,16 +1243,18 @@ Expression PrimarySuffix() :
 LiteralExpressionNode Literal() :
 {
     Token t;
-    LiteralExpressionNode l = new LiteralExpressionNode(fileName, token.beginLine);
 }
 {
-    t=<INTEGER_LITERAL> { l.value = t.image; return l; }
-|   t=<FLOATING_POINT_LITERAL> { l.value = t.image; return l; }
-|   t=<CHARACTER_LITERAL> { l.value = t.image; return l; }
-|   t=<STRING_LITERAL> { l.value = t.image; return l; }
-|   t=<TRUE> { l.value = t.image; return l; }
-|   t=<FALSE> { l.value = t.image; return l; }
-|   t=<NULL> { l.value = t.image; return l; }
+    (t=<INTEGER_LITERAL>
+|   t=<FLOATING_POINT_LITERAL>
+|   t=<CHARACTER_LITERAL>
+|   t=<STRING_LITERAL>
+|   t=<TRUE>
+|   t=<FALSE>
+|   t=<NULL>)
+    {
+        return new LiteralExpressionNode(fileName, token.beginLine, t.image);
+    }
 }
 
 ArgumentExpressionNode Arguments() :
@@ -1576,7 +1578,7 @@ WhileStatementNode WhileStatement() :
     <WHILE> <LPAREN> expression=Expression() <RPAREN>
     statement=Statement()
     {
-        return new WhileStatement(fileName, token.beginLine, expression, statement);
+        return new WhileStatementNode(fileName, token.beginLine, expression, statement);
     }
 }
 
@@ -1589,41 +1591,44 @@ DoStatementNode DoStatement() :
     <DO> statement=Statement() <WHILE> <LPAREN>
     expression=Expression() <RPAREN> <SEMICOLON>
     {
-        return new DoStatementNode(fileName, token.beginLine, expression, statement);
+        return new DoStatementNode(fileName, token.beginLine, statement, expression);
     }
 }
 
 ForStatementNode ForStatement() :
 {
-    ForStatementNode f = new ForStatementNode(fileName, token.beginLine);
+    ForInitNode init = null;
+    Expression condition = null;
+    StatementExprNodeList update = null;
+    StatementNode block;
 }
 {
-    <FOR> <LPAREN> [ f.init=ForInit() ] <SEMICOLON>
-    [ f.condition=Expression() ] <SEMICOLON>
-    [ f.update=ForUpdate() ] <RPAREN> f.block=Statement()
+    <FOR> <LPAREN> [ init=ForInit() ] <SEMICOLON>
+    [ condition=Expression() ] <SEMICOLON>
+    [ update=ForUpdate() ] <RPAREN> block=Statement()
     {
-        return f;
+        return new ForStatementNode(fileName, token.beginLine, init, condition, update, block);
     }
 }
 
 ForInitNode ForInit() :
 {
-    ForInitNode f = new ForInitNode(fileName, token.beginLine);
+    ForInitNode temp;
 }
 {
     LOOKAHEAD( Type() <IDENTIFIER> )
-    f.dec=LocalVariableDeclaration()
+    temp=LocalVariableDeclaration()
     {
-        return f;
+        return temp;
     }
 |
-    f.items=StatementExpressionList()
+    temp=StatementExpressionList()
     {
-        return f;
+        return temp;
     }
 }
 
-ArrayList<StatementExprNode> StatementExpressionList() :
+StatementExprNodeList StatementExpressionList() :
 {
     ArrayList<StatementExprNode> s = new ArrayList<StatementExprNode>();
     StatementExprNode temp;
@@ -1632,14 +1637,14 @@ ArrayList<StatementExprNode> StatementExpressionList() :
     temp=StatementExpression() { s.add(temp); }
     ( <COMMA> temp=StatementExpression() { s.add(temp); } )*
     {
-        return s;
+        return new StatementExprNodeList(fileName, token.beginLine, s);
     }
 }
 
-ArrayList<StatementExprNode> ForUpdate() :
+StatementExprNodeList ForUpdate() :
 {
     /* This rule is just a statement expression list */
-    ArrayList<StatementExprNode> t;
+    StatementExprNodeList t;
 }
 {
     t=StatementExpressionList()
@@ -1650,25 +1655,25 @@ ArrayList<StatementExprNode> ForUpdate() :
 
 BreakStatementNode BreakStatement() :
 {
-    BreakStatementNode b = new BreakStatementNode(fileName, token.beginLine);
     Token t;
+    String image = null;
 }
 {
-    <BREAK> [ t=<IDENTIFIER> { b.name = t.image; }] <SEMICOLON>
+    <BREAK> [ t=<IDENTIFIER> { image = t.image; }] <SEMICOLON>
     {
-        return b;
+        return new BreakStatementNode(fileName, token.beginLine, image);
     }
 }
 
 ContinueStatementNode ContinueStatement() :
 {
-    ContinueStatementNode c = new ContinueStatementNode(fileName, token.beginLine);
     Token t;
+    String image = null;
 }
 {
-    <CONTINUE> [ t=<IDENTIFIER> { c.name = t.image; } ] <SEMICOLON>
+    <CONTINUE> [ t=<IDENTIFIER> { image = t.image; } ] <SEMICOLON>
     {
-        return c;
+        return new ContinueStatementNode(fileName, token.beginLine, image);
     }
 }
 

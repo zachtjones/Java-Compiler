@@ -4,12 +4,14 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BreakStatementNode extends NodeImpl implements StatementNode {
-    public String name; // could be null - label to break
+    @Nullable private final String name; // label to break
 
-    public BreakStatementNode(String fileName, int line) {
+    public BreakStatementNode(@NotNull String fileName, int line, @Nullable String name) {
     	super(fileName, line);
+    	this.name = name;
     }
 
 	@Override
@@ -19,7 +21,6 @@ public class BreakStatementNode extends NodeImpl implements StatementNode {
 
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
-		// nothing needed, check if name is in symbol table for
-		//  the compile method if name != null.
+		throw new CompileException("break statement not implemented yet", "", -1);
 	}
 }
