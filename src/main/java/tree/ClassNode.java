@@ -6,43 +6,50 @@ import helper.ClassLookup;
 import helper.CompileException;
 import helper.Types;
 import intermediate.InterFile;
-import intermediate.InterFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** This represents a class in the tree
 * @author Zach Jones
 */
-public class ClassNode extends NodeImpl implements TypeDecNode {
-    public boolean isAbstract;
-    public boolean isFinal;
-    public boolean isPublic;
-    public boolean isInterface;
-    public String name;
-    
-    public NameNode superclass; // used if a class, or even abstract class.
-    public ArrayList<NameNode> supers; // used if an interface
-    public ArrayList<NameNode> interfaces;
-    public ArrayList<ClassBodyNode> body = new ArrayList<>();
-    public ArrayList<NameNode> typeParams;
-    
-    public ClassNode(String fileName, int line) {
-    	super(fileName, line);
+public class ClassNode implements TypeDecNode {
+	@NotNull private final String fileName;
+	private final int line;
+
+	private final boolean isAbstract;
+    private final boolean isFinal;
+    private final boolean isPublic;
+    @NotNull private final String name;
+	@Nullable public ArrayList<NameNode> typeParams;
+
+	@NotNull private final NameNode superclass; // used if a class, or even abstract class.
+	@NotNull private final ArrayList<NameNode> interfaces;
+	@NotNull public ArrayList<ClassBodyNode> body;
+
+    public ClassNode(@NotNull String fileName, int line, boolean isAbstract, boolean isFinal, boolean isPublic,
+					 @NotNull String name, @Nullable ArrayList<NameNode> typeParams, @Nullable NameNode superClass,
+					 @Nullable ArrayList<NameNode> implementedInterfaces, @NotNull ArrayList<ClassBodyNode> body) {
+
+    	this.fileName = fileName;
+    	this.line = line;
+    	this.isAbstract = isAbstract;
+    	this.isFinal = isFinal;
+    	this.isPublic = isPublic;
+    	this.name = name;
+    	this.typeParams = typeParams;
+    	final NameNode superName = new NameNode(fileName, line);
+    	superName.primaryName = "java/lang/Object";
+
+    	this.superclass = superClass == null ? superName : superClass;
+    	this.interfaces = implementedInterfaces == null ? new ArrayList<>() : implementedInterfaces;
+    	this.body = body;
     }
 
 	@Override
 	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
-		if (superclass != null) {
-			superclass.resolveImports(c);
-		} else {
-			superclass = new NameNode(getFileName(), getLine());
-			superclass.primaryName = "java/lang/Object";
-		}
-		if (interfaces != null) {
-			for (NameNode n : interfaces) {
-				n.resolveImports(c);
-			}	
-		} else {
-			interfaces = new ArrayList<>();
+		superclass.resolveImports(c);
+		for (NameNode n : interfaces) {
+			n.resolveImports(c);
 		}
 		for (ClassBodyNode b : body) {
 			b.resolveImports(c);
@@ -54,16 +61,11 @@ public class ClassNode extends NodeImpl implements TypeDecNode {
 		}
 		
 	}
-	
-	@Override
-	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
-		// this method should not be called.
-	}
 
-	public InterFile compile(String packageName, SymbolTable classLevel) throws CompileException {
-    	ArrayList<NameNode> extendsNodes = isInterface ? supers : interfaces;
-    	ArrayList<String> extendsNames = new ArrayList<>();
-    	extendsNodes.forEach(i -> extendsNames.add(i.primaryName));
+	@Override
+	public InterFile compile(@Nullable String packageName, @NotNull SymbolTable classLevel) throws CompileException {
+		ArrayList<String> extendsNames = new ArrayList<>();
+    	interfaces.forEach(i -> extendsNames.add(i.primaryName));
 		InterFile f;
 		if (packageName != null) {
 			f = new InterFile(packageName + "/" + name, superclass.primaryName, extendsNames);
@@ -72,7 +74,7 @@ public class ClassNode extends NodeImpl implements TypeDecNode {
 		}
 		
 		// place the class name in the symbol table (used for static fields)
-		classLevel.putEntry(name, Types.CLASS, getFileName(), getLine());
+		classLevel.putEntry(name, Types.CLASS, fileName, line);
 
 		// put the symbols for this class into the symbol table
 		SymbolTable staticFields = new SymbolTable(classLevel, SymbolTable.staticFields);
@@ -87,9 +89,9 @@ public class ClassNode extends NodeImpl implements TypeDecNode {
 			c.compile(f, syms);
 		}
 		
-		if (!isAbstract && !isInterface) {
+		if (!isAbstract) {
 			// generate default <init> if needed only.
-			f.generateDefaultConstructor(getFileName(), getLine());
+			f.generateDefaultConstructor(fileName, line);
 		}
 		
 		// TODO stuff with the isAbstract, isFinal optimizations

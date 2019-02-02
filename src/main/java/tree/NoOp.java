@@ -5,12 +5,19 @@ import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
 
 /** Represents a do-nothing operation*/
-public class NoOp extends NodeImpl implements Expression, StatementNode, TypeDecNode {
-    
-    public NoOp(String fileName, int line) {
-    	super(fileName, line);
+public class NoOp implements Expression, StatementNode, TypeDecNode {
+
+	private final int line;
+	@NotNull private final String fileName;
+
+	public NoOp(@NotNull String fileName, int line) {
+    	this.fileName = fileName;
+    	this.line = line;
     }
 
 	@Override
@@ -20,8 +27,18 @@ public class NoOp extends NodeImpl implements Expression, StatementNode, TypeDec
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {}
 
 	@Override
-	public InterFile compile(String packageName, SymbolTable classLevel) throws CompileException {
-		return null;
+	public @NotNull String getFileName() {
+		return fileName;
+	}
+
+	@Override
+	public int getLine() {
+		return line;
+	}
+
+	@Override
+	public InterFile compile(@Nullable String packageName, @NotNull SymbolTable classLevel) throws CompileException {
+		return new InterFile("not_used", "java/lang/Object", new ArrayList<>());
 	}
 
 }

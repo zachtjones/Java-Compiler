@@ -269,7 +269,7 @@ TypeDecNode TypeDeclaration() :
     { return t; }
 
 |   LOOKAHEAD( ( "abstract" | "public")* "interface" )
-    t=ClassDeclaration()
+    t=InterfaceDeclaration()
     { return t; }
 
 |   t=EnumDeclaration()
@@ -286,22 +286,28 @@ TypeDecNode TypeDeclaration() :
 
 ClassNode ClassDeclaration() :
 {
-    ClassNode c = new ClassNode(fileName, token.beginLine);
     Token t;
     ClassBodyNode b;
+
+    ArrayList<ClassBodyNode> body = new ArrayList<ClassBodyNode>();
+    ArrayList<NameNode> typeParams = null;
+    boolean isAbstract = false;
+    boolean isFinal = false;
+    boolean isPublic = false;
+    NameNode superClass = null;
+    ArrayList<NameNode> interfaces = null;
 }
 {
-    ( <ABSTRACT> { c.isAbstract=true; }
-        | <FINAL> { c.isFinal=true; }
-        | <PUBLIC> { c.isPublic=true; } )*
-    <CLASS> t=<IDENTIFIER> [ c.typeParams=ClassTypeParameters() ]
-    [ <EXTENDS> c.superclass=Name() ]
-    [ <IMPLEMENTS> c.interfaces=NameList() ]
-    <LBRACE> ( b=ClassBodyDeclaration() { c.body.add(b); } )* <RBRACE>
+    ( <ABSTRACT> { isAbstract=true; }
+        | <FINAL> { isFinal=true; }
+        | <PUBLIC> { isPublic=true; } )*
+    <CLASS> t=<IDENTIFIER> [ typeParams=ClassTypeParameters() ]
+    [ <EXTENDS> superClass=Name() ]
+    [ <IMPLEMENTS> interfaces=NameList() ]
+    <LBRACE> ( b=ClassBodyDeclaration() { body.add(b); } )* <RBRACE>
     {
-        c.isInterface = false;
-        c.name = t.image;
-        return c;
+        return new ClassNode(fileName, token.beginLine, isAbstract, isFinal, isPublic, t.image, typeParams,
+            superClass, interfaces, body);
     }
 }
 
@@ -355,22 +361,24 @@ void MethodDeclarationLookahead() :
   ResultType() <IDENTIFIER> "("
 }
 
-ClassNode InterfaceDeclaration() :
+InterfaceNode InterfaceDeclaration() :
 {
-    ClassNode c = new ClassNode(fileName, token.beginLine);
+    // temporaries
     ClassBodyNode b;
     Token t;
+
+    // fields of created object
+    ArrayList<NameNode> extendsList = null;
+    String name;
+    ArrayList<ClassBodyNode> body = new ArrayList<ClassBodyNode>();
 }
 {
-    ( <ABSTRACT> | <PUBLIC> )*
-    <INTERFACE> t=<IDENTIFIER> { c.name = t.image; }
-    [ <EXTENDS> c.supers=NameList() ]
-    "{" ( b=InterfaceMemberDeclaration() { c.body.add(b); } )* "}"
+    ( <ABSTRACT> | <PUBLIC> )* // all interfaces are public and abstract by default.
+    <INTERFACE> t=<IDENTIFIER> { name = t.image; }
+    [ <EXTENDS> extendsList=NameList() ]
+    "{" ( b=InterfaceMemberDeclaration() { body.add(b); } )* "}"
     {
-        c.isInterface = true;
-        c.isAbstract = true;
-        c.isPublic = true;
-        return c;
+        return new InterfaceNode(fileName, token.beginLine, name, extendsList, body);
     }
 }
 
@@ -394,14 +402,15 @@ ClassBodyNode InterfaceMemberDeclaration() :
 
 EnumNode EnumDeclaration() :
 {
-    EnumNode e = new EnumNode(fileName, token.beginLine);
+    ArrayList<String> body;
+    String name;
     Token t;
 }
 {
-    (<PUBLIC>)* <ENUM> t=<IDENTIFIER> {e.name = t.image; }
-    <LBRACE> e.values=EnumBody() <RBRACE>
+    (<PUBLIC>)* <ENUM> t=<IDENTIFIER> {name = t.image; }
+    <LBRACE> body=EnumBody() <RBRACE>
     {
-        return e;
+        return new EnumNode(fileName, token.beginLine, name, body);
     }
 }
 
