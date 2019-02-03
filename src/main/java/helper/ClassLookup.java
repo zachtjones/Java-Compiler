@@ -23,7 +23,7 @@ public class ClassLookup {
 	 * @param classLevel The class level symbol table (from imports)
 	 * @throws CompileException If there is an issue resolving creating this object.
 	 */
-	public ClassLookup(@NotNull String fileName, @Nullable String packageName,
+	public ClassLookup(@NotNull String fileName, @Nullable NameNode packageName,
 					   @NotNull ArrayList<ImportNode> imports,
 					   @NotNull SymbolTable classLevel)	throws CompileException {
 
@@ -38,7 +38,7 @@ public class ClassLookup {
 					String name = f.getName(); // just the name.extension
 					String justName = f.getName().replaceAll(".java", "");
 					if (name.endsWith(".java")) {
-						items.put(justName, packageName + "." + name);
+						items.put(justName, packageName.primaryName + "." + name);
 					}
 				}
 			}

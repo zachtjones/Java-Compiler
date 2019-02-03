@@ -7,41 +7,47 @@ import helper.CompileException;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** Represents a CompilationUnit, that is a source file.
 *  @author Zach Jones */
-public class CompilationUnit extends NodeImpl implements Node {
-    public NameNode packageName;
-    public ArrayList<ImportNode> imports = new ArrayList<>();
-    public ArrayList<TypeDecNode> types = new ArrayList<>();
-    public String fileName;
-    public int line;
+public class CompilationUnit {
+    public final NameNode packageName;
+    public final ArrayList<ImportNode> imports;
+    private final ArrayList<TypeDecNode> types;
+    @NotNull private final String fileName;
+    private final int line;
     
-    public CompilationUnit(String fileName, int line) {
-    	super(fileName, line);
-    }
-
-    @Override
-	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
-		// pass down to the types to do
-		for (TypeDecNode t : types) {
-			t.resolveImports(c);
-		}
-	}
-	
-	@Override
-	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
-		// don't call this method.
+    public CompilationUnit(@NotNull String fileName, int line, @Nullable NameNode packageName,
+						   @NotNull ArrayList<ImportNode> imports, @NotNull ArrayList<TypeDecNode> types) {
+    	this.fileName = fileName;
+    	this.line = line;
+		this.packageName = packageName;
+		this.imports = imports;
+		this.types = types;
 	}
 
 	/**
 	 * Compiles the various types in this CompilationUnit
-	 * @param classLevel The class level symbol table (imported)
-	 * @return An ArrayList of the types converted to their 
+	 * @param newFileName The filename that represents the file's name crated in on list
+	 * @return An ArrayList of the types converted to their
 	 * intermediate representation.
 	 * @throws CompileException If there is an error compiling this.
 	 */
-	public ArrayList<InterFile> compile(SymbolTable classLevel) throws CompileException {
+	public ArrayList<InterFile> compile(String newFileName) throws CompileException {
+
+		// update the class lookup tables (short names to full names)
+		SymbolTable classLevel = new SymbolTable(null, SymbolTable.className);
+		ClassLookup lookup = new ClassLookup(newFileName, packageName, imports, classLevel);
+
+		// resolve the imports -- placing resolved names into the global symbol table
+
+		// pass down to the types to do
+		for (TypeDecNode t : types) {
+			t.resolveImports(lookup);
+		}
+
+
 		ArrayList<InterFile> a = new ArrayList<>();
 		// names are already resolved, so there should be no need
 		//   to pass down the imports -- everything can be figured out

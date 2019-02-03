@@ -221,17 +221,19 @@ TOKEN : /* OPERATORS */
 // the whole file is a compilation unit
 CompilationUnit CompilationUnit(String filename) :
 {
-    CompilationUnit c = new CompilationUnit(fileName, token.beginLine);
+    ArrayList<ImportNode> imports = new ArrayList<ImportNode>();
+    ArrayList<TypeDecNode> body = new ArrayList<TypeDecNode>();
+    NameNode packageNode = null;
     ImportNode temp;
     TypeDecNode temp2;
 }
 {
-    [ c.packageName=PackageDeclaration() ]
-    ( temp=ImportDeclaration() { c.imports.add(temp); } )*
-    ( temp2=TypeDeclaration() { c.types.add(temp2); })*
+    [ packageNode=PackageDeclaration() ]
+    ( temp=ImportDeclaration() { imports.add(temp); } )*
+    ( temp2=TypeDeclaration() { body.add(temp2); })*
     <EOF>
     {
-        return c;
+        return new CompilationUnit(fileName, token.beginLine, packageNode, imports, body);
     }
 }
 
