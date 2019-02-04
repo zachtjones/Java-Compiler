@@ -8,15 +8,20 @@ import intermediate.Register;
 import intermediate.SetConditionStatement;
 import org.jetbrains.annotations.NotNull;
 
-/** left > right */
-public class GreaterThanExpressionNode extends NodeImpl implements Expression {
-    public Expression left;
-    public Expression right;
-    
-    public GreaterThanExpressionNode(String fileName, int line) {
-    	super(fileName, line);
-    }
+/** left relational operator right;
+ * relational operator is one of: less than, greater than, less than or equal, greater than or equal */
+public class RelationalExpressionNode extends NodeImpl implements Expression {
+	@NotNull private final Expression left, right;
+	private final int type; // one of SetConditionStatement constants
 
+    public RelationalExpressionNode(String fileName, int line,
+									@NotNull Expression left, @NotNull Expression right, int type) {
+    	super(fileName, line);
+    	this.left = left;
+    	this.right = right;
+    	this.type = type;
+    }
+    
 	@Override
 	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		left.resolveImports(c);
@@ -32,7 +37,6 @@ public class GreaterThanExpressionNode extends NodeImpl implements Expression {
 		
 		// add in the condition
 		Register result = f.allocator.getNext(Types.BOOLEAN);
-		f.statements.add(new SetConditionStatement(
-			SetConditionStatement.GREATER, leftResult, rightResult, result, getFileName(), getLine()));
+		f.statements.add(new SetConditionStatement(type, leftResult, rightResult, result, getFileName(), getLine()));
 	}
 }

@@ -15,6 +15,7 @@ package main;
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import tree.*;
+import intermediate.SetConditionStatement;
 import java.util.ArrayList;
 import java.nio.charset.Charset;
 import helper.Types;
@@ -868,14 +869,12 @@ Expression EqualityExpression() :
     two=InstanceOfExpression()
     {
         if (isEqual) {
-            EqualityExpressionNode eq = new EqualityExpressionNode(fileName, token.beginLine);
-            eq.left = one;
-            eq.right = two;
+            RelationalExpressionNode eq = new RelationalExpressionNode(fileName, token.beginLine,
+                one, two, SetConditionStatement.EQUAL);
             one = eq; // base for next tree element
         } else {
-            NotEqualityExpressionNode neq = new NotEqualityExpressionNode(fileName, token.beginLine);
-            neq.left = one;
-            neq.right = two;
+            RelationalExpressionNode neq = new RelationalExpressionNode(fileName, token.beginLine,
+                one, two, SetConditionStatement.NOTEQUAL);
             one = neq; // base for next tree element
         }
     })*
@@ -921,24 +920,20 @@ Expression RelationalExpression() :
         two=ShiftExpression()
         {
             if (type == 0) {
-                LessThanExpressionNode lt = new LessThanExpressionNode(fileName, token.beginLine);
-                lt.left = one;
-                lt.right = two;
+                RelationalExpressionNode lt = new RelationalExpressionNode(fileName, token.beginLine,
+                    one, two, SetConditionStatement.LESS);
                 one = lt;
             } else if (type == 1) {
-                GreaterThanExpressionNode gt = new GreaterThanExpressionNode(fileName, token.beginLine);
-                gt.left = one;
-                gt.right = two;
+                RelationalExpressionNode gt = new RelationalExpressionNode(fileName, token.beginLine,
+                    one, two, SetConditionStatement.GREATER);
                 one = gt;
             } else if (type == 2) {
-                LessThanEqualExpressionNode lte = new LessThanEqualExpressionNode(fileName, token.beginLine);
-                lte.left = one;
-                lte.right = two;
+                RelationalExpressionNode lte = new RelationalExpressionNode(fileName, token.beginLine,
+                    one, two, SetConditionStatement.LESSEQUAL);
                 one = lte;
             } else {
-                GreaterThanEqualExpressionNode gte = new GreaterThanEqualExpressionNode(fileName, token.beginLine);
-                gte.left = one;
-                gte.right = two;
+                RelationalExpressionNode gte = new RelationalExpressionNode(fileName, token.beginLine,
+                    one, two, SetConditionStatement.GREATEREQUAL);
                 one = gte;
             }
         }
