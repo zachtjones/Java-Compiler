@@ -12,9 +12,9 @@ import org.jetbrains.annotations.Nullable;
 /** Represents a CompilationUnit, that is a source file.
 *  @author Zach Jones */
 public class CompilationUnit {
-    public final NameNode packageName;
-    public final ArrayList<ImportNode> imports;
-    private final ArrayList<TypeDecNode> types;
+    @Nullable public final NameNode packageName; // TODO make this private, create methods here for other needs
+    @NotNull private final ArrayList<ImportNode> imports;
+    @NotNull private final ArrayList<TypeDecNode> types;
     @NotNull private final String fileName;
     private final int line;
     

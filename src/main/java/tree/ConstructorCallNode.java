@@ -32,7 +32,7 @@ public class ConstructorCallNode extends NodeImpl implements Expression {
     	Types resultType = Types.fromFullyQualifiedClass(name.primaryName);
 		Register result = f.allocator.getNext(resultType);
 
-		ArrayList<Expression> expressions = args.expressions;
+		ArrayList<Expression> expressions = args.getExpressions();
 		// compile in the args
 		Register[] results = new Register[expressions.size()];
 		for(int i = 0; i < expressions.size(); i++) {

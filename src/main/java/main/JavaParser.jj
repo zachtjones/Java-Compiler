@@ -1233,9 +1233,7 @@ Expression PrimarySuffix() :
 {
     "[" temp=Expression() "]"
     {
-        ArrayIndexExpressionNode a = new ArrayIndexExpressionNode(fileName, token.beginLine);
-        a.expr = temp;
-        return a;
+        return new ArrayIndexExpressionNode(fileName, token.beginLine, temp);
     }
 |
     "." t=<IDENTIFIER>
@@ -1270,12 +1268,12 @@ LiteralExpressionNode Literal() :
 
 ArgumentExpressionNode Arguments() :
 {
-    ArgumentExpressionNode e = new ArgumentExpressionNode(fileName, token.beginLine);
+    ArrayList<Expression> expressions = null;
 }
 {
-    "(" [ e.expressions=ArgumentList() ] ")"
+    "(" [ expressions=ArgumentList() ] ")"
     {
-        return e;
+        return new ArgumentExpressionNode(fileName, token.beginLine, expressions);
     }
 }
 

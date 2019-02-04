@@ -10,15 +10,17 @@ import intermediate.CallVirtualStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** ( expressions * )
 * This is the second part of a function call, the arguments list. */
 public class ArgumentExpressionNode extends NodeImpl implements Expression {
-    /** The expressions to evaluate before the function call. Could be empty, but will not be null. */
-    public ArrayList<Expression> expressions = new ArrayList<>();
+    /** The expressions to evaluate before the function call. */
+    @NotNull private final ArrayList<Expression> expressions;
 
-    public ArgumentExpressionNode(@NotNull String fileName, int line) {
+    public ArgumentExpressionNode(@NotNull String fileName, int line, @Nullable ArrayList<Expression> expressions) {
     	super(fileName, line);
+    	this.expressions = expressions == null ? new ArrayList<>() : expressions;
     }
 
 	@Override
@@ -62,4 +64,8 @@ public class ArgumentExpressionNode extends NodeImpl implements Expression {
 		}
 	}
 
+	@NotNull
+	ArrayList<Expression> getExpressions() {
+		return expressions;
+	}
 }

@@ -7,15 +7,17 @@ import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.StoreAddressStatement;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** left type right */
 public class AssignmentNode extends NodeImpl implements StatementExprNode, Expression {
 
-	private final Expression left;
-	private final BinaryOperation type;
-	private final Expression right;
+	@NotNull private final Expression left;
+	@Nullable private final BinaryOperation type; //null means = operation, other is the compound type.
+	@NotNull private final Expression right;
 
-    public AssignmentNode(@NotNull String fileName, int line, Expression left, Expression right, BinaryOperation type) {
+    public AssignmentNode(@NotNull String fileName, int line, @NotNull Expression left,
+						  @NotNull Expression right, @Nullable BinaryOperation type) {
     	super(fileName, line);
     	this.left = left;
     	this.right = right;

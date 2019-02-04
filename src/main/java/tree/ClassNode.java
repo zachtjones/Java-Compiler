@@ -20,11 +20,11 @@ public class ClassNode implements TypeDecNode {
     private final boolean isFinal;
     private final boolean isPublic;
     @NotNull private final String name;
-	@Nullable public ArrayList<NameNode> typeParams;
+	@Nullable private ArrayList<NameNode> typeParams;
 
 	@NotNull private final NameNode superclass; // used if a class, or even abstract class.
 	@NotNull private final ArrayList<NameNode> interfaces;
-	@NotNull public ArrayList<ClassBodyNode> body;
+	@NotNull private ArrayList<ClassBodyNode> body;
 
     public ClassNode(@NotNull String fileName, int line, boolean isAbstract, boolean isFinal, boolean isPublic,
 					 @NotNull String name, @Nullable ArrayList<NameNode> typeParams, @Nullable NameNode superClass,
