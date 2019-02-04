@@ -166,9 +166,7 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 			ex.suffixes = new ArrayList<>();
 			// the rest are consecutive fieldAccesses
 			for (int i = 1; i < split.length; i++) {
-				FieldExpressionNode field = new FieldExpressionNode(getFileName(), getLine());
-				field.identifier = split[i];
-				ex.suffixes.add(field);
+				ex.suffixes.add(new FieldExpressionNode(getFileName(), getLine(), split[i]));
 			}
 			
 			// compile address the primaryExpressionNode

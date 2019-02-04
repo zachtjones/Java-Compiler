@@ -48,10 +48,9 @@ public class ClassLookup {
 		// note name.* only imports the public things (java language spec)
 		// again, get the file names
 		// always import java.lang.*
-		ImportNode javaLang = new ImportNode(fileName, -1);
-		javaLang.isAll = true;
-		javaLang.name = new NameNode(fileName, -1);
-		javaLang.name.primaryName = "java.lang";
+		NameNode temp = new NameNode(fileName, -1);
+		temp.primaryName = "java.lang";
+		ImportNode javaLang = new ImportNode(temp, true);
 		imports.add(javaLang);
 
 		for (ImportNode i : imports) {

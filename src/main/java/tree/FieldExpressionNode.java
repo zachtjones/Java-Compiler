@@ -14,10 +14,11 @@ import org.jetbrains.annotations.NotNull;
 
 /** Represents accessing a field of an object. */
 public class FieldExpressionNode extends NodeImpl implements Expression, LValue {
-    public String identifier;
+    @NotNull private final String identifier;
 
-    public FieldExpressionNode(String fileName, int line) {
+    public FieldExpressionNode(@NotNull String fileName, int line, @NotNull String identifier) {
     	super(fileName, line);
+    	this.identifier = identifier;
     }
 
 	@Override

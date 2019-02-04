@@ -7,11 +7,14 @@ import intermediate.InterFunction;
 import org.jetbrains.annotations.NotNull;
 
 public class LabeledStatementNode extends NodeImpl implements StatementNode {
-    public String name;
-    public StatementNode statement;
+    @NotNull private final String name;
+    @NotNull private final StatementNode statement;
     
-    public LabeledStatementNode(String fileName, int line) {
+    public LabeledStatementNode(@NotNull String fileName, int line, @NotNull String name,
+								@NotNull StatementNode statement) {
     	super(fileName, line);
+    	this.name = name;
+    	this.statement = statement;
     }
     
 	@Override

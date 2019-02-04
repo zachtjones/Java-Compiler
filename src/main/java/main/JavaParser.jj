@@ -251,14 +251,15 @@ NameNode PackageDeclaration() :
 
 ImportNode ImportDeclaration() :
 {
-    ImportNode n = new ImportNode(fileName, token.beginLine);
+    NameNode name;
+    boolean isAll = false;
 }
 {
-    <IMPORT> n.name=Name()
-    [ <DOT> <STAR> { n.isAll = true; } ]
+    <IMPORT> name=Name()
+    [ <DOT> <STAR> { isAll = true; } ]
     <SEMICOLON>
     {
-        return n;
+        return new ImportNode(name, isAll);
     }
 }
 
@@ -498,7 +499,9 @@ MethodNode MethodDeclaration() :
     | <PRIVATE> { m.isPrivate=true; } | <STATIC> { m.isStatic=true; }
     | <ABSTRACT> { m.isAbstract=true; } | <FINAL> { m.isFinal=true; }
     | <NATIVE> { m.isNative=true; } | <SYNCHRONIZED> { m.isSynchronized=true; } )*
-    m.resultType=ResultType() m.dec=MethodDeclarator() [ <THROWS> m.throwsList=NameList() ]
+    m.resultType=ResultType()
+    m.dec=MethodDeclarator()
+    [ <THROWS> m.throwsList=NameList() ]
     ( m.code=Block() | ";" )
     {
         return m;
@@ -1074,9 +1077,7 @@ Expression UnaryExpressionNotPlusMinus() :
         if (type == 0) {
             return new BitwiseNotExpressionNode(fileName, token.beginLine, e);
         } else {
-            LogicalNotExpressionNode l = new LogicalNotExpressionNode(fileName, token.beginLine);
-            l.expr = e;
-            return l;
+            return new LogicalNotExpressionNode(fileName, token.beginLine, e);
         }
     }
 |
@@ -1224,9 +1225,7 @@ Expression PrimarySuffix() :
 |
     "." t=<IDENTIFIER>
     {
-        FieldExpressionNode f = new FieldExpressionNode(fileName, token.beginLine);
-        f.identifier = t.image;
-        return f;
+        return new FieldExpressionNode(fileName, token.beginLine, t.image);
     }
 |
     temp=Arguments() // just grab the args
@@ -1417,13 +1416,13 @@ StatementNode Statement() :
 
 LabeledStatementNode LabeledStatement() :
 {
-    LabeledStatementNode l = new LabeledStatementNode(fileName, token.beginLine);
+    StatementNode statement;
     Token t;
 }
 {
-    t=<IDENTIFIER> { l.name = t.image; } ":" l.statement=Statement()
+    t=<IDENTIFIER> ":" statement=Statement()
     {
-        return l;
+        return new LabeledStatementNode(fileName, token.beginLine, t.image, statement);
     }
 }
 

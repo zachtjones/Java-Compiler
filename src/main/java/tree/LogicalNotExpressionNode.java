@@ -9,12 +9,11 @@ import org.jetbrains.annotations.NotNull;
 
 /** ! expr */
 public class LogicalNotExpressionNode extends NodeImpl implements Expression {
-    public Expression expr;
-    public String fileName;
-    public int line;
-    
-    public LogicalNotExpressionNode(String fileName, int line) {
+    @NotNull private final Expression expr;
+
+    public LogicalNotExpressionNode(String fileName, int line, @NotNull Expression expr) {
     	super(fileName, line);
+    	this.expr = expr;
     }
 
 	@Override
