@@ -748,19 +748,17 @@ BinaryOperation AssignmentOperator() :
 *  ConditionalExpression or the next level down */
 Expression ConditionalExpression() :
 {
-    ConditionalExpressionNode e = new ConditionalExpressionNode(fileName, token.beginLine);
-    Expression temp;
+    Expression condition;
+    Expression truePart;
+    Expression falsePart;
 }
 {
-    temp=ConditionalOrExpression()
-    [ "?" e.truePart=Expression() ":" e.falsePart=ConditionalExpression() ]
+    condition=ConditionalOrExpression()
+    [ "?" truePart=Expression() ":" falsePart=ConditionalExpression()
+      { return new ConditionalExpressionNode(fileName, token.beginLine, condition, truePart, falsePart); }
+    ]
     {
-        if (e.truePart == null) {
-            return temp;
-        } else {
-            e.condition = temp;
-            return e;
-        }
+        return condition;
     }
 }
 
@@ -774,9 +772,7 @@ Expression ConditionalOrExpression() :
     one=ConditionalAndExpression()
     ( "||" two=ConditionalAndExpression()
     {
-        ConditionalOrExpressionNode e = new ConditionalOrExpressionNode(fileName, token.beginLine);
-        e.left = one;
-        e.right = two;
+        ConditionalOrExpressionNode e = new ConditionalOrExpressionNode(fileName, token.beginLine, one, two);
         one = e;
     } )*
     {
@@ -794,9 +790,7 @@ Expression ConditionalAndExpression() :
     one=InclusiveOrExpression()
     ( "&&" two=InclusiveOrExpression()
     {
-        ConditionalAndExpressionNode e = new ConditionalAndExpressionNode(fileName, token.beginLine);
-        e.left = one;
-        e.right = two;
+        ConditionalAndExpressionNode e = new ConditionalAndExpressionNode(fileName, token.beginLine, one, two);
         one = e;
     } )*
     {
@@ -893,16 +887,13 @@ Expression EqualityExpression() :
 
 Expression InstanceOfExpression() :
 {
-    InstanceOfExpressionNode e = new InstanceOfExpressionNode(fileName, token.beginLine);
     Expression temp;
     Types t;
 }
 {
     temp=RelationalExpression()
     [ "instanceof" t=Type() {
-        e.left = temp;
-        e.right = t;
-        return e;
+        return new InstanceOfExpressionNode(fileName, token.beginLine, temp, t);
     } ]
     {
         // simple expression instead

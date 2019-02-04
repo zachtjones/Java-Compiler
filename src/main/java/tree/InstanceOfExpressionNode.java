@@ -10,11 +10,13 @@ import org.jetbrains.annotations.NotNull;
 
 /* left instanceof right */
 public class InstanceOfExpressionNode extends NodeImpl implements Expression {
-    public Expression left;
-    public Types right;
+	@NotNull private final Expression left;
+    @NotNull private final Types right;
     
-    public InstanceOfExpressionNode(String fileName, int line) {
+    public InstanceOfExpressionNode(String fileName, int line, @NotNull Expression left, @NotNull Types right) {
     	super(fileName, line);
+    	this.left = left;
+    	this.right = right;
     }
 
 	@Override

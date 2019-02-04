@@ -12,12 +12,13 @@ import org.jetbrains.annotations.NotNull;
 
 /** left && right */
 public class ConditionalAndExpressionNode extends NodeImpl implements Expression {
-    public Expression left;
-    public Expression right;
+    @NotNull private final Expression left, right;
 
-    public ConditionalAndExpressionNode(String fileName, int line) {
+    public ConditionalAndExpressionNode(String fileName, int line, @NotNull Expression left, @NotNull Expression right) {
     	super(fileName, line);
-    }
+		this.left = left;
+		this.right = right;
+	}
 
 	@Override
 	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
