@@ -492,32 +492,33 @@ VariableInitializerNode VariableInitializer() :
 
 MethodNode MethodDeclaration() :
 {
-    MethodNode m = new MethodNode();
-}
-{
-    ( <PUBLIC> { m.isPublic=true;} | <PROTECTED> { m.isProtected=true; }
-    | <PRIVATE> { m.isPrivate=true; } | <STATIC> { m.isStatic=true; }
-    | <ABSTRACT> { m.isAbstract=true; } | <FINAL> { m.isFinal=true; }
-    | <NATIVE> { m.isNative=true; } | <SYNCHRONIZED> { m.isSynchronized=true; } )*
-    m.resultType=ResultType()
-    m.dec=MethodDeclarator()
-    [ <THROWS> m.throwsList=NameList() ]
-    ( m.code=Block() | ";" )
-    {
-        return m;
-    }
-}
+    boolean isPublic, isProtected, isPrivate, isStatic, isAbstract, isFinal, isNative, isSynchronized;
+    isPublic = isProtected = isPrivate = isStatic = isAbstract = isFinal = isNative = isSynchronized = false;
+    Types returnType;
+    String name;
+    ArrayList<ParamNode> params;
+    ArrayList<NameNode> throwsList = null;
+    BlockNode code = null;
 
-MethodDeclaratorNode MethodDeclarator() :
-{
-    MethodDeclaratorNode m = new MethodDeclaratorNode(fileName, token.beginLine);
     Token t;
 }
 {
-    t=<IDENTIFIER> { m.name = t.image; }
-    m.params=FormalParameters() ( <LBRACKET> <RBRACKET>{ m.arrayDims ++; } )*
+    ( <PUBLIC> { isPublic=true;} | <PROTECTED> { isProtected=true; }
+    | <PRIVATE> { isPrivate=true; } | <STATIC> { isStatic=true; }
+    | <ABSTRACT> { isAbstract=true; } | <FINAL> { isFinal=true; }
+    | <NATIVE> { isNative=true; } | <SYNCHRONIZED> { isSynchronized=true; } )*
+    returnType=ResultType()
+    t=<IDENTIFIER> { name = t.image; }
+    params=FormalParameters()
+    // array parts after the parameters
+    ( <LBRACKET> <RBRACKET> { returnType = Types.arrayOf(returnType); } )*
+
+    [ <THROWS> throwsList=NameList() ]
+    ( code=Block() | ";" )
     {
-        return m;
+        return new MethodNode(fileName, token.beginLine,
+            isPublic, isProtected, isPrivate, isStatic, isAbstract, isFinal, isNative, isSynchronized,
+            returnType, name, params, throwsList, code);
     }
 }
 
