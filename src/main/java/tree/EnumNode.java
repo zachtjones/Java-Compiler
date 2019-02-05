@@ -7,24 +7,26 @@ import helper.CompileException;
 import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class EnumNode extends NodeImpl implements TypeDecNode {
-    public String name;
-    public ArrayList<String> values;
+public class EnumNode implements TypeDecNode {
+    @NotNull private final String fileName;
+	private final int line;
+	@NotNull private final String name;
+	@NotNull private final ArrayList<String> values;
 
-    public EnumNode(String fileName, int line) {
-    	super(fileName, line);
-    }
+    public EnumNode(@NotNull String fileName, int line, @NotNull String name, @NotNull ArrayList<String> values) {
 
-	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
-		// nothing needed
+		this.fileName = fileName;
+		this.line = line;
+		this.name = name;
+		this.values = values;
 	}
-	
+
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
-		// nothing needed either -- only simple enum's supported.
-		// this method should not be called, since you call the compile(String) one instead.
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
+		// nothing needed
 	}
 
 	/**
@@ -33,12 +35,13 @@ public class EnumNode extends NodeImpl implements TypeDecNode {
 	 * @param classLevel The classLevel symbols (from imports)
 	 * @return A new intermediate file.
 	 */
-	public InterFile compile(String packageName, SymbolTable classLevel) {
+	@Override
+	public InterFile compile(@Nullable String packageName, @NotNull SymbolTable classLevel) {
 		InterFile f;
 		if (packageName != null) {
-			f = new InterFile(packageName + "." + name);
+			f = new InterFile(packageName + "." + this.name, "java/lang/Enum", new ArrayList<>());
 		} else {
-			f = new InterFile(name);
+			f = new InterFile(this.name, "java/lang/Enum", new ArrayList<>());
 		}
 		for (int i = 0; i < values.size(); i++) {
 			String id = values.get(i);

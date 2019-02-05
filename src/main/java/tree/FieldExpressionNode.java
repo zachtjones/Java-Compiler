@@ -10,22 +10,24 @@ import intermediate.GetStaticFieldAddressStatement;
 import intermediate.GetStaticFieldStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
+import org.jetbrains.annotations.NotNull;
 
 /** Represents accessing a field of an object. */
 public class FieldExpressionNode extends NodeImpl implements Expression, LValue {
-    public String identifier;
+    @NotNull private final String identifier;
 
-    public FieldExpressionNode(String fileName, int line) {
+    public FieldExpressionNode(@NotNull String fileName, int line, @NotNull String identifier) {
     	super(fileName, line);
+    	this.identifier = identifier;
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		// identifier is a variable name, don't need to resolve imports
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f)
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 		
 		if (f.history.wasThisLast()) {
@@ -47,7 +49,8 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 			f.statements.add(new GetInstanceFieldStatement(thisPointer, identifier, result,
 					getFileName(), getLine()));
 			
-		} else if (f.history.getName() != null) {
+		} else {
+			f.history.getName();
 			int tableLookup = s.lookup(f.history.getName());
 			if (tableLookup == SymbolTable.className) {
 				// static lookup
@@ -57,22 +60,18 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 			} else {
 				// instance field of symbol name
 				// get the address of the object
-				NameNode n = new NameNode(getFileName(), getLine());
-				n.primaryName = f.history.getName();
+				NameNode n = new NameNode(getFileName(), getLine(), f.history.getName(), null);
 				n.compile(s, f);
 				Register name = f.allocator.getLast();
 				f.statements.add(new GetInstanceFieldStatement(name, identifier, f.allocator.getNext(Types.UNKNOWN),
 						getFileName(), getLine()));
 			}
 			f.history.setName(identifier);
-		} else {
-			throw new CompileException("Expression compilation of object.FIELD not done yet.",
-					getFileName(), getLine());
 		}
 	}
 
 	@Override
-	public void compileAddress(SymbolTable s, InterFunction f)
+	public void compileAddress(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 		if (f.history.wasThisLast()) {
 			// check symbol table -- declared in the same compilation unit
@@ -93,7 +92,8 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 			f.statements.add(new GetInstanceFieldAddressStatement(thisPointer, identifier, result,
 					getFileName(), getLine()));
 			
-		} else if (f.history.getName() != null) {
+		} else {
+			f.history.getName();
 			int tableLookup = s.lookup(f.history.getName());
 			if (tableLookup == SymbolTable.className) {
 				// static lookup
@@ -103,8 +103,7 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 			} else {
 				// instance field of symbol name
 				// get the address of the object
-				NameNode n = new NameNode(getFileName(), getLine());
-				n.primaryName = f.history.getName();
+				NameNode n = new NameNode(getFileName(), getLine(), f.history.getName(), null);
 				n.compileAddress(s, f);
 				Register name = f.allocator.getLast();
 				f.statements.add(
@@ -112,9 +111,6 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 							getFileName(), getLine()));
 			}
 			f.history.setName(identifier);
-		} else {
-			throw new CompileException("Expression compilation of object.FIELD not done yet.",
-					getFileName(), getLine());
 		}
 	}
 }

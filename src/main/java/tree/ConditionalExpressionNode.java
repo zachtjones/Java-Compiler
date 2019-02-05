@@ -3,26 +3,29 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 /** condition ? truePart : falsePart */
 public class ConditionalExpressionNode extends NodeImpl implements Expression {
-    public Expression condition;
-    public Expression truePart;
-    public Expression falsePart;
+    @NotNull private final Expression condition, truePart, falsePart;
 
-    public ConditionalExpressionNode(String fileName, int line) {
+    public ConditionalExpressionNode(String fileName, int line, @NotNull Expression condition,
+									 @NotNull Expression truePart, @NotNull Expression falsePart) {
     	super(fileName, line);
-    }
+		this.condition = condition;
+		this.truePart = truePart;
+		this.falsePart = falsePart;
+	}
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		condition.resolveImports(c);
 		truePart.resolveImports(c);
 		falsePart.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f)
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 		
 		// TODO

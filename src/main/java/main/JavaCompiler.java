@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import helper.ClassLookup;
 import helper.CompileException;
 import helper.ProcessRunner;
 import helper.Types;
 import javaLibrary.JavaLibraryLookup;
+import org.jetbrains.annotations.NotNull;
 import tree.*;
 import intermediate.*;
 import x64.X64File;
@@ -27,7 +27,7 @@ public class JavaCompiler {
 	 * @param fullyQualifiedName The java class name (ex: java/lang/String)
 	 * @return The Intermediate file representation, or null 
 	 */
-	public static InterFile parseAndCompile(String fullyQualifiedName, String fileName, int line)
+	public static InterFile parseAndCompile(@NotNull String fullyQualifiedName, @NotNull String fileName, int line)
 			throws CompileException {
 		
 		fullyQualifiedName = fullyQualifiedName.replace('.', '/');
@@ -46,16 +46,8 @@ public class JavaCompiler {
 		try {
 			CompilationUnit c = JavaParser.parse(newFileName);
 
-			// update the class lookup tables (short names to full names)
-			String packageName = c.packageName == null ? null : c.packageName.primaryName;
-			SymbolTable classLevel = new SymbolTable(null, SymbolTable.className);
-			ClassLookup lookup = new ClassLookup(newFileName, packageName, c.imports, classLevel);
-
-			// resolve the imports -- placing resolved names into the global symbol table
-			c.resolveImports(lookup);
-
-			// compile and put all in the cache
-			ArrayList<InterFile> files = c.compile(classLevel);
+			// resolves imports, compile to intermediate language
+			ArrayList<InterFile> files = c.compile(newFileName);
 			for (InterFile file : files) {
 				file.typeCheck();
 				cache.put(file.getName(), file);
@@ -90,16 +82,8 @@ public class JavaCompiler {
 			rootDir = new File(file).getParent().replace(packageFile, "");
 		}
 
-		// update the class lookup tables (short names to full names)
-		String packageName = c.packageName == null ? null : c.packageName.primaryName;
-		SymbolTable classLevel = new SymbolTable(null, SymbolTable.className);
-		ClassLookup lookup = new ClassLookup(file, packageName, c.imports, classLevel);
-
-		// resolve the imports -- placing resolved names into the global symbol table
-		c.resolveImports(lookup);
-
 		// compile to IL & put in cache
-		ArrayList<InterFile> files = c.compile(classLevel);
+		ArrayList<InterFile> files = c.compile(file);
 		for (InterFile f : files) {
 			cache.put(f.getName(), f);
 		}
@@ -117,9 +101,11 @@ public class JavaCompiler {
 		arg.add(Types.arrayOf(Types.STRING));
 
 		for (InterFile f : files) {
-			if (f.getReturnType("main", arg) != null) {
+			// verify there is a main method
+			try {
+				f.getReturnType("main", arg, f.getName(), -1);
 				mainClass = f;
-			}
+			} catch (CompileException ignored) {}
 		}
 
 		// enforce there is a `static void main(String[] args)`

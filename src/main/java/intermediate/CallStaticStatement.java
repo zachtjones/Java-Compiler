@@ -4,6 +4,8 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
 import x64.instructions.CallClassMethod;
 import x64.instructions.MoveInstruction;
@@ -17,22 +19,21 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.allocation.CallingConvention.returnValueRegister;
 
 /** Represents a function call without a lookup. */
 public class CallStaticStatement implements InterStatement, FindClassJNI, GetStaticMethodIdJNI, CallStaticMethodJNI {
-	private final String className;
-	private final String functionName;
-	private final Register[] args;
-	private final Register returnVal;
+	@NotNull private final String className;
+	@NotNull private final String functionName;
+	@NotNull private final Register[] args;
+	@Nullable private final Register returnVal;
 
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 
 
-	public CallStaticStatement(String className, String functionName, Register[] args,
-							   Register returnVal, String fileName, int line) {
+	public CallStaticStatement(@NotNull String className, @NotNull String functionName, @NotNull Register[] args,
+							   @Nullable Register returnVal, @NotNull String fileName, int line) {
 
 		this.className = className;
 		this.functionName = functionName;
@@ -50,8 +51,8 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		for (Register r : args) {
 			UsageCheck.verifyDefined(r, regs, fileName, line);
@@ -62,17 +63,7 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 			InterFile e = JavaCompiler.parseAndCompile(className, fileName, line);
 			ArrayList<Types> argsList = new ArrayList<>();
 			Arrays.stream(args).map(Register::getType).forEachOrdered(argsList::add);
-			Types returnType = e.getReturnType(functionName, argsList);
-
-			if (returnType == null) {
-				final String signature = functionName + "(" +
-					Arrays.stream(args)
-					.map(i -> i.getType().getIntermediateRepresentation())
-					.collect(Collectors.joining()) + ")";
-
-				throw new CompileException("no method found with signature, " + signature
-				+ ", referenced", fileName, line);
-			}
+			Types returnType = e.getReturnType(functionName, argsList, fileName, line);
 
 			returnVal.setType(returnType);
 			regs.put(returnVal, returnType);
@@ -80,7 +71,7 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 	}
 
 	@Override
-	public void compile(X64Context context) throws CompileException {
+	public void compile(@NotNull X64Context context) throws CompileException {
 		// if the type of the register is java/*, use JNI
 		if (className.startsWith("java/")) {
 
@@ -115,12 +106,14 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 			);
 
 			// 3. mov %rax, result
-			context.addInstruction(
-				new MoveInstruction(
-					returnValueRegister(),
-					returnVal.toX64()
-				)
-			);
+			if (returnVal != null) {
+				context.addInstruction(
+					new MoveInstruction(
+						returnValueRegister(),
+						returnVal.toX64()
+					)
+				);
+			}
 		}
 	}
 }

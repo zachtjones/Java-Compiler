@@ -6,23 +6,27 @@ import intermediate.BranchStatementFalse;
 import intermediate.InterFunction;
 import intermediate.JumpStatement;
 import intermediate.LabelStatement;
+import org.jetbrains.annotations.NotNull;
 
 public class WhileStatementNode extends NodeImpl implements StatementNode {
-    public Expression expression;
-    public StatementNode statement;
+    @NotNull private final Expression expression;
+    @NotNull private final StatementNode statement;
 
-    public WhileStatementNode(String fileName, int line) {
+    public WhileStatementNode(@NotNull String fileName, int line, @NotNull Expression expression,
+							  @NotNull StatementNode statement) {
     	super(fileName, line);
+    	this.expression = expression;
+    	this.statement = statement;
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		expression.resolveImports(c);
 		statement.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// label for expression
 		LabelStatement exprLbl = new LabelStatement("L_COND_" + f.allocator.getNextLabel());
 		// label for ending

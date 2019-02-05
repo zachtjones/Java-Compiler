@@ -7,6 +7,7 @@ import intermediate.CopyStatement;
 import intermediate.InterFunction;
 import intermediate.LoadLiteralStatement;
 import intermediate.Register;
+import org.jetbrains.annotations.NotNull;
 
 /** ++ expr */
 public class PreIncrementExpressionNode extends NodeImpl implements StatementExprNode, Expression {
@@ -17,13 +18,13 @@ public class PreIncrementExpressionNode extends NodeImpl implements StatementExp
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// get new one = expr
 		// expr -- (but have to use the previous answer + 1, can't calculate 2x)
 		// copy new new one from new one

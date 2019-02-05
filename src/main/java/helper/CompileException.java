@@ -1,19 +1,21 @@
 package helper;
 
+import org.jetbrains.annotations.NotNull;
+
 public class CompileException extends Exception {
 	
-	private String file;
+	@NotNull private String file;
 	private int line;
 	
 	/** Constructs a new exception with the specified detail message */
-	public CompileException(String message, String file, int line) {
+	public CompileException(@NotNull String message, @NotNull String file, int line) {
 		super(message);
 		this.file = file;
 		this.line = line;
 	}
 
 	/** Constructs a new exception with the specified detail message and cause. */
-	public CompileException(String string, Throwable cause, String file, int line) {
+	public CompileException(@NotNull String string, @NotNull Throwable cause, @NotNull String file, int line) {
 		super(string, cause);
 		this.file = file;
 		this.line = line;

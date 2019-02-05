@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class PrimaryExpressionNode extends NodeImpl implements Expression, LValue {
     public Expression prefix;
@@ -15,7 +16,7 @@ public class PrimaryExpressionNode extends NodeImpl implements Expression, LValu
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		prefix.resolveImports(c);
 		for (Expression e : suffixes) {
 			e.resolveImports(c);
@@ -23,7 +24,7 @@ public class PrimaryExpressionNode extends NodeImpl implements Expression, LValu
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		prefix.compile(s, f);
 		for (Expression e : suffixes) {
 			e.compile(s, f);
@@ -32,7 +33,7 @@ public class PrimaryExpressionNode extends NodeImpl implements Expression, LValu
 	}
 
 	@Override
-	public void compileAddress(SymbolTable s, InterFunction f) throws CompileException {
+	public void compileAddress(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// compile the address of the last part
 		prefix.compile(s, f);
 		for (int i = 0; i < suffixes.size(); i++) {

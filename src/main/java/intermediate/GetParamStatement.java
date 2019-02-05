@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
+import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.instructions.MoveInstruction;
 
@@ -12,10 +13,10 @@ import static x64.allocation.CallingConvention.argumentRegister;
 
 /** getParam %register = name */
 public class GetParamStatement implements InterStatement {
-	Register r;
-	private String localName;
+	@NotNull private final Register r;
+	@NotNull private final String localName;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 
 	private InterFunction func;
@@ -25,7 +26,7 @@ public class GetParamStatement implements InterStatement {
 	 * @param r The register number to set
 	 * @param localName The parameter to get.
 	 */
-	public GetParamStatement(Register r, String localName, String fileName, int line) {
+	public GetParamStatement(@NotNull Register r, @NotNull String localName, @NotNull String fileName, int line) {
 		this.r = r;
 		this.localName = localName;
 		this.fileName = fileName;
@@ -38,8 +39,8 @@ public class GetParamStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 
 		this.func = func;
 		
@@ -52,7 +53,7 @@ public class GetParamStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64Context context) {
+	public void compile(@NotNull X64Context context) {
 
 		// the args are as follows: JNI, obj/class, actual args
 		if (localName.equals("this")) {

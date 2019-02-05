@@ -1,5 +1,7 @@
 package helper;
 
+import org.jetbrains.annotations.NotNull;
+
 public class TypeChecker {
 	
 	/**
@@ -10,8 +12,8 @@ public class TypeChecker {
 	 * you will need to add some convert statements.
 	 * @throws CompileException if subclassName is not the same as className or a subclass of it.
 	 */
-	public static void canDirectlyAssign(Types target, Types source, String fileName, int line)
-			throws CompileException {
+	public static void canDirectlyAssign(@NotNull Types target, @NotNull Types source,
+										 @NotNull String fileName, int line) throws CompileException {
 		
 		if (target.equals(source)) {
 			return;

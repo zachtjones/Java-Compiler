@@ -8,24 +8,26 @@ import intermediate.ChooseStatement;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
 import intermediate.Register;
+import org.jetbrains.annotations.NotNull;
 
 /** left && right */
 public class ConditionalAndExpressionNode extends NodeImpl implements Expression {
-    public Expression left;
-    public Expression right;
+    @NotNull private final Expression left, right;
 
-    public ConditionalAndExpressionNode(String fileName, int line) {
+    public ConditionalAndExpressionNode(String fileName, int line, @NotNull Expression left, @NotNull Expression right) {
     	super(fileName, line);
-    }
+		this.left = left;
+		this.right = right;
+	}
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		left.resolveImports(c);
 		right.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		left.compile(s, f);
 		LabelStatement end = new LabelStatement("L_" + f.allocator.getNextLabel());
 		Register leftResult = f.allocator.getLast();

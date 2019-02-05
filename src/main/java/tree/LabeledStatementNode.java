@@ -4,22 +4,26 @@ import helper.ClassLookup;
 import helper.CompileException;
 import helper.Types;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class LabeledStatementNode extends NodeImpl implements StatementNode {
-    public String name;
-    public StatementNode statement;
+    @NotNull private final String name;
+    @NotNull private final StatementNode statement;
     
-    public LabeledStatementNode(String fileName, int line) {
+    public LabeledStatementNode(@NotNull String fileName, int line, @NotNull String name,
+								@NotNull StatementNode statement) {
     	super(fileName, line);
+    	this.name = name;
+    	this.statement = statement;
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		statement.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// put the label into the table
 		s.putEntry(name, Types.LABEL, getFileName(), getLine());
 		

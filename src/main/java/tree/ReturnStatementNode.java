@@ -5,22 +5,25 @@ import helper.CompileException;
 import intermediate.InterFunction;
 import intermediate.ReturnRegStatement;
 import intermediate.ReturnVoidStatement;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ReturnStatementNode extends NodeImpl implements StatementNode {
     // could be null
-    public Expression expression;
+    @Nullable private final Expression expression;
     
-    public ReturnStatementNode(String fileName, int line) {
+    public ReturnStatementNode(String fileName, int line, @Nullable Expression expression) {
     	super(fileName, line);
+    	this.expression = expression;
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		if (expression != null) expression.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// compile in the expression
 		if (expression != null) {
 			expression.compile(s, f);

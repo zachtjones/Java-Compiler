@@ -1,22 +1,25 @@
 package intermediate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import helper.CompileException;
 import helper.Types;
-import tree.NameNode;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import x64.X64File;
 
 import static helper.Types.fromFullyQualifiedClass;
 
 public class InterFile {
-	private String name;
-	private InterStructure staticPart;
-	private InterStructure instancePart;
-	private ArrayList<InterFunction> functions;
+	@NotNull private final String name;
+	@NotNull private final String superClass;
+	@NotNull private final ArrayList<String> implementsClasses;
 
-	private ArrayList<NameNode> implementsNodes;
-	private NameNode superNode;
+	@NotNull private final InterStructure staticPart;
+	@NotNull private final InterStructure instancePart;
+	@NotNull private final ArrayList<InterFunction> functions;
+
 
 	/** name -> Map of list of args to return value */
 	private final Map<String, Map<List<Types>, Types>> typesOfFunctions;
@@ -24,9 +27,14 @@ public class InterFile {
 	/**
 	 * Creates an intermediate file, given the name
 	 * @param name The name, such as java/util/Scanner
+	 * @param superClass The name of the superclass, same form as name.
 	 */
-	public InterFile(String name) {
+	public InterFile(@NotNull String name, @NotNull String superClass,
+					 @NotNull ArrayList<String> implementsClasses) {
+
 		this.name = name;
+		this.superClass = superClass;
+		this.implementsClasses = implementsClasses;
 		this.staticPart = new InterStructure(false);
 		this.instancePart = new InterStructure(true);
 		this.functions = new ArrayList<>();
@@ -40,7 +48,7 @@ public class InterFile {
 	 * @param isStatic true if the field is static, 
 	 * false if it is instance-based.
 	 */
-	public void addField(Types type, String name, boolean isStatic) {
+	public void addField(@NotNull Types type, @NotNull String name, boolean isStatic) {
 		addField(type, name, isStatic, null);
 	}
 
@@ -52,7 +60,7 @@ public class InterFile {
 	 * @param value The default value of the field.
 	 * false if it is instance-based.
 	 */
-	public void addField(Types type, String name, boolean isStatic, String value) {
+	public void addField(@NotNull Types type, @NotNull String name, boolean isStatic, @Nullable String value) {
 		if (isStatic) {
 			this.staticPart.addMember(type, name, value);
 		} else {
@@ -60,8 +68,8 @@ public class InterFile {
 		}
 	}
 
-	/** Gets the file's name (with package, using '/') as a String.
-	 */
+	/** Gets the file's name (with package, using '/') as a String. */
+	@NotNull
 	public String getName() {
 		return name;
 	}
@@ -73,19 +81,16 @@ public class InterFile {
 		result.append(".jil\n\n");
 
 		// super class
-		if (this.superNode != null) {
-			result.append("super ");
-			result.append(this.superNode.primaryName);
-			result.append('\n');
-		}
+		result.append("super ");
+		result.append(this.superClass);
+		result.append('\n');
 
 		// interfaces
-		if (this.implementsNodes != null) {
+		if (!implementsClasses.isEmpty()) {
 			result.append("implements ");
-			for (NameNode n : this.implementsNodes) {
-				result.append(n.primaryName);
-				result.append(' ');
-			}
+			result.append(
+				String.join(", ", implementsClasses)
+			);
 			result.append('\n');
 		}
 
@@ -104,45 +109,24 @@ public class InterFile {
 	}
 
 	/**
-	 * Sets the list of Names that this IL file implements
-	 * @param names The list of NameNode's
-	 */
-	public void setImplements(ArrayList<NameNode> names) {
-		this.implementsNodes = names;
-	}
-
-	/**
-	 * Sets the name that this IL file has as a superclass
-	 * @param superclass The NameNode representing the superclass.
-	 */
-	public void setExtends(NameNode superclass) {
-		this.superNode = superclass;
-	}
-
-	/**
 	 * Adds an intermediate file function to the list.
 	 * @param func The IL function.
 	 */
-	public void addFunction(InterFunction func) {
+	public void addFunction(@NotNull InterFunction func) {
 		this.functions.add(func);
 	}
 
 	/**
 	 * Generates the default constructor if needed.
 	 */
-	public void generateDefaultConstructor(String fileName, int line) {
-		boolean hasOne = false;
-		for (InterFunction i : functions) {
-			if (i.name.equals("<init>")) {
-				hasOne = true;
-			}
-		}
+	public void generateDefaultConstructor(@NotNull String fileName, int line) {
+
+		boolean hasOne = functions.stream().anyMatch(InterFunction::isConstructor);
+
 		if (!hasOne) {
-			InterFunction d = new InterFunction(name);
+			InterFunction d = new InterFunction(name, "<init>", Types.VOID);
 			// add the name and return type
-			d.name = "<init>";
 			d.isInstance = true;
-			d.returnType = Types.VOID;
 
 			// TODO call to super (that's pretty complicated since the test classes extend object)
 			// in order to call a superclass that is part of the java library, have to do some sort of
@@ -186,7 +170,8 @@ public class InterFile {
 	 * @return The JIL representation of the type
 	 * @throws CompileException if the field doesn't exist, or there is a problem checking it.
 	 */
-	public Types getInstFieldType(String fieldName, String fileName, int line) throws CompileException {
+	@NotNull
+	Types getInstFieldType(String fieldName, String fileName, int line) throws CompileException {
 		return instancePart.getFieldType(fieldName, fileName, line);
 	}
 
@@ -196,7 +181,8 @@ public class InterFile {
 	 * @return The JIL representation of the type
 	 * @throws CompileException if the field doesn't exist, or there is a problem checking it.
 	 */
-	public Types getStatFieldType(String fieldName, String fileName, int line) throws CompileException {
+	@NotNull
+	Types getStatFieldType(String fieldName, String fileName, int line) throws CompileException {
 		return staticPart.getFieldType(fieldName, fileName, line);
 	}
 
@@ -206,11 +192,21 @@ public class InterFile {
 	 * @param args The array of arguments.
 	 * @return The return object type, or null if there's no method with that signature
 	 */
-	public Types getReturnType(String name, ArrayList<Types> args) {
+	@NotNull
+	public Types getReturnType(@NotNull String name, @NotNull ArrayList<Types> args,
+							   @NotNull String fileName, int line) throws CompileException {
+
 		if (typesOfFunctions.containsKey(name)) {
 			return typesOfFunctions.get(name).get(args);
+		} else {
+			final String signature = name + "(" +
+				args.stream()
+					.map(Types::getIntermediateRepresentation)
+					.collect(Collectors.joining()) + ")";
+
+			throw new CompileException("no method found with signature, " + signature
+				+ ", referenced", fileName, line);
 		}
-		return null;
 	}
 
 	/**
@@ -218,6 +214,7 @@ public class InterFile {
 	 * @return The X64 assembly file.
 	 * @throws CompileException If there is a problem converting the IL to the assembly.
 	 */
+	@NotNull
 	public X64File compileX64() throws CompileException {
 
 		// TODO use the inheritance to build to function tables
@@ -232,11 +229,12 @@ public class InterFile {
 	}
 
 	/** Returns the offset, in bytes for the fieldName within the structure. */
-	public int getFieldOffset(String fieldName) {
+	int getFieldOffset(String fieldName) {
 		return instancePart.getFieldOffset(fieldName);
 	}
 
-	public int getClassSize() {
+	/** Returns the size of the instance field table in bytes */
+	int getClassSize() {
 		return instancePart.getTotalSize();
 	}
 }

@@ -4,6 +4,7 @@ import helper.ClassLookup;
 import helper.CompileException;
 import helper.Types;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 /** (type[]...)expr */
 public class ObjectCastExpressionNode extends NodeImpl implements Expression {
@@ -16,13 +17,13 @@ public class ObjectCastExpressionNode extends NodeImpl implements Expression {
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		expr.resolveImports(c);
 		type = type.resolveImports(c, getFileName(), getLine());
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// TODO
 		throw new CompileException("Object cast not implemented yet.", getFileName(), getLine());
 	}

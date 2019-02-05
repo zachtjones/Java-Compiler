@@ -4,7 +4,7 @@ import helper.CompileException;
 import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
-import tree.NameNode;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -19,8 +19,8 @@ import static main.FileReader.readResourcesFile;
  */
 public class JavaLibraryLookup {
 
-    private static final String[] lines = readResourcesFile("javaLookup.txt").split("\n");
-    private static final Map<String, InterFile> javaCache = new HashMap<>();
+    @NotNull private static final String[] lines = readResourcesFile("javaLookup.txt").split("\n");
+    @NotNull private static final Map<String, InterFile> javaCache = new HashMap<>();
 
     static {
         for (int i = 0; i < lines.length; i++) {
@@ -29,13 +29,16 @@ public class JavaLibraryLookup {
     }
 
     /** Returns the list of fully qualified names of the classes, enums, and interfaces in the package. */
-    public static List<String> getClassesInPackage(String packageName) {
+    @NotNull
+    public static List<String> getClassesInPackage(@NotNull String packageName) {
         return Arrays.stream(lines)
                 .filter(line -> line.startsWith(packageName))
                 .collect(Collectors.toList());
     }
 
-    public static InterFile getLibraryFile(String fullyQualified, String fileName, int line) throws CompileException {
+    @NotNull
+    public static InterFile getLibraryFile(@NotNull String fullyQualified, @NotNull String fileName, int line)
+            throws CompileException {
 
         // use the cache if already there
         if (javaCache.containsKey(fullyQualified)) {
@@ -50,26 +53,19 @@ public class JavaLibraryLookup {
             Class<?> classFound = JavaLibraryLookup.class.getClassLoader()
                 .loadClass(fullyQualified.replace('/','.'));
 
-            Class<?> superClass = classFound.getSuperclass();
+            String superClass = classFound.getSuperclass().getCanonicalName();
+
             Class<?>[] interfacesImplemented = classFound.getInterfaces();
+            // interfaces
+            ArrayList<String> interfaces = new ArrayList<>();
+            for (Class<?> implemented : interfacesImplemented) {
+                interfaces.add(implemented.getCanonicalName());
+            }
+
             Field[] fields = classFound.getDeclaredFields();
             Method[] methods = classFound.getMethods();
 
-            InterFile result = new InterFile(fullyQualified);
-
-            // super classes
-            NameNode superClassNode = new NameNode(fileName, line);
-            superClassNode.primaryName = superClass.getCanonicalName();
-            result.setExtends(superClassNode);
-
-            // interfaces
-            ArrayList<NameNode> interfaces = new ArrayList<>();
-            for (Class<?> implemented : interfacesImplemented) {
-                NameNode interfaceNode = new NameNode(fileName, line);
-                interfaceNode.primaryName = implemented.getCanonicalName();
-                interfaces.add(interfaceNode);
-            }
-            result.setImplements(interfaces);
+            InterFile result = new InterFile(fullyQualified, superClass, interfaces);
 
             // fields -- since this is just used for type checking,
             // we don't need to know the field's initial value if it has one
@@ -80,9 +76,8 @@ public class JavaLibraryLookup {
 
             // methods -- again don't need to know the contents, just the signatures
             for (Method method : methods) {
-                InterFunction function = new InterFunction(fullyQualified);
-                function.name = method.getName();
-                function.returnType = Types.fromReflection(method.getReturnType());
+                Types returnType = Types.fromReflection(method.getReturnType());
+                InterFunction function = new InterFunction(fullyQualified, method.getName(), returnType);
 
                 ArrayList<Types> arguments = new ArrayList<>();
                 for (Class<?> argType : method.getParameterTypes()) {

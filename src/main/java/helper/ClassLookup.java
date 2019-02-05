@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javaLibrary.JavaLibraryLookup;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import tree.ImportNode;
 import tree.NameNode;
 import tree.SymbolTable;
@@ -21,19 +23,23 @@ public class ClassLookup {
 	 * @param classLevel The class level symbol table (from imports)
 	 * @throws CompileException If there is an issue resolving creating this object.
 	 */
-	public ClassLookup(String fileName, String packageName, ArrayList<ImportNode> imports,
-			SymbolTable classLevel)	throws CompileException {
+	public ClassLookup(@NotNull String fileName, @Nullable NameNode packageName,
+					   @NotNull ArrayList<ImportNode> imports,
+					   @NotNull SymbolTable classLevel)	throws CompileException {
 
 		File thisFile = new File(fileName);
 		// automatically import the files in the same directory / package
 		// if default package (null), fully qualified == short name
 		if (packageName != null) {
 			File parent = thisFile.getParentFile();
-			for (File f : parent.listFiles()) {
-				String name = f.getName(); // just the name.extension
-				String justName = f.getName().replaceAll(".java", "");
-				if (name.endsWith(".java")) {
-					items.put(justName, packageName + "." + name);
+			File[] files = parent.listFiles();
+			if (files != null) {
+				for (File f : files) {
+					String name = f.getName(); // just the name.extension
+					String justName = f.getName().replaceAll(".java", "");
+					if (name.endsWith(".java")) {
+						items.put(justName, packageName.primaryName + "." + name);
+					}
 				}
 			}
 		}
@@ -42,11 +48,7 @@ public class ClassLookup {
 		// note name.* only imports the public things (java language spec)
 		// again, get the file names
 		// always import java.lang.*
-		ImportNode javaLang = new ImportNode(fileName, -1);
-		javaLang.isAll = true;
-		javaLang.name = new NameNode(fileName, -1);
-		javaLang.name.primaryName = "java.lang";
-		imports.add(javaLang);
+		imports.add(new ImportNode(new NameNode(fileName, -1, "java.lang", null), true));
 
 		for (ImportNode i : imports) {
 			String name = i.name.primaryName;
@@ -80,6 +82,7 @@ public class ClassLookup {
 	/** Gets the full name from the short name representation.
 	 * @param shortName the short name of this class/interface/enum
 	 * */
+	@NotNull
 	public String getFullName(String shortName) {
 
 		// handle Object -> java/lang/Object, 

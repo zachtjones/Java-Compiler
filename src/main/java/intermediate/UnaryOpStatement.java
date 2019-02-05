@@ -5,6 +5,7 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
+import org.jetbrains.annotations.NotNull;
 
 /** dest = OP src2 */
 public class UnaryOpStatement implements InterStatement {
@@ -12,15 +13,16 @@ public class UnaryOpStatement implements InterStatement {
 	public static final char LOGNOT = '!';
 	public static final char NEGATIVE = '-';
 
-	private final Register src1;
-	private final Register dest;
+	@NotNull private final Register src1;
+	@NotNull private final Register dest;
 	char type;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 
 	/** Creates an unary operation statement */
-	public UnaryOpStatement(Register src1, Register dest, char type, String fileName, int line) {
+	public UnaryOpStatement(@NotNull Register src1, @NotNull Register dest, char type,
+							@NotNull String fileName, int line) {
 		this.src1 = src1;
 		this.dest = dest;
 		this.type = type;
@@ -34,8 +36,8 @@ public class UnaryOpStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 
 		UsageCheck.verifyDefined(src1, regs, fileName, line);
 

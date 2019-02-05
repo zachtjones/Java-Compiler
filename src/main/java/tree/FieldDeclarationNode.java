@@ -7,6 +7,7 @@ import helper.CompileException;
 import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class FieldDeclarationNode extends NodeImpl {
 	public boolean isPublic;
@@ -24,7 +25,7 @@ public class FieldDeclarationNode extends NodeImpl {
     	super(fileName, line);
     }
 
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		type = type.resolveImports(c, getFileName(), getLine());
 	}
 
@@ -48,16 +49,15 @@ public class FieldDeclarationNode extends NodeImpl {
 			// add the initial values if any
 			if (d.init != null && d.init.e != null) {
 				// construct the assignment to the expression
-				NameNode n = new NameNode(getFileName(), getLine());
-				n.primaryName = d.id.name;
+				NameNode n = new NameNode(getFileName(), getLine(), d.id.name, null);
 
 				// the type is null here
 				AssignmentNode a = new AssignmentNode(getFileName(), getLine(), n, d.init.e, null);
 
-				// compile the created expression.
-				InterFunction func = new InterFunction(f.getName());
 				// add instance initializer
-				func.name = isStatic ? "<clinit>" : "<init>"; // following java .class standard here
+				final String name = isStatic ? "<clinit>" : "<init>"; // following java .class standard here
+				// compile the created expression.
+				InterFunction func = new InterFunction(f.getName(), name, Types.VOID);
 				func.isInit = true;
 				func.isInstance = !isStatic;
 				a.compile(syms, func);
@@ -67,7 +67,7 @@ public class FieldDeclarationNode extends NodeImpl {
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		/* Nothing to do here*/
 	}
 

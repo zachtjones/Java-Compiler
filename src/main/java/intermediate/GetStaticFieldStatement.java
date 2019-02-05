@@ -5,6 +5,7 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import main.JavaCompiler;
+import org.jetbrains.annotations.NotNull;
 import x64.*;
 import x64.instructions.MoveInstruction;
 import x64.jni.FindClassJNI;
@@ -15,11 +16,11 @@ import x64.operands.X64RegisterOperand;
 import static x64.operands.PCRelativeData.fromField;
 
 public class GetStaticFieldStatement implements InterStatement, FindClassJNI, GetStaticFieldIdJNI, GetStaticFieldJNI {
-	private final String className;
-	private final String fieldName;
-	Register result;
+	@NotNull private final String className;
+	@NotNull private final String fieldName;
+	@NotNull private final Register result;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
 	/**
@@ -28,8 +29,8 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 	 * @param fieldName The field's name.
 	 * @param register The result register.
 	 */
-	public GetStaticFieldStatement(String className, String fieldName, Register register,
-			String fileName, int line) {
+	public GetStaticFieldStatement(@NotNull String className, @NotNull String fieldName, @NotNull Register register,
+			@NotNull String fileName, int line) {
 		
 		this.className = className;
 		this.fieldName = fieldName;
@@ -45,8 +46,8 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		// get the field type for the static field.
 		InterFile object = JavaCompiler.parseAndCompile(className, fileName, line);
@@ -57,7 +58,7 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 	}
 
 	@Override
-	public void compile(X64Context context) throws CompileException {
+	public void compile(@NotNull X64Context context) throws CompileException {
 		if (className.startsWith("java/")) {
 
 			// the flag on the register that is returned that it is a JNI register is based on the type,

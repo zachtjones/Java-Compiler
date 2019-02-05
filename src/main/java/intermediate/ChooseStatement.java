@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a SSA choose between statement.
@@ -12,13 +13,13 @@ import helper.Types;
  * @author zach jones
  */
 public class ChooseStatement implements InterStatement {
-	Register src1, src2, result;
+	@NotNull private Register src1, src2, result;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
-	public ChooseStatement(Register src1, Register src2, Register result,
-			String fileName, int line) {
+	public ChooseStatement(@NotNull Register src1, @NotNull Register src2, @NotNull Register result,
+						   @NotNull String fileName, int line) {
 		
 		this.src1 = src1;
 		this.src2 = src2;
@@ -33,8 +34,8 @@ public class ChooseStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		// TODO left and right have to have common superclass, and the result
 		//   is that common superclass

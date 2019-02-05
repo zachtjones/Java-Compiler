@@ -3,6 +3,7 @@ package intermediate;
 import helper.ClassLookup;
 import helper.CompileException;
 import helper.Types;
+import org.jetbrains.annotations.NotNull;
 import tree.Expression;
 import tree.NodeImpl;
 import tree.SymbolTable;
@@ -23,12 +24,11 @@ public class Register extends NodeImpl implements Expression {
 	
 	public static final int BOOLEAN = 0;
 	public static final int BYTE = 1;
-	public static final int REFERENCE = 8;
 
 	int num;
-	private Types type;
+	@NotNull private Types type;
 
-	public Register(int num, Types type, String fileName, int line) {
+	public Register(int num, @NotNull Types type, @NotNull String fileName, int line) {
 		super(fileName, line);
 		this.num = num;
 		this.type = type;
@@ -40,12 +40,13 @@ public class Register extends NodeImpl implements Expression {
 	}
 
 	/** gets the type of this register */
+	@NotNull
 	public Types getType() {
 		return type;
 	}
 
 	/** sets the type of this register */
-	public void setType(Types type) {
+	public void setType(@NotNull Types type) {
 		this.type = type;
 	}
 
@@ -67,17 +68,17 @@ public class Register extends NodeImpl implements Expression {
 	}
 	
 	/** Helper function if this register holds a primitive value. */
-	public boolean isPrimitive() {
+	boolean isPrimitive() {
 		return type.isPrimitive();
 	}
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		// nothing needed
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// make a copy statement so the result can be gotten with r.getLast()
 		Register result = f.allocator.getNext(type);
 		f.statements.add(new CopyStatement(this, result, getFileName(), getLine()));

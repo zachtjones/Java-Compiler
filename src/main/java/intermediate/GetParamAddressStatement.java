@@ -4,13 +4,14 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
+import org.jetbrains.annotations.NotNull;
 
 /** getLocalAddress %register = name */
 public class GetParamAddressStatement implements InterStatement {
-	Register r;
-	private String localName;
+	@NotNull private Register r;
+	@NotNull private String localName;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
 	/**
@@ -18,7 +19,8 @@ public class GetParamAddressStatement implements InterStatement {
 	 * @param r The register to set
 	 * @param localName The local variable to get.
 	 */
-	public GetParamAddressStatement(Register r, String localName, String fileName, int line) {
+	public GetParamAddressStatement(@NotNull Register r, @NotNull String localName,
+									@NotNull String fileName, int line) {
 		this.r = r;
 		this.localName = localName;
 		this.fileName = fileName;
@@ -31,8 +33,8 @@ public class GetParamAddressStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		if (!params.containsKey(localName)) {
 			throw new CompileException("Error: " + localName + " not a parameter.", fileName, line);

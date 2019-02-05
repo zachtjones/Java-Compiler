@@ -5,32 +5,37 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
+import org.jetbrains.annotations.NotNull;
 import tree.CompileHistory;
 import x64.X64Context;
 import x64.X64File;
 
 public class InterFunction {
-	
-	public String name;
-	public Types returnType;
+
+	@NotNull public final String parentClass;
+	@NotNull public final String name;
+	@NotNull public final Types returnType;
 	public boolean isInstance; // instance or static
 	public boolean isInit; // static init or instance init
-	
-	public ArrayList<Types> paramTypes;
-	public ArrayList<String> paramNames;
+
+	@NotNull public ArrayList<Types> paramTypes;
+	@NotNull public ArrayList<String> paramNames;
 	public boolean lastArgVarargs;
-	
-	public ArrayList<String> throwsList;
-	
-	public ArrayList<InterStatement> statements;
 
-	public final RegisterAllocator allocator;
-	public final CompileHistory history;
+	@NotNull public final ArrayList<String> throwsList;
 
-	public final String parentClass;
+	@NotNull public final ArrayList<InterStatement> statements;
+
+	@NotNull public final RegisterAllocator allocator;
+	@NotNull public final CompileHistory history;
+
+
 	
-	
-	public InterFunction(String fromClass) {
+	public InterFunction(@NotNull String fromClass, @NotNull String name, @NotNull Types returnType) {
+		parentClass = fromClass;
+		this.name = name;
+		this.returnType = returnType;
+
 		this.paramTypes = new ArrayList<>();
 		this.paramNames = new ArrayList<>();
 		this.throwsList = new ArrayList<>();
@@ -38,7 +43,11 @@ public class InterFunction {
 
 		allocator = new RegisterAllocator();
 		history = new CompileHistory();
-		parentClass = fromClass;
+	}
+
+	/** Returns true if and only if this method is a constructor */
+	public boolean isConstructor() {
+		return name.equals("<init>");
 	}
 	
 	@Override

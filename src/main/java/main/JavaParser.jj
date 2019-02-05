@@ -15,6 +15,7 @@ package main;
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import tree.*;
+import intermediate.SetConditionStatement;
 import java.util.ArrayList;
 import java.nio.charset.Charset;
 import helper.Types;
@@ -221,17 +222,19 @@ TOKEN : /* OPERATORS */
 // the whole file is a compilation unit
 CompilationUnit CompilationUnit(String filename) :
 {
-    CompilationUnit c = new CompilationUnit(fileName, token.beginLine);
+    ArrayList<ImportNode> imports = new ArrayList<ImportNode>();
+    ArrayList<TypeDecNode> body = new ArrayList<TypeDecNode>();
+    NameNode packageNode = null;
     ImportNode temp;
     TypeDecNode temp2;
 }
 {
-    [ c.packageName=PackageDeclaration() ]
-    ( temp=ImportDeclaration() { c.imports.add(temp); } )*
-    ( temp2=TypeDeclaration() { c.types.add(temp2); })*
+    [ packageNode=PackageDeclaration() ]
+    ( temp=ImportDeclaration() { imports.add(temp); } )*
+    ( temp2=TypeDeclaration() { body.add(temp2); })*
     <EOF>
     {
-        return c;
+        return new CompilationUnit(fileName, token.beginLine, packageNode, imports, body);
     }
 }
 
@@ -248,14 +251,15 @@ NameNode PackageDeclaration() :
 
 ImportNode ImportDeclaration() :
 {
-    ImportNode n = new ImportNode(fileName, token.beginLine);
+    NameNode name;
+    boolean isAll = false;
 }
 {
-    <IMPORT> n.name=Name()
-    [ <DOT> <STAR> { n.isAll = true; } ]
+    <IMPORT> name=Name()
+    [ <DOT> <STAR> { isAll = true; } ]
     <SEMICOLON>
     {
-        return n;
+        return new ImportNode(name, isAll);
     }
 }
 
@@ -269,7 +273,7 @@ TypeDecNode TypeDeclaration() :
     { return t; }
 
 |   LOOKAHEAD( ( "abstract" | "public")* "interface" )
-    t=ClassDeclaration()
+    t=InterfaceDeclaration()
     { return t; }
 
 |   t=EnumDeclaration()
@@ -286,22 +290,28 @@ TypeDecNode TypeDeclaration() :
 
 ClassNode ClassDeclaration() :
 {
-    ClassNode c = new ClassNode(fileName, token.beginLine);
     Token t;
     ClassBodyNode b;
+
+    ArrayList<ClassBodyNode> body = new ArrayList<ClassBodyNode>();
+    ArrayList<NameNode> typeParams = null;
+    boolean isAbstract = false;
+    boolean isFinal = false;
+    boolean isPublic = false;
+    NameNode superClass = null;
+    ArrayList<NameNode> interfaces = null;
 }
 {
-    ( <ABSTRACT> { c.isAbstract=true; }
-        | <FINAL> { c.isFinal=true; }
-        | <PUBLIC> { c.isPublic=true; } )*
-    <CLASS> t=<IDENTIFIER> [ c.typeParams=ClassTypeParameters() ]
-    [ <EXTENDS> c.superclass=Name() ]
-    [ <IMPLEMENTS> c.interfaces=NameList() ]
-    <LBRACE> ( b=ClassBodyDeclaration() { c.body.add(b); } )* <RBRACE>
+    ( <ABSTRACT> { isAbstract=true; }
+        | <FINAL> { isFinal=true; }
+        | <PUBLIC> { isPublic=true; } )*
+    <CLASS> t=<IDENTIFIER> [ typeParams=ClassTypeParameters() ]
+    [ <EXTENDS> superClass=Name() ]
+    [ <IMPLEMENTS> interfaces=NameList() ]
+    <LBRACE> ( b=ClassBodyDeclaration() { body.add(b); } )* <RBRACE>
     {
-        c.isInterface = false;
-        c.name = t.image;
-        return c;
+        return new ClassNode(fileName, token.beginLine, isAbstract, isFinal, isPublic, t.image, typeParams,
+            superClass, interfaces, body);
     }
 }
 
@@ -355,22 +365,24 @@ void MethodDeclarationLookahead() :
   ResultType() <IDENTIFIER> "("
 }
 
-ClassNode InterfaceDeclaration() :
+InterfaceNode InterfaceDeclaration() :
 {
-    ClassNode c = new ClassNode(fileName, token.beginLine);
+    // temporaries
     ClassBodyNode b;
     Token t;
+
+    // fields of created object
+    ArrayList<NameNode> extendsList = null;
+    String name;
+    ArrayList<ClassBodyNode> body = new ArrayList<ClassBodyNode>();
 }
 {
-    ( <ABSTRACT> | <PUBLIC> )*
-    <INTERFACE> t=<IDENTIFIER> { c.name = t.image; }
-    [ <EXTENDS> c.supers=NameList() ]
-    "{" ( b=InterfaceMemberDeclaration() { c.body.add(b); } )* "}"
+    ( <ABSTRACT> | <PUBLIC> )* // all interfaces are public and abstract by default.
+    <INTERFACE> t=<IDENTIFIER> { name = t.image; }
+    [ <EXTENDS> extendsList=NameList() ]
+    "{" ( b=InterfaceMemberDeclaration() { body.add(b); } )* "}"
     {
-        c.isInterface = true;
-        c.isAbstract = true;
-        c.isPublic = true;
-        return c;
+        return new InterfaceNode(fileName, token.beginLine, name, extendsList, body);
     }
 }
 
@@ -394,14 +406,15 @@ ClassBodyNode InterfaceMemberDeclaration() :
 
 EnumNode EnumDeclaration() :
 {
-    EnumNode e = new EnumNode(fileName, token.beginLine);
+    ArrayList<String> body;
+    String name;
     Token t;
 }
 {
-    (<PUBLIC>)* <ENUM> t=<IDENTIFIER> {e.name = t.image; }
-    <LBRACE> e.values=EnumBody() <RBRACE>
+    (<PUBLIC>)* <ENUM> t=<IDENTIFIER> {name = t.image; }
+    <LBRACE> body=EnumBody() <RBRACE>
     {
-        return e;
+        return new EnumNode(fileName, token.beginLine, name, body);
     }
 }
 
@@ -479,30 +492,33 @@ VariableInitializerNode VariableInitializer() :
 
 MethodNode MethodDeclaration() :
 {
-    MethodNode m = new MethodNode();
-}
-{
-    ( <PUBLIC> { m.isPublic=true;} | <PROTECTED> { m.isProtected=true; }
-    | <PRIVATE> { m.isPrivate=true; } | <STATIC> { m.isStatic=true; }
-    | <ABSTRACT> { m.isAbstract=true; } | <FINAL> { m.isFinal=true; }
-    | <NATIVE> { m.isNative=true; } | <SYNCHRONIZED> { m.isSynchronized=true; } )*
-    m.resultType=ResultType() m.dec=MethodDeclarator() [ <THROWS> m.throwsList=NameList() ]
-    ( m.code=Block() | ";" )
-    {
-        return m;
-    }
-}
+    boolean isPublic, isProtected, isPrivate, isStatic, isAbstract, isFinal, isNative, isSynchronized;
+    isPublic = isProtected = isPrivate = isStatic = isAbstract = isFinal = isNative = isSynchronized = false;
+    Types returnType;
+    String name;
+    ArrayList<ParamNode> params;
+    ArrayList<NameNode> throwsList = null;
+    BlockNode code = null;
 
-MethodDeclaratorNode MethodDeclarator() :
-{
-    MethodDeclaratorNode m = new MethodDeclaratorNode(fileName, token.beginLine);
     Token t;
 }
 {
-    t=<IDENTIFIER> { m.name = t.image; }
-    m.params=FormalParameters() ( <LBRACKET> <RBRACKET>{ m.arrayDims ++; } )*
+    ( <PUBLIC> { isPublic=true;} | <PROTECTED> { isProtected=true; }
+    | <PRIVATE> { isPrivate=true; } | <STATIC> { isStatic=true; }
+    | <ABSTRACT> { isAbstract=true; } | <FINAL> { isFinal=true; }
+    | <NATIVE> { isNative=true; } | <SYNCHRONIZED> { isSynchronized=true; } )*
+    returnType=ResultType()
+    t=<IDENTIFIER> { name = t.image; }
+    params=FormalParameters()
+    // array parts after the parameters
+    ( <LBRACKET> <RBRACKET> { returnType = Types.arrayOf(returnType); } )*
+
+    [ <THROWS> throwsList=NameList() ]
+    ( code=Block() | ";" )
     {
-        return m;
+        return new MethodNode(fileName, token.beginLine,
+            isPublic, isProtected, isPrivate, isStatic, isAbstract, isFinal, isNative, isSynchronized,
+            returnType, name, params, throwsList, code);
     }
 }
 
@@ -612,21 +628,21 @@ NameNode Name() :
  * Also support generics, making this require even more lookahead
  */
 {
-    NameNode n = new NameNode(fileName, token.beginLine);
     Token t;
-    NameNode temp;
+    String name;
+    ArrayList<GenericNode> generics = null;
 }
 {
     // need to make this so that NameNode isn't recursively defined, so that
     //  we can make another method for the bounds, since you can have a list
     //  of them using super and extends, list is separated with '&'
-    t=<IDENTIFIER> { n.primaryName = t.image; }
+    t=<IDENTIFIER> { name = t.image; }
     ( LOOKAHEAD(2) "." t=<IDENTIFIER> {
-        n.primaryName += "." + t.image;
+        name += "." + t.image;
     } )*
-    ( LOOKAHEAD(<LT> GenericList() <GT>) <LT> n.generics=GenericList() <GT>)?
+    ( LOOKAHEAD(<LT> GenericList() <GT>) <LT> generics=GenericList() <GT>)?
     {
-        return n;
+        return new NameNode(fileName, token.beginLine, name, generics);
     }
 }
 
@@ -664,7 +680,6 @@ ArrayList<NameNode> BoundList() :
 }
 {
     temp=Name(){ n.add(temp); }
-    // choice conflict since name could go to '&' somehow -- TODO
     ( <BIT_AND> temp=Name() { n.add(temp); } )*
     {
         return n;
@@ -738,19 +753,17 @@ BinaryOperation AssignmentOperator() :
 *  ConditionalExpression or the next level down */
 Expression ConditionalExpression() :
 {
-    ConditionalExpressionNode e = new ConditionalExpressionNode(fileName, token.beginLine);
-    Expression temp;
+    Expression condition;
+    Expression truePart;
+    Expression falsePart;
 }
 {
-    temp=ConditionalOrExpression()
-    [ "?" e.truePart=Expression() ":" e.falsePart=ConditionalExpression() ]
+    condition=ConditionalOrExpression()
+    [ "?" truePart=Expression() ":" falsePart=ConditionalExpression()
+      { return new ConditionalExpressionNode(fileName, token.beginLine, condition, truePart, falsePart); }
+    ]
     {
-        if (e.truePart == null) {
-            return temp;
-        } else {
-            e.condition = temp;
-            return e;
-        }
+        return condition;
     }
 }
 
@@ -764,9 +777,7 @@ Expression ConditionalOrExpression() :
     one=ConditionalAndExpression()
     ( "||" two=ConditionalAndExpression()
     {
-        ConditionalOrExpressionNode e = new ConditionalOrExpressionNode(fileName, token.beginLine);
-        e.left = one;
-        e.right = two;
+        ConditionalOrExpressionNode e = new ConditionalOrExpressionNode(fileName, token.beginLine, one, two);
         one = e;
     } )*
     {
@@ -784,9 +795,7 @@ Expression ConditionalAndExpression() :
     one=InclusiveOrExpression()
     ( "&&" two=InclusiveOrExpression()
     {
-        ConditionalAndExpressionNode e = new ConditionalAndExpressionNode(fileName, token.beginLine);
-        e.left = one;
-        e.right = two;
+        ConditionalAndExpressionNode e = new ConditionalAndExpressionNode(fileName, token.beginLine, one, two);
         one = e;
     } )*
     {
@@ -864,14 +873,12 @@ Expression EqualityExpression() :
     two=InstanceOfExpression()
     {
         if (isEqual) {
-            EqualityExpressionNode eq = new EqualityExpressionNode(fileName, token.beginLine);
-            eq.left = one;
-            eq.right = two;
+            RelationalExpressionNode eq = new RelationalExpressionNode(fileName, token.beginLine,
+                one, two, SetConditionStatement.EQUAL);
             one = eq; // base for next tree element
         } else {
-            NotEqualityExpressionNode neq = new NotEqualityExpressionNode(fileName, token.beginLine);
-            neq.left = one;
-            neq.right = two;
+            RelationalExpressionNode neq = new RelationalExpressionNode(fileName, token.beginLine,
+                one, two, SetConditionStatement.NOTEQUAL);
             one = neq; // base for next tree element
         }
     })*
@@ -883,16 +890,13 @@ Expression EqualityExpression() :
 
 Expression InstanceOfExpression() :
 {
-    InstanceOfExpressionNode e = new InstanceOfExpressionNode(fileName, token.beginLine);
     Expression temp;
     Types t;
 }
 {
     temp=RelationalExpression()
     [ "instanceof" t=Type() {
-        e.left = temp;
-        e.right = t;
-        return e;
+        return new InstanceOfExpressionNode(fileName, token.beginLine, temp, t);
     } ]
     {
         // simple expression instead
@@ -920,24 +924,20 @@ Expression RelationalExpression() :
         two=ShiftExpression()
         {
             if (type == 0) {
-                LessThanExpressionNode lt = new LessThanExpressionNode(fileName, token.beginLine);
-                lt.left = one;
-                lt.right = two;
+                RelationalExpressionNode lt = new RelationalExpressionNode(fileName, token.beginLine,
+                    one, two, SetConditionStatement.LESS);
                 one = lt;
             } else if (type == 1) {
-                GreaterThanExpressionNode gt = new GreaterThanExpressionNode(fileName, token.beginLine);
-                gt.left = one;
-                gt.right = two;
+                RelationalExpressionNode gt = new RelationalExpressionNode(fileName, token.beginLine,
+                    one, two, SetConditionStatement.GREATER);
                 one = gt;
             } else if (type == 2) {
-                LessThanEqualExpressionNode lte = new LessThanEqualExpressionNode(fileName, token.beginLine);
-                lte.left = one;
-                lte.right = two;
+                RelationalExpressionNode lte = new RelationalExpressionNode(fileName, token.beginLine,
+                    one, two, SetConditionStatement.LESSEQUAL);
                 one = lte;
             } else {
-                GreaterThanEqualExpressionNode gte = new GreaterThanEqualExpressionNode(fileName, token.beginLine);
-                gte.left = one;
-                gte.right = two;
+                RelationalExpressionNode gte = new RelationalExpressionNode(fileName, token.beginLine,
+                    one, two, SetConditionStatement.GREATEREQUAL);
                 one = gte;
             }
         }
@@ -1019,9 +1019,7 @@ Expression UnaryExpression() :
     e=UnaryExpression()
     {
         if (temp) { // unary -
-            UnaryMinusExpressionNode u = new UnaryMinusExpressionNode(fileName, token.beginLine);
-            u.expr = e;
-            return u;
+            return new UnaryMinusExpressionNode(fileName, token.beginLine, e);
         } else { // unary +, no meaning
             return e;
         }
@@ -1076,13 +1074,9 @@ Expression UnaryExpressionNotPlusMinus() :
     e=UnaryExpression()
     {
         if (type == 0) {
-            BitwiseNotExpressionNode b = new BitwiseNotExpressionNode(fileName, token.beginLine);
-            b.expr = e;
-            return b;
+            return new BitwiseNotExpressionNode(fileName, token.beginLine, e);
         } else {
-            LogicalNotExpressionNode l = new LogicalNotExpressionNode(fileName, token.beginLine);
-            l.expr = e;
-            return l;
+            return new LogicalNotExpressionNode(fileName, token.beginLine, e);
         }
     }
 |
@@ -1225,16 +1219,12 @@ Expression PrimarySuffix() :
 {
     "[" temp=Expression() "]"
     {
-        ArrayIndexExpressionNode a = new ArrayIndexExpressionNode(fileName, token.beginLine);
-        a.expr = temp;
-        return a;
+        return new ArrayIndexExpressionNode(fileName, token.beginLine, temp);
     }
 |
     "." t=<IDENTIFIER>
     {
-        FieldExpressionNode f = new FieldExpressionNode(fileName, token.beginLine);
-        f.identifier = t.image;
-        return f;
+        return new FieldExpressionNode(fileName, token.beginLine, t.image);
     }
 |
     temp=Arguments() // just grab the args
@@ -1246,26 +1236,28 @@ Expression PrimarySuffix() :
 LiteralExpressionNode Literal() :
 {
     Token t;
-    LiteralExpressionNode l = new LiteralExpressionNode(fileName, token.beginLine);
 }
 {
-    t=<INTEGER_LITERAL> { l.value = t.image; return l; }
-|   t=<FLOATING_POINT_LITERAL> { l.value = t.image; return l; }
-|   t=<CHARACTER_LITERAL> { l.value = t.image; return l; }
-|   t=<STRING_LITERAL> { l.value = t.image; return l; }
-|   t=<TRUE> { l.value = t.image; return l; }
-|   t=<FALSE> { l.value = t.image; return l; }
-|   t=<NULL> { l.value = t.image; return l; }
+    (t=<INTEGER_LITERAL>
+|   t=<FLOATING_POINT_LITERAL>
+|   t=<CHARACTER_LITERAL>
+|   t=<STRING_LITERAL>
+|   t=<TRUE>
+|   t=<FALSE>
+|   t=<NULL>)
+    {
+        return new LiteralExpressionNode(fileName, token.beginLine, t.image);
+    }
 }
 
 ArgumentExpressionNode Arguments() :
 {
-    ArgumentExpressionNode e = new ArgumentExpressionNode(fileName, token.beginLine);
+    ArrayList<Expression> expressions = null;
 }
 {
-    "(" [ e.expressions=ArgumentList() ] ")"
+    "(" [ expressions=ArgumentList() ] ")"
     {
-        return e;
+        return new ArgumentExpressionNode(fileName, token.beginLine, expressions);
     }
 }
 
@@ -1423,42 +1415,42 @@ StatementNode Statement() :
 
 LabeledStatementNode LabeledStatement() :
 {
-    LabeledStatementNode l = new LabeledStatementNode(fileName, token.beginLine);
+    StatementNode statement;
     Token t;
 }
 {
-    t=<IDENTIFIER> { l.name = t.image; } ":" l.statement=Statement()
+    t=<IDENTIFIER> ":" statement=Statement()
     {
-        return l;
+        return new LabeledStatementNode(fileName, token.beginLine, t.image, statement);
     }
 }
 
 BlockNode Block() :
 {
-    BlockNode b = new BlockNode(fileName, token.beginLine);
-    b.statements = new ArrayList<BlockStatementNode>();
+    int line = token.beginLine;
+    ArrayList<BlockStatementNode> statements = new ArrayList<BlockStatementNode>();
     BlockStatementNode s;
 }
 {
     <LBRACE> ( s=BlockStatement()
-    { b.statements.add(s); } )* <RBRACE>
+    { statements.add(s); } )* <RBRACE>
     {
-        return b;
+        return new BlockNode(fileName, line, statements);
     }
 }
 
 BlockStatementNode BlockStatement() :
 {
-    BlockStatementNode b = new BlockStatementNode(fileName, token.beginLine);
+    BlockStatementNode b;
 }
 {
     LOOKAHEAD(Type() <IDENTIFIER>)
-    b.dec=LocalVariableDeclaration() <SEMICOLON>
+    b=LocalVariableDeclaration() <SEMICOLON>
     {
         return b;
     }
 |
-    b.statement=Statement()
+    b=Statement()
     {
         return b;
     }
@@ -1466,15 +1458,15 @@ BlockStatementNode BlockStatement() :
 
 LocalVariableDecNode LocalVariableDeclaration() :
 {
-    LocalVariableDecNode d = new LocalVariableDecNode(fileName, token.beginLine);
-    d.declarators = new ArrayList<VariableDecNode>();
+    Types type;
+    ArrayList<VariableDecNode> declarations = new ArrayList<VariableDecNode>();
     VariableDecNode temp;
 }
 {
-    d.type=Type() temp=VariableDeclarator() { d.declarators.add(temp); }
-    ( <COMMA> temp=VariableDeclarator() { d.declarators.add(temp); })*
+    type=Type() temp=VariableDeclarator() { declarations.add(temp); }
+    ( <COMMA> temp=VariableDeclarator() { declarations.add(temp); })*
     {
-        return d;
+        return new LocalVariableDecNode(fileName, token.beginLine, type, declarations);
     }
 }
 
@@ -1518,38 +1510,35 @@ StatementExprNode StatementExpression() :
 
 SwitchStatementNode SwitchStatement() :
 {
-    SwitchStatementNode s = new SwitchStatementNode(fileName, token.beginLine);
-    s.labels = new ArrayList<SwitchLabelNode>();
-    s.statements = new ArrayList<ArrayList<BlockStatementNode>>();
-    SwitchLabelNode temp;
-    BlockStatementNode temp2;
-    ArrayList<BlockStatementNode> currStatements = new ArrayList<BlockStatementNode>();
-    /* This rule is a bit funky as you can have a variable number of statements
-      in each labeled thing */
+    Expression expression; // switch(expression)
+    ArrayList<SwitchStatementPart> parts = new ArrayList<SwitchStatementPart>(); // label: (Statements)*
+
+    SwitchLabelNode tempLabel;
+    ArrayList<BlockStatementNode> statements = new ArrayList<BlockStatementNode>();
+    BlockStatementNode tempExpression;
 }
 {
-    <SWITCH> <LPAREN> s.expression=Expression() <RPAREN> <LBRACE>
-        ( temp=SwitchLabel() { s.labels.add(temp); }
-            ( temp2=BlockStatement() { currStatements.add(temp2); } )*
+    <SWITCH> <LPAREN> expression=Expression() <RPAREN> <LBRACE>
+        ( tempLabel=SwitchLabel()
+            ( tempExpression=BlockStatement() { statements.add(tempExpression); } )*
             {
-                s.statements.add(currStatements);
-                currStatements = new ArrayList<BlockStatementNode>();
+                parts.add(new SwitchStatementPart(fileName, token.beginLine, tempLabel, statements));
             }
         )*
     <RBRACE>
     {
-        return s;
+        return new SwitchStatementNode(fileName, token.beginLine, expression, parts);
     }
 }
 
 SwitchLabelNode SwitchLabel() :
 {
-    SwitchLabelNode s = new SwitchLabelNode(fileName, token.beginLine);
+    Expression expr;
 }
 {
-  <CASE> s.expression=Expression() <COLON> { return s; }
+  <CASE> expr=Expression() <COLON> { return new SwitchLabelNode(fileName, token.beginLine, expr); }
 |
-  <_DEFAULT> <COLON> { s.isDefault=true; return s; }
+  <_DEFAULT> <COLON> { return new SwitchLabelNode(fileName, token.beginLine, null); }
 }
 
 IfStatementNode IfStatement() :
@@ -1561,71 +1550,78 @@ IfStatementNode IfStatement() :
  * as the second if is part of the last expression thing.
  */
 {
-    IfStatementNode i = new IfStatementNode(fileName, token.beginLine);
+    Expression expr;
+    StatementNode truePart;
+    StatementNode falsePart = null;
 }
 {
-    <IF> <LPAREN> i.expression=Expression() <RPAREN>
-    i.statement=Statement() [ LOOKAHEAD(1) <ELSE> i.elsePart=Statement() ]
+    <IF> <LPAREN> expr=Expression() <RPAREN>
+    truePart=Statement() [ LOOKAHEAD(1) <ELSE> falsePart=Statement() ]
     {
-        return i;
+        return new IfStatementNode(fileName, token.beginLine, expr, truePart, falsePart);
     }
 }
 
 WhileStatementNode WhileStatement() :
 {
-    WhileStatementNode w = new WhileStatementNode(fileName, token.beginLine);
+    Expression expression;
+    StatementNode statement;
 }
 {
-    <WHILE> <LPAREN> w.expression=Expression() <RPAREN>
-    w.statement=Statement()
+    <WHILE> <LPAREN> expression=Expression() <RPAREN>
+    statement=Statement()
     {
-        return w;
+        return new WhileStatementNode(fileName, token.beginLine, expression, statement);
     }
 }
 
 DoStatementNode DoStatement() :
 {
-    DoStatementNode d = new DoStatementNode(fileName, token.beginLine);
+    Expression expression;
+    StatementNode statement;
 }
 {
-    <DO> d.statement=Statement() <WHILE> <LPAREN>
-    d.expression=Expression() <RPAREN> <SEMICOLON>
+    <DO> statement=Statement() <WHILE> <LPAREN>
+    expression=Expression() <RPAREN> <SEMICOLON>
     {
-        return d;
+        return new DoStatementNode(fileName, token.beginLine, statement, expression);
     }
 }
 
 ForStatementNode ForStatement() :
 {
-    ForStatementNode f = new ForStatementNode(fileName, token.beginLine);
+    ForInitNode init = null;
+    Expression condition = null;
+    StatementExprNodeList update = null;
+    StatementNode block;
 }
 {
-    <FOR> <LPAREN> [ f.init=ForInit() ] <SEMICOLON>
-    [ f.condition=Expression() ] <SEMICOLON>
-    [ f.update=ForUpdate() ] <RPAREN> f.block=Statement()
+    <FOR> <LPAREN> [ init=ForInit() ] <SEMICOLON>
+    [ condition=Expression() ] <SEMICOLON>
+    [ update=ForUpdate() ] <RPAREN> block=Statement()
     {
-        return f;
+        return new ForStatementNode(fileName, token.beginLine, init, condition, update, block);
     }
 }
 
 ForInitNode ForInit() :
 {
-    ForInitNode f = new ForInitNode(fileName, token.beginLine);
+    ForInitNode temp;
 }
 {
     LOOKAHEAD( Type() <IDENTIFIER> )
-    f.dec=LocalVariableDeclaration()
+    temp=LocalVariableDeclaration()
     {
-        return f;
+        return temp;
     }
 |
-    f.items=StatementExpressionList()
+    temp=StatementExpressionList()
     {
-        return f;
+        return temp;
     }
 }
 
-ArrayList<StatementExprNode> StatementExpressionList() :
+StatementExprNodeList StatementExpressionList() :
 {
     ArrayList<StatementExprNode> s = new ArrayList<StatementExprNode>();
     StatementExprNode temp;
@@ -1634,14 +1630,14 @@ ArrayList<StatementExprNode> StatementExpressionList() :
     temp=StatementExpression() { s.add(temp); }
     ( <COMMA> temp=StatementExpression() { s.add(temp); } )*
     {
-        return s;
+        return new StatementExprNodeList(fileName, token.beginLine, s);
     }
 }
 
-ArrayList<StatementExprNode> ForUpdate() :
+StatementExprNodeList ForUpdate() :
 {
     /* This rule is just a statement expression list */
-    ArrayList<StatementExprNode> t;
+    StatementExprNodeList t;
 }
 {
     t=StatementExpressionList()
@@ -1652,59 +1648,60 @@ ArrayList<StatementExprNode> ForUpdate() :
 
 BreakStatementNode BreakStatement() :
 {
-    BreakStatementNode b = new BreakStatementNode(fileName, token.beginLine);
     Token t;
+    String image = null;
 }
 {
-    <BREAK> [ t=<IDENTIFIER> { b.name = t.image; }] <SEMICOLON>
+    <BREAK> [ t=<IDENTIFIER> { image = t.image; }] <SEMICOLON>
     {
-        return b;
+        return new BreakStatementNode(fileName, token.beginLine, image);
     }
 }
 
 ContinueStatementNode ContinueStatement() :
 {
-    ContinueStatementNode c = new ContinueStatementNode(fileName, token.beginLine);
     Token t;
+    String image = null;
 }
 {
-    <CONTINUE> [ t=<IDENTIFIER> { c.name = t.image; } ] <SEMICOLON>
+    <CONTINUE> [ t=<IDENTIFIER> { image = t.image; } ] <SEMICOLON>
     {
-        return c;
+        return new ContinueStatementNode(fileName, token.beginLine, image);
     }
 }
 
 ReturnStatementNode ReturnStatement() :
 {
-    ReturnStatementNode r =  new ReturnStatementNode(fileName, token.beginLine);
+    Expression expression = null;
 }
 {
-    <RETURN> [ r.expression=Expression() ] <SEMICOLON>
+    <RETURN> [ expression=Expression() ] <SEMICOLON>
     {
-        return r;
+        return new ReturnStatementNode(fileName, token.beginLine, expression);
     }
 }
 
 ThrowStatementNode ThrowStatement() :
 {
-    ThrowStatementNode t = new ThrowStatementNode(fileName, token.beginLine);
+    Expression expression;
 }
 {
-    <THROW> t.expression=Expression() <SEMICOLON>
+    <THROW> expression=Expression() <SEMICOLON>
     {
-        return t;
+        return new ThrowStatementNode(fileName, token.beginLine, expression);
     }
 }
 
 SynchronizedStatementNode SynchronizedStatement() :
 {
-    SynchronizedStatementNode s = new SynchronizedStatementNode(fileName, token.beginLine);
+    BlockNode block;
+    Expression expression;
 }
 {
-    <SYNCHRONIZED> <LPAREN> s.expression=Expression()
-    <RPAREN> s.block=Block()
+    <SYNCHRONIZED> <LPAREN> expression=Expression()
+    <RPAREN> block=Block()
     {
-        return s;
+        return new SynchronizedStatementNode(fileName, token.beginLine, expression, block);
     }
 }
 

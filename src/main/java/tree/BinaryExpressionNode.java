@@ -5,13 +5,15 @@ import helper.CompileException;
 import intermediate.BinaryOpStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
+import org.jetbrains.annotations.NotNull;
 
 public class BinaryExpressionNode extends NodeImpl implements Expression {
-	private final Expression left;
-	private final Expression right;
-	private final BinaryOperation op;
+	@NotNull private final Expression left;
+	@NotNull private final Expression right;
+	@NotNull private final BinaryOperation op;
 
-	public BinaryExpressionNode(String fileName, int line, Expression left, Expression right, BinaryOperation op) {
+	public BinaryExpressionNode(@NotNull String fileName, int line, @NotNull Expression left,
+								@NotNull Expression right, @NotNull BinaryOperation op) {
 		super(fileName, line);
 		this.left = left;
 		this.right = right;
@@ -19,13 +21,13 @@ public class BinaryExpressionNode extends NodeImpl implements Expression {
 	}
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		left.resolveImports(c);
 		right.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// evaluate left
 		left.compile(s, f);
 		Register leftResult = f.allocator.getLast();

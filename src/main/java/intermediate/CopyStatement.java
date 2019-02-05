@@ -5,17 +5,18 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
+import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.instructions.MoveInstruction;
 
 public class CopyStatement implements InterStatement {
-	private final Register src;
-	private final Register dest;
+	@NotNull private final Register src;
+	@NotNull private final Register dest;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
-	public CopyStatement(Register src, Register dest, String fileName, int line) {
+	public CopyStatement(@NotNull Register src, @NotNull Register dest, @NotNull String fileName, int line) {
 		this.src = src;
 		this.dest = dest;
 		this.fileName = fileName;
@@ -28,8 +29,8 @@ public class CopyStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		UsageCheck.verifyDefined(src, regs, fileName, line);
 
@@ -38,7 +39,7 @@ public class CopyStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64Context context) throws CompileException {
+	public void compile(@NotNull X64Context context) throws CompileException {
 		// simple move from source to destination
 		context.addInstruction(
 			new MoveInstruction(

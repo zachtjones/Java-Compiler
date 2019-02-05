@@ -3,12 +3,13 @@ package intermediate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.stream.Collectors;
 
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
 import x64.instructions.CallClassMethod;
 import x64.instructions.MoveInstruction;
@@ -17,22 +18,21 @@ import x64.jni.FindClassJNI;
 import x64.jni.GetMethodIdJNI;
 import x64.operands.X64RegisterOperand;
 
-import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.allocation.CallingConvention.returnValueRegister;
 
 /** Represents a function call without a lookup. */
 public class CallActualStatement implements InterStatement, FindClassJNI, GetMethodIdJNI, CallNonVirtualMethodJNI {
-	private final Register obj;
-	private final String className;
-	String name;
-	private final Register[] args;
-	private final Register returnVal;
+	@NotNull private final Register obj;
+	@NotNull private final String className;
+	@NotNull final String name;
+	@NotNull private final Register[] args;
+	@Nullable private final Register returnVal;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
-	public CallActualStatement(Register obj, String className, String name, Register[] args, 
-			Register returnVal, String fileName, int line) {
+	public CallActualStatement(@NotNull Register obj, @NotNull String className, @NotNull String name,
+			@NotNull Register[] args, @Nullable Register returnVal, @NotNull String fileName, int line) {
 		
 		this.obj = obj;
 		this.className = className;
@@ -51,8 +51,8 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		for (Register r : args) {
 			UsageCheck.verifyDefined(r, regs, fileName, line);
@@ -63,17 +63,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			InterFile e = JavaCompiler.parseAndCompile(obj.getType().getClassName(fileName, line), fileName, line);
 			ArrayList<Types> argsList = new ArrayList<>();
 			Arrays.stream(args).map(Register::getType).forEachOrdered(argsList::add);
-			Types returnType = e.getReturnType(name, argsList);
-
-			if (returnType == null) {
-				final String signature = name + "(" +
-					Arrays.stream(args)
-					.map(i -> i.getType().getIntermediateRepresentation())
-					.collect(Collectors.joining()) + ")";
-
-				throw new CompileException("no method found with signature, " + signature
-				+ ", referenced", fileName, line);
-			}
+			Types returnType = e.getReturnType(name, argsList, fileName, line);
 
 			returnVal.setType(returnType);
 			regs.put(returnVal, returnType);
@@ -81,7 +71,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 	}
 
 	@Override
-	public void compile(X64Context context) throws CompileException {
+	public void compile(@NotNull X64Context context) throws CompileException {
 		// if the type of the register is java/*, use JNI
 		if (obj.getType().getClassName(fileName, line).startsWith("java/")) {
 

@@ -6,22 +6,24 @@ import helper.Types;
 import intermediate.GetArrayValueStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
+import org.jetbrains.annotations.NotNull;
 
 /** [ expr ] */
 public class ArrayIndexExpressionNode extends NodeImpl implements Expression, LValue {
-    public Expression expr;
+    @NotNull private final Expression expr;
 
-    public ArrayIndexExpressionNode(String fileName, int line) {
+    public ArrayIndexExpressionNode(@NotNull String fileName, int line, @NotNull Expression expr) {
     	super(fileName, line);
+    	this.expr = expr;
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		expr.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		Register array = f.allocator.getLast();
 		// get the index
 		expr.compile(s, f);
@@ -32,7 +34,7 @@ public class ArrayIndexExpressionNode extends NodeImpl implements Expression, LV
 	}
 
 	@Override
-	public void compileAddress(SymbolTable s, InterFunction f)
+	public void compileAddress(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 		
 		Register array = f.allocator.getLast();

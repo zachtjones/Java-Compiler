@@ -5,14 +5,15 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import main.JavaCompiler;
+import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 
 public class GetStaticFieldAddressStatement implements InterStatement {
-	private String className;
-	private String fieldName;
-	Register result;
+	@NotNull private final String className;
+	@NotNull private final String fieldName;
+	@NotNull private final Register result;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
 	/**
@@ -21,8 +22,8 @@ public class GetStaticFieldAddressStatement implements InterStatement {
 	 * @param fieldName The field's name.
 	 * @param register The result register.
 	 */
-	public GetStaticFieldAddressStatement(String className, String fieldName, Register register,
-			String fileName, int line) {
+	public GetStaticFieldAddressStatement(@NotNull String className, @NotNull String fieldName,
+			@NotNull Register register, @NotNull String fileName, int line) {
 		
 		this.className = className;
 		this.fieldName = fieldName;
@@ -38,8 +39,8 @@ public class GetStaticFieldAddressStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		// get the field type for the static field.
 		InterFile object = JavaCompiler.parseAndCompile(className, fileName, line);
 		Types type = object.getStatFieldType(fieldName, fileName, line);
@@ -49,7 +50,7 @@ public class GetStaticFieldAddressStatement implements InterStatement {
 	}
 
 	@Override
-	public void compile(X64Context context) throws CompileException {
+	public void compile(@NotNull X64Context context) throws CompileException {
 		// handle the details in the store instruction later on
 		context.markRegisterAsStaticFieldAddress(result, className, fieldName);
 	}

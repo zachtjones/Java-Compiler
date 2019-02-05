@@ -8,16 +8,18 @@ import helper.CompileException;
 import helper.Types;
 import intermediate.EndScopeStatement;
 import intermediate.InterFunction;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockNode extends NodeImpl implements StatementNode {
-    public ArrayList<BlockStatementNode> statements;
+    @NotNull private final ArrayList<BlockStatementNode> statements;
 
-    public BlockNode(String fileName, int line) {
+    public BlockNode(@NotNull String fileName, int line, @NotNull ArrayList<BlockStatementNode> statements) {
     	super(fileName, line);
+    	this.statements = statements;
     }
 
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		// pass down
 		for (BlockStatementNode b : statements) {
 			b.resolveImports(c);
@@ -25,7 +27,7 @@ public class BlockNode extends NodeImpl implements StatementNode {
 	}
 	
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// create new scope for variables
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.local);
 		// compile with this new table, placing declarations where needed.

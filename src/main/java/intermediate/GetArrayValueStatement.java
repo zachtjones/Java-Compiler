@@ -5,19 +5,20 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
+import org.jetbrains.annotations.NotNull;
 
 public class GetArrayValueStatement implements InterStatement {
 	
-	Register array, index, result;
+	@NotNull private final Register array, index, result;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 
 	/**
 	 * Represents getting a value out of an array.
 	 */
-	public GetArrayValueStatement(Register array, Register index, Register result,
-			String fileName, int line) {
+	public GetArrayValueStatement(@NotNull Register array, @NotNull Register index, @NotNull Register result,
+								  @NotNull String fileName, int line) {
 		this.array = array;
 		this.index = index;
 		this.result = result;
@@ -30,8 +31,8 @@ public class GetArrayValueStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
 		UsageCheck.verifyDefined(array, regs, fileName, line);
 		UsageCheck.verifyDefined(index, regs, fileName, line);

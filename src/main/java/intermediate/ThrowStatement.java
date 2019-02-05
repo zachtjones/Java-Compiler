@@ -5,15 +5,16 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
+import org.jetbrains.annotations.NotNull;
 
 /** throw REGISTER */
 public class ThrowStatement implements InterStatement {
-	Register r;
+	@NotNull private final Register r;
 	
-	private final String fileName;
+	@NotNull private final String fileName;
 	private final int line;
 	
-	public ThrowStatement(Register r, String fileName, int line) {
+	public ThrowStatement(@NotNull Register r, @NotNull String fileName, int line) {
 		this.r = r;
 		this.fileName = fileName;
 		this.line = line;
@@ -25,8 +26,8 @@ public class ThrowStatement implements InterStatement {
 	}
 
 	@Override
-	public void typeCheck(HashMap<Register, Types> regs, HashMap<String, Types> locals,
-						  HashMap<String, Types> params, InterFunction func) throws CompileException {
+	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
+						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		UsageCheck.verifyDefined(r, regs, fileName, line);
 	}
 }

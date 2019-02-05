@@ -2,6 +2,7 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.Types;
 import intermediate.InterFile;
 import intermediate.InterFunction;
 
@@ -34,8 +35,8 @@ public class ClassBodyNode {
 	public void compile(InterFile f, SymbolTable syms) throws CompileException {
 		// pass down
 		if (staticInit != null) {
-			InterFunction func = new InterFunction(f.getName());
-			func.name = "<clinit>"; // that's what java class files name it (class initializer)
+			// Java calls static {} cl init (class initializer)
+			InterFunction func = new InterFunction(f.getName(), "<clinit>", Types.VOID);
 			func.isInstance = false;
 			func.isInit = true;
 			staticInit.compile(syms, func);
@@ -50,7 +51,7 @@ public class ClassBodyNode {
 	}
 
 	/** Places the symbols if needed into the class level symbol table. */
-	public void putSymbols(SymbolTable classLevel, SymbolTable staticFields, SymbolTable instanceFields) throws CompileException {
+	void putSymbols(SymbolTable classLevel, SymbolTable staticFields, SymbolTable instanceFields) throws CompileException {
 		if (method != null) {
 			method.putSymbols(classLevel);
 		} else if (field != null) {

@@ -8,6 +8,7 @@ import helper.Types;
 import intermediate.CreateArrayStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
+import org.jetbrains.annotations.NotNull;
 
 /** new type[expression or empty] ... */
 public class ObjectArrayAllocationNode extends NodeImpl implements Expression {
@@ -19,7 +20,7 @@ public class ObjectArrayAllocationNode extends NodeImpl implements Expression {
     }
 
     @Override
-   	public void resolveImports(ClassLookup c) throws CompileException {
+   	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
    		for (Expression e : expressions) {
    			if (e != null) {
    				e.resolveImports(c);
@@ -28,7 +29,7 @@ public class ObjectArrayAllocationNode extends NodeImpl implements Expression {
    	}
        
    	@Override
-   	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+   	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
    		if (expressions.get(0) == null) {
    			throw new CompileException(
    				"The first dimension of an array has to have a size given at the constructor.",

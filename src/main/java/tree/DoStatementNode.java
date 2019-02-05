@@ -5,24 +5,29 @@ import helper.CompileException;
 import intermediate.BranchStatementTrue;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
+import org.jetbrains.annotations.NotNull;
 
 /** do { statement } while (expression); */
 public class DoStatementNode extends NodeImpl implements StatementNode {
-    public StatementNode statement;
-    public Expression expression;
+    @NotNull private final StatementNode statement;
+    @NotNull private final Expression expression;
 
-    public DoStatementNode(String fileName, int line) {
+    public DoStatementNode(@NotNull String fileName, int line, @NotNull StatementNode statement,
+						   @NotNull Expression expression) {
+
     	super(fileName, line);
+    	this.statement = statement;
+    	this.expression = expression;
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		statement.resolveImports(c);
 		expression.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// label at top of statement
 		LabelStatement l = new LabelStatement("L_L" + f.allocator.getNextLabel());
 		f.statements.add(l);

@@ -6,15 +6,18 @@ import intermediate.CopyStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 import intermediate.StoreAddressStatement;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** left type right */
 public class AssignmentNode extends NodeImpl implements StatementExprNode, Expression {
 
-	public Expression left;
-	public BinaryOperation type;
-	public Expression right;
+	@NotNull private final Expression left;
+	@Nullable private final BinaryOperation type; //null means = operation, other is the compound type.
+	@NotNull private final Expression right;
 
-    public AssignmentNode(String fileName, int line, Expression left, Expression right, BinaryOperation type) {
+    public AssignmentNode(@NotNull String fileName, int line, @NotNull Expression left,
+						  @NotNull Expression right, @Nullable BinaryOperation type) {
     	super(fileName, line);
     	this.left = left;
     	this.right = right;
@@ -22,13 +25,13 @@ public class AssignmentNode extends NodeImpl implements StatementExprNode, Expre
     }
 	
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		left.resolveImports(c);
 		right.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f)
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 		
 		if (type == null) {

@@ -1,5 +1,9 @@
 package tree;
 
+import helper.CompileException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * This class is used to hold a small history of the current compilation process.
  * For example, this stores if the last part compiled was "this", or "this.x",
@@ -9,8 +13,8 @@ public class CompileHistory {
 	
 	private boolean lastWasThis;
 
-	private String twoNamesAgo;
-	private String lastName; // name last used
+	@Nullable private String twoNamesAgo;
+	@Nullable private String lastName; // name last used
 	
 	/** Call if the last expression parsed was "this" */
 	public void setThis() {
@@ -29,10 +33,14 @@ public class CompileHistory {
 	}
 	
 	/** Returns null, or the name last used. */
-	public String getName() {
+	@NotNull public String getName() throws CompileException {
+		if (lastName == null) throw new CompileException("the last name node was null", "", -1);
 		return lastName;
 	}
 
 	/** Returns null, or the name used before the last used name. */
-	public String getTwoNamesAgo() { return twoNamesAgo; }
+	@Nullable
+	public String getTwoNamesAgo() throws CompileException {
+		return twoNamesAgo;
+	}
 }

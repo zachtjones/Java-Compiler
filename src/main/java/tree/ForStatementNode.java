@@ -1,42 +1,45 @@
 package tree;
 
-import java.util.ArrayList;
-
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.BranchStatementFalse;
 import intermediate.InterFunction;
 import intermediate.LabelStatement;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ForStatementNode extends NodeImpl implements StatementNode {
-    // these 3 are all optional, so could be null
-    public ForInitNode init;
-    public Expression condition;
-    public ArrayList<StatementExprNode> update;
+
+    @Nullable private final ForInitNode init;
+    @NotNull private final Expression condition;
+    @Nullable private final StatementExprNodeList update;
     // the block of code
-    public StatementNode block;
+    @NotNull private final StatementNode block;
     
-    public ForStatementNode(String fileName, int line) {
+    public ForStatementNode(String fileName, int line, @Nullable ForInitNode init, @Nullable Expression condition,
+							@Nullable StatementExprNodeList update, @NotNull StatementNode block) {
     	super(fileName, line);
+    	this.init = init;
+    	this.condition = condition == null ? new LiteralExpressionNode(fileName, line, "true") : condition;
+    	this.update = update;
+    	this.block = block;
     }
     
 	@Override
-	public void resolveImports(ClassLookup c) throws CompileException {
-		init.resolveImports(c);
+	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
+		if (init != null) init.resolveImports(c);
 		condition.resolveImports(c);
-		for (StatementExprNode s : update) {
-			s.resolveImports(c);
-		}
+		if (update != null) update.resolveImports(c);
 		block.resolveImports(c);
 	}
 
 	@Override
-	public void compile(SymbolTable s, InterFunction f) throws CompileException {
+	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// create a new scope
 		SymbolTable newTable = new SymbolTable(s, SymbolTable.local);
 		
 		// put in the initializers first
-		init.compile(newTable, f);
+		if (init != null) init.compile(newTable, f);
 		
 		// label condition -> condition -> if false, branch end 
 		//   -> block -> jump condition -> label end
@@ -58,9 +61,7 @@ public class ForStatementNode extends NodeImpl implements StatementNode {
 		
 		// TODO continue should have a label here to go to.
 		// compile in the update
-		for (StatementExprNode stmt : update) {
-			stmt.compile(newTable, f);
-		}
+		if (update != null) update.compile(s, f);
 		
 		// add in the ending label
 		f.statements.add(endLabel);
