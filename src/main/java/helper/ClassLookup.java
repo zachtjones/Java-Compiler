@@ -48,10 +48,7 @@ public class ClassLookup {
 		// note name.* only imports the public things (java language spec)
 		// again, get the file names
 		// always import java.lang.*
-		NameNode temp = new NameNode(fileName, -1);
-		temp.primaryName = "java.lang";
-		ImportNode javaLang = new ImportNode(temp, true);
-		imports.add(javaLang);
+		imports.add(new ImportNode(new NameNode(fileName, -1, "java.lang", null), true));
 
 		for (ImportNode i : imports) {
 			String name = i.name.primaryName;
@@ -85,6 +82,7 @@ public class ClassLookup {
 	/** Gets the full name from the short name representation.
 	 * @param shortName the short name of this class/interface/enum
 	 * */
+	@NotNull
 	public String getFullName(String shortName) {
 
 		// handle Object -> java/lang/Object, 

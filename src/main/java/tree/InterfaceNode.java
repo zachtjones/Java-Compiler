@@ -30,9 +30,6 @@ public class InterfaceNode implements TypeDecNode {
     	this.fileName = fileName;
     	this.line = line;
     	this.name = name;
-    	final NameNode superName = new NameNode(fileName, line);
-    	superName.primaryName = "java/lang/Object";
-
     	this.interfaces = implementedInterfaces == null ? new ArrayList<>() : implementedInterfaces;
     	this.body = body;
     }

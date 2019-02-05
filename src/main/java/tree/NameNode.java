@@ -7,20 +7,21 @@ import helper.CompileException;
 import helper.Types;
 import intermediate.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class NameNode extends NodeImpl implements Expression, LValue {
-	public String primaryName;
-	public ArrayList<GenericNode> generics;
+	@NotNull public String primaryName;
+	@Nullable private final ArrayList<GenericNode> generics;
 	
-    public NameNode(String fileName, int line) {
+    public NameNode(String fileName, int line, @NotNull String name, @Nullable ArrayList<GenericNode> generics) {
     	super(fileName, line);
+    	this.primaryName = name;
+    	this.generics = generics;
     }
 
 	@Override
 	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
-		//System.out.print("Replace: " + primaryName);
-		if (primaryName != null)
-			primaryName = c.getFullName(primaryName);
+		primaryName = c.getFullName(primaryName);
 		// don't have to check if one of primaryName or bounds is set, as this is handled by the parser
 		
 		// resolve the nested structures as well
@@ -29,8 +30,6 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 				n.resolveImports(c);
 			}
 		}
-		
-		//System.out.println(" -> " + primaryName);
 	}
 
 	@Override
@@ -94,9 +93,8 @@ public class NameNode extends NodeImpl implements Expression, LValue {
 				
 			} else {
 				// instance fields of the parameter
-				NameNode temp = new NameNode(getFileName(), getLine());
-				temp.primaryName = split[0];
-				
+				NameNode temp = new NameNode(getFileName(), getLine(), split[0], null);
+
 				temp.compile(s, f);
 				Register result = f.allocator.getLast();
 				

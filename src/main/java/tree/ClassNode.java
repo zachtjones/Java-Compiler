@@ -37,8 +37,7 @@ public class ClassNode implements TypeDecNode {
     	this.isPublic = isPublic;
     	this.name = name;
     	this.typeParams = typeParams;
-    	final NameNode superName = new NameNode(fileName, line);
-    	superName.primaryName = "java/lang/Object";
+    	final NameNode superName = new NameNode(fileName, line, "java/lang/Object", null);
 
     	this.superclass = superClass == null ? superName : superClass;
     	this.interfaces = implementedInterfaces == null ? new ArrayList<>() : implementedInterfaces;

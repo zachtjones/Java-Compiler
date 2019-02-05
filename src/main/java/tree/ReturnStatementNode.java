@@ -6,13 +6,15 @@ import intermediate.InterFunction;
 import intermediate.ReturnRegStatement;
 import intermediate.ReturnVoidStatement;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ReturnStatementNode extends NodeImpl implements StatementNode {
     // could be null
-    public Expression expression;
+    @Nullable private final Expression expression;
     
-    public ReturnStatementNode(String fileName, int line) {
+    public ReturnStatementNode(String fileName, int line, @Nullable Expression expression) {
     	super(fileName, line);
+    	this.expression = expression;
     }
 
 	@Override

@@ -9,10 +9,11 @@ import org.jetbrains.annotations.NotNull;
 
 /** - expr */
 public class UnaryMinusExpressionNode extends NodeImpl implements Expression {
-    public Expression expr;
+    @NotNull private final Expression expr;
 
-    public UnaryMinusExpressionNode(String fileName, int line) {
+    public UnaryMinusExpressionNode(String fileName, int line, @NotNull Expression expression) {
     	super(fileName, line);
+    	this.expr = expression;
     }
 
 	@Override

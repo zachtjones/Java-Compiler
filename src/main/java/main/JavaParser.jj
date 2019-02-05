@@ -628,21 +628,21 @@ NameNode Name() :
  * Also support generics, making this require even more lookahead
  */
 {
-    NameNode n = new NameNode(fileName, token.beginLine);
     Token t;
-    NameNode temp;
+    String name;
+    ArrayList<GenericNode> generics = null;
 }
 {
     // need to make this so that NameNode isn't recursively defined, so that
     //  we can make another method for the bounds, since you can have a list
     //  of them using super and extends, list is separated with '&'
-    t=<IDENTIFIER> { n.primaryName = t.image; }
+    t=<IDENTIFIER> { name = t.image; }
     ( LOOKAHEAD(2) "." t=<IDENTIFIER> {
-        n.primaryName += "." + t.image;
+        name += "." + t.image;
     } )*
-    ( LOOKAHEAD(<LT> GenericList() <GT>) <LT> n.generics=GenericList() <GT>)?
+    ( LOOKAHEAD(<LT> GenericList() <GT>) <LT> generics=GenericList() <GT>)?
     {
-        return n;
+        return new NameNode(fileName, token.beginLine, name, generics);
     }
 }
 
@@ -1019,9 +1019,7 @@ Expression UnaryExpression() :
     e=UnaryExpression()
     {
         if (temp) { // unary -
-            UnaryMinusExpressionNode u = new UnaryMinusExpressionNode(fileName, token.beginLine);
-            u.expr = e;
-            return u;
+            return new UnaryMinusExpressionNode(fileName, token.beginLine, e);
         } else { // unary +, no meaning
             return e;
         }
@@ -1674,35 +1672,36 @@ ContinueStatementNode ContinueStatement() :
 
 ReturnStatementNode ReturnStatement() :
 {
-    ReturnStatementNode r =  new ReturnStatementNode(fileName, token.beginLine);
+    Expression expression = null;
 }
 {
-    <RETURN> [ r.expression=Expression() ] <SEMICOLON>
+    <RETURN> [ expression=Expression() ] <SEMICOLON>
     {
-        return r;
+        return new ReturnStatementNode(fileName, token.beginLine, expression);
     }
 }
 
 ThrowStatementNode ThrowStatement() :
 {
-    ThrowStatementNode t = new ThrowStatementNode(fileName, token.beginLine);
+    Expression expression;
 }
 {
-    <THROW> t.expression=Expression() <SEMICOLON>
+    <THROW> expression=Expression() <SEMICOLON>
     {
-        return t;
+        return new ThrowStatementNode(fileName, token.beginLine, expression);
     }
 }
 
 SynchronizedStatementNode SynchronizedStatement() :
 {
-    SynchronizedStatementNode s = new SynchronizedStatementNode(fileName, token.beginLine);
+    BlockNode block;
+    Expression expression;
 }
 {
-    <SYNCHRONIZED> <LPAREN> s.expression=Expression()
-    <RPAREN> s.block=Block()
+    <SYNCHRONIZED> <LPAREN> expression=Expression()
+    <RPAREN> block=Block()
     {
-        return s;
+        return new SynchronizedStatementNode(fileName, token.beginLine, expression, block);
     }
 }
 

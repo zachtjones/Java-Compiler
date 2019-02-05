@@ -7,12 +7,15 @@ import org.jetbrains.annotations.NotNull;
 
 /** synchronized (expression) block */
 public class SynchronizedStatementNode extends NodeImpl implements StatementNode {
-    public Expression expression;
-    public BlockNode block;
+    @NotNull private final Expression expression;
+    @NotNull private final BlockNode block;
 
-    public SynchronizedStatementNode(String fileName, int line) {
+    public SynchronizedStatementNode(@NotNull String fileName, int line,
+									 @NotNull Expression expression, @NotNull BlockNode block) {
     	super(fileName, line);
-    }
+		this.expression = expression;
+		this.block = block;
+	}
     
 	@Override
 	public void resolveImports(@NotNull ClassLookup c) throws CompileException {

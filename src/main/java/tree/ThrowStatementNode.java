@@ -7,10 +7,12 @@ import intermediate.ThrowStatement;
 import org.jetbrains.annotations.NotNull;
 
 public class ThrowStatementNode extends NodeImpl implements StatementNode {
-    public Expression expression;
 
-    public ThrowStatementNode(String fileName, int line) {
+	@NotNull private final Expression expression;
+
+    public ThrowStatementNode(String fileName, int line, @NotNull Expression expression) {
     	super(fileName, line);
+    	this.expression = expression;
     }
 
 	@Override
@@ -23,7 +25,6 @@ public class ThrowStatementNode extends NodeImpl implements StatementNode {
 		// compile in the expression
 		expression.compile(s, f);
 		// throw the result of the expression.
-		ThrowStatement th = new ThrowStatement(f.allocator.getLast(), getFileName(), getLine());
-		f.statements.add(th);
+		f.statements.add(new ThrowStatement(f.allocator.getLast(), getFileName(), getLine()));
 	}
 }

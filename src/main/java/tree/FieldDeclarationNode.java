@@ -49,8 +49,7 @@ public class FieldDeclarationNode extends NodeImpl {
 			// add the initial values if any
 			if (d.init != null && d.init.e != null) {
 				// construct the assignment to the expression
-				NameNode n = new NameNode(getFileName(), getLine());
-				n.primaryName = d.id.name;
+				NameNode n = new NameNode(getFileName(), getLine(), d.id.name, null);
 
 				// the type is null here
 				AssignmentNode a = new AssignmentNode(getFileName(), getLine(), n, d.init.e, null);
