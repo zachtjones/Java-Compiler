@@ -1,9 +1,12 @@
 package x64;
 
 import intermediate.InterStructure;
+import org.jetbrains.annotations.NotNull;
 import x64.directives.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class X64File {
@@ -18,6 +21,9 @@ public class X64File {
     private final ArrayList<Instruction> dataStrings;
 
     private int nextDataItem = 0;
+
+    /** A mapping of the Strings put into the data section to their label to load them */
+    @NotNull private final Map<String, String> stringsMap = new HashMap<>();
 
     /** Creates an initially empty x64 assembly file, given the name
      * @param name The java class/interface/enum name, ex: java/lang/String
@@ -60,11 +66,18 @@ public class X64File {
     /** Inserts the string into the data section, this string is suitable for
      * JNI -> NewStringUTF conversion if a java/lang/String is needed.
      * @return The label that corresponds to the section */
-    public String insertDataString(String dataString) {
+    String insertDataString(String dataString) {
+        // use a cache for the data strings to reduce the file size in the executable
+        //  this might help with cache hits
+        if (stringsMap.containsKey(dataString)) {
+            return stringsMap.get(dataString);
+        }
         nextDataItem++;
         String label = "L_.str" + nextDataItem;
         dataStrings.add(new LabelInstruction(label));
         dataStrings.add(new AscizString(dataString));
+        // put in the cache
+        stringsMap.put(dataString, label);
         return label;
     }
 
