@@ -2,6 +2,15 @@
 public class OutOfRegisters {
 
 	public static void main(String[] args) {
+
+		// each literal uses a register, each assignment to a local is a register,
+		// each retreivale of a local is a register, and each
+		//  binary operation is 3, plus the code esentially for hello, world
+
+		// this is a special case for optimizations that would be perfect, it could be boiled down
+		//  pretty easily to 91 (copy propogation, constant folding) -- full code could be equivalent to:
+		// System.out.print(91L);
+
 		long a = 1L;
 		long b = 2L;
 		long c = 3L;

@@ -30,4 +30,9 @@ public class X64PreservedRegister {
         return other instanceof X64PreservedRegister &&
             ((X64PreservedRegister)other).assemblyRep().equals(this.assemblyRep());
     }
+
+    @Override
+    public String toString() {
+        return assemblyRep();
+    }
 }

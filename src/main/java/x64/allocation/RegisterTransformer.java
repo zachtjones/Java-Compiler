@@ -13,10 +13,9 @@ import static x64.allocation.CallingConvention.argumentRegister;
 public class RegisterTransformer {
 
 	private final ArrayList<Instruction> initialContents;
-	private final Deque<X64NativeRegister> preservedOnes;
-	private final Deque<X64NativeRegister> temporaryOnes;
 
-	private final Deque<X64NativeRegister> initialTemps;
+	/** This is r10 + r11, + the unused argument registers */
+	private final List<X64NativeRegister> tempsAvailable;
 
 	/***
 	 * Creates a register transformer, used to transform pseudo registers into real ones.
@@ -26,38 +25,38 @@ public class RegisterTransformer {
 	public RegisterTransformer(ArrayList<Instruction> contents, X64Context context) {
 		this.initialContents = contents;
 
-		preservedOnes = new ArrayDeque<>();
-		for (X64RegisterOperand op : CallingConvention.preservedRegisters()) {
-			preservedOnes.add(op.nativeOne);
-		}
 
-		temporaryOnes = new ArrayDeque<>();
-		initialTemps = new ArrayDeque<>();
+		tempsAvailable = new ArrayList<>();
 		for (X64RegisterOperand op : CallingConvention.temporaryRegisters()) {
-			temporaryOnes.add(op.nativeOne);
-			initialTemps.add(op.nativeOne);
+			tempsAvailable.add(op.nativeOne);
 		}
 		for (int i = context.getHighestArgUsed() + 1; i < CallingConvention.argumentRegisterCount(); i++) {
-			final X64NativeRegister nativeOne = CallingConvention.argumentRegister(i).nativeOne;
-			temporaryOnes.add(nativeOne);
-			initialTemps.add(nativeOne);
+
+			tempsAvailable.add(CallingConvention.argumentRegister(i).nativeOne);
 		}
 	}
 
-	private X64NativeRegister getNextTemporary() {
-		if (!temporaryOnes.isEmpty()) return temporaryOnes.pop();
-		return preservedOnes.pop();
-	}
+	private static class RegisterMapped {
+		final int num;
+		final boolean needsPreserved;
+		int priorityValue; // incremented every usage
 
-	private X64NativeRegister getNextPreserved() {
-		return preservedOnes.pop();
-	}
+		RegisterMapped(int num, boolean needsPreserved) {
+			this.num = num;
+			this.priorityValue = 1;
+			this.needsPreserved = needsPreserved;
+		}
 
-	private void doneWithRegister(X64NativeRegister reg) {
-		if (initialTemps.contains(reg)) {
-			temporaryOnes.push(reg);
-		} else {
-			preservedOnes.push(reg);
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof RegisterMapped &&
+				((RegisterMapped) obj).needsPreserved == this.needsPreserved &&
+				((RegisterMapped) obj).num == this.num;
+		}
+
+		@Override
+		public String toString() {
+			return "%" + (needsPreserved ? 'p' : 't') + num;
 		}
 	}
 
@@ -80,7 +79,13 @@ public class RegisterTransformer {
 		Map<Integer, X64PreservedRegister> lastUsedLines = usedRegs.getLastUsages();
 		Map<Integer, X64PreservedRegister> definedLines = usedRegs.getDefinitions();
 
-		Map<X64PreservedRegister, X64NativeRegister> mapping = new HashMap<>();
+		Deque<RegisterMapped> preservedStack = new ArrayDeque<>();
+		int maxPreserved = 0; // after the next loop, this holds the number used
+
+		Deque<RegisterMapped> temporaryStack = new ArrayDeque<>();
+		int maxTemp = 0;
+
+		Map<X64PreservedRegister, RegisterMapped> mapping = new HashMap<>();
 
 		for (int i = 0; i < initialContents.size(); i++) {
 			// we can use a register on both operands of the instruction
@@ -89,7 +94,12 @@ public class RegisterTransformer {
 			if (lastUsedLines.containsKey(i)) {
 				final X64PreservedRegister doneWith = lastUsedLines.get(i);
 
-				doneWithRegister(mapping.get(doneWith));
+				RegisterMapped doneWithMapped = mapping.get(doneWith);
+				if (doneWithMapped.needsPreserved) {
+					preservedStack.push(doneWithMapped);
+				} else {
+					temporaryStack.push(doneWithMapped);
+				}
 			}
 
 			// if the instruction defines a X64PreservedRegister, then:
@@ -98,31 +108,115 @@ public class RegisterTransformer {
 			if (definedLines.containsKey(i)) {
 				final X64PreservedRegister using = definedLines.get(i);
 
-				X64NativeRegister replacement =
-					usedRegs.canBeTemporary(using) ? getNextTemporary() : getNextPreserved();
-				mapping.put(using, replacement);
+				if (usedRegs.canBeTemporary(using)) {
+					if (temporaryStack.isEmpty()) {
+						// allocate a new one
+						temporaryStack.push(new RegisterMapped(maxTemp, false));
+						maxTemp++;
+					}
+					mapping.put(using, temporaryStack.pop());
+				} else {
+
+					if (preservedStack.isEmpty()) {
+						// allocate a new one, first one is 0, second 1, ... maxPreserved is the number allocated
+						preservedStack.push(new RegisterMapped(maxPreserved, true));
+						maxPreserved++;
+					}
+					mapping.put(using, preservedStack.pop());
+				}
+
 			}
+		}
+
+		if (hasEnoughHardwareRegs(maxPreserved, maxTemp)) {
+
+			Map<X64PreservedRegister, X64NativeRegister> nativeMapping = getNatives(maxTemp, mapping);
+
+
+			for (Instruction i : initialContents) {
+				i.allocateRegisters(nativeMapping);
+			}
+
+			Set<X64NativeRegister> usedPreservedRegs = new HashSet<>();
+			for (X64NativeRegister reg : nativeMapping.values()) {
+				if (reg != X64NativeRegister.R10.nativeOne && reg != X64NativeRegister.R11.nativeOne) {
+					usedPreservedRegs.add(reg);
+				}
+			}
+
+			// add another one if there are an even number used -- might add one already in the set
+			// since we just need to preserve one, do one of the arguments
+			while (usedPreservedRegs.size() % 2 == 0) {
+				usedPreservedRegs.add(argumentRegister(1).nativeOne);
+			}
+
+			return usedPreservedRegs;
+		} else {
+			throw new RuntimeException(mapping.toString());
 		}
 
 		// iterate through the instructions, converting the X64PreservedRegister's to the X64NativeRegister's
-		for (Instruction i : initialContents) {
-			i.allocateRegisters(mapping);
-		}
+//		for (Instruction i : initialContents) {
+//			i.allocateRegisters(mapping);
+//		}
+//
+//		Set<X64NativeRegister> usedPreservedRegs = new HashSet<>();
+//		for (X64NativeRegister reg : mapping.values()) {
+//			if (reg != X64NativeRegister.R10.nativeOne && reg != X64NativeRegister.R11.nativeOne) {
+//				usedPreservedRegs.add(reg);
+//			}
+//		}
+//
+//		// add another one if there are an even number used -- might add one already in the set
+//		// since we just need to preserve one, do one of the arguments
+//		while (usedPreservedRegs.size() % 2 == 0) {
+//			usedPreservedRegs.add(argumentRegister(1).nativeOne);
+//		}
 
-		Set<X64NativeRegister> usedPreservedRegs = new HashSet<>();
-		for (X64NativeRegister reg : mapping.values()) {
-			if (reg != X64NativeRegister.R10.nativeOne && reg != X64NativeRegister.R11.nativeOne) {
-				usedPreservedRegs.add(reg);
+//		return usedPreservedRegs;
+	}
+
+
+	private boolean hasEnoughHardwareRegs(int numPreserved, int numTemporary) {
+
+		X64RegisterOperand[] preservedPossible = CallingConvention.preservedRegisters();
+
+		int totalNumAvailable = tempsAvailable.size() + preservedPossible.length;
+
+		// just need to have enough preserved registers available
+		//  and the total number has to be enough for the preserved + temporary (temps can be stored in preserved ones)
+
+		return preservedPossible.length >= numPreserved &&
+			totalNumAvailable >= numPreserved + numTemporary;
+	}
+
+	private Map<X64PreservedRegister, X64NativeRegister> getNatives(int numTemporary, Map<X64PreservedRegister, RegisterMapped> mapping) {
+
+		X64RegisterOperand[] preservedPossible = CallingConvention.preservedRegisters();
+
+		HashMap<X64PreservedRegister, X64NativeRegister> nativeMap = new HashMap<>();
+
+		// if more than the temps available, the preserved ones are used
+		int preservedBase = numTemporary <= tempsAvailable.size() ? 0 : numTemporary - tempsAvailable.size();
+
+		for (Map.Entry<X64PreservedRegister, RegisterMapped> entry : mapping.entrySet()) {
+			X64PreservedRegister key = entry.getKey();
+			RegisterMapped value = entry.getValue();
+
+			if (value.needsPreserved) {
+				// simple case -- needs preserved, offset by the amount of temps over
+				nativeMap.put(key, preservedPossible[value.num + preservedBase].nativeOne);
+			} else {
+				if (value.num < tempsAvailable.size()) {
+					// fits in the amount of temporaries
+					nativeMap.put(key, tempsAvailable.get(value.num));
+				} else {
+					// requires temporary, not enough, so uses the first few of preserved
+					nativeMap.put(key, preservedPossible[value.num - tempsAvailable.size()].nativeOne);
+				}
 			}
 		}
 
-		// add another one if there are an even number used -- might add one already in the set
-		// since we just need to preserve one, do one of the arguments
-		while (usedPreservedRegs.size() % 2 == 0) {
-			usedPreservedRegs.add(argumentRegister(1).nativeOne);
-		}
-
-		return usedPreservedRegs;
+		return nativeMap;
 	}
-
 }
