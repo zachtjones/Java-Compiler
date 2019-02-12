@@ -36,30 +36,6 @@ public class RegisterTransformer {
 		}
 	}
 
-	private static class RegisterMapped {
-		final int num;
-		final boolean needsPreserved;
-		int priorityValue; // incremented every usage
-
-		RegisterMapped(int num, boolean needsPreserved) {
-			this.num = num;
-			this.priorityValue = 1;
-			this.needsPreserved = needsPreserved;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			return obj instanceof RegisterMapped &&
-				((RegisterMapped) obj).needsPreserved == this.needsPreserved &&
-				((RegisterMapped) obj).num == this.num;
-		}
-
-		@Override
-		public String toString() {
-			return "%" + (needsPreserved ? 'p' : 't') + num;
-		}
-	}
-
 	/**
 	 * Allocates the hardware registers,
 	 * returning a set of the actual preserved registers that need to be saved / restored.
@@ -220,3 +196,4 @@ public class RegisterTransformer {
 		return nativeMap;
 	}
 }
+
