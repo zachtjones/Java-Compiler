@@ -41,7 +41,7 @@ public class BinaryExpressionNode extends NodeImpl implements Expression {
 
 		f.statements.add(new BinaryOpStatement(
 			leftResult, rightResult,
-			destination, op.getRepresentation(),
+			destination, op,
 			getFileName(), getLine()));
 	}
 }

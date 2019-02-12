@@ -35,7 +35,7 @@ public class PreIncrementExpressionNode extends NodeImpl implements StatementExp
 		f.statements.add(new LoadLiteralStatement("1", f.allocator, getFileName(), getLine()));
 		Register one = f.allocator.getLast();
 
-		f.statements.add(new BinaryOpStatement(result, one, f.allocator.getNext(result.getType()), "+",
+		f.statements.add(new BinaryOpStatement(result, one, f.allocator.getNext(result.getType()), BinaryOperation.ADD,
 			getFileName(), getLine()));
 		Register minusOne = f.allocator.getLast();
 		// compile in the store to the address
