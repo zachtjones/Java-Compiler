@@ -44,7 +44,8 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
     static Stream<Arguments> programList() {
         return Stream.of(
             Arguments.of("HelloWorld", 0, "Hello, World!\n", ""),
-            Arguments.of("BasicClass", 0, "b is: 5\na is: 1\n", "")
+            Arguments.of("BasicClass", 0, "b is: 5\na is: 1\n", ""),
+            Arguments.of("OutOfRegisters", 0, "91", "")
         );
     }
 
