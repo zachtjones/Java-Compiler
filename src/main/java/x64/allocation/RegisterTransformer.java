@@ -2,13 +2,20 @@ package x64.allocation;
 
 import x64.Instruction;
 import x64.X64Context;
+import x64.instructions.AddInstruction;
+import x64.instructions.PopInstruction;
+import x64.instructions.PushInstruction;
+import x64.instructions.SubtractInstruction;
+import x64.operands.Immediate;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 import x64.operands.X64RegisterOperand;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static x64.allocation.CallingConvention.argumentRegister;
+import static x64.operands.X64NativeRegister.RSP;
 
 public class RegisterTransformer {
 
@@ -36,11 +43,16 @@ public class RegisterTransformer {
 		}
 	}
 
+	public static class AllocationUnit {
+		public final Deque<Instruction> prologue = new LinkedList<>();
+		public final Deque<Instruction> epilogue = new LinkedList<>();
+	}
+
 	/**
 	 * Allocates the hardware registers,
 	 * returning a set of the actual preserved registers that need to be saved / restored.
 	 */
-	public Set<X64NativeRegister> allocate() {
+	public AllocationUnit allocate() {
 
 		// determine the usages of the registers, as well as which ones are used across function calls
 		RegistersUsed usedRegs = new RegistersUsed();
@@ -113,20 +125,25 @@ public class RegisterTransformer {
 				i.allocateRegisters(nativeMapping);
 			}
 
-			Set<X64NativeRegister> usedPreservedRegs = new HashSet<>();
-			for (X64NativeRegister reg : nativeMapping.values()) {
-				if (reg != X64NativeRegister.R10.nativeOne && reg != X64NativeRegister.R11.nativeOne) {
-					usedPreservedRegs.add(reg);
-				}
+			AllocationUnit au = new AllocationUnit();
+			X64RegisterOperand[] preserved = CallingConvention.preservedRegisters();
+
+			int totalPreserved = maxPreserved;
+			if (maxTemp > tempsAvailable.size()) {
+				totalPreserved += maxTemp - tempsAvailable.size();
 			}
 
-			// add another one if there are an even number used -- might add one already in the set
-			// since we just need to preserve one, do one of the arguments
-			while (usedPreservedRegs.size() % 2 == 0) {
-				usedPreservedRegs.add(argumentRegister(1).nativeOne);
+			for (int i = 0; i < totalPreserved; i++) {
+				au.prologue.add(new PushInstruction(preserved[i]));
+				au.epilogue.addFirst(new PopInstruction(preserved[i]));
+			}
+			if (totalPreserved % 2 == 0) {
+				// move another 8 bytes to maintains 16 byte alignment on function calls
+				au.prologue.add(new SubtractInstruction(new Immediate(8), RSP));
+				au.epilogue.addFirst(new AddInstruction(new Immediate(8), RSP));
 			}
 
-			return usedPreservedRegs;
+			return au;
 		} else {
 			throw new RuntimeException(mapping.toString());
 		}
@@ -182,14 +199,12 @@ public class RegisterTransformer {
 			if (value.needsPreserved) {
 				// simple case -- needs preserved, offset by the amount of temps over
 				nativeMap.put(key, preservedPossible[value.num + preservedBase].nativeOne);
+			} else if (value.num < tempsAvailable.size()) {
+				// fits in the amount of temporaries
+				nativeMap.put(key, tempsAvailable.get(value.num));
 			} else {
-				if (value.num < tempsAvailable.size()) {
-					// fits in the amount of temporaries
-					nativeMap.put(key, tempsAvailable.get(value.num));
-				} else {
-					// requires temporary, not enough, so uses the first few of preserved
-					nativeMap.put(key, preservedPossible[value.num - tempsAvailable.size()].nativeOne);
-				}
+				// requires temporary, not enough, so uses the first few of preserved
+				nativeMap.put(key, preservedPossible[value.num - tempsAvailable.size()].nativeOne);
 			}
 		}
 
