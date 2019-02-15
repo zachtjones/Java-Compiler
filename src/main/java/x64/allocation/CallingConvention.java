@@ -1,5 +1,6 @@
 package x64.allocation;
 
+import x64.operands.X64NativeRegister;
 import x64.operands.X64RegisterOperand;
 
 import static x64.operands.X64NativeRegister.*;
@@ -25,8 +26,10 @@ public class CallingConvention {
 	private static final X64RegisterOperand[] preservedSystemV = { RBX, RBP, R12, R13, R14, R15 };
 	private static final X64RegisterOperand[] preservedMicrosoft = { RBX, RBP, RDI, RSI, R12, R13, R14, R15 };
 
-	private static final X64RegisterOperand[] preservedSystemVNotRBP = { RBX, R12, R13, R14, R15 };
-	private static final X64RegisterOperand[] preservedMicrosoftNotRBP = { RBX, RDI, RSI, R12, R13, R14, R15 };
+	private static final X64NativeRegister[] preservedSystemVNotRBP =
+		{ RBX.nativeOne, R12.nativeOne, R13.nativeOne, R14.nativeOne, R15.nativeOne };
+	private static final X64NativeRegister[] preservedMicrosoftNotRBP =
+		{ RBX.nativeOne, RDI.nativeOne, RSI.nativeOne, R12.nativeOne, R13.nativeOne, R14.nativeOne, R15.nativeOne };
 
 	private static final X64RegisterOperand[] extraTemps = { R10, R11 };
 
@@ -61,7 +64,7 @@ public class CallingConvention {
 	}
 
 	/** returns the array of registers whose values must be preserved (not including stack pointer, or base pointer) */
-	static X64RegisterOperand[] preservedRegistersNotRBP() {
+	static X64NativeRegister[] preservedRegistersNotRBP() {
 		return isMicrosoft ? preservedMicrosoftNotRBP : preservedSystemVNotRBP;
 	}
 

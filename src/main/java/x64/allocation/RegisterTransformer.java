@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static x64.allocation.CallingConvention.argumentRegister;
+import static x64.allocation.CallingConvention.preservedRegistersNotRBP;
 import static x64.operands.X64NativeRegister.RBP;
 import static x64.operands.X64NativeRegister.RSP;
 
@@ -161,8 +162,6 @@ public class RegisterTransformer {
 			// spaceNeeded should be oddNumber * 8.
 			//au.prologue.add(new SubtractInstruction(new Immediate(registerMapping.spaceNeeded), RSP));
 
-			new RegisterMapping(maxTemp, mapping);
-
 			au.epilogue.addFirst(new PopInstruction(RBP));
 			au.epilogue.addFirst(new MoveInstruction(RBP, RSP));
 
@@ -263,7 +262,15 @@ public class RegisterTransformer {
 			//  to base-pointer offsets
 			TreeSet<RegisterMapped> priorities = new TreeSet<>(mapping.values());
 
-			System.out.println(priorities);
+			ArrayList<X64NativeRegister> tempsLeft = new ArrayList<>(tempsAvailable);
+
+			// this particular register is available for transitions of memory to memory to 2 instructions
+			X64NativeRegister temporaryIntermediate = tempsLeft.remove(0);
+
+			ArrayList<X64NativeRegister> preservedLeft = new ArrayList<>(Arrays.asList(preservedRegistersNotRBP()));
+
+			// allocate them, pulling from the lists until they're empty, then start allocating stack space
+			// TODO
 		}
 	}
 }
