@@ -9,7 +9,7 @@ import x64.allocation.RegistersUsed;
 import java.util.Map;
 
 /** Represents displacement from the program counter, OFFSET(%rip) in x64 */
-public class PCRelativeData implements SourceOperand, DestinationOperand {
+public class PCRelativeData implements Operand {
 
     private final String label;
     private final Instruction.Size size;

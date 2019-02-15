@@ -55,4 +55,8 @@ public class X64NativeRegister {
 		return representation;
 	}
 
+	@Override
+	public String toString() {
+		return assemblyRep();
+	}
 }

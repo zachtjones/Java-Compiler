@@ -6,7 +6,7 @@ import x64.allocation.RegistersUsed;
 
 import java.util.Map;
 
-public class MemoryAtRegister implements SourceOperand, DestinationOperand {
+public class MemoryAtRegister implements Operand {
     private final X64RegisterOperand source;
 
     public MemoryAtRegister(X64RegisterOperand source) {

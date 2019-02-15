@@ -6,7 +6,7 @@ import x64.allocation.RegistersUsed;
 
 import java.util.Map;
 
-public class X64RegisterOperand implements SourceOperand, DestinationOperand {
+public class X64RegisterOperand implements Operand {
 
 
 	public X64NativeRegister nativeOne;

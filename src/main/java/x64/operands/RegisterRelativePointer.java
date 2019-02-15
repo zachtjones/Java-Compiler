@@ -7,7 +7,7 @@ import x64.allocation.RegistersUsed;
 import java.util.Map;
 
 /** Represents a memory displacement from a register with a known constant integer offset */
-public class RegisterRelativePointer implements SourceOperand, DestinationOperand {
+public class RegisterRelativePointer implements Operand {
 
     private final int offset;
     private X64RegisterOperand register;

@@ -3,10 +3,7 @@ package x64.allocation;
 import x64.Instruction;
 import x64.X64Context;
 import x64.instructions.*;
-import x64.operands.Immediate;
-import x64.operands.X64NativeRegister;
-import x64.operands.X64PreservedRegister;
-import x64.operands.X64RegisterOperand;
+import x64.operands.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,6 +12,7 @@ import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.allocation.CallingConvention.preservedRegistersNotRBP;
 import static x64.operands.X64NativeRegister.RBP;
 import static x64.operands.X64NativeRegister.RSP;
+import static x64.operands.X64RegisterOperand.of;
 
 public class RegisterTransformer {
 
@@ -149,11 +147,11 @@ public class RegisterTransformer {
 
 			// we know we use all the registers
 			AllocationUnit au = new AllocationUnit();
-			X64RegisterOperand[] preservedLeft = CallingConvention.preservedRegistersNotRBP();
+			X64NativeRegister[] preservedLeft = CallingConvention.preservedRegistersNotRBP();
 
-			for (X64RegisterOperand x64RegisterOperand : preservedLeft) { // odd number of these
-				au.prologue.add(new PushInstruction(x64RegisterOperand));
-				au.epilogue.addFirst(new PopInstruction(x64RegisterOperand));
+			for (X64NativeRegister x64RegisterOperand : preservedLeft) { // odd number of these
+				au.prologue.add(new PushInstruction(of(x64RegisterOperand)));
+				au.epilogue.addFirst(new PopInstruction(of(x64RegisterOperand)));
 			}
 
 			au.prologue.add(new PushInstruction(RBP)); // stack now has even number pushed
@@ -245,9 +243,9 @@ public class RegisterTransformer {
 	public class RegisterMapping {
 
 		/** This is the space needed on the stack. Note that this will be (odd number * 8) bytes */
-		//public final long spaceNeeded;
+		public final long spaceNeeded;
 
-		public RegisterMapping(int numTemporariesRequired, Map<X64PreservedRegister, RegisterMapped> mapping) {
+		RegisterMapping(int numTemporariesRequired, Map<X64PreservedRegister, RegisterMapped> mapping) {
 
 			// todo, loop through counting jumps to increase priority level,
 			//  jumps backwards = 3x as much, conditional jumps backwards 2x as much
@@ -270,7 +268,14 @@ public class RegisterTransformer {
 			ArrayList<X64NativeRegister> preservedLeft = new ArrayList<>(Arrays.asList(preservedRegistersNotRBP()));
 
 			// allocate them, pulling from the lists until they're empty, then start allocating stack space
+			HashMap<RegisterMapped, X64NativeRegister> nativeAllocations = new HashMap<>();
+			HashMap<RegisterMapped, BasePointerOffset> basePointerOffsets = new HashMap<>();
+			
 			// TODO
+			System.out.println("Priorities: " + priorities);
+			System.out.println("Temp used as intermediate: " + temporaryIntermediate);
+			System.out.println("Temps available list: " + tempsLeft);
+			System.out.println("Preserved available list: " + preservedLeft);
 		}
 	}
 }
