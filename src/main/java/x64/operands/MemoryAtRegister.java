@@ -1,6 +1,7 @@
 package x64.operands;
 
 import x64.Instruction;
+import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 
 import java.util.Map;
@@ -30,6 +31,11 @@ public class MemoryAtRegister implements SourceOperand, DestinationOperand {
     @Override
     public void swapOut(Map<X64PreservedRegister, X64NativeRegister> mapping) {
         source.swapOut(mapping);
+    }
+
+    @Override
+    public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
+        source.prioritizeRegisters(mapping);
     }
 
     @Override

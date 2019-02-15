@@ -1,6 +1,7 @@
 package x64.operands;
 
 import x64.Instruction;
+import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 
 import java.util.Map;
@@ -56,6 +57,13 @@ public class X64RegisterOperand implements SourceOperand, DestinationOperand {
 		if (preservedOne != null) {
 			nativeOne = mapping.get(preservedOne);
 			preservedOne = null;
+		}
+	}
+
+	@Override
+	public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
+		if (preservedOne != null) {
+			mapping.get(preservedOne).increment();
 		}
 	}
 }

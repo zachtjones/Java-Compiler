@@ -1,6 +1,7 @@
 package x64.instructions;
 
 import x64.Instruction;
+import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 import x64.operands.SourceOperand;
 import x64.operands.X64NativeRegister;
@@ -29,6 +30,11 @@ public class CallFunctionPointerInstruction implements Instruction {
     @Override
     public void allocateRegisters(Map<X64PreservedRegister, X64NativeRegister> mapping) {
         temp.swapOut(mapping);
+    }
+
+    @Override
+    public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
+        temp.prioritizeRegisters(mapping);
     }
 
     @Override

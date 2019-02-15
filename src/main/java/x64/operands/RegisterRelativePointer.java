@@ -1,6 +1,7 @@
 package x64.operands;
 
 import x64.Instruction;
+import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 
 import java.util.Map;
@@ -22,11 +23,6 @@ public class RegisterRelativePointer implements SourceOperand, DestinationOperan
     }
 
     @Override
-    public String toString() {
-        return offset + "(" + register.toString() + ")";
-    }
-
-    @Override
     public void markUsed(int i, RegistersUsed usedRegs) {
         register.markUsed(i, usedRegs);
     }
@@ -37,7 +33,17 @@ public class RegisterRelativePointer implements SourceOperand, DestinationOperan
     }
 
     @Override
+    public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
+        register.prioritizeRegisters(mapping);
+    }
+
+    @Override
     public void markDefined(int i, RegistersUsed usedRegs) {
         register.markDefined(i, usedRegs);
+    }
+
+    @Override
+    public String toString() {
+        return offset + "(" + register.toString() + ")";
     }
 }

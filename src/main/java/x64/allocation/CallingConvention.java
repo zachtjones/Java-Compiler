@@ -25,6 +25,9 @@ public class CallingConvention {
 	private static final X64RegisterOperand[] preservedSystemV = { RBX, RBP, R12, R13, R14, R15 };
 	private static final X64RegisterOperand[] preservedMicrosoft = { RBX, RBP, RDI, RSI, R12, R13, R14, R15 };
 
+	private static final X64RegisterOperand[] preservedSystemVNotRBP = { RBX, R12, R13, R14, R15 };
+	private static final X64RegisterOperand[] preservedMicrosoftNotRBP = { RBX, RDI, RSI, R12, R13, R14, R15 };
+
 	private static final X64RegisterOperand[] extraTemps = { R10, R11 };
 
 	/**
@@ -55,6 +58,11 @@ public class CallingConvention {
 	/** returns the array of registers whose values must be preserved (not including the stack pointer) */
 	static X64RegisterOperand[] preservedRegisters() {
 		return isMicrosoft ? preservedMicrosoft : preservedSystemV;
+	}
+
+	/** returns the array of registers whose values must be preserved (not including stack pointer, or base pointer) */
+	static X64RegisterOperand[] preservedRegistersNotRBP() {
+		return isMicrosoft ? preservedMicrosoftNotRBP : preservedSystemVNotRBP;
 	}
 
 	/** returns the array of registers whose values are temporary */

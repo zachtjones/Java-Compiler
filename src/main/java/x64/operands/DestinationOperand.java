@@ -1,6 +1,7 @@
 package x64.operands;
 
 import x64.Instruction;
+import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 
 import java.util.Map;
@@ -21,4 +22,8 @@ public interface DestinationOperand {
 
     /** Swaps the preserved registers with their allocated real registers */
     void swapOut(Map<X64PreservedRegister, X64NativeRegister> mapping);
+
+    /** Increments the priority of the allocated register when it is used.
+     * @param mapping The RegisterMapped instance that each pseudo register is mapped to */
+    void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping);
 }

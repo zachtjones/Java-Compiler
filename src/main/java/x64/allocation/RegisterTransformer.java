@@ -2,10 +2,7 @@ package x64.allocation;
 
 import x64.Instruction;
 import x64.X64Context;
-import x64.instructions.AddInstruction;
-import x64.instructions.PopInstruction;
-import x64.instructions.PushInstruction;
-import x64.instructions.SubtractInstruction;
+import x64.instructions.*;
 import x64.operands.Immediate;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
@@ -15,6 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static x64.allocation.CallingConvention.argumentRegister;
+import static x64.operands.X64NativeRegister.RBP;
 import static x64.operands.X64NativeRegister.RSP;
 
 public class RegisterTransformer {
@@ -145,6 +143,40 @@ public class RegisterTransformer {
 
 			return au;
 		} else {
+
+			RegisterMapping registerMapping = new RegisterMapping(maxTemp - 1, mapping);
+
+			// we know we use all the registers
+			AllocationUnit au = new AllocationUnit();
+			X64RegisterOperand[] preservedLeft = CallingConvention.preservedRegistersNotRBP();
+
+			for (X64RegisterOperand x64RegisterOperand : preservedLeft) { // odd number of these
+				au.prologue.add(new PushInstruction(x64RegisterOperand));
+				au.epilogue.addFirst(new PopInstruction(x64RegisterOperand));
+			}
+
+			au.prologue.add(new PushInstruction(RBP)); // stack now has even number pushed
+			au.prologue.add(new MoveInstruction(RSP, RBP));
+
+			// spaceNeeded should be oddNumber * 8.
+			//au.prologue.add(new SubtractInstruction(new Immediate(registerMapping.spaceNeeded), RSP));
+
+			new RegisterMapping(maxTemp, mapping);
+
+			au.epilogue.addFirst(new PopInstruction(RBP));
+			au.epilogue.addFirst(new MoveInstruction(RBP, RSP));
+
+			// similarly, obtain a mapping, but with certain registers as offset from the rbp
+			//   this means we can't use the RBP as another preserved register
+
+			// if there are any instructions that result in 2 memory operands, need to also
+			//   keep a temporary reserved for those as well
+
+			// here the allocateRegisters operation will be slightly different,
+			//   we'll need to create an interface that covers either: register / rbp-offset memory
+
+			// for simplicity (at least at first), we will allocate 8 bytes for all extra registers
+
 			throw new RuntimeException(mapping.toString());
 		}
 
@@ -209,6 +241,30 @@ public class RegisterTransformer {
 		}
 
 		return nativeMap;
+	}
+
+	public class RegisterMapping {
+
+		/** This is the space needed on the stack. Note that this will be (odd number * 8) bytes */
+		//public final long spaceNeeded;
+
+		public RegisterMapping(int numTemporariesRequired, Map<X64PreservedRegister, RegisterMapped> mapping) {
+
+			// todo, loop through counting jumps to increase priority level,
+			//  jumps backwards = 3x as much, conditional jumps backwards 2x as much
+			// Could also do some prediction based on other heuristics, like forward jumps as well
+
+			// right now, a simple priority incremented by the number of usages
+			for (Instruction i : initialContents) {
+				 i.prioritizeRegisters(mapping);
+			}
+
+			// now we can determine the which registers are more important, lower important ones get mapped
+			//  to base-pointer offsets
+			TreeSet<RegisterMapped> priorities = new TreeSet<>(mapping.values());
+
+			System.out.println(priorities);
+		}
 	}
 }
 

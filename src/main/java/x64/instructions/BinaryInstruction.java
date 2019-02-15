@@ -1,5 +1,6 @@
 package x64.instructions;
 
+import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 import x64.operands.DestinationOperand;
 import x64.Instruction;
@@ -32,6 +33,12 @@ public abstract class BinaryInstruction implements Instruction {
     public void allocateRegisters(Map<X64PreservedRegister, X64NativeRegister> mapping) {
         source.swapOut(mapping);
         destination.swapOut(mapping);
+    }
+
+    @Override
+    public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
+        source.prioritizeRegisters(mapping);
+        destination.prioritizeRegisters(mapping);
     }
 
     /** Represents how this instruction should be represented */

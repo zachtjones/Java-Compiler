@@ -3,6 +3,7 @@ package x64.operands;
 import intermediate.Register;
 import x64.Instruction;
 import x64.SymbolNames;
+import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 
 import java.util.Map;
@@ -48,6 +49,11 @@ public class PCRelativeData implements SourceOperand, DestinationOperand {
     @Override
     public void swapOut(Map<X64PreservedRegister, X64NativeRegister> mapping) {
         // same as markUsed
+    }
+
+    @Override
+    public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
+        // uses RIP, not preserved registers
     }
 
     @Override

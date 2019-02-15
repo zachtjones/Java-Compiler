@@ -1,5 +1,6 @@
 package x64.operands;
 
+import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 
 import java.util.Map;
@@ -31,5 +32,10 @@ public class Immediate implements SourceOperand {
     @Override
     public void swapOut(Map<X64PreservedRegister, X64NativeRegister> mapping) {
         // doesn't use register
+    }
+
+    @Override
+    public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
+        // doesn't use registers
     }
 }
