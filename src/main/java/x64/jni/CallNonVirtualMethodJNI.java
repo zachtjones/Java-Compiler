@@ -19,8 +19,8 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
      * @param args The program arguments to the function
      * @param returnVal Where to store the returned value
      */
-    default void addCallNonVirtualMethodJNI(X64Context context, X64RegisterOperand classReg,
-            X64RegisterOperand objReg, X64RegisterOperand methodId, Register[] args, Register returnVal) {
+    default void addCallNonVirtualMethodJNI(X64Context context, X64PreservedRegister classReg,
+            X64PreservedRegister objReg, X64PreservedRegister methodId, Register[] args, Register returnVal) {
 
         // 3 options for the method call, but will use the first one
         // %result = CallNonVirtual<type>Method(JNIEnv, obj, class, methodID, ...);
@@ -65,7 +65,7 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
 
         // load the function pointer
         // Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
-        final X64RegisterOperand temp2 = context.getNextQuadRegister();
+        final X64PreservedRegister temp2 = context.getNextQuadRegister();
         context.addInstruction(
             new MoveInstruction(
                 new MemoryAtRegister(context.getJniPointer()),

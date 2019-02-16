@@ -3,9 +3,8 @@ package x64.jni;
 import x64.X64Context;
 import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PreservedRegister;
 
-import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.jni.JNIOffsets.GET_OBJECT_CLASS;
 
 public interface GetObjectClassJNI extends CallJNIMethod {
@@ -16,7 +15,7 @@ public interface GetObjectClassJNI extends CallJNIMethod {
      * @param object The x64 register that holds the reference to the object
      * @return A new x64 register that holds the object's class.
      */
-    default X64RegisterOperand addGetObjectClass(X64Context context, X64RegisterOperand object) {
+    default X64PreservedRegister addGetObjectClass(X64Context context, X64PreservedRegister object) {
         // result = JNIEnv -> GetObjectClass(JNIEnv, obj);
 
         // JNIEnv -> arg1
@@ -30,7 +29,7 @@ public interface GetObjectClassJNI extends CallJNIMethod {
             )
         );
 
-        X64RegisterOperand result = context.getNextQuadRegister();
+        X64PreservedRegister result = context.getNextQuadRegister();
 
         addCallJNI(context, GET_OBJECT_CLASS, result);
 

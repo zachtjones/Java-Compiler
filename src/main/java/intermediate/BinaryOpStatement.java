@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import tree.BinaryOperation;
 import x64.X64Context;
 import x64.instructions.MoveInstruction;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PreservedRegister;
 
 /** dest = src1 OP src2 */
 public class BinaryOpStatement implements InterStatement {
@@ -67,7 +67,7 @@ public class BinaryOpStatement implements InterStatement {
 		//  op src2, temp ---- this means temp = temp op src2
 		//  mov temp, dest
 
-		X64RegisterOperand temp = context.getNextQuadRegister();
+		X64PreservedRegister temp = context.getNextQuadRegister();
 
 		context.addInstruction(new MoveInstruction(src1.toX64(), temp));
 

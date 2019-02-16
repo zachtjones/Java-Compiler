@@ -10,9 +10,9 @@ import java.util.Map;
 public class RegisterRelativePointer implements Operand {
 
     private final int offset;
-    private X64RegisterOperand register;
+    private X64PreservedRegister register;
 
-    public RegisterRelativePointer(int offset, X64RegisterOperand register) {
+    public RegisterRelativePointer(int offset, X64PreservedRegister register) {
         this.offset = offset;
         this.register = register;
     }
@@ -25,11 +25,6 @@ public class RegisterRelativePointer implements Operand {
     @Override
     public void markUsed(int i, RegistersUsed usedRegs) {
         register.markUsed(i, usedRegs);
-    }
-
-    @Override
-    public void swapOut(Map<X64PreservedRegister, X64NativeRegister> mapping) {
-        register.swapOut(mapping);
     }
 
     @Override

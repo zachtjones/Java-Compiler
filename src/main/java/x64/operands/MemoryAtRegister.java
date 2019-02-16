@@ -7,9 +7,9 @@ import x64.allocation.RegistersUsed;
 import java.util.Map;
 
 public class MemoryAtRegister implements Operand {
-    private final X64RegisterOperand source;
+    private final X64PreservedRegister source;
 
-    public MemoryAtRegister(X64RegisterOperand source) {
+    public MemoryAtRegister(X64PreservedRegister source) {
         this.source = source;
     }
 
@@ -26,11 +26,6 @@ public class MemoryAtRegister implements Operand {
     @Override
     public void markUsed(int i, RegistersUsed usedRegs) {
         source.markUsed(i, usedRegs);
-    }
-
-    @Override
-    public void swapOut(Map<X64PreservedRegister, X64NativeRegister> mapping) {
-        source.swapOut(mapping);
     }
 
     @Override

@@ -15,7 +15,7 @@ public interface CallJNIMethod {
     default void addCallVoidJNI(X64Context context, JNIOffsets jniOffset) {
 
         // mov %javaEnv*, %javaEnv
-        final X64RegisterOperand temp = context.getNextQuadRegister();
+        final X64PreservedRegister temp = context.getNextQuadRegister();
         context.addInstruction(
             new MoveInstruction(
                 new MemoryAtRegister(context.getJniPointer()),
@@ -33,7 +33,7 @@ public interface CallJNIMethod {
 
     /** Inserts the code to load the JNI pointer -> JNI structure -> virtual function table,
      * calls the code, and moves the result to the resultHolder register. */
-    default void addCallJNI(X64Context context, JNIOffsets jniOffset, X64RegisterOperand resultHolder) {
+    default void addCallJNI(X64Context context, JNIOffsets jniOffset, X64PreservedRegister resultHolder) {
 
         // treat like calling void method, then move result to the register
         addCallVoidJNI(context, jniOffset);

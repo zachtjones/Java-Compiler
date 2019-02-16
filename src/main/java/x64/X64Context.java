@@ -4,13 +4,12 @@ import intermediate.Register;
 import intermediate.RegisterAllocator;
 import x64.allocation.CallingConvention;
 import x64.instructions.MoveInstruction;
+import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
-import x64.operands.X64RegisterOperand;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static x64.operands.X64RegisterOperand.of;
 
 /**
  * This class serves the purpose of providing the adequate information for the
@@ -21,13 +20,13 @@ public class X64Context {
 	private final X64File enclosingFile;
 	private final X64Function function;
 	private int nextRegister;
-	private final X64RegisterOperand jniPointer;
+	private final X64PreservedRegister jniPointer;
 
 	private final Map<Register, Register> instanceFieldAddressInstances = new HashMap<>();
 	private final Map<Register, String> instanceFieldAddressNames = new HashMap<>();
 	private final Map<Register, String> staticFieldAddressClasses = new HashMap<>();
 	private final Map<Register, String> staticFieldAddressFields = new HashMap<>();
-	private final Map<String, X64RegisterOperand> locals = new HashMap<>();
+	private final Map<String, X64PreservedRegister> locals = new HashMap<>();
 
 	/** Returns the highest number of argument register used */
 	private int highestArgUsed = 1; // reserve the JNI register as always used
@@ -41,15 +40,15 @@ public class X64Context {
 	}
 
 	/** Wrapper for CallingConvention.argumentRegister, used to keep track of highest number used */
-	public X64RegisterOperand argumentRegister(int number) {
+	public X64NativeRegister argumentRegister(int number) {
 		highestArgUsed = Math.max(number, highestArgUsed);
 		return CallingConvention.argumentRegister(number);
 	}
 
 	/** Returns the next pseudo register available that is a quad-word size (64-bit) */
-	public X64RegisterOperand getNextQuadRegister() {
+	public X64PreservedRegister getNextQuadRegister() {
 		nextRegister++;
-		return of(new X64PreservedRegister(nextRegister, Instruction.Size.QUAD));
+		return new X64PreservedRegister(nextRegister, Instruction.Size.QUAD);
 	}
 
 	/** returns the argument number that is the highest number used */
@@ -63,7 +62,7 @@ public class X64Context {
 	}
 
 	/** Returns the register operand that holds the JNI pointer */
-	public X64RegisterOperand getJniPointer() {
+	public X64PreservedRegister getJniPointer() {
 		return jniPointer;
 	}
 
@@ -125,13 +124,13 @@ public class X64Context {
 	}
 
 	/** Marks the register as a local variable */
-	public void markRegisterAsLocalVariable(String name, X64RegisterOperand allocated) {
+	public void markRegisterAsLocalVariable(String name, X64PreservedRegister allocated) {
 		locals.put(name, allocated);
 	}
 
 	/** returns the local variable's register that holds it's value (used for get/set)
 	 * There isn't a need for an is local variable, since intermediate language is already type checked. */
-	public X64RegisterOperand getLocalVariable(String name) {
+	public X64PreservedRegister getLocalVariable(String name) {
 		return locals.get(name);
 	}
 }

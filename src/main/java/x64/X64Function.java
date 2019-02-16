@@ -5,14 +5,13 @@ import x64.allocation.RegisterTransformer;
 import x64.directives.*;
 import x64.instructions.*;
 import x64.operands.Immediate;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PreservedRegister;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static x64.allocation.CallingConvention.*;
 import static x64.operands.X64NativeRegister.RSP;
-import static x64.operands.X64RegisterOperand.of;
 
 public class X64Function {
 
@@ -22,7 +21,7 @@ public class X64Function {
 
 	@Nullable private RegisterTransformer.AllocationUnit au = null;
 
-	X64Function(String javaClass, String javaMethod, X64RegisterOperand jniEnvPointer, X64Context context) {
+	X64Function(String javaClass, String javaMethod, X64PreservedRegister jniEnvPointer, X64Context context) {
 		this.context = context;
 
 		header.add(new SegmentChange(SegmentChange.TEXT));

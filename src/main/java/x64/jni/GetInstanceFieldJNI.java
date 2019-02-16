@@ -4,9 +4,7 @@ import intermediate.Register;
 import x64.X64Context;
 import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
-import x64.operands.X64RegisterOperand;
-
-import static x64.allocation.CallingConvention.argumentRegister;
+import x64.operands.X64PreservedRegister;
 
 public interface GetInstanceFieldJNI extends CallJNIMethod {
 
@@ -18,7 +16,7 @@ public interface GetInstanceFieldJNI extends CallJNIMethod {
      * @param result The IL Register that will hold the value after the call
      */
     default void addGetInstanceField(X64Context context, Register objReg,
-                                     X64RegisterOperand fieldIDReg, Register result) {
+                                     X64PreservedRegister fieldIDReg, Register result) {
 
         // load the args
         // arg1 = JNI
