@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import static x64.allocation.CallingConvention.preservedRegistersNotRBP;
 import static x64.operands.X64NativeRegister.*;
-import static x64.operands.X64RegisterOperand.of;
 
 public class RegisterTransformer {
 
@@ -29,14 +28,11 @@ public class RegisterTransformer {
 	public RegisterTransformer(@NotNull List<Instruction> contents, X64Context context) {
 		this.initialContents = contents;
 
+		tempsAvailable = new ArrayList<>(Arrays.asList(CallingConvention.temporaryRegisters()));
 
-		tempsAvailable = new ArrayList<>();
-		for (X64RegisterOperand op : CallingConvention.temporaryRegisters()) {
-			tempsAvailable.add(op.nativeOne);
-		}
 		for (int i = context.getHighestArgUsed() + 1; i < CallingConvention.argumentRegisterCount(); i++) {
 
-			tempsAvailable.add(CallingConvention.argumentRegister(i).nativeOne);
+			tempsAvailable.add(CallingConvention.argumentRegister(i));
 		}
 	}
 
@@ -124,13 +120,13 @@ public class RegisterTransformer {
 			// obtain the new list of instructions, with them swapped out
 			Map<X64PreservedRegister, BasePointerOffset> locals = new HashMap<>();
 			initialContents = initialContents.stream()
-				.map(i -> i.allocate(nativeMapping, locals, R10.nativeOne))
+				.map(i -> i.allocate(nativeMapping, locals, R10))
 				.flatMap(Collection::stream)
 				.collect(Collectors.toList());
 
 			// determine the function prologue and epilogue
 			AllocationUnit au = new AllocationUnit();
-			X64RegisterOperand[] preserved = CallingConvention.preservedRegisters();
+			X64NativeRegister[] preserved = CallingConvention.preservedRegisters();
 
 			int totalPreserved = maxPreserved;
 			if (maxTemp > tempsAvailable.size()) {
@@ -138,12 +134,12 @@ public class RegisterTransformer {
 			}
 
 			for (int i = 0; i < totalPreserved; i++) {
-				au.prologue.add(new PushInstruction(preserved[i]));
-				au.epilogue.addFirst(new PopInstruction(preserved[i]));
+				au.prologue.add(new PushNativeRegInstruction(preserved[i]));
+				au.epilogue.addFirst(new PopNativeRegInstruction(preserved[i]));
 			}
 			if (totalPreserved % 2 == 0) {
 				// move another 8 bytes to maintains 16 byte alignment on function calls
-				au.prologue.add(new SubtractInstruction(new Immediate(8), RSP));
+				au.prologue.add(new SubtractImmRegInstruction(new Immediate(8), RSP));
 				au.epilogue.addFirst(new AddInstruction(new Immediate(8), RSP));
 			}
 
@@ -163,19 +159,19 @@ public class RegisterTransformer {
 			// epilogue is kept in the order by addFirst on all calls
 			for (X64NativeRegister x64RegisterOperand : preservedLeft) {
 				// odd number of these due to number in both conventions
-				au.prologue.add(new PushInstruction(of(x64RegisterOperand)));
-				au.epilogue.addFirst(new PopInstruction(of(x64RegisterOperand)));
+				au.prologue.add(new PushNativeRegInstruction(x64RegisterOperand));
+				au.epilogue.addFirst(new PopNativeRegInstruction(x64RegisterOperand));
 			}
 
 			// preserve base pointer & set to the base of the stack frame
-			au.prologue.add(new PushInstruction(RBP)); // stack now has even number pushed
+			au.prologue.add(new PushNativeRegInstruction(RBP)); // stack now has even number pushed
 			au.prologue.add(new MoveInstruction(RSP, RBP));
 
 			// spaceNeeded should be oddNumber * 8.
-			au.prologue.add(new SubtractInstruction(new Immediate(spaceNeeded), RSP));
+			au.prologue.add(new SubtractImmRegInstruction(new Immediate(spaceNeeded), RSP));
 
 			// restore stack and base pointer
-			au.epilogue.addFirst(new PopInstruction(RBP));
+			au.epilogue.addFirst(new PopNativeRegInstruction(RBP));
 			au.epilogue.addFirst(new MoveInstruction(RBP, RSP));
 
 			return au;
@@ -191,7 +187,7 @@ public class RegisterTransformer {
 	 */
 	private boolean hasEnoughHardwareRegs(int numPreserved, int numTemporary) {
 
-		X64RegisterOperand[] preservedPossible = CallingConvention.preservedRegisters();
+		X64NativeRegister[] preservedPossible = CallingConvention.preservedRegisters();
 
 		int totalNumAvailable = tempsAvailable.size() + preservedPossible.length;
 
@@ -211,7 +207,7 @@ public class RegisterTransformer {
 	 */
 	private Map<X64PreservedRegister, X64NativeRegister> getNatives(int numTemporary, Map<X64PreservedRegister, RegisterMapped> mapping) {
 
-		X64RegisterOperand[] preservedPossible = CallingConvention.preservedRegisters();
+		X64NativeRegister[] preservedPossible = CallingConvention.preservedRegisters();
 
 		HashMap<X64PreservedRegister, X64NativeRegister> nativeMap = new HashMap<>();
 
@@ -224,13 +220,13 @@ public class RegisterTransformer {
 
 			if (value.needsPreserved) {
 				// simple case -- needs preserved, offset by the amount of temps over
-				nativeMap.put(key, preservedPossible[value.num + preservedBase].nativeOne);
+				nativeMap.put(key, preservedPossible[value.num + preservedBase]);
 			} else if (value.num < tempsAvailable.size()) {
 				// fits in the amount of temporaries
 				nativeMap.put(key, tempsAvailable.get(value.num));
 			} else {
 				// requires temporary, not enough, so uses the first few of preserved
-				nativeMap.put(key, preservedPossible[value.num - tempsAvailable.size()].nativeOne);
+				nativeMap.put(key, preservedPossible[value.num - tempsAvailable.size()]);
 			}
 		}
 

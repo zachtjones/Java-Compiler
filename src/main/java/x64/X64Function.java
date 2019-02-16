@@ -60,7 +60,7 @@ public class X64Function {
 		if (au != null) allInstructions.addAll(au.prologue);
 
 		if (needsToAllocate32BytesForArgs())
-			allInstructions.add(new SubtractInstruction(new Immediate(32), RSP));
+			allInstructions.add(new SubtractImmRegInstruction(new Immediate(32), RSP));
 
 		allInstructions.addAll(contents);
 

@@ -3,7 +3,7 @@ package tree;
 import org.jetbrains.annotations.NotNull;
 import x64.Instruction;
 import x64.instructions.AddInstruction;
-import x64.instructions.SubtractInstruction;
+import x64.instructions.SubtractImmRegInstruction;
 import x64.operands.DestinationOperand;
 import x64.operands.SourceOperand;
 
@@ -37,7 +37,7 @@ public enum BinaryOperation {
 			case ADD:
 				return new AddInstruction(source, destination);
 			case SUBTRACT:
-				return new SubtractInstruction(source, destination);
+				return new SubtractImmRegInstruction(source, destination);
 			case TIMES:
 				break;
 			case DIVIDE:

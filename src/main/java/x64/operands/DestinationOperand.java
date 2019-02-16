@@ -20,9 +20,6 @@ public interface DestinationOperand {
     /** call markDefined on the used register argument if this uses a register. */
 	void markDefined(int i, RegistersUsed usedRegs);
 
-    /** Swaps the preserved registers with their allocated real registers */
-    void swapOut(Map<X64PreservedRegister, X64NativeRegister> mapping);
-
     /** Increments the priority of the allocated register when it is used.
      * @param mapping The RegisterMapped instance that each pseudo register is mapped to */
     void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping);

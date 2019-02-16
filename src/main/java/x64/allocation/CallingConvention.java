@@ -1,7 +1,6 @@
 package x64.allocation;
 
 import x64.operands.X64NativeRegister;
-import x64.operands.X64RegisterOperand;
 
 import static x64.operands.X64NativeRegister.*;
 
@@ -20,25 +19,23 @@ public class CallingConvention {
 	 * Only one and exactly one of isMicrosoft, isMac, or isLinux will be true */
 	public static boolean isLinux = !isMicrosoft && !isMac;
 
-	private static final X64RegisterOperand[] argsSystemV = { RDI, RSI, RDX, RCX, R8, R9 };
-	private static final X64RegisterOperand[] argsMicrosoft = { RCX, RDX, R8, R9 };
+	private static final X64NativeRegister[] argsSystemV = { RDI, RSI, RDX, RCX, R8, R9 };
+	private static final X64NativeRegister[] argsMicrosoft = { RCX, RDX, R8, R9 };
 
-	private static final X64RegisterOperand[] preservedSystemV = { RBX, RBP, R12, R13, R14, R15 };
-	private static final X64RegisterOperand[] preservedMicrosoft = { RBX, RBP, RDI, RSI, R12, R13, R14, R15 };
+	private static final X64NativeRegister[] preservedSystemV = { RBX, RBP, R12, R13, R14, R15 };
+	private static final X64NativeRegister[] preservedMicrosoft = { RBX, RBP, RDI, RSI, R12, R13, R14, R15 };
 
-	private static final X64NativeRegister[] preservedSystemVNotRBP =
-		{ RBX.nativeOne, R12.nativeOne, R13.nativeOne, R14.nativeOne, R15.nativeOne };
-	private static final X64NativeRegister[] preservedMicrosoftNotRBP =
-		{ RBX.nativeOne, RDI.nativeOne, RSI.nativeOne, R12.nativeOne, R13.nativeOne, R14.nativeOne, R15.nativeOne };
+	private static final X64NativeRegister[] preservedSystemVNotRBP = { RBX, R12, R13, R14, R15 };
+	private static final X64NativeRegister[] preservedMicrosoftNotRBP = { RBX, RDI, RSI, R12, R13, R14, R15 };
 
-	private static final X64RegisterOperand[] extraTemps = { R10, R11 };
+	private static final X64NativeRegister[] extraTemps = { R10, R11 };
 
 	/**
 	 * Returns the x64 native register that is mapped to that argument.
 	 * @param num 1 for the first argument, 2 for the second, ...
 	 * @return The RegisterOperand which is a reference to that register.
 	 */
-	public static X64RegisterOperand argumentRegister(int num) {
+	public static X64NativeRegister argumentRegister(int num) {
 		// TODO a sort of pseudo-register for extra arguments more than 4 / 6
 		if (isMicrosoft) {
 			return argsMicrosoft[num - 1];
@@ -53,13 +50,13 @@ public class CallingConvention {
 	}
 
 	/** returns the register operand that is used for holding return values */
-	public static X64RegisterOperand returnValueRegister() {
+	public static X64NativeRegister returnValueRegister() {
 		// both System V and Microsoft are same
 		return RAX;
 	}
 
 	/** returns the array of registers whose values must be preserved (not including the stack pointer) */
-	static X64RegisterOperand[] preservedRegisters() {
+	static X64NativeRegister[] preservedRegisters() {
 		return isMicrosoft ? preservedMicrosoft : preservedSystemV;
 	}
 
@@ -69,7 +66,7 @@ public class CallingConvention {
 	}
 
 	/** returns the array of registers whose values are temporary */
-	static X64RegisterOperand[] temporaryRegisters() {
+	static X64NativeRegister[] temporaryRegisters() {
 		return extraTemps;
 	}
 
