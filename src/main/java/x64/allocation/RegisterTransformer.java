@@ -8,25 +8,25 @@ import x64.instructions.*;
 import x64.operands.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static x64.allocation.CallingConvention.preservedRegistersNotRBP;
-import static x64.operands.X64NativeRegister.RBP;
-import static x64.operands.X64NativeRegister.RSP;
+import static x64.operands.X64NativeRegister.*;
 import static x64.operands.X64RegisterOperand.of;
 
 public class RegisterTransformer {
 
-	private final ArrayList<Instruction> initialContents;
+	@NotNull private List<Instruction> initialContents;
 
 	/** This is r10 + r11, + the unused argument registers */
-	private final List<X64NativeRegister> tempsAvailable;
+	@NotNull private final List<X64NativeRegister> tempsAvailable;
 
 	/***
 	 * Creates a register transformer, used to transform pseudo registers into real ones.
 	 * @param contents The contents of the function.
 	 * @param context The context to which the function was created.
 	 */
-	public RegisterTransformer(ArrayList<Instruction> contents, X64Context context) {
+	public RegisterTransformer(@NotNull List<Instruction> contents, X64Context context) {
 		this.initialContents = contents;
 
 
@@ -118,13 +118,15 @@ public class RegisterTransformer {
 		//  allocate a preserved register to a hardware preserved register
 		if (hasEnoughHardwareRegs(maxPreserved, maxTemp)) {
 
-			// obtain the mapping
+			// obtain the mapping to native registers
 			Map<X64PreservedRegister, X64NativeRegister> nativeMapping = getNatives(maxTemp, mapping);
 
 			// obtain the new list of instructions, with them swapped out
-			for (Instruction i : initialContents) {
-				i.allocateRegisters(nativeMapping);
-			}
+			Map<X64PreservedRegister, BasePointerOffset> locals = new HashMap<>();
+			initialContents = initialContents.stream()
+				.map(i -> i.allocate(nativeMapping, locals, R10.nativeOne))
+				.flatMap(Collection::stream)
+				.collect(Collectors.toList());
 
 			// determine the function prologue and epilogue
 			AllocationUnit au = new AllocationUnit();
@@ -149,38 +151,34 @@ public class RegisterTransformer {
 		} else {
 
 			// transforms the instructions out, replacing 2 memory op ones with an intermediate calculation
-			int spaceNeeded = rbpTransform(initialContents, mapping, tempsAvailable);
+			// here we use the base pointer for that allocation
 
-			// we know we use all the registers
+			// this function also changes the instructions
+			int spaceNeeded = rbpTransform(mapping, tempsAvailable);
+
+			// we know we use all the registers, can't use the base pointer elsewhere
 			AllocationUnit au = new AllocationUnit();
 			X64NativeRegister[] preservedLeft = CallingConvention.preservedRegistersNotRBP();
 
-			for (X64NativeRegister x64RegisterOperand : preservedLeft) { // odd number of these
+			// epilogue is kept in the order by addFirst on all calls
+			for (X64NativeRegister x64RegisterOperand : preservedLeft) {
+				// odd number of these due to number in both conventions
 				au.prologue.add(new PushInstruction(of(x64RegisterOperand)));
 				au.epilogue.addFirst(new PopInstruction(of(x64RegisterOperand)));
 			}
 
+			// preserve base pointer & set to the base of the stack frame
 			au.prologue.add(new PushInstruction(RBP)); // stack now has even number pushed
 			au.prologue.add(new MoveInstruction(RSP, RBP));
 
 			// spaceNeeded should be oddNumber * 8.
 			au.prologue.add(new SubtractInstruction(new Immediate(spaceNeeded), RSP));
 
+			// restore stack and base pointer
 			au.epilogue.addFirst(new PopInstruction(RBP));
 			au.epilogue.addFirst(new MoveInstruction(RBP, RSP));
 
-			// similarly, obtain a mapping, but with certain registers as offset from the rbp
-			//   this means we can't use the RBP as another preserved register
-
-			// if there are any instructions that result in 2 memory operands, need to also
-			//   keep a temporary reserved for those as well
-
-			// here the allocateRegisters operation will be slightly different,
-			//   we'll need to create an interface that covers either: register / rbp-offset memory
-
-			// for simplicity (at least at first), we will allocate 8 bytes for all extra registers
-
-			throw new RuntimeException(mapping.toString());
+			return au;
 		}
 	}
 
@@ -297,9 +295,10 @@ public class RegisterTransformer {
 		HashMap<X64PreservedRegister, X64NativeRegister> natives = MapUtils.map(mapping, nativeAllocations);
 		HashMap<X64PreservedRegister, BasePointerOffset> locals = MapUtils.map(mapping, basePointerOffsets);
 
-		// TODO transform the instructions, replacing all the pseudo registers out.
-		//  Some will require using a temporary registers as an intermediate one when the
-		//    instruction would have 2 memory operands
+		this.initialContents = initialContents.stream()
+			.map(i -> i.allocate(natives, locals, temporaryIntermediate)) // Stream<List<Instruction>>
+			.flatMap(Collection::stream) // 'flattens' the stream of lists into a stream of instructions
+			.collect(Collectors.toList());
 
 		return stackNumberAllocated * 8;
 	}
