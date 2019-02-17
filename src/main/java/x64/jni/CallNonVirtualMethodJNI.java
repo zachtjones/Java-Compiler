@@ -63,16 +63,6 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
             );
         }
 
-        // load the function pointer
-        // Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
-        final X64PreservedRegister temp2 = context.getNextQuadRegister();
-        context.addInstruction(
-            new MoveInstruction(
-                new MemoryAtPseudo(context.getJniPointer()),
-                temp2
-            )
-        );
-
         addCallJNI(context, getCallNonVirtualMethodOffset(returnVal.getType()), returnVal.toX64());
     }
 }

@@ -1,9 +1,7 @@
 package x64.jni.helpers;
 
 import x64.X64Context;
-import x64.pseudo.LoadEffectiveAddressRIPPseudo;
 import x64.instructions.LoadEffectiveAddressRIPRegister;
-import x64.instructions.MoveInstruction;
 import x64.jni.JNIOffsets;
 import x64.operands.*;
 import x64.pseudo.MovePseudoRegToReg;
@@ -41,7 +39,7 @@ public interface GetIdJNI extends CallJNIMethod {
         // add the signature of the field type -> %arg4
         final String fieldTypeLabel = context.insertDataString(signature);
         context.addInstruction(
-            new LoadEffectiveAddressRIPPseudo(
+            new LoadEffectiveAddressRIPRegister(
                 RIPRelativeData.pointerFromLabel(fieldTypeLabel),
                 context.argumentRegister(4)
             )

@@ -2,9 +2,10 @@ package x64.jni.helpers;
 
 import x64.X64Context;
 import x64.pseudo.CallRegisterDisplacementPseudo;
-import x64.instructions.MoveInstruction;
 import x64.jni.JNIOffsets;
 import x64.operands.*;
+import x64.pseudo.MovePseudoAbsoluteToPseudo;
+import x64.pseudo.MoveRegToPseudoReg;
 
 import static x64.allocation.CallingConvention.returnValueRegister;
 
@@ -17,8 +18,8 @@ public interface CallJNIMethod {
         // mov %javaEnv*, %javaEnv
         final X64PreservedRegister temp = context.getNextQuadRegister();
         context.addInstruction(
-            new MoveInstruction(
-                new MemoryAtRegister(context.getJniPointer()),
+            new MovePseudoAbsoluteToPseudo(
+                new MemoryAtPseudo(context.getJniPointer()),
                 temp
             )
         );
@@ -40,7 +41,7 @@ public interface CallJNIMethod {
 
         // mov %RAX, %result holder
         context.addInstruction(
-            new MoveInstruction(
+            new MoveRegToPseudoReg(
                 returnValueRegister(),
                 resultHolder
             )

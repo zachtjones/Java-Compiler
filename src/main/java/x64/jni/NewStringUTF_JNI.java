@@ -2,9 +2,9 @@ package x64.jni;
 
 import intermediate.Register;
 import x64.X64Context;
-import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.X64PreservedRegister;
+import x64.pseudo.MovePseudoRegToReg;
 
 import static x64.jni.JNIOffsets.NEW_STRING_UTF;
 
@@ -23,7 +23,7 @@ public interface NewStringUTF_JNI extends CallJNIMethod {
 
 		// arg 2
 		context.addInstruction(
-			new MoveInstruction(
+			new MovePseudoRegToReg(
 				chars,
 				context.argumentRegister(2)
 			)
