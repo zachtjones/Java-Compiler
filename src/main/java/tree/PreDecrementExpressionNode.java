@@ -9,7 +9,7 @@ import intermediate.LoadLiteralStatement;
 import intermediate.Register;
 import org.jetbrains.annotations.NotNull;
 
-import static tree.BinaryOperation.SUBTRACT;
+import static helper.BinaryOperation.SUBTRACT;
 
 /** -- expr */
 public class PreDecrementExpressionNode extends NodeImpl implements StatementExprNode, Expression {

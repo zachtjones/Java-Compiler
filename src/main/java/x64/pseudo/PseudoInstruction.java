@@ -1,4 +1,4 @@
-package x64.pseudoInstruction;
+package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.RegisterMapped;

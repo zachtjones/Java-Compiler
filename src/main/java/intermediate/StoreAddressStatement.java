@@ -12,7 +12,7 @@ import x64.X64Context;
 import x64.instructions.MoveInstruction;
 import x64.jni.*;
 import x64.operands.PCRelativeData;
-import x64.operands.RegisterRelativePointer;
+import x64.operands.PseudoRegDisplacement;
 import x64.operands.X64PreservedRegister;
 
 /** store %src at %addr */
@@ -82,7 +82,7 @@ public class StoreAddressStatement implements InterStatement,
 				context.addInstruction(
 					new MoveInstruction(
 						src.toX64(),
-						new RegisterRelativePointer(fieldOffset, object.toX64())
+						new PseudoRegDisplacement(fieldOffset, object.toX64())
 					)
 				);
 			}

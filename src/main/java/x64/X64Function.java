@@ -6,7 +6,7 @@ import x64.directives.*;
 import x64.instructions.*;
 import x64.operands.Immediate;
 import x64.operands.X64PreservedRegister;
-import x64.pseudoInstruction.PseudoInstruction;
+import x64.pseudo.PseudoInstruction;
 
 import java.util.*;
 import java.util.stream.Collectors;

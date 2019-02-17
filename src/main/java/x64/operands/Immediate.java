@@ -1,13 +1,8 @@
 package x64.operands;
 
-import x64.allocation.RegisterMapped;
-import x64.allocation.RegistersUsed;
-
-import java.util.Map;
-
 /** Represents an immediate value that can be directly part of the instruction.
  * The assembler chooses which size of data is necessary for the instruction, but up to 64-bit values are allowed */
-public class Immediate implements SourceOperand {
+public class Immediate {
 
     private long value;
 
@@ -22,20 +17,5 @@ public class Immediate implements SourceOperand {
     @Override
     public String toString() {
         return "$" + value;
-    }
-
-    @Override
-    public void markUsed(int i, RegistersUsed usedRegs) {
-        // doesn't use register
-    }
-
-    @Override
-    public void swapOut(Map<X64PreservedRegister, X64NativeRegister> mapping) {
-        // doesn't use register
-    }
-
-    @Override
-    public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
-        // doesn't use registers
     }
 }

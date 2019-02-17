@@ -3,7 +3,7 @@ package x64;
 import intermediate.InterStructure;
 import org.jetbrains.annotations.NotNull;
 import x64.directives.*;
-import x64.pseudoInstruction.PseudoInstruction;
+import x64.pseudo.PseudoInstruction;
 
 import java.util.ArrayList;
 import java.util.HashMap;

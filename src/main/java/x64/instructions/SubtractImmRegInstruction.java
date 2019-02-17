@@ -1,7 +1,8 @@
 package x64.instructions;
 
 import org.jetbrains.annotations.NotNull;
-import x64.pseudoInstruction.PseudoInstruction;
+import x64.pseudo.BinaryInstruction;
+import x64.pseudo.PseudoInstruction;
 import x64.operands.*;
 
 import java.util.Collections;

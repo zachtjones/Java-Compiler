@@ -1,4 +1,4 @@
-package x64.pseudoInstruction;
+package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.RegisterMapped;
@@ -11,9 +11,9 @@ import java.util.Map;
 /** Represents a call to a register relative memory pointer, callq *16(%q10) for example */
 public class CallRegisterDisplacementPseudo implements PseudoInstruction {
 
-	@NotNull private final RegisterRelativePointer temp;
+	@NotNull private final PseudoRegDisplacement temp;
 
-	public CallRegisterDisplacementPseudo(@NotNull RegisterRelativePointer temp) {
+	public CallRegisterDisplacementPseudo(@NotNull PseudoRegDisplacement temp) {
 		this.temp = temp;
 	}
 

@@ -6,7 +6,7 @@ import x64.allocation.CallingConvention;
 import x64.instructions.MoveInstruction;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
-import x64.pseudoInstruction.PseudoInstruction;
+import x64.pseudo.PseudoInstruction;
 
 import java.util.HashMap;
 import java.util.Map;

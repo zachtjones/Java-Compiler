@@ -1,6 +1,5 @@
 package x64.instructions;
 
-import x64.pseudoInstruction.PseudoInstruction;
 import x64.SymbolNames;
 
 import static x64.allocation.CallingConvention.isLinux;
@@ -9,7 +8,7 @@ import static x64.allocation.CallingConvention.isLinux;
  * Represents a call to a routine specified by the class/method names.
  * These calls should be put in the procedure linkage table
  */
-public class CallClassMethod implements PseudoInstruction {
+public class CallClassMethod extends Instruction {
 
     private final String label;
 
@@ -22,12 +21,7 @@ public class CallClassMethod implements PseudoInstruction {
     }
 
     @Override
-    public boolean isCalling() {
-        return true;
-    }
-
-    @Override
-    public String toString() {
+    public String assemblyRepresentation() {
         return "\tcall " + label;
     }
 }

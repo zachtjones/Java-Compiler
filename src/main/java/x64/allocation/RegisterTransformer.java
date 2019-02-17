@@ -2,7 +2,7 @@ package x64.allocation;
 
 import helper.MapUtils;
 import org.jetbrains.annotations.NotNull;
-import x64.pseudoInstruction.PseudoInstruction;
+import x64.pseudo.PseudoInstruction;
 import x64.X64Context;
 import x64.instructions.*;
 import x64.operands.*;

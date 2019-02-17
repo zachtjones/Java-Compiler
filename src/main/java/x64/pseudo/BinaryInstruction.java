@@ -1,11 +1,10 @@
-package x64.instructions;
+package x64.pseudo;
 
 import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 import x64.operands.DestinationOperand;
-import x64.pseudoInstruction.PseudoInstruction;
+import x64.pseudo.PseudoInstruction;
 import x64.operands.SourceOperand;
-import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 
 import java.util.Map;
@@ -17,7 +16,7 @@ public abstract class BinaryInstruction implements PseudoInstruction {
     private final String name;
 
 
-    BinaryInstruction(String name, SourceOperand source, DestinationOperand destination) {
+    public BinaryInstruction(String name, SourceOperand source, DestinationOperand destination) {
         this.name = name;
         this.source = source;
         this.destination = destination;

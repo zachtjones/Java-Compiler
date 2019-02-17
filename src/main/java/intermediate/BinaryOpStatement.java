@@ -6,7 +6,7 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
-import tree.BinaryOperation;
+import helper.BinaryOperation;
 import x64.X64Context;
 import x64.instructions.MoveInstruction;
 import x64.operands.X64PreservedRegister;

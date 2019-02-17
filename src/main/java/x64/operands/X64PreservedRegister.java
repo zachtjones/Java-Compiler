@@ -2,13 +2,9 @@ package x64.operands;
 
 import org.jetbrains.annotations.NotNull;
 import x64.X64InstructionSize;
-import x64.allocation.RegisterMapped;
-import x64.allocation.RegistersUsed;
-
-import java.util.Map;
 
 /** This is an abstraction of a hardware register that is preserved across function calls */
-public class X64PreservedRegister implements Operand {
+public class X64PreservedRegister {
 
     private final int number;
     private final X64InstructionSize size;
@@ -35,20 +31,5 @@ public class X64PreservedRegister implements Operand {
     @Override
     public String toString() {
         return "%" + size.size + number;
-    }
-
-    @Override
-    public void markUsed(int i, RegistersUsed usedRegs) {
-        usedRegs.markUsed(this, i);
-    }
-
-    @Override
-    public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
-        mapping.get(this).increment();
-    }
-
-    @Override
-    public void markDefined(int i, RegistersUsed usedRegs) {
-        usedRegs.markDefined(this, i);
     }
 }

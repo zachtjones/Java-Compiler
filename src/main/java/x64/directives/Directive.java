@@ -1,7 +1,7 @@
 package x64.directives;
 
 import org.jetbrains.annotations.NotNull;
-import x64.pseudoInstruction.PseudoInstruction;
+import x64.pseudo.PseudoInstruction;
 import x64.operands.BasePointerOffset;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
