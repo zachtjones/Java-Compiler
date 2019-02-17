@@ -1,6 +1,6 @@
 package x64.directives;
 
-public class SegmentChange implements Directive {
+public class SegmentChange extends Directive {
 
     public static final String TEXT = "text";
     public static final String DATA = "data";
@@ -12,7 +12,7 @@ public class SegmentChange implements Directive {
     }
 
     @Override
-    public String toString() {
+    public String assemblyRepresentation() {
         return "." + type;
     }
 }

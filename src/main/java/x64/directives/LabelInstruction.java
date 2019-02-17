@@ -1,6 +1,6 @@
 package x64.directives;
 
-public class LabelInstruction implements Directive {
+public class LabelInstruction extends Directive {
     private final String name;
 
     public LabelInstruction(String name) {
@@ -8,7 +8,7 @@ public class LabelInstruction implements Directive {
     }
 
     @Override
-    public String toString() {
+    public String assemblyRepresentation() {
         return name + ":";
     }
 }

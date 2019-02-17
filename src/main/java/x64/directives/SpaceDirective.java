@@ -1,6 +1,6 @@
 package x64.directives;
 
-public class SpaceDirective implements Directive {
+public class SpaceDirective extends Directive {
 	private int size;
 
 	public SpaceDirective(int size) {
@@ -8,7 +8,7 @@ public class SpaceDirective implements Directive {
 	}
 
 	@Override
-	public String toString() {
+	public String assemblyRepresentation() {
 		return ".space " + size;
 	}
 }
