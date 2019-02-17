@@ -16,7 +16,7 @@ import x64.instructions.MoveInstruction;
 import x64.jni.CallNonVirtualMethodJNI;
 import x64.jni.FindClassJNI;
 import x64.jni.GetMethodIdJNI;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PreservedRegister;
 
 import static x64.allocation.CallingConvention.returnValueRegister;
 
@@ -75,13 +75,13 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 		// if the type of the register is java/*, use JNI
 		if (obj.getType().getClassName(fileName, line).startsWith("java/")) {
 
-			final X64RegisterOperand objReg = obj.toX64();
+			final X64PreservedRegister objReg = obj.toX64();
 
 			// clazz = FindClass
-			final X64RegisterOperand clazz = addFindClassJNICall(context, className);
+			final X64PreservedRegister clazz = addFindClassJNICall(context, className);
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
-			final X64RegisterOperand methodId =
+			final X64PreservedRegister methodId =
 				addGetMethodId(context, clazz, name, args, returnVal);
 
 			// result = CallNonVirtual<Type>Method(JNIEnv, obj, methodID, ...)
@@ -116,6 +116,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			);
 
 			// 3. mov %rax, result
+			if (returnVal != null)
 			context.addInstruction(
 				new MoveInstruction(
 					returnValueRegister(),

@@ -1,4 +1,4 @@
-package x64;
+package x64.pseudoInstruction;
 
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.RegisterMapped;
@@ -10,20 +10,8 @@ import x64.operands.X64PreservedRegister;
 import java.util.List;
 import java.util.Map;
 
-public interface Instruction {
-
-	enum Size {
-        // integer ones, quad can also be pointer
-        BYTE('b'), WORD('w'), LONG('l'), QUAD('q'),
-
-        // floating-point numbers
-        SINGLE('s'), DOUBLE('d');
-
-        public char size;
-        Size(char suffix) {
-            this.size = suffix;
-        }
-    }
+/** These are instructions that deal with pseudo registers, instead of the real ones. */
+public interface PseudoInstruction {
 
     /** Returns true if and only if this instruction is a variety of call */
     default boolean isCalling() {
@@ -42,9 +30,9 @@ public interface Instruction {
      * @return A list of the instructions that result in the allocation.
      * This will be a list of 1+ elements, usually 2 if there's 2 memory operands, but could be more for edge cases.
      */
-    @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PreservedRegister, X64NativeRegister> mapping,
-                                        @NotNull Map<X64PreservedRegister, BasePointerOffset> locals,
-                                        @NotNull X64NativeRegister temporaryImmediate);
+    @NotNull List<@NotNull PseudoInstruction> allocate(@NotNull Map<X64PreservedRegister, X64NativeRegister> mapping,
+                                                       @NotNull Map<X64PreservedRegister, BasePointerOffset> locals,
+                                                       @NotNull X64NativeRegister temporaryImmediate);
 
     /** Increments the priority of the allocated register when it is used.
      * If no pseudo registers are used, don't have to implement this method.

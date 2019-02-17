@@ -2,7 +2,7 @@ package x64.allocation;
 
 import helper.MapUtils;
 import org.jetbrains.annotations.NotNull;
-import x64.Instruction;
+import x64.pseudoInstruction.PseudoInstruction;
 import x64.X64Context;
 import x64.instructions.*;
 import x64.operands.*;
@@ -15,7 +15,7 @@ import static x64.operands.X64NativeRegister.*;
 
 public class RegisterTransformer {
 
-	@NotNull private List<Instruction> initialContents;
+	@NotNull private List<PseudoInstruction> initialContents;
 
 	/** This is r10 + r11, + the unused argument registers */
 	@NotNull private final List<X64NativeRegister> tempsAvailable;
@@ -25,7 +25,7 @@ public class RegisterTransformer {
 	 * @param contents The contents of the function.
 	 * @param context The context to which the function was created.
 	 */
-	public RegisterTransformer(@NotNull List<Instruction> contents, X64Context context) {
+	public RegisterTransformer(@NotNull List<PseudoInstruction> contents, X64Context context) {
 		this.initialContents = contents;
 
 		tempsAvailable = new ArrayList<>(Arrays.asList(CallingConvention.temporaryRegisters()));
@@ -37,8 +37,8 @@ public class RegisterTransformer {
 	}
 
 	public static class AllocationUnit {
-		public final Deque<Instruction> prologue = new LinkedList<>();
-		public final Deque<Instruction> epilogue = new LinkedList<>();
+		public final Deque<PseudoInstruction> prologue = new LinkedList<>();
+		public final Deque<PseudoInstruction> epilogue = new LinkedList<>();
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class RegisterTransformer {
 		// determine the usages of the registers, as well as which ones are used across function calls
 		RegistersUsed usedRegs = new RegistersUsed();
 		for (int i = 0; i < initialContents.size(); i++) {
-			final Instruction temp = initialContents.get(i);
+			final PseudoInstruction temp = initialContents.get(i);
 			temp.markRegisters(i, usedRegs);
 			if (temp.isCalling()) {
 				usedRegs.markFunctionCall(i);
@@ -249,7 +249,7 @@ public class RegisterTransformer {
 		// Could also do some prediction based on other heuristics, like forward jumps as well
 
 		// right now, a simple priority incremented by the number of usages
-		for (Instruction i : initialContents) {
+		for (PseudoInstruction i : initialContents) {
 			i.prioritizeRegisters(mapping);
 		}
 

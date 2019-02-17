@@ -11,7 +11,7 @@ import x64.instructions.MoveInstruction;
 import x64.jni.FindClassJNI;
 import x64.jni.GetStaticFieldIdJNI;
 import x64.jni.GetStaticFieldJNI;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PreservedRegister;
 
 import static x64.operands.PCRelativeData.fromField;
 
@@ -67,10 +67,10 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 
 			// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
 			//    - name is like: java/lang/String
-			final X64RegisterOperand classReg = addFindClassJNICall(context, className);
+			final X64PreservedRegister classReg = addFindClassJNICall(context, className);
 
 			// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
-			final X64RegisterOperand fieldIDReg =
+			final X64PreservedRegister fieldIDReg =
 				addGetStaticFieldIdJNICall(result, fieldName, classReg, context);
 
 

@@ -13,7 +13,7 @@ import x64.jni.FindClassJNI;
 import x64.jni.GetInstanceFieldIdJNI;
 import x64.jni.GetInstanceFieldJNI;
 import x64.operands.RegisterRelativePointer;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PreservedRegister;
 
 public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, GetInstanceFieldIdJNI, GetInstanceFieldJNI {
 	@NotNull private Register instance;
@@ -65,11 +65,11 @@ public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, 
 
 			// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
 			//    - name is like: java/lang/String
-			final X64RegisterOperand classReg = addFindClassJNICall(context, className);
+			final X64PreservedRegister classReg = addFindClassJNICall(context, className);
 
 			// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
 			// src holds the type
-			final X64RegisterOperand fieldIDReg =
+			final X64PreservedRegister fieldIDReg =
 				addGetInstanceFieldIdJNICall(instance, fieldName, classReg, context);
 
 

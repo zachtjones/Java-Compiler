@@ -1,7 +1,7 @@
 package x64.operands;
 
 import org.jetbrains.annotations.NotNull;
-import x64.Instruction;
+import x64.X64InstructionSize;
 import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 
@@ -11,13 +11,13 @@ import java.util.Map;
 public class X64PreservedRegister implements Operand {
 
     private final int number;
-    private final Instruction.Size size;
-    public X64PreservedRegister(int number, @NotNull Instruction.Size size) {
+    private final X64InstructionSize size;
+    public X64PreservedRegister(int number, @NotNull X64InstructionSize size) {
         this.number = number;
         this.size = size;
     }
 
-    public Instruction.Size getSuffix() {
+    public X64InstructionSize getSuffix() {
         return size;
     }
 

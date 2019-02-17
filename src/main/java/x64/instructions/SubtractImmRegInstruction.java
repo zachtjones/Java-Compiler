@@ -1,7 +1,7 @@
 package x64.instructions;
 
 import org.jetbrains.annotations.NotNull;
-import x64.Instruction;
+import x64.pseudoInstruction.PseudoInstruction;
 import x64.operands.*;
 
 import java.util.Collections;
@@ -19,9 +19,9 @@ public class SubtractImmRegInstruction extends BinaryInstruction {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PreservedRegister, X64NativeRegister> mapping,
-														@NotNull Map<X64PreservedRegister, BasePointerOffset> locals,
-														@NotNull X64NativeRegister temporaryImmediate) {
+	public @NotNull List<@NotNull PseudoInstruction> allocate(@NotNull Map<X64PreservedRegister, X64NativeRegister> mapping,
+															  @NotNull Map<X64PreservedRegister, BasePointerOffset> locals,
+															  @NotNull X64NativeRegister temporaryImmediate) {
 		return Collections.singletonList(this);
 	}
 }

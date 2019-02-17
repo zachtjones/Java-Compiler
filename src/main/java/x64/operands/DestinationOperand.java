@@ -1,6 +1,6 @@
 package x64.operands;
 
-import x64.Instruction;
+import x64.X64InstructionSize;
 import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 public interface DestinationOperand {
 
     /** The instruction size that should be selected to use this destination operand. */
-    Instruction.Size getSuffix();
+    X64InstructionSize getSuffix();
 
     /** How this source operand should be written in x64 */
     String toString();

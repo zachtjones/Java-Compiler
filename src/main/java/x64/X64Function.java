@@ -6,6 +6,7 @@ import x64.directives.*;
 import x64.instructions.*;
 import x64.operands.Immediate;
 import x64.operands.X64PreservedRegister;
+import x64.pseudoInstruction.PseudoInstruction;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,8 +16,8 @@ import static x64.operands.X64NativeRegister.RSP;
 
 public class X64Function {
 
-	private final ArrayList<Instruction> header = new ArrayList<>();
-	private ArrayList<Instruction> contents = new ArrayList<>();
+	private final ArrayList<PseudoInstruction> header = new ArrayList<>();
+	private ArrayList<PseudoInstruction> contents = new ArrayList<>();
 	private final X64Context context;
 
 	@Nullable private RegisterTransformer.AllocationUnit au = null;
@@ -40,7 +41,7 @@ public class X64Function {
 	}
 
 	/** Adds an instruction to this function */
-	public void addInstruction(Instruction instruction) {
+	public void addInstruction(PseudoInstruction instruction) {
 		this.contents.add(instruction);
 	}
 
@@ -54,7 +55,7 @@ public class X64Function {
 	@Override
 	public String toString() {
 
-		final List<Instruction> allInstructions = new ArrayList<>(header);
+		final List<PseudoInstruction> allInstructions = new ArrayList<>(header);
 
 		if (au != null) allInstructions.addAll(au.prologue);
 
@@ -71,7 +72,7 @@ public class X64Function {
 		allInstructions.add(ReturnInstruction.instance);
 
 		return allInstructions.stream()
-				.map(Instruction::toString)
+				.map(PseudoInstruction::toString)
 				.collect(Collectors.joining("\n"));
 	}
 }

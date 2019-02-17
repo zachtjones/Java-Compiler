@@ -6,6 +6,7 @@ import x64.allocation.CallingConvention;
 import x64.instructions.MoveInstruction;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
+import x64.pseudoInstruction.PseudoInstruction;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class X64Context {
 	/** Returns the next pseudo register available that is a quad-word size (64-bit) */
 	public X64PreservedRegister getNextQuadRegister() {
 		nextRegister++;
-		return new X64PreservedRegister(nextRegister, Instruction.Size.QUAD);
+		return new X64PreservedRegister(nextRegister, X64InstructionSize.QUAD);
 	}
 
 	/** returns the argument number that is the highest number used */
@@ -72,7 +73,7 @@ public class X64Context {
 	}
 
 	/** Adds the instruction into the function being created. */
-	public void addInstruction(Instruction instruction) {
+	public void addInstruction(PseudoInstruction instruction) {
 		this.function.addInstruction(instruction);
 	}
 

@@ -12,12 +12,11 @@ import x64.instructions.MoveInstruction;
 import x64.jni.CallStaticMethodJNI;
 import x64.jni.FindClassJNI;
 import x64.jni.GetStaticMethodIdJNI;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PreservedRegister;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.stream.Collectors;
 
 import static x64.allocation.CallingConvention.returnValueRegister;
 
@@ -76,10 +75,10 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 		if (className.startsWith("java/")) {
 
 			// clazz = FindClass
-			final X64RegisterOperand clazz = addFindClassJNICall(context, className);
+			final X64PreservedRegister clazz = addFindClassJNICall(context, className);
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
-			final X64RegisterOperand methodId =
+			final X64PreservedRegister methodId =
 				addGetStaticMethodId(context, clazz, functionName, args, returnVal);
 
 			// result = CallNonVirtual<Type>Method(JNIEnv, clazz, methodID, ...)

@@ -1,6 +1,6 @@
 package x64.operands;
 
-import x64.Instruction;
+import x64.X64InstructionSize;
 import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 
@@ -10,16 +10,22 @@ import java.util.Map;
 public class RegisterRelativePointer implements Operand {
 
     private final int offset;
-    private X64PreservedRegister register;
+
+    private final X64PreservedRegister register;
 
     public RegisterRelativePointer(int offset, X64PreservedRegister register) {
         this.offset = offset;
         this.register = register;
     }
 
+    /** Returns the register that this is an offset of */
+    public X64PreservedRegister getRegister() {
+        return register;
+    }
+
     @Override
-    public Instruction.Size getSuffix() {
-        return Instruction.Size.QUAD;
+    public X64InstructionSize getSuffix() {
+        return X64InstructionSize.QUAD;
     }
 
     @Override

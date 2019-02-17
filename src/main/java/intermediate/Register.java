@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import tree.Expression;
 import tree.NodeImpl;
 import tree.SymbolTable;
-import x64.Instruction;
+import x64.X64InstructionSize;
 import x64.operands.X64PreservedRegister;
 
 /**
@@ -98,7 +98,7 @@ public class Register extends NodeImpl implements Expression {
 	}
 
 	/** Returns the instruction size that is suitable for this instruction, for the x64 architecture */
-	public Instruction.Size x64Type() {
+	public X64InstructionSize x64Type() {
 		return type.x64Type();
     }
 

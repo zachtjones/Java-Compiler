@@ -1,9 +1,7 @@
 package x64.instructions;
 
-import x64.Instruction;
-
 /** Represents the simple return instruction, which pops the return address & jumps back. */
-public class ReturnInstruction implements Instruction {
+public class ReturnInstruction extends Instruction {
 
     /** represents the instance of a return instruction.
      * Since all are identical, there's no need to create a bunch*/
@@ -13,7 +11,7 @@ public class ReturnInstruction implements Instruction {
     private ReturnInstruction() {}
 
     @Override
-    public String toString() {
+    public String assemblyRepresentation() {
         return "\tret";
     }
 }

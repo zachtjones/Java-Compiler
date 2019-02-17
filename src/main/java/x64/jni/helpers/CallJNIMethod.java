@@ -1,7 +1,7 @@
 package x64.jni.helpers;
 
 import x64.X64Context;
-import x64.instructions.CallFunctionPointerInstruction;
+import x64.pseudoInstruction.CallRegisterDisplacementPseudo;
 import x64.instructions.MoveInstruction;
 import x64.jni.JNIOffsets;
 import x64.operands.*;
@@ -25,7 +25,7 @@ public interface CallJNIMethod {
 
         // call *JNI_METHOD_OFFSET(%javaEnv)
         context.addInstruction(
-            new CallFunctionPointerInstruction(
+            new CallRegisterDisplacementPseudo(
                 new RegisterRelativePointer(jniOffset.getOffset(), temp)
             )
         );

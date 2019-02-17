@@ -1,6 +1,6 @@
 package x64.operands;
 
-import x64.Instruction;
+import x64.X64InstructionSize;
 import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 
@@ -14,8 +14,8 @@ public class MemoryAtRegister implements Operand {
     }
 
     @Override
-    public Instruction.Size getSuffix() {
-        return Instruction.Size.QUAD;
+    public X64InstructionSize getSuffix() {
+        return X64InstructionSize.QUAD;
     }
 
     @Override

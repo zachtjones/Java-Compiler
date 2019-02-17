@@ -7,7 +7,7 @@ import helper.Types;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.instructions.MoveInstruction;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PreservedRegister;
 
 /** getLocal %register = name */
 public class GetLocalStatement implements InterStatement {
@@ -50,7 +50,7 @@ public class GetLocalStatement implements InterStatement {
 
 	@Override
 	public void compile(@NotNull X64Context context) throws CompileException {
-		final X64RegisterOperand source = context.getLocalVariable(localName);
+		final X64PreservedRegister source = context.getLocalVariable(localName);
 
 		// move the register over
 		context.addInstruction(

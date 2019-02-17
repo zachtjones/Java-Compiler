@@ -1,7 +1,7 @@
 package tree;
 
 import org.jetbrains.annotations.NotNull;
-import x64.Instruction;
+import x64.pseudoInstruction.PseudoInstruction;
 import x64.instructions.AddInstruction;
 import x64.instructions.SubtractImmRegInstruction;
 import x64.operands.DestinationOperand;
@@ -32,7 +32,7 @@ public enum BinaryOperation {
 	 * @param destination The operation that is used as the destination.
 	 * @return The instruction created.
 	 */
-	@NotNull public Instruction getInstruction(SourceOperand source, DestinationOperand destination) {
+	@NotNull public PseudoInstruction getInstruction(SourceOperand source, DestinationOperand destination) {
 		switch (this){
 			case ADD:
 				return new AddInstruction(source, destination);

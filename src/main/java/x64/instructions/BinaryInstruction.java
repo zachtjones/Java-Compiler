@@ -3,14 +3,14 @@ package x64.instructions;
 import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 import x64.operands.DestinationOperand;
-import x64.Instruction;
+import x64.pseudoInstruction.PseudoInstruction;
 import x64.operands.SourceOperand;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 
 import java.util.Map;
 
-public abstract class BinaryInstruction implements Instruction {
+public abstract class BinaryInstruction implements PseudoInstruction {
 
     private final SourceOperand source;
     private final DestinationOperand destination;
@@ -30,12 +30,6 @@ public abstract class BinaryInstruction implements Instruction {
     }
 
     @Override
-    public void allocateRegisters(Map<X64PreservedRegister, X64NativeRegister> mapping) {
-        source.swapOut(mapping);
-        destination.swapOut(mapping);
-    }
-
-    @Override
     public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
         source.prioritizeRegisters(mapping);
         destination.prioritizeRegisters(mapping);
@@ -44,7 +38,7 @@ public abstract class BinaryInstruction implements Instruction {
     /** Represents how this instruction should be represented */
     @Override
     public final String toString() {
-        return '\t' + name + destination.getSuffix().size + " " +
+        return '\t' + name + destination.getSuffix() + " " +
                 source.toString() + ", " + destination.toString();
     }
 }

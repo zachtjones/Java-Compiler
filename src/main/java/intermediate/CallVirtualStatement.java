@@ -3,7 +3,6 @@ package intermediate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.stream.Collectors;
 
 import helper.CompileException;
 import helper.Types;
@@ -17,7 +16,7 @@ import x64.instructions.MoveInstruction;
 import x64.jni.CallMethodJNI;
 import x64.jni.GetMethodIdJNI;
 import x64.jni.GetObjectClassJNI;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PreservedRegister;
 
 import static x64.allocation.CallingConvention.returnValueRegister;
 
@@ -81,13 +80,13 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 		final String classname = obj.getType().getClassName(fileName, line);
 		if (classname.startsWith("java/")) {
 
-			final X64RegisterOperand objReg = obj.toX64();
+			final X64PreservedRegister objReg = obj.toX64();
 
 			// clazz = GetClass
-			final X64RegisterOperand clazz = addGetObjectClass(context, objReg);
+			final X64PreservedRegister clazz = addGetObjectClass(context, objReg);
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
-			X64RegisterOperand methodId = addGetMethodId(context, clazz, name, args, returnVal);
+			final X64PreservedRegister methodId = addGetMethodId(context, clazz, name, args, returnVal);
 
 			// result = Call<Type>Method(JNIEnv, obj, methodID, ...)
 			addCallMethodJNI(context, objReg, methodId, args, returnVal);

@@ -9,7 +9,7 @@ import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.instructions.MoveInstruction;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PreservedRegister;
 
 /** PutLocal name = %register */
 public class PutLocalStatement implements InterStatement {
@@ -50,7 +50,7 @@ public class PutLocalStatement implements InterStatement {
 
 	@Override
 	public void compile(@NotNull X64Context context) throws CompileException {
-		final X64RegisterOperand destination = context.getLocalVariable(localName);
+		final X64PreservedRegister destination = context.getLocalVariable(localName);
 
 		// copy the result over to the destination
 		context.addInstruction(

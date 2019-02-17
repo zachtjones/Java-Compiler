@@ -13,7 +13,7 @@ import x64.instructions.MoveInstruction;
 import x64.jni.*;
 import x64.operands.PCRelativeData;
 import x64.operands.RegisterRelativePointer;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PreservedRegister;
 
 /** store %src at %addr */
 public class StoreAddressStatement implements InterStatement,
@@ -60,11 +60,11 @@ public class StoreAddressStatement implements InterStatement,
 
 				// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
 				//    - name is like: java/lang/String
-				final X64RegisterOperand classReg = addFindClassJNICall(context, className);
+				final X64PreservedRegister classReg = addFindClassJNICall(context, className);
 
 				// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
 				// src holds the type
-				final X64RegisterOperand fieldIDReg =
+				final X64PreservedRegister fieldIDReg =
 					addGetInstanceFieldIdJNICall(src, fieldName, classReg, context);
 
 
@@ -93,11 +93,11 @@ public class StoreAddressStatement implements InterStatement,
 			if (className.startsWith("java/")) {
 
 				// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
-				final X64RegisterOperand classReg = addFindClassJNICall(context, className);
+				final X64PreservedRegister classReg = addFindClassJNICall(context, className);
 
 				// Step 2. fieldID = javaEnv -> GetStaticFieldID(JNIEnv *env, class, char *name, char *sig);
 				// src holds the type
-				final X64RegisterOperand fieldIDReg =
+				final X64PreservedRegister fieldIDReg =
 					addGetStaticFieldIdJNICall(src, fieldName, classReg, context);
 
 				// Step 3. javaEnv -> SetStatic<Type>Field(JNIEnv *env, class, fieldID, value)
