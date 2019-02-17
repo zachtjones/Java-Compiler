@@ -140,7 +140,7 @@ public class RegisterTransformer {
 			if (totalPreserved % 2 == 0) {
 				// move another 8 bytes to maintains 16 byte alignment on function calls
 				au.prologue.add(new SubtractImmRegInstruction(new Immediate(8), RSP));
-				au.epilogue.addFirst(new AddInstruction(new Immediate(8), RSP));
+				au.epilogue.addFirst(new AddImmRegInstruction(new Immediate(8), RSP));
 			}
 
 			return au;
@@ -165,14 +165,14 @@ public class RegisterTransformer {
 
 			// preserve base pointer & set to the base of the stack frame
 			au.prologue.add(new PushNativeRegInstruction(RBP)); // stack now has even number pushed
-			au.prologue.add(new MoveInstruction(RSP, RBP));
+			au.prologue.add(new MoveRegToRegInstruction(RSP, RBP));
 
 			// spaceNeeded should be oddNumber * 8.
 			au.prologue.add(new SubtractImmRegInstruction(new Immediate(spaceNeeded), RSP));
 
 			// restore stack and base pointer
 			au.epilogue.addFirst(new PopNativeRegInstruction(RBP));
-			au.epilogue.addFirst(new MoveInstruction(RBP, RSP));
+			au.epilogue.addFirst(new MoveRegToRegInstruction(RBP, RSP));
 
 			return au;
 		}

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.instructions.MoveInstruction;
 import x64.jni.*;
-import x64.operands.PCRelativeData;
+import x64.operands.RIPRelativeData;
 import x64.operands.PseudoRegDisplacement;
 import x64.operands.X64PreservedRegister;
 
@@ -108,7 +108,7 @@ public class StoreAddressStatement implements InterStatement,
 				context.addInstruction(
 					new MoveInstruction(
 						src.toX64(),
-						PCRelativeData.fromField(className, fieldName, src)
+						RIPRelativeData.fromField(className, fieldName, src)
 					)
 				);
 			}

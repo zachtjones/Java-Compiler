@@ -1,12 +1,12 @@
 package x64.jni;
 
 import x64.X64Context;
-import x64.instructions.LoadEffectiveAddressInstruction;
+import x64.pseudo.LoadEffectiveAddressRIPPseudo;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.*;
 
 import static x64.jni.JNIOffsets.FIND_CLASS;
-import static x64.operands.PCRelativeData.pointerFromLabel;
+import static x64.operands.RIPRelativeData.pointerFromLabel;
 
 public interface FindClassJNI extends CallJNIMethod {
 
@@ -25,7 +25,7 @@ public interface FindClassJNI extends CallJNIMethod {
         // leaq NEW_STRING_REFERENCE(%rip), %arg2
         String label = context.insertDataString(className);
         context.addInstruction(
-            new LoadEffectiveAddressInstruction(
+            new LoadEffectiveAddressRIPPseudo(
                 pointerFromLabel(label),
                 context.argumentRegister(2)
             )

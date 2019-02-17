@@ -4,15 +4,14 @@ import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-import x64.instructions.LoadEffectiveAddressInstruction;
+import x64.pseudo.LoadEffectiveAddressRIPPseudo;
 import x64.instructions.MoveInstruction;
 import x64.jni.NewStringUTF_JNI;
 import x64.operands.Immediate;
+import x64.operands.RIPRelativeData;
 import x64.operands.X64PreservedRegister;
 
 import java.util.HashMap;
-
-import static x64.operands.PCRelativeData.pointerFromLabel;
 
 /** load 10 into %i12; load "hello, world" into %r4, ... */
 public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
@@ -146,8 +145,8 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 			// leaq LABEL(%rip), %temp
 			X64PreservedRegister chars = context.getNextQuadRegister();
 			context.addInstruction(
-				new LoadEffectiveAddressInstruction(
-					pointerFromLabel(label),
+				new LoadEffectiveAddressRIPPseudo(
+					RIPRelativeData.pointerFromLabel(label),
 					chars
 				)
 			);

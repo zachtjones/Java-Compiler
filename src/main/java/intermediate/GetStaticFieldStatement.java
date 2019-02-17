@@ -13,7 +13,7 @@ import x64.jni.GetStaticFieldIdJNI;
 import x64.jni.GetStaticFieldJNI;
 import x64.operands.X64PreservedRegister;
 
-import static x64.operands.PCRelativeData.fromField;
+import static x64.operands.RIPRelativeData.fromField;
 
 public class GetStaticFieldStatement implements InterStatement, FindClassJNI, GetStaticFieldIdJNI, GetStaticFieldJNI {
 	@NotNull private final String className;

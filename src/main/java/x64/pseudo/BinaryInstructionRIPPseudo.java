@@ -1,22 +1,24 @@
 package x64.pseudo;
 
+import org.jetbrains.annotations.NotNull;
 import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
-import x64.operands.DestinationOperand;
-import x64.pseudo.PseudoInstruction;
-import x64.operands.SourceOperand;
+import x64.operands.RIPRelativeData;
 import x64.operands.X64PreservedRegister;
 
 import java.util.Map;
 
-public abstract class BinaryInstruction implements PseudoInstruction {
+public abstract class BinaryInstructionRIPPseudo implements PseudoInstruction {
 
-    private final SourceOperand source;
-    private final DestinationOperand destination;
+    @NotNull
+	public final RIPRelativeData source;
+    @NotNull
+    public final X64PreservedRegister destination;
     private final String name;
 
 
-    public BinaryInstruction(String name, SourceOperand source, DestinationOperand destination) {
+    public BinaryInstructionRIPPseudo(String name, @NotNull RIPRelativeData source,
+                                      @NotNull X64PreservedRegister destination) {
         this.name = name;
         this.source = source;
         this.destination = destination;
@@ -24,20 +26,18 @@ public abstract class BinaryInstruction implements PseudoInstruction {
 
     @Override
     public void markRegisters(int i, RegistersUsed usedRegs) {
-        source.markUsed(i, usedRegs);
-        destination.markDefined(i, usedRegs);
+        usedRegs.markDefined(destination, i);
     }
 
     @Override
     public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
-        source.prioritizeRegisters(mapping);
-        destination.prioritizeRegisters(mapping);
+        mapping.get(destination).increment();
     }
 
     /** Represents how this instruction should be represented */
     @Override
     public final String toString() {
-        return '\t' + name + destination.getSuffix() + " " +
+        return '\t' + name + " " +
                 source.toString() + ", " + destination.toString();
     }
 }

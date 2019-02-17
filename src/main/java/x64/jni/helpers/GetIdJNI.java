@@ -1,12 +1,12 @@
 package x64.jni.helpers;
 
 import x64.X64Context;
-import x64.instructions.LoadEffectiveAddressInstruction;
+import x64.pseudo.LoadEffectiveAddressRIPPseudo;
+import x64.instructions.LoadEffectiveAddressRIPRegister;
 import x64.instructions.MoveInstruction;
 import x64.jni.JNIOffsets;
 import x64.operands.*;
-
-import static x64.allocation.CallingConvention.argumentRegister;
+import x64.pseudo.MovePseudoRegToReg;
 
 
 public interface GetIdJNI extends CallJNIMethod {
@@ -23,7 +23,7 @@ public interface GetIdJNI extends CallJNIMethod {
 
         // mov %classReg, %arg2
         context.addInstruction(
-            new MoveInstruction(
+            new MovePseudoRegToReg(
                 classReg,
                 context.argumentRegister(2)
             )
@@ -32,8 +32,8 @@ public interface GetIdJNI extends CallJNIMethod {
         // add field name to the data strings -> %arg3
         String fieldNameLabel = context.insertDataString(fieldOrMethodName);
         context.addInstruction(
-            new LoadEffectiveAddressInstruction(
-                PCRelativeData.pointerFromLabel(fieldNameLabel),
+            new LoadEffectiveAddressRIPRegister(
+                RIPRelativeData.pointerFromLabel(fieldNameLabel),
                 context.argumentRegister(3)
             )
         );
@@ -41,8 +41,8 @@ public interface GetIdJNI extends CallJNIMethod {
         // add the signature of the field type -> %arg4
         final String fieldTypeLabel = context.insertDataString(signature);
         context.addInstruction(
-            new LoadEffectiveAddressInstruction(
-                PCRelativeData.pointerFromLabel(fieldTypeLabel),
+            new LoadEffectiveAddressRIPPseudo(
+                RIPRelativeData.pointerFromLabel(fieldTypeLabel),
                 context.argumentRegister(4)
             )
         );
