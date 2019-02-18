@@ -17,7 +17,7 @@ public abstract class BinaryBasePointerOffsetToReg extends Instruction {
      * @param source The base pointer offset source.
      * @param destination The register destination.
      */
-    public BinaryBasePointerOffsetToReg(@NotNull String name, @NotNull BasePointerOffset source,
+    BinaryBasePointerOffsetToReg(@NotNull String name, @NotNull BasePointerOffset source,
 										@NotNull X64NativeRegister destination) {
         this.name = name;
         this.source = source;
@@ -27,7 +27,7 @@ public abstract class BinaryBasePointerOffsetToReg extends Instruction {
     /** Represents how this instruction should be represented */
     @Override
     public final String assemblyRepresentation() {
-        return '\t' + name + destination.getSuffix() +
+        return '\t' + name + destination.getSuffix() + " " +
                 source.toString() + ", " + destination.toString();
     }
 }
