@@ -8,6 +8,6 @@ import x64.operands.X64NativeRegister;
 public class AddImmReg extends BinaryImmToReg {
 
 	public AddImmReg(@NotNull Immediate source, @NotNull X64NativeRegister destination) {
-		super("sub", source, destination);
+		super("add", source, destination);
 	}
 }

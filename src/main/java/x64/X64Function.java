@@ -19,6 +19,7 @@ public class X64Function {
 
 	private final ArrayList<PseudoInstruction> header = new ArrayList<>();
 	private ArrayList<PseudoInstruction> contents = new ArrayList<>();
+
 	private final X64Context context;
 
 	@Nullable private RegisterTransformer.AllocationUnit au = null;
@@ -63,7 +64,11 @@ public class X64Function {
 		if (needsToAllocate32BytesForArgs())
 			allInstructions.add(new SubtractImmToReg(new Immediate(32), RSP));
 
-		allInstructions.addAll(contents);
+		if (au == null) {
+			allInstructions.addAll(contents);
+		} else {
+			allInstructions.addAll(au.instructions);
+		}
 
 		if (needsToAllocate32BytesForArgs())
 			allInstructions.add(new AddImmReg(new Immediate(32), RSP));

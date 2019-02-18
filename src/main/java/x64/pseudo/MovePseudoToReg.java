@@ -24,7 +24,7 @@ public class MovePseudoToReg extends BinaryPseudoToReg {
 														@NotNull Map<X64PreservedRegister, BasePointerOffset> locals,
 														@NotNull X64NativeRegister temporaryImmediate) {
 
-		if (locals.containsKey(source)) {
+		if (mapping.containsKey(source)) {
 			return Collections.singletonList(
 				new MoveRegToReg(mapping.get(source), destination)
 			);

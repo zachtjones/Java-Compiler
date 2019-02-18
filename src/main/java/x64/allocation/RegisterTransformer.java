@@ -20,6 +20,8 @@ public class RegisterTransformer {
 	/** This is r10 + r11, + the unused argument registers */
 	@NotNull private final List<X64NativeRegister> tempsAvailable;
 
+	private List<Instruction> results = null;
+
 	/***
 	 * Creates a register transformer, used to transform pseudo registers into real ones.
 	 * @param contents The contents of the function.
@@ -39,6 +41,11 @@ public class RegisterTransformer {
 	public static class AllocationUnit {
 		public final Deque<PseudoInstruction> prologue = new LinkedList<>();
 		public final Deque<PseudoInstruction> epilogue = new LinkedList<>();
+		@NotNull public final List<Instruction> instructions;
+
+		AllocationUnit(@NotNull List<Instruction> instructions) {
+			this.instructions = instructions;
+		}
 	}
 
 	/**
@@ -119,13 +126,13 @@ public class RegisterTransformer {
 
 			// obtain the new list of instructions, with them swapped out
 			Map<X64PreservedRegister, BasePointerOffset> locals = new HashMap<>();
-			initialContents = initialContents.stream()
+			List<Instruction> results = initialContents.stream()
 				.map(i -> i.allocate(nativeMapping, locals, R10))
 				.flatMap(Collection::stream)
 				.collect(Collectors.toList());
 
 			// determine the function prologue and epilogue
-			AllocationUnit au = new AllocationUnit();
+			AllocationUnit au = new AllocationUnit(results);
 			X64NativeRegister[] preserved = CallingConvention.preservedRegisters();
 
 			int totalPreserved = maxPreserved;
@@ -153,7 +160,7 @@ public class RegisterTransformer {
 			int spaceNeeded = rbpTransform(mapping, tempsAvailable);
 
 			// we know we use all the registers, can't use the base pointer elsewhere
-			AllocationUnit au = new AllocationUnit();
+			AllocationUnit au = new AllocationUnit(results);
 			X64NativeRegister[] preservedLeft = CallingConvention.preservedRegistersNotRBP();
 
 			// epilogue is kept in the order by addFirst on all calls
@@ -291,7 +298,7 @@ public class RegisterTransformer {
 		HashMap<X64PreservedRegister, X64NativeRegister> natives = MapUtils.map(mapping, nativeAllocations);
 		HashMap<X64PreservedRegister, BasePointerOffset> locals = MapUtils.map(mapping, basePointerOffsets);
 
-		this.initialContents = initialContents.stream()
+		this.results = initialContents.stream()
 			.map(i -> i.allocate(natives, locals, temporaryIntermediate)) // Stream<List<Instruction>>
 			.flatMap(Collection::stream) // 'flattens' the stream of lists into a stream of instructions
 			.collect(Collectors.toList());

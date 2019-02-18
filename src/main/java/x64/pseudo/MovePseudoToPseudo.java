@@ -26,8 +26,8 @@ public class MovePseudoToPseudo extends BinaryPseudoToPseudo {
 														@NotNull Map<X64PreservedRegister, BasePointerOffset> locals,
 														@NotNull X64NativeRegister temporaryImmediate) {
 
-		if (locals.containsKey(source)) {
-			if (locals.containsKey(destination)) {
+		if (mapping.containsKey(source)) {
+			if (mapping.containsKey(destination)) {
 				// both are real registers
 				return Collections.singletonList(
 					new MoveRegToReg(mapping.get(source), mapping.get(destination))
@@ -39,7 +39,7 @@ public class MovePseudoToPseudo extends BinaryPseudoToPseudo {
 				);
 			}
 		} else {
-			if (locals.containsKey(destination)) {
+			if (mapping.containsKey(destination)) {
 				// source -- base pointer, destination, real
 				return Collections.singletonList(
 					new MoveBasePointerOffsetToReg(locals.get(source), mapping.get(destination))
