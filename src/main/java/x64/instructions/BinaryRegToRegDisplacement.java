@@ -2,11 +2,11 @@ package x64.instructions;
 
 import org.jetbrains.annotations.NotNull;
 import x64.operands.RegDisplacement;
-import x64.operands.X64NativeRegister;
+import x64.operands.X64Register;
 
 public abstract class BinaryRegToRegDisplacement extends Instruction {
 
-    @NotNull private final X64NativeRegister source;
+    @NotNull private final X64Register source;
     @NotNull private final RegDisplacement destination;
     @NotNull private final String name;
 
@@ -17,7 +17,7 @@ public abstract class BinaryRegToRegDisplacement extends Instruction {
      * @param source The register source.
      * @param destination The register destination.
      */
-    public BinaryRegToRegDisplacement(@NotNull String name, @NotNull X64NativeRegister source,
+    public BinaryRegToRegDisplacement(@NotNull String name, @NotNull X64Register source,
 									  @NotNull RegDisplacement destination) {
         this.name = name;
         this.source = source;

@@ -7,7 +7,7 @@ import x64.X64InstructionSize;
  * The only register that exists that is not a part of this set is the instruction pointer,
  *   which can only be used indirectly as an offset.
  */
-public enum X64NativeRegister {
+public enum X64Register {
 	RAX("rax"), RBX("rbx"), RCX("rcx"), RDX("rdx"),
 	RDI("rdi"), RSI("rsi"), RBP("rbp"), RSP("rsp"),
 	R8("r8"),   R9("r9"),   R10("r10"), R11("r11"),
@@ -17,7 +17,7 @@ public enum X64NativeRegister {
 	/** How this x64 machine register is represented in the assembly language*/
 	private final String representation;
 
-	X64NativeRegister(String representation) {
+	X64Register(String representation) {
 		this.representation = "%" + representation;
 	}
 

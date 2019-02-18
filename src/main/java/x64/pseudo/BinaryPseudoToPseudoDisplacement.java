@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 import x64.operands.PseudoDisplacement;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 
 import java.util.Map;
 
@@ -13,12 +13,12 @@ import java.util.Map;
  */
 public abstract class BinaryPseudoToPseudoDisplacement implements PseudoInstruction {
 
-	@NotNull public final X64PreservedRegister source;
+	@NotNull public final X64PseudoRegister source;
 	@NotNull public final PseudoDisplacement destination;
 	@NotNull private final String name;
 
 
-	public BinaryPseudoToPseudoDisplacement(@NotNull String name, @NotNull X64PreservedRegister source,
+	public BinaryPseudoToPseudoDisplacement(@NotNull String name, @NotNull X64PseudoRegister source,
 											@NotNull PseudoDisplacement destination) {
 		this.name = name;
 		this.source = source;
@@ -31,7 +31,7 @@ public abstract class BinaryPseudoToPseudoDisplacement implements PseudoInstruct
 	}
 
 	@Override
-	public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
+	public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
 		mapping.get(source).increment();
 	}
 

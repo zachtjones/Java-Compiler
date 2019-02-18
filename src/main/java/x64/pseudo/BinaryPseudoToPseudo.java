@@ -3,8 +3,7 @@ package x64.pseudo;
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
-import x64.operands.X64NativeRegister;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 
 import java.util.Map;
 
@@ -13,13 +12,13 @@ import java.util.Map;
  */
 public abstract class BinaryPseudoToPseudo implements PseudoInstruction {
 
-	@NotNull public final X64PreservedRegister source;
-	@NotNull public final X64PreservedRegister destination;
+	@NotNull public final X64PseudoRegister source;
+	@NotNull public final X64PseudoRegister destination;
 	@NotNull private final String name;
 
 
-	BinaryPseudoToPseudo(@NotNull String name, @NotNull X64PreservedRegister source,
-								@NotNull X64PreservedRegister destination) {
+	BinaryPseudoToPseudo(@NotNull String name, @NotNull X64PseudoRegister source,
+								@NotNull X64PseudoRegister destination) {
 		this.name = name;
 		this.source = source;
 		this.destination = destination;
@@ -32,7 +31,7 @@ public abstract class BinaryPseudoToPseudo implements PseudoInstruction {
 	}
 
 	@Override
-	public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
+	public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
 		mapping.get(source).increment();
 	}
 

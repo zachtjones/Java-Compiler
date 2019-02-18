@@ -14,14 +14,14 @@ import java.util.Map;
 public class MoveRIPRelativeToPseudo extends BinaryRIPRelativeToPseudo {
 
 	public MoveRIPRelativeToPseudo(@NotNull RIPRelativeData source,
-								   @NotNull X64PreservedRegister destination) {
+								   @NotNull X64PseudoRegister destination) {
 		super("mov", source, destination);
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PreservedRegister, X64NativeRegister> mapping,
-														@NotNull Map<X64PreservedRegister, BasePointerOffset> locals,
-														@NotNull X64NativeRegister temporaryImmediate) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
+														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
+														@NotNull X64Register temporaryImmediate) {
 		if (mapping.containsKey(destination)) {
 			return Collections.singletonList(
 				new MoveRIPRelativeToReg(source, mapping.get(destination))

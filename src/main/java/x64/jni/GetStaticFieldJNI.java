@@ -3,7 +3,7 @@ package x64.jni;
 import intermediate.Register;
 import x64.X64Context;
 import x64.jni.helpers.CallJNIMethod;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToReg;
 
 public interface GetStaticFieldJNI extends CallJNIMethod {
@@ -15,8 +15,8 @@ public interface GetStaticFieldJNI extends CallJNIMethod {
      * @param fieldIDReg The x64 register holding the result of GetStaticFieldId
      * @param result The IL Register that is used for the type and the returned value.
      */
-    default void addGetStaticField(X64Context context, X64PreservedRegister classReg,
-                                   X64PreservedRegister fieldIDReg, Register result) {
+    default void addGetStaticField(X64Context context, X64PseudoRegister classReg,
+								   X64PseudoRegister fieldIDReg, Register result) {
 
         // load the args
         // arg1 = JNI

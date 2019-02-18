@@ -1,15 +1,14 @@
 package x64.instructions;
 
 import org.jetbrains.annotations.NotNull;
-import x64.operands.Immediate;
 import x64.operands.RIPRelativeData;
-import x64.operands.X64NativeRegister;
+import x64.operands.X64Register;
 
 /** This class represents a binary instruction with an immediate source and register destination */
 public abstract class BinaryRIPRelativeToReg extends Instruction {
 
     @NotNull private final RIPRelativeData source;
-    @NotNull private final X64NativeRegister destination;
+    @NotNull private final X64Register destination;
     private final String name;
 
 
@@ -20,7 +19,7 @@ public abstract class BinaryRIPRelativeToReg extends Instruction {
      * @param destination The register destination.
      */
     public BinaryRIPRelativeToReg(String name, @NotNull RIPRelativeData source,
-								  @NotNull X64NativeRegister destination) {
+								  @NotNull X64Register destination) {
         this.name = name;
         this.source = source;
         this.destination = destination;

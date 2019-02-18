@@ -7,9 +7,9 @@ public class PseudoDisplacement {
 
     public final int offset;
 
-    @NotNull public final X64PreservedRegister register;
+    @NotNull public final X64PseudoRegister register;
 
-    public PseudoDisplacement(int offset, @NotNull X64PreservedRegister register) {
+    public PseudoDisplacement(int offset, @NotNull X64PseudoRegister register) {
         this.offset = offset;
         this.register = register;
     }

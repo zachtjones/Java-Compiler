@@ -6,7 +6,7 @@ import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 
 /** Represents the starting of a scope of a local variable. */
 public class StartScopeStatement implements InterStatement {
@@ -40,7 +40,7 @@ public class StartScopeStatement implements InterStatement {
 	@Override
 	public void compile(@NotNull X64Context context) throws CompileException {
 		// TODO other sized registers
-		X64PreservedRegister allocated = context.getNextQuadRegister();
+		X64PseudoRegister allocated = context.getNextQuadRegister();
 		context.markRegisterAsLocalVariable(name, allocated);
 	}
 }

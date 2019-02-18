@@ -12,7 +12,7 @@ import x64.jni.FindClassJNI;
 import x64.jni.GetInstanceFieldIdJNI;
 import x64.jni.GetInstanceFieldJNI;
 import x64.operands.PseudoDisplacement;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoDisplacementToPseudo;
 
 public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, GetInstanceFieldIdJNI, GetInstanceFieldJNI {
@@ -65,11 +65,11 @@ public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, 
 
 			// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
 			//    - name is like: java/lang/String
-			final X64PreservedRegister classReg = addFindClassJNICall(context, className);
+			final X64PseudoRegister classReg = addFindClassJNICall(context, className);
 
 			// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
 			// src holds the type
-			final X64PreservedRegister fieldIDReg =
+			final X64PseudoRegister fieldIDReg =
 				addGetInstanceFieldIdJNICall(instance, fieldName, classReg, context);
 
 

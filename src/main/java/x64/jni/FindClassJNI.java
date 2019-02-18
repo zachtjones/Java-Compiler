@@ -17,7 +17,7 @@ public interface FindClassJNI extends CallJNIMethod {
      * @param className The java class name to load
      * @return The newly allocated preserved register holding a reference to the JNI class
      */
-    default X64PreservedRegister addFindClassJNICall(X64Context context, String className) {
+    default X64PseudoRegister addFindClassJNICall(X64Context context, String className) {
 
         // mov %javaEnvOne, %arg1
         context.loadJNI1();
@@ -32,7 +32,7 @@ public interface FindClassJNI extends CallJNIMethod {
         );
 
         // call JNI find class with the arguments, storing result in class register
-        final X64PreservedRegister classReg = context.getNextQuadRegister();
+        final X64PseudoRegister classReg = context.getNextQuadRegister();
 
         addCallJNI(context, FIND_CLASS, classReg);
 

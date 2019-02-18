@@ -14,14 +14,14 @@ import java.util.Map;
 
 public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPseudo {
 	public MovePseudoDisplacementToPseudo(@NotNull PseudoDisplacement source,
-										  @NotNull X64PreservedRegister destination) {
+										  @NotNull X64PseudoRegister destination) {
 		super("mov", source, destination);
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PreservedRegister, X64NativeRegister> mapping,
-														@NotNull Map<X64PreservedRegister, BasePointerOffset> locals,
-														@NotNull X64NativeRegister temporaryImmediate) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
+														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
+														@NotNull X64Register temporaryImmediate) {
 		// example: mov 8(%q1), %q2
 		if (mapping.containsKey(source.register)) {
 			if (mapping.containsKey(destination)) {

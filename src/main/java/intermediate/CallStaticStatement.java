@@ -11,7 +11,7 @@ import x64.instructions.CallLabel;
 import x64.jni.CallStaticMethodJNI;
 import x64.jni.FindClassJNI;
 import x64.jni.GetStaticMethodIdJNI;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToReg;
 import x64.pseudo.MoveRegToPseudo;
 
@@ -76,10 +76,10 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 		if (className.startsWith("java/")) {
 
 			// clazz = FindClass
-			final X64PreservedRegister clazz = addFindClassJNICall(context, className);
+			final X64PseudoRegister clazz = addFindClassJNICall(context, className);
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
-			final X64PreservedRegister methodId =
+			final X64PseudoRegister methodId =
 				addGetStaticMethodId(context, clazz, functionName, args, returnVal);
 
 			// result = CallNonVirtual<Type>Method(JNIEnv, clazz, methodID, ...)

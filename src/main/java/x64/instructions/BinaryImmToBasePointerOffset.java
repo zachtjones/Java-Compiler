@@ -3,7 +3,6 @@ package x64.instructions;
 import org.jetbrains.annotations.NotNull;
 import x64.operands.BasePointerOffset;
 import x64.operands.Immediate;
-import x64.operands.X64NativeRegister;
 
 /** This class represents a binary instruction with an immediate source and base pointer offset destination */
 public abstract class BinaryImmToBasePointerOffset extends Instruction {

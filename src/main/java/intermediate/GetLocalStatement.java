@@ -4,7 +4,7 @@ import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToPseudo;
 
 import java.util.HashMap;
@@ -50,7 +50,7 @@ public class GetLocalStatement implements InterStatement {
 
 	@Override
 	public void compile(@NotNull X64Context context) throws CompileException {
-		final X64PreservedRegister source = context.getLocalVariable(localName);
+		final X64PseudoRegister source = context.getLocalVariable(localName);
 
 		// move the register over
 		context.addInstruction(

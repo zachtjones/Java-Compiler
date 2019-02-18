@@ -1,6 +1,6 @@
 package x64.allocation;
 
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,9 +9,9 @@ import java.util.TreeSet;
 public class RegistersUsed {
 
 	// map of 1 register -> many usages
-	private Map<X64PreservedRegister, TreeSet<Integer>> usages;
+	private Map<X64PseudoRegister, TreeSet<Integer>> usages;
 
-	private Map<X64PreservedRegister, TreeSet<Integer>> definition;
+	private Map<X64PseudoRegister, TreeSet<Integer>> definition;
 
 	private TreeSet<Integer> functionCallLines;
 
@@ -22,14 +22,14 @@ public class RegistersUsed {
 	}
 
 	/** Marks a register as being used at line */
-	public void markUsed(X64PreservedRegister used, int line) {
+	public void markUsed(X64PseudoRegister used, int line) {
 		TreeSet<Integer> mapping = usages.getOrDefault(used, new TreeSet<>());
 		mapping.add(line);
 		usages.putIfAbsent(used, mapping);
 	}
 
 	/** Marks a register as being defined at line (aka given a value) */
-	public void markDefined(X64PreservedRegister defined, int line) {
+	public void markDefined(X64PseudoRegister defined, int line) {
 		TreeSet<Integer> mapping = definition.getOrDefault(defined, new TreeSet<>());
 		mapping.add(line);
 		definition.putIfAbsent(defined, mapping);
@@ -41,17 +41,17 @@ public class RegistersUsed {
 	}
 
 	/** Returns the index of the instruction that last uses the register */
-	private int getLastUsage(X64PreservedRegister register) {
+	private int getLastUsage(X64PseudoRegister register) {
 		return usages.get(register).last();
 	}
 
 	/** Returns the index of the instruction that last uses the register */
-	private int getFirstDefinition(X64PreservedRegister register) {
+	private int getFirstDefinition(X64PseudoRegister register) {
 		return definition.get(register).first();
 	}
 
 	/** Utility method for determining if a register in the function can be temporary */
-	boolean canBeTemporary(X64PreservedRegister register) {
+	boolean canBeTemporary(X64PseudoRegister register) {
 
 		// TODO this will be more complicated with branches backwards
 
@@ -73,8 +73,8 @@ public class RegistersUsed {
 	 * Returns a mapping of line offset to the register that is last used at that line.
 	 * There will be no mapping for a line which has no last usages of a register.
 	 */
-	Map<Integer, X64PreservedRegister> getLastUsages() {
-		HashMap<Integer, X64PreservedRegister> used = new HashMap<>();
+	Map<Integer, X64PseudoRegister> getLastUsages() {
+		HashMap<Integer, X64PseudoRegister> used = new HashMap<>();
 		usages.forEach((register, integers) -> used.put(integers.last(), register));
 		return used;
 	}
@@ -83,8 +83,8 @@ public class RegistersUsed {
 	 * Returns a mapping of the line offset to the register that is defined at that line.
 	 * There will be no mapping for a line which has no definition of a register.
 	 */
-	Map<Integer, X64PreservedRegister> getDefinitions() {
-		HashMap<Integer, X64PreservedRegister> temp = new HashMap<>();
+	Map<Integer, X64PseudoRegister> getDefinitions() {
+		HashMap<Integer, X64PseudoRegister> temp = new HashMap<>();
 		definition.forEach(((register, integers) -> temp.put(integers.first(), register)));
 		return temp;
 	}

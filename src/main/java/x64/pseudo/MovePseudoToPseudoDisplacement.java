@@ -13,16 +13,16 @@ import java.util.Map;
 
 public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplacement {
 
-	public MovePseudoToPseudoDisplacement(@NotNull X64PreservedRegister source,
+	public MovePseudoToPseudoDisplacement(@NotNull X64PseudoRegister source,
 										  @NotNull PseudoDisplacement destination) {
 
 		super("mov", source, destination);
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PreservedRegister, X64NativeRegister> mapping,
-														@NotNull Map<X64PreservedRegister, BasePointerOffset> locals,
-														@NotNull X64NativeRegister temporaryImmediate) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
+														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
+														@NotNull X64Register temporaryImmediate) {
 
 		// destination is always a memory operand, the displacement
 

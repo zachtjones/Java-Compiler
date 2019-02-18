@@ -15,7 +15,7 @@ import x64.instructions.CallLabel;
 import x64.jni.CallMethodJNI;
 import x64.jni.GetMethodIdJNI;
 import x64.jni.GetObjectClassJNI;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToReg;
 import x64.pseudo.MoveRegToPseudo;
 
@@ -81,13 +81,13 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 		final String classname = obj.getType().getClassName(fileName, line);
 		if (classname.startsWith("java/")) {
 
-			final X64PreservedRegister objReg = obj.toX64();
+			final X64PseudoRegister objReg = obj.toX64();
 
 			// clazz = GetClass
-			final X64PreservedRegister clazz = addGetObjectClass(context, objReg);
+			final X64PseudoRegister clazz = addGetObjectClass(context, objReg);
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
-			final X64PreservedRegister methodId = addGetMethodId(context, clazz, name, args, returnVal);
+			final X64PseudoRegister methodId = addGetMethodId(context, clazz, name, args, returnVal);
 
 			// result = Call<Type>Method(JNIEnv, obj, methodID, ...)
 			addCallMethodJNI(context, objReg, methodId, args, returnVal);

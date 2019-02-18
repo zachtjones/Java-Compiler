@@ -8,7 +8,7 @@ import x64.pseudo.LoadEffectiveAddressRIPPseudo;
 import x64.jni.NewStringUTF_JNI;
 import x64.operands.Immediate;
 import x64.operands.RIPRelativeData;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 import x64.pseudo.MoveImmToPseudo;
 
 import java.util.HashMap;
@@ -143,7 +143,7 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 			String label = context.insertDataString(value.substring(1, value.length() - 1));
 
 			// leaq LABEL(%rip), %temp
-			X64PreservedRegister chars = context.getNextQuadRegister();
+			X64PseudoRegister chars = context.getNextQuadRegister();
 			context.addInstruction(
 				new LoadEffectiveAddressRIPPseudo(
 					RIPRelativeData.pointerFromLabel(label),

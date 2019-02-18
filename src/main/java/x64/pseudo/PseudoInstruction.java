@@ -5,8 +5,8 @@ import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 import x64.instructions.Instruction;
 import x64.operands.BasePointerOffset;
-import x64.operands.X64NativeRegister;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64Register;
+import x64.operands.X64PseudoRegister;
 
 import java.util.List;
 import java.util.Map;
@@ -31,14 +31,14 @@ public interface PseudoInstruction {
      * @return A list of the instructions that result in the allocation.
      * This will be a list of 1+ elements, usually 2 if there's 2 memory operands, but could be more for edge cases.
      */
-    @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PreservedRegister, X64NativeRegister> mapping,
-                                                 @NotNull Map<X64PreservedRegister, BasePointerOffset> locals,
-                                                 @NotNull X64NativeRegister temporaryImmediate);
+    @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
+                                                 @NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
+                                                 @NotNull X64Register temporaryImmediate);
 
     /** Increments the priority of the allocated register when it is used.
      * If no pseudo registers are used, don't have to implement this method.
      * @param mapping The RegisterMapped instance that each pseudo register is mapped to */
-    default void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {}
+    default void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {}
 
     /** Represents how this instruction should be represented in x64 assembly */
     String toString();

@@ -2,8 +2,8 @@ package x64.instructions;
 
 import org.jetbrains.annotations.NotNull;
 import x64.operands.BasePointerOffset;
-import x64.operands.X64NativeRegister;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64Register;
+import x64.operands.X64PseudoRegister;
 import x64.pseudo.PseudoInstruction;
 
 import java.util.Collections;
@@ -23,9 +23,9 @@ public abstract class Instruction implements PseudoInstruction {
 	 */
 	@Override
 	@NotNull
-	public List<@NotNull Instruction> allocate(@NotNull Map<X64PreservedRegister, X64NativeRegister> mapping,
-													   @NotNull Map<X64PreservedRegister, BasePointerOffset> locals,
-													   @NotNull X64NativeRegister temporaryImmediate) {
+	public List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
+													   @NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
+													   @NotNull X64Register temporaryImmediate) {
 		return Collections.singletonList(this);
 	}
 

@@ -4,8 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 import x64.operands.Immediate;
-import x64.operands.RIPRelativeData;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 
 import java.util.Map;
 
@@ -13,12 +12,12 @@ import java.util.Map;
 public abstract class BinaryImmediateToPseudo implements PseudoInstruction {
 
     @NotNull public final Immediate source;
-    @NotNull public final X64PreservedRegister destination;
+    @NotNull public final X64PseudoRegister destination;
     @NotNull private final String name;
 
 
     public BinaryImmediateToPseudo(@NotNull String name, @NotNull Immediate source,
-								   @NotNull X64PreservedRegister destination) {
+								   @NotNull X64PseudoRegister destination) {
         this.name = name;
         this.source = source;
         this.destination = destination;
@@ -30,7 +29,7 @@ public abstract class BinaryImmediateToPseudo implements PseudoInstruction {
     }
 
     @Override
-    public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
+    public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
         mapping.get(destination).increment();
     }
 

@@ -3,7 +3,7 @@ package x64.jni;
 import intermediate.Register;
 import x64.X64Context;
 import x64.jni.helpers.CallJNIMethod;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToReg;
 
 import static x64.jni.JNIOffsets.getCallStaticMethodOffset;
@@ -18,8 +18,8 @@ public interface CallStaticMethodJNI extends CallJNIMethod {
      * @param args The program arguments to the function
      * @param returnVal Where to store the returned value
      */
-    default void addCallStaticMethodJNI(X64Context context, X64PreservedRegister classReg, X64PreservedRegister methodId,
-                                        Register[] args, Register returnVal) {
+    default void addCallStaticMethodJNI(X64Context context, X64PseudoRegister classReg, X64PseudoRegister methodId,
+										Register[] args, Register returnVal) {
 
         // 3 options for the method call, but will use the first one
         // %result = CallNonVirtual<type>Method(JNIEnv, obj, class, methodID, ...);

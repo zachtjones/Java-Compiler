@@ -8,7 +8,7 @@ import tree.Expression;
 import tree.NodeImpl;
 import tree.SymbolTable;
 import x64.X64InstructionSize;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 
 /**
  * Represents an abstraction of a hardware Register.
@@ -103,7 +103,7 @@ public class Register extends NodeImpl implements Expression {
     }
 
     /** Converts this intermediate language register to the x64 assembly type. */
-    public X64PreservedRegister toX64() {
-		return new X64PreservedRegister(this.num, this.x64Type());
+    public X64PseudoRegister toX64() {
+		return new X64PseudoRegister(this.num, this.x64Type());
 	}
 }

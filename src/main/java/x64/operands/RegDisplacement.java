@@ -7,9 +7,9 @@ public class RegDisplacement {
 
     public final int offset;
 
-    @NotNull public final X64NativeRegister register;
+    @NotNull public final X64Register register;
 
-    public RegDisplacement(int offset, @NotNull X64NativeRegister register) {
+    public RegDisplacement(int offset, @NotNull X64Register register) {
         this.offset = offset;
         this.register = register;
     }

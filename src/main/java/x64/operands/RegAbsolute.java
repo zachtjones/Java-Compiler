@@ -4,9 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class RegAbsolute {
     @NotNull
-    public final X64NativeRegister source;
+    public final X64Register source;
 
-    public RegAbsolute(@NotNull X64NativeRegister source) {
+    public RegAbsolute(@NotNull X64Register source) {
         this.source = source;
     }
 

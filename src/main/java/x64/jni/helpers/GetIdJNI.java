@@ -13,8 +13,8 @@ public interface GetIdJNI extends CallJNIMethod {
      * method call, the difference being the class/object param and how to determine the char* sig parameter.
      * This interface is created as a helper for those specific ones
      * Returns the allocated register for the methodId/fieldId */
-    default X64PreservedRegister addGetIdJNICall(JNIOffsets jniOffset, String fieldOrMethodName, String signature,
-                                               X64Context context, X64PreservedRegister classReg) {
+    default X64PseudoRegister addGetIdJNICall(JNIOffsets jniOffset, String fieldOrMethodName, String signature,
+											  X64Context context, X64PseudoRegister classReg) {
 
         // mov %javaEnvOne, %arg1
         context.loadJNI1();
@@ -46,7 +46,7 @@ public interface GetIdJNI extends CallJNIMethod {
         );
 
         // call the method, storing result in fieldIDReg
-        final X64PreservedRegister fieldIDReg = context.getNextQuadRegister();
+        final X64PseudoRegister fieldIDReg = context.getNextQuadRegister();
         addCallJNI(context, jniOffset, fieldIDReg);
 
         return fieldIDReg;

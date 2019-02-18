@@ -1,13 +1,13 @@
 package x64.instructions;
 
 import org.jetbrains.annotations.NotNull;
-import x64.operands.X64NativeRegister;
+import x64.operands.X64Register;
 
 public class PopNativeReg extends Instruction {
 
-	private X64NativeRegister reg;
+	private X64Register reg;
 
-	public PopNativeReg(@NotNull X64NativeRegister reg) {
+	public PopNativeReg(@NotNull X64Register reg) {
 		this.reg = reg;
 	}
 

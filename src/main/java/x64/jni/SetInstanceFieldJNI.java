@@ -3,7 +3,7 @@ package x64.jni;
 import intermediate.Register;
 import x64.X64Context;
 import x64.jni.helpers.CallJNIMethod;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToReg;
 
 public interface SetInstanceFieldJNI extends CallJNIMethod {
@@ -16,7 +16,7 @@ public interface SetInstanceFieldJNI extends CallJNIMethod {
      * @param value The IL Register that holds the value to set
      */
     default void addSetInstanceField(X64Context context, Register objReg,
-                                     X64PreservedRegister fieldIDReg, Register value) {
+									 X64PseudoRegister fieldIDReg, Register value) {
 
         // load the args
         // arg1 = JNI

@@ -3,7 +3,7 @@ package x64.jni;
 import intermediate.Register;
 import x64.X64Context;
 import x64.jni.helpers.CallJNIMethod;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToReg;
 
 import static x64.jni.JNIOffsets.getCallMethodOffset;
@@ -11,8 +11,8 @@ import static x64.jni.JNIOffsets.getCallMethodOffset;
 public interface CallMethodJNI extends CallJNIMethod {
 
     /** Adds the code to JNI Call&lt;type&gt;Method */
-    default void addCallMethodJNI(X64Context context, X64PreservedRegister objReg,
-                                  X64PreservedRegister methodId, Register[] args, Register returnVal) {
+    default void addCallMethodJNI(X64Context context, X64PseudoRegister objReg,
+								  X64PseudoRegister methodId, Register[] args, Register returnVal) {
 
         // 3 options for the method call, using the first one:
         // %result = Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);

@@ -8,7 +8,7 @@ import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
 import helper.BinaryOperation;
 import x64.X64Context;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToPseudo;
 
 /** dest = src1 OP src2 */
@@ -67,7 +67,7 @@ public class BinaryOpStatement implements InterStatement {
 		//  op src2, temp ---- this means temp = temp op src2
 		//  mov temp, dest
 
-		X64PreservedRegister temp = context.getNextQuadRegister();
+		X64PseudoRegister temp = context.getNextQuadRegister();
 
 		context.addInstruction(new MovePseudoToPseudo(src1.toX64(), temp));
 

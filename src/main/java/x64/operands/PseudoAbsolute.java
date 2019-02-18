@@ -4,9 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class PseudoAbsolute {
     @NotNull
-    public final X64PreservedRegister source;
+    public final X64PseudoRegister source;
 
-    public PseudoAbsolute(@NotNull X64PreservedRegister source) {
+    public PseudoAbsolute(@NotNull X64PseudoRegister source) {
         this.source = source;
     }
 

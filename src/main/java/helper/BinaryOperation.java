@@ -1,7 +1,7 @@
 package helper;
 
 import org.jetbrains.annotations.NotNull;
-import x64.operands.X64PreservedRegister;
+import x64.operands.X64PseudoRegister;
 import x64.pseudo.AddPseudoToPseudo;
 import x64.pseudo.PseudoInstruction;
 import x64.pseudo.SubtractPseudoToPseudo;
@@ -30,8 +30,8 @@ public enum BinaryOperation {
 	 * @param destination The destination pseudo register.
 	 * @return An pseudo instruction representing that computation.
 	 */
-	public PseudoInstruction getInstruction(@NotNull X64PreservedRegister source,
-											@NotNull X64PreservedRegister destination) {
+	public PseudoInstruction getInstruction(@NotNull X64PseudoRegister source,
+											@NotNull X64PseudoRegister destination) {
 		switch (this){
 			case ADD:
 				return new AddPseudoToPseudo(source, destination);

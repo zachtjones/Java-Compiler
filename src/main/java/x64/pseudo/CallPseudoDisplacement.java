@@ -33,9 +33,9 @@ public class CallPseudoDisplacement implements PseudoInstruction {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PreservedRegister, X64NativeRegister> mapping,
-														@NotNull Map<X64PreservedRegister, BasePointerOffset> locals,
-														@NotNull X64NativeRegister temporaryImmediate) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
+														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
+														@NotNull X64Register temporaryImmediate) {
 		if (mapping.containsKey(temp.register)) {
 			// simple mapping
 			return Collections.singletonList(
@@ -51,7 +51,7 @@ public class CallPseudoDisplacement implements PseudoInstruction {
 	}
 
 	@Override
-	public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
+	public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
 		mapping.get(temp.register).increment();
 	}
 
