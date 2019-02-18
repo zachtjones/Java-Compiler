@@ -1,7 +1,7 @@
 package x64.jni.helpers;
 
 import x64.X64Context;
-import x64.pseudo.CallRegisterDisplacementPseudo;
+import x64.pseudo.CallPseudoRegDisplacement;
 import x64.jni.JNIOffsets;
 import x64.operands.*;
 import x64.pseudo.MovePseudoAbsoluteToPseudo;
@@ -26,7 +26,7 @@ public interface CallJNIMethod {
 
         // call *JNI_METHOD_OFFSET(%javaEnv)
         context.addInstruction(
-            new CallRegisterDisplacementPseudo(
+            new CallPseudoRegDisplacement(
                 new PseudoRegDisplacement(jniOffset.getOffset(), temp)
             )
         );

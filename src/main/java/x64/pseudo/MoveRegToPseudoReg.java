@@ -2,7 +2,7 @@ package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
 import x64.instructions.Instruction;
-import x64.instructions.MoveBasePointerOffsetToReg;
+import x64.instructions.MoveRegToBasePointerOffset;
 import x64.instructions.MoveRegToRegInstruction;
 import x64.operands.BasePointerOffset;
 import x64.operands.X64NativeRegister;
@@ -12,10 +12,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class MovePseudoRegToReg extends BinaryPseudoRegToReg {
+public class MoveRegToPseudoReg extends BinaryRegToPseudoReg {
 
-	public MovePseudoRegToReg(@NotNull X64PreservedRegister source,
-							  @NotNull X64NativeRegister destination) {
+	public MoveRegToPseudoReg(@NotNull X64NativeRegister source,
+							  @NotNull X64PreservedRegister destination) {
 		super("mov", source, destination);
 	}
 
@@ -23,14 +23,13 @@ public class MovePseudoRegToReg extends BinaryPseudoRegToReg {
 	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PreservedRegister, X64NativeRegister> mapping,
 														@NotNull Map<X64PreservedRegister, BasePointerOffset> locals,
 														@NotNull X64NativeRegister temporaryImmediate) {
-
-		if (locals.containsKey(source)) {
+		if (mapping.containsKey(destination)) {
 			return Collections.singletonList(
-				new MoveRegToRegInstruction(mapping.get(source), destination)
+				new MoveRegToRegInstruction(source, mapping.get(destination))
 			);
 		} else {
 			return Collections.singletonList(
-				new MoveBasePointerOffsetToReg(locals.get(source), destination)
+				new MoveRegToBasePointerOffset(source, locals.get(destination))
 			);
 		}
 	}

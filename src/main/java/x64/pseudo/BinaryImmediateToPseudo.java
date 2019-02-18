@@ -3,22 +3,22 @@ package x64.pseudo;
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
+import x64.operands.Immediate;
 import x64.operands.RIPRelativeData;
 import x64.operands.X64PreservedRegister;
 
 import java.util.Map;
 
-public abstract class BinaryInstructionRIPPseudo implements PseudoInstruction {
+/** Represents a binary instruction that uses an immediate source and a pseudo register destination. */
+public abstract class BinaryImmediateToPseudo implements PseudoInstruction {
 
-    @NotNull
-	public final RIPRelativeData source;
-    @NotNull
-    public final X64PreservedRegister destination;
-    private final String name;
+    @NotNull public final Immediate source;
+    @NotNull public final X64PreservedRegister destination;
+    @NotNull private final String name;
 
 
-    public BinaryInstructionRIPPseudo(String name, @NotNull RIPRelativeData source,
-                                      @NotNull X64PreservedRegister destination) {
+    public BinaryImmediateToPseudo(@NotNull String name, @NotNull Immediate source,
+								   @NotNull X64PreservedRegister destination) {
         this.name = name;
         this.source = source;
         this.destination = destination;
@@ -34,7 +34,6 @@ public abstract class BinaryInstructionRIPPseudo implements PseudoInstruction {
         mapping.get(destination).increment();
     }
 
-    /** Represents how this instruction should be represented */
     @Override
     public final String toString() {
         return '\t' + name + " " +

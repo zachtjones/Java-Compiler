@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class LoadEffectiveAddressRIPPseudo extends BinaryInstructionRIPPseudo {
+public class LoadEffectiveAddressRIPPseudo extends BinaryRIPRelativeToPseudo {
 
     public LoadEffectiveAddressRIPPseudo(@NotNull RIPRelativeData source, @NotNull X64PreservedRegister destination) {
         super("leaq", source, destination);
