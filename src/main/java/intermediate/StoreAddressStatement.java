@@ -9,11 +9,11 @@ import helper.UsageCheck;
 import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-import x64.instructions.MoveInstruction;
 import x64.jni.*;
 import x64.operands.RIPRelativeData;
-import x64.operands.PseudoRegDisplacement;
+import x64.operands.PseudoDisplacement;
 import x64.operands.X64PreservedRegister;
+import x64.pseudo.MovePseudoToRIPRelative;
 
 /** store %src at %addr */
 public class StoreAddressStatement implements InterStatement,
@@ -80,9 +80,9 @@ public class StoreAddressStatement implements InterStatement,
 
 				// mov %src, field_offset(%instance)
 				context.addInstruction(
-					new MoveInstruction(
+					new MovePseudoToPseudoDisplacement(
 						src.toX64(),
-						new PseudoRegDisplacement(fieldOffset, object.toX64())
+						new PseudoDisplacement(fieldOffset, object.toX64())
 					)
 				);
 			}
@@ -106,9 +106,9 @@ public class StoreAddressStatement implements InterStatement,
 			} else {
 				// mov %src, class_name_field_offset(%rip), src is used in the destination for the data size
 				context.addInstruction(
-					new MoveInstruction(
+					new MovePseudoToRIPRelative(
 						src.toX64(),
-						RIPRelativeData.fromField(className, fieldName, src)
+						RIPRelativeData.fromField(className, fieldName)
 					)
 				);
 			}

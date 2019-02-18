@@ -4,7 +4,7 @@ import intermediate.Register;
 import x64.X64Context;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.X64PreservedRegister;
-import x64.pseudo.MovePseudoRegToReg;
+import x64.pseudo.MovePseudoToReg;
 
 public interface GetStaticFieldJNI extends CallJNIMethod {
 
@@ -24,7 +24,7 @@ public interface GetStaticFieldJNI extends CallJNIMethod {
 
         // arg2 = class reference
         context.addInstruction(
-            new MovePseudoRegToReg(
+            new MovePseudoToReg(
                 classReg,
                 context.argumentRegister(2)
             )
@@ -32,7 +32,7 @@ public interface GetStaticFieldJNI extends CallJNIMethod {
 
         // arg3 = field ID
         context.addInstruction(
-            new MovePseudoRegToReg(
+            new MovePseudoToReg(
                 fieldIDReg,
                 context.argumentRegister(3)
             )

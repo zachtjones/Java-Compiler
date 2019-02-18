@@ -6,7 +6,7 @@ import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.allocation.CallingConvention;
-import x64.instructions.CallClassMethod;
+import x64.instructions.CallLabel;
 import x64.instructions.MoveInstruction;
 import x64.operands.Immediate;
 
@@ -55,7 +55,7 @@ public class AllocateClassMemoryStatement implements InterStatement {
 		);
 
 		context.addInstruction(
-			new CallClassMethod(CallingConvention.libraryFunc("malloc"))
+			new CallLabel(CallingConvention.libraryFunc("malloc"))
 		);
 
 		// move returned value

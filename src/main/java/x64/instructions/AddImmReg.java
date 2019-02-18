@@ -5,9 +5,9 @@ import x64.operands.Immediate;
 import x64.operands.X64NativeRegister;
 
 /** Represents a add $number, %register */
-public class AddImmRegInstruction extends BinaryImmRegInstruction {
+public class AddImmReg extends BinaryImmToReg {
 
-	public AddImmRegInstruction(@NotNull Immediate source, @NotNull X64NativeRegister destination) {
+	public AddImmReg(@NotNull Immediate source, @NotNull X64NativeRegister destination) {
 		super("sub", source, destination);
 	}
 }

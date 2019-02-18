@@ -134,13 +134,13 @@ public class RegisterTransformer {
 			}
 
 			for (int i = 0; i < totalPreserved; i++) {
-				au.prologue.add(new PushNativeRegInstruction(preserved[i]));
-				au.epilogue.addFirst(new PopNativeRegInstruction(preserved[i]));
+				au.prologue.add(new PushNativeReg(preserved[i]));
+				au.epilogue.addFirst(new PopNativeReg(preserved[i]));
 			}
 			if (totalPreserved % 2 == 0) {
 				// move another 8 bytes to maintains 16 byte alignment on function calls
-				au.prologue.add(new SubtractImmRegInstruction(new Immediate(8), RSP));
-				au.epilogue.addFirst(new AddImmRegInstruction(new Immediate(8), RSP));
+				au.prologue.add(new SubtractImmToReg(new Immediate(8), RSP));
+				au.epilogue.addFirst(new AddImmReg(new Immediate(8), RSP));
 			}
 
 			return au;
@@ -159,20 +159,20 @@ public class RegisterTransformer {
 			// epilogue is kept in the order by addFirst on all calls
 			for (X64NativeRegister x64RegisterOperand : preservedLeft) {
 				// odd number of these due to number in both conventions
-				au.prologue.add(new PushNativeRegInstruction(x64RegisterOperand));
-				au.epilogue.addFirst(new PopNativeRegInstruction(x64RegisterOperand));
+				au.prologue.add(new PushNativeReg(x64RegisterOperand));
+				au.epilogue.addFirst(new PopNativeReg(x64RegisterOperand));
 			}
 
 			// preserve base pointer & set to the base of the stack frame
-			au.prologue.add(new PushNativeRegInstruction(RBP)); // stack now has even number pushed
-			au.prologue.add(new MoveRegToRegInstruction(RSP, RBP));
+			au.prologue.add(new PushNativeReg(RBP)); // stack now has even number pushed
+			au.prologue.add(new MoveRegToReg(RSP, RBP));
 
 			// spaceNeeded should be oddNumber * 8.
-			au.prologue.add(new SubtractImmRegInstruction(new Immediate(spaceNeeded), RSP));
+			au.prologue.add(new SubtractImmToReg(new Immediate(spaceNeeded), RSP));
 
 			// restore stack and base pointer
-			au.epilogue.addFirst(new PopNativeRegInstruction(RBP));
-			au.epilogue.addFirst(new MoveRegToRegInstruction(RBP, RSP));
+			au.epilogue.addFirst(new PopNativeReg(RBP));
+			au.epilogue.addFirst(new MoveRegToReg(RBP, RSP));
 
 			return au;
 		}

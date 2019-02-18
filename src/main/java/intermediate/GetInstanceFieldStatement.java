@@ -11,7 +11,7 @@ import x64.X64Context;
 import x64.jni.FindClassJNI;
 import x64.jni.GetInstanceFieldIdJNI;
 import x64.jni.GetInstanceFieldJNI;
-import x64.operands.PseudoRegDisplacement;
+import x64.operands.PseudoDisplacement;
 import x64.operands.X64PreservedRegister;
 
 public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, GetInstanceFieldIdJNI, GetInstanceFieldJNI {
@@ -85,7 +85,7 @@ public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, 
 			// mov field_offset(%instance), result
 			context.addInstruction(
 				new MoveInstruction(
-					new PseudoRegDisplacement(fieldOffset, instance.toX64()),
+					new PseudoDisplacement(fieldOffset, instance.toX64()),
 					result.toX64()
 				)
 			);

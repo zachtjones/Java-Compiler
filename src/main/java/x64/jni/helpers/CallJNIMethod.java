@@ -19,7 +19,7 @@ public interface CallJNIMethod {
         final X64PreservedRegister temp = context.getNextQuadRegister();
         context.addInstruction(
             new MovePseudoAbsoluteToPseudo(
-                new MemoryAtPseudo(context.getJniPointer()),
+                new PseudoAbsolute(context.getJniPointer()),
                 temp
             )
         );
@@ -27,7 +27,7 @@ public interface CallJNIMethod {
         // call *JNI_METHOD_OFFSET(%javaEnv)
         context.addInstruction(
             new CallPseudoRegDisplacement(
-                new PseudoRegDisplacement(jniOffset.getOffset(), temp)
+                new PseudoDisplacement(jniOffset.getOffset(), temp)
             )
         );
     }

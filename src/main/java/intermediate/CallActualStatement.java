@@ -11,7 +11,7 @@ import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
-import x64.instructions.CallClassMethod;
+import x64.instructions.CallLabel;
 import x64.instructions.MoveInstruction;
 import x64.jni.CallNonVirtualMethodJNI;
 import x64.jni.FindClassJNI;
@@ -112,7 +112,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 
 			// 2. call CLASS_NAME_METHOD_NAME
 			context.addInstruction(
-				new CallClassMethod(className, name)
+				new CallLabel(className, name)
 			);
 
 			// 3. mov %rax, result

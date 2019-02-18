@@ -11,7 +11,7 @@ import java.util.Map;
 /***
  * Represents a binary instruction that involves a pseudo register source and native register destination.
  */
-public abstract class BinaryPseudoRegToReg implements PseudoInstruction {
+public abstract class BinaryPseudoToReg implements PseudoInstruction {
 	@NotNull
 	public final X64PreservedRegister source;
 	@NotNull
@@ -19,8 +19,8 @@ public abstract class BinaryPseudoRegToReg implements PseudoInstruction {
 	private final String name;
 
 
-	public BinaryPseudoRegToReg(String name, @NotNull X64PreservedRegister source,
-								@NotNull X64NativeRegister destination) {
+	public BinaryPseudoToReg(String name, @NotNull X64PreservedRegister source,
+							 @NotNull X64NativeRegister destination) {
 		this.name = name;
 		this.source = source;
 		this.destination = destination;

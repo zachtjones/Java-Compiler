@@ -5,7 +5,7 @@ import x64.operands.BasePointerOffset;
 import x64.operands.X64NativeRegister;
 
 /** This class represents a binary instruction with an base pointer offset source and register destination */
-public abstract class BinaryBasePointerOffsetToRegInstruction extends Instruction {
+public abstract class BinaryBasePointerOffsetToReg extends Instruction {
 
     @NotNull private final BasePointerOffset source;
     @NotNull private final X64NativeRegister destination;
@@ -17,8 +17,8 @@ public abstract class BinaryBasePointerOffsetToRegInstruction extends Instructio
      * @param source The base pointer offset source.
      * @param destination The register destination.
      */
-    public BinaryBasePointerOffsetToRegInstruction(@NotNull String name, @NotNull BasePointerOffset source,
-												   @NotNull X64NativeRegister destination) {
+    public BinaryBasePointerOffsetToReg(@NotNull String name, @NotNull BasePointerOffset source,
+										@NotNull X64NativeRegister destination) {
         this.name = name;
         this.source = source;
         this.destination = destination;

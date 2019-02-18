@@ -1,16 +1,16 @@
 package x64.instructions;
 
 import org.jetbrains.annotations.NotNull;
+import x64.operands.BasePointerOffset;
 import x64.operands.Immediate;
-import x64.operands.RIPRelativeData;
 import x64.operands.X64NativeRegister;
 
-/** This class represents a binary instruction with an immediate source and register destination */
-public abstract class BinaryRIPRelativeToRegInstruction extends Instruction {
+/** This class represents a binary instruction with an immediate source and base pointer offset destination */
+public abstract class BinaryImmToBasePointerOffset extends Instruction {
 
-    @NotNull private final RIPRelativeData source;
-    @NotNull private final X64NativeRegister destination;
-    private final String name;
+    @NotNull private final Immediate source;
+    @NotNull private final BasePointerOffset destination;
+    @NotNull private final String name;
 
 
     /**
@@ -19,8 +19,8 @@ public abstract class BinaryRIPRelativeToRegInstruction extends Instruction {
      * @param source The Immediate source.
      * @param destination The register destination.
      */
-    public BinaryRIPRelativeToRegInstruction(String name, @NotNull RIPRelativeData source,
-                                             @NotNull X64NativeRegister destination) {
+    public BinaryImmToBasePointerOffset(@NotNull String name, @NotNull Immediate source,
+										@NotNull BasePointerOffset destination) {
         this.name = name;
         this.source = source;
         this.destination = destination;
@@ -29,7 +29,7 @@ public abstract class BinaryRIPRelativeToRegInstruction extends Instruction {
     /** Represents how this instruction should be represented */
     @Override
     public final String assemblyRepresentation() {
-        return '\t' + name + destination.getSuffix() + " " +
+        return '\t' + name + "q " +
                 source.toString() + ", " + destination.toString();
     }
 }

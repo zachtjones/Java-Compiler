@@ -11,7 +11,7 @@ import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
-import x64.instructions.CallClassMethod;
+import x64.instructions.CallLabel;
 import x64.instructions.MoveInstruction;
 import x64.jni.CallMethodJNI;
 import x64.jni.GetMethodIdJNI;
@@ -109,7 +109,7 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 			}
 
 			// call
-			context.addInstruction(new CallClassMethod(classname, name));
+			context.addInstruction(new CallLabel(classname, name));
 
 			// move result -- unless null (meaning void method)
 			if (returnVal != null)

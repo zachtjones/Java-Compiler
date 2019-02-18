@@ -5,9 +5,9 @@ import x64.operands.Immediate;
 import x64.operands.X64NativeRegister;
 
 /** Represents a sub $number, %register */
-public class SubtractImmRegInstruction extends BinaryImmRegInstruction {
+public class SubtractImmToReg extends BinaryImmToReg {
 
-	public SubtractImmRegInstruction(@NotNull Immediate source, @NotNull X64NativeRegister destination) {
+	public SubtractImmToReg(@NotNull Immediate source, @NotNull X64NativeRegister destination) {
 		super("sub", source, destination);
 	}
 }

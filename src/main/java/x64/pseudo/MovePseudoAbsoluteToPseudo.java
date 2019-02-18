@@ -6,7 +6,7 @@ import x64.instructions.MoveBasePointerOffsetToReg;
 import x64.instructions.MoveRegAbsoluteToReg;
 import x64.instructions.MoveRegToBasePointerOffset;
 import x64.operands.BasePointerOffset;
-import x64.operands.MemoryAtPseudo;
+import x64.operands.PseudoAbsolute;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 
@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class MovePseudoAbsoluteToPseudo extends BinaryPseudoAbsoluteToPseudo {
 
-	public MovePseudoAbsoluteToPseudo(@NotNull MemoryAtPseudo source,
+	public MovePseudoAbsoluteToPseudo(@NotNull PseudoAbsolute source,
 									  @NotNull X64PreservedRegister destination) {
 		super("mov", source, destination);
 	}

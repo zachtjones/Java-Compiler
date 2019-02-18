@@ -61,16 +61,16 @@ public class X64Function {
 		if (au != null) allInstructions.addAll(au.prologue);
 
 		if (needsToAllocate32BytesForArgs())
-			allInstructions.add(new SubtractImmRegInstruction(new Immediate(32), RSP));
+			allInstructions.add(new SubtractImmToReg(new Immediate(32), RSP));
 
 		allInstructions.addAll(contents);
 
 		if (needsToAllocate32BytesForArgs())
-			allInstructions.add(new AddImmRegInstruction(new Immediate(32), RSP));
+			allInstructions.add(new AddImmReg(new Immediate(32), RSP));
 
 		if (au != null) allInstructions.addAll(au.epilogue);
 
-		allInstructions.add(ReturnInstruction.instance);
+		allInstructions.add(Return.instance);
 
 		return allInstructions.stream()
 				.map(PseudoInstruction::toString)

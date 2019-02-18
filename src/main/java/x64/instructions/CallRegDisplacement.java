@@ -1,12 +1,12 @@
 package x64.instructions;
 
-import x64.operands.RegisterDisplacement;
+import x64.operands.RegDisplacement;
 
 
 public class CallRegDisplacement extends Instruction {
-	private RegisterDisplacement registerDisplacement;
+	private RegDisplacement registerDisplacement;
 
-	public CallRegDisplacement(RegisterDisplacement registerDisplacement) {
+	public CallRegDisplacement(RegDisplacement registerDisplacement) {
 		this.registerDisplacement = registerDisplacement;
 	}
 

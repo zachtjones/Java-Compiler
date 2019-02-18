@@ -3,7 +3,7 @@ package x64.jni;
 import x64.X64Context;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.X64PreservedRegister;
-import x64.pseudo.MovePseudoRegToReg;
+import x64.pseudo.MovePseudoToReg;
 
 import static x64.jni.JNIOffsets.GET_OBJECT_CLASS;
 
@@ -23,7 +23,7 @@ public interface GetObjectClassJNI extends CallJNIMethod {
 
         // object -> arg2
         context.addInstruction(
-            new MovePseudoRegToReg(
+            new MovePseudoToReg(
                 object,
                 context.argumentRegister(2)
             )

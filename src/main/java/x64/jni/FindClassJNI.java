@@ -1,7 +1,7 @@
 package x64.jni;
 
 import x64.X64Context;
-import x64.instructions.LoadEffectiveAddressRIPRegister;
+import x64.instructions.LoadEffectiveAddressRIPRelativeToReg;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.*;
 
@@ -25,7 +25,7 @@ public interface FindClassJNI extends CallJNIMethod {
         // leaq NEW_STRING_REFERENCE(%rip), %arg2
         String label = context.insertDataString(className);
         context.addInstruction(
-            new LoadEffectiveAddressRIPRegister(
+            new LoadEffectiveAddressRIPRelativeToReg(
                 pointerFromLabel(label),
                 context.argumentRegister(2)
             )

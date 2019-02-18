@@ -16,9 +16,9 @@ import java.util.Map;
 /** Represents a call to a register relative memory pointer, callq *16(%q10) for example */
 public class CallPseudoRegDisplacement implements PseudoInstruction {
 
-	@NotNull private final PseudoRegDisplacement temp;
+	@NotNull private final PseudoDisplacement temp;
 
-	public CallPseudoRegDisplacement(@NotNull PseudoRegDisplacement temp) {
+	public CallPseudoRegDisplacement(@NotNull PseudoDisplacement temp) {
 		this.temp = temp;
 	}
 
@@ -39,13 +39,13 @@ public class CallPseudoRegDisplacement implements PseudoInstruction {
 		if (mapping.containsKey(temp.register)) {
 			// simple mapping
 			return Collections.singletonList(
-				new CallRegDisplacement(new RegisterDisplacement(temp.offset, mapping.get(temp.register)))
+				new CallRegDisplacement(new RegDisplacement(temp.offset, mapping.get(temp.register)))
 			);
 		} else {
 			return Arrays.asList(
 				// can't to a displacement of a displacement of the base pointer
 				new MoveBasePointerOffsetToReg(locals.get(temp.register), temporaryImmediate),
-				new CallRegDisplacement(new RegisterDisplacement(temp.offset, temporaryImmediate))
+				new CallRegDisplacement(new RegDisplacement(temp.offset, temporaryImmediate))
 			);
 		}
 	}

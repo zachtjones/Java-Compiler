@@ -2,10 +2,9 @@ package x64.instructions;
 
 import org.jetbrains.annotations.NotNull;
 import x64.operands.BasePointerOffset;
-import x64.operands.Immediate;
 import x64.operands.X64NativeRegister;
 
-public class MoveBasePointerOffsetToReg extends BinaryBasePointerOffsetToRegInstruction {
+public class MoveBasePointerOffsetToReg extends BinaryBasePointerOffsetToReg {
 
 
 	public MoveBasePointerOffsetToReg(@NotNull BasePointerOffset source,

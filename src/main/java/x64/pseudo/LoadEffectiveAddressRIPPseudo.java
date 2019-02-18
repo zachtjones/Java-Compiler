@@ -2,7 +2,7 @@ package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
 import x64.instructions.Instruction;
-import x64.instructions.LoadEffectiveAddressRIPRegister;
+import x64.instructions.LoadEffectiveAddressRIPRelativeToReg;
 import x64.instructions.MoveRegToBasePointerOffset;
 import x64.operands.BasePointerOffset;
 import x64.operands.RIPRelativeData;
@@ -26,11 +26,11 @@ public class LoadEffectiveAddressRIPPseudo extends BinaryRIPRelativeToPseudo {
                                                         @NotNull X64NativeRegister temporaryImmediate) {
 
         if (mapping.containsKey(destination)) {
-            return Collections.singletonList(new LoadEffectiveAddressRIPRegister(source, mapping.get(destination)));
+            return Collections.singletonList(new LoadEffectiveAddressRIPRelativeToReg(source, mapping.get(destination)));
         } else {
             // can't do direct swap, need the temporary
             return Arrays.asList(
-                new LoadEffectiveAddressRIPRegister(source, temporaryImmediate),
+                new LoadEffectiveAddressRIPRelativeToReg(source, temporaryImmediate),
                 new MoveRegToBasePointerOffset(temporaryImmediate, locals.get(destination))
             );
         }

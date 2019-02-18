@@ -6,7 +6,7 @@ import x64.operands.Immediate;
 import x64.operands.X64NativeRegister;
 
 /** This class represents a binary instruction with an immediate source and register destination */
-public abstract class BinaryRegToBasePointerOffsetInstruction extends Instruction {
+public abstract class BinaryRegToBasePointerOffset extends Instruction {
 
     @NotNull private final X64NativeRegister source;
     @NotNull private final BasePointerOffset destination;
@@ -19,8 +19,8 @@ public abstract class BinaryRegToBasePointerOffsetInstruction extends Instructio
      * @param source The Immediate source.
      * @param destination The register destination.
      */
-    public BinaryRegToBasePointerOffsetInstruction(@NotNull String name, @NotNull X64NativeRegister source,
-                                                   @NotNull BasePointerOffset destination) {
+    public BinaryRegToBasePointerOffset(@NotNull String name, @NotNull X64NativeRegister source,
+										@NotNull BasePointerOffset destination) {
         this.name = name;
         this.source = source;
         this.destination = destination;

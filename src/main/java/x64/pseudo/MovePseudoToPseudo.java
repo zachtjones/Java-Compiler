@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import x64.instructions.Instruction;
 import x64.instructions.MoveBasePointerOffsetToReg;
 import x64.instructions.MoveRegToBasePointerOffset;
-import x64.instructions.MoveRegToRegInstruction;
+import x64.instructions.MoveRegToReg;
 import x64.operands.BasePointerOffset;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
@@ -30,7 +30,7 @@ public class MovePseudoToPseudo extends BinaryPseudoToPseudo {
 			if (locals.containsKey(destination)) {
 				// both are real registers
 				return Collections.singletonList(
-					new MoveRegToRegInstruction(mapping.get(source), mapping.get(destination))
+					new MoveRegToReg(mapping.get(source), mapping.get(destination))
 				);
 			} else {
 				// destination is a local

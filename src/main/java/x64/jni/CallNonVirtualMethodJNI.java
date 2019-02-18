@@ -4,7 +4,7 @@ import intermediate.Register;
 import x64.X64Context;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.*;
-import x64.pseudo.MovePseudoRegToReg;
+import x64.pseudo.MovePseudoToReg;
 
 import static x64.jni.JNIOffsets.getCallNonVirtualMethodOffset;
 
@@ -30,7 +30,7 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
 
         // arg 2
         context.addInstruction(
-            new MovePseudoRegToReg(
+            new MovePseudoToReg(
                 objReg,
                 context.argumentRegister(2)
             )
@@ -38,7 +38,7 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
 
         // arg 3
         context.addInstruction(
-            new MovePseudoRegToReg(
+            new MovePseudoToReg(
                 classReg,
                 context.argumentRegister(3)
             )
@@ -46,7 +46,7 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
 
         // arg 4
         context.addInstruction(
-            new MovePseudoRegToReg(
+            new MovePseudoToReg(
                 methodId,
                 context.argumentRegister(4)
             )
@@ -56,7 +56,7 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
         // insert up to the number of registers required to fill up the args
         for (int i = 0; i < args.length; i++) {
             context.addInstruction(
-                new MovePseudoRegToReg(
+                new MovePseudoToReg(
                     args[i].toX64(),
                     context.argumentRegister(i + 5)
                 )

@@ -8,7 +8,7 @@ import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-import x64.pseudo.MovePseudoRegToReg;
+import x64.pseudo.MovePseudoToReg;
 
 import static x64.allocation.CallingConvention.returnValueRegister;
 
@@ -45,7 +45,7 @@ public class ReturnRegStatement implements InterStatement {
 	@Override
 	public void compile(@NotNull X64Context function) throws CompileException {
 		function.addInstruction(
-			new MovePseudoRegToReg(
+			new MovePseudoToReg(
 				r.toX64(),
 				returnValueRegister()
 			)

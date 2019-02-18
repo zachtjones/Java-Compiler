@@ -2,8 +2,8 @@ package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
 import x64.instructions.Instruction;
-import x64.instructions.MoveImmToBasePointerOffsetInstruction;
-import x64.instructions.MoveImmToRegInstruction;
+import x64.instructions.MoveImmToBasePointerOffset;
+import x64.instructions.MoveImmToReg;
 import x64.operands.BasePointerOffset;
 import x64.operands.Immediate;
 import x64.operands.X64NativeRegister;
@@ -25,11 +25,11 @@ public class MoveImmToPseudo extends BinaryImmediateToPseudo {
 														@NotNull X64NativeRegister temporaryImmediate) {
 		if (mapping.containsKey(destination)) {
 			return Collections.singletonList(
-				new MoveImmToRegInstruction(source, mapping.get(destination))
+				new MoveImmToReg(source, mapping.get(destination))
 			);
 		} else {
 			return Collections.singletonList(
-				new MoveImmToBasePointerOffsetInstruction(source, locals.get(destination))
+				new MoveImmToBasePointerOffset(source, locals.get(destination))
 			);
 		}
 	}

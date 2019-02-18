@@ -7,7 +7,7 @@ import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
-import x64.instructions.CallClassMethod;
+import x64.instructions.CallLabel;
 import x64.instructions.MoveInstruction;
 import x64.jni.CallStaticMethodJNI;
 import x64.jni.FindClassJNI;
@@ -101,7 +101,7 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 
 			// 2. call CLASS_NAME_METHOD_NAME
 			context.addInstruction(
-				new CallClassMethod(className, functionName)
+				new CallLabel(className, functionName)
 			);
 
 			// 3. mov %rax, result
