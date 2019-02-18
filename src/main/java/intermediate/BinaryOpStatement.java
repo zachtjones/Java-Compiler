@@ -8,8 +8,8 @@ import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
 import helper.BinaryOperation;
 import x64.X64Context;
-import x64.instructions.MoveInstruction;
 import x64.operands.X64PreservedRegister;
+import x64.pseudo.MovePseudoToPseudo;
 
 /** dest = src1 OP src2 */
 public class BinaryOpStatement implements InterStatement {
@@ -69,11 +69,11 @@ public class BinaryOpStatement implements InterStatement {
 
 		X64PreservedRegister temp = context.getNextQuadRegister();
 
-		context.addInstruction(new MoveInstruction(src1.toX64(), temp));
+		context.addInstruction(new MovePseudoToPseudo(src1.toX64(), temp));
 
 		context.addInstruction(type.getInstruction(src2.toX64(), temp));
 
-		context.addInstruction(new MoveInstruction(temp, dest.toX64()));
+		context.addInstruction(new MovePseudoToPseudo(temp, dest.toX64()));
 
 	}
 }

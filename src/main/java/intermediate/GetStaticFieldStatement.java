@@ -7,11 +7,11 @@ import helper.Types;
 import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import x64.*;
-import x64.instructions.MoveInstruction;
 import x64.jni.FindClassJNI;
 import x64.jni.GetStaticFieldIdJNI;
 import x64.jni.GetStaticFieldJNI;
 import x64.operands.X64PreservedRegister;
+import x64.pseudo.MoveRIPRelativeToPseudo;
 
 import static x64.operands.RIPRelativeData.fromField;
 
@@ -80,8 +80,8 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 		} else {
 			// mov CLASS_NAME_FIELD_NAME(%rip), %destination
 			context.addInstruction(
-				new MoveInstruction(
-					fromField(className, fieldName, result),
+				new MoveRIPRelativeToPseudo(
+					fromField(className, fieldName),
 					result.toX64()
 				)
 			);

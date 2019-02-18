@@ -2,11 +2,11 @@ package x64.operands;
 
 import org.jetbrains.annotations.NotNull;
 
-public class MemoryAtPseudo {
+public class MemoryAtRegister {
     @NotNull
-    public final X64PreservedRegister source;
+    public final X64NativeRegister source;
 
-    public MemoryAtPseudo(@NotNull X64PreservedRegister source) {
+    public MemoryAtRegister(@NotNull X64NativeRegister source) {
         this.source = source;
     }
 

@@ -8,7 +8,6 @@ import helper.UsageCheck;
 import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-import x64.instructions.MoveInstruction;
 import x64.jni.FindClassJNI;
 import x64.jni.GetInstanceFieldIdJNI;
 import x64.jni.GetInstanceFieldJNI;

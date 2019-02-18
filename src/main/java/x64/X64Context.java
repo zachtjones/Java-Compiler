@@ -3,9 +3,9 @@ package x64;
 import intermediate.Register;
 import intermediate.RegisterAllocator;
 import x64.allocation.CallingConvention;
-import x64.instructions.MoveInstruction;
 import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
+import x64.pseudo.MovePseudoRegToReg;
 import x64.pseudo.PseudoInstruction;
 
 import java.util.HashMap;
@@ -59,7 +59,7 @@ public class X64Context {
 
 	/** Loads the JNI pointer into the first argument */
 	public void loadJNI1() {
-		function.addInstruction(new MoveInstruction(jniPointer, argumentRegister(1)));
+		function.addInstruction(new MovePseudoRegToReg(jniPointer, argumentRegister(1)));
 	}
 
 	/** Returns the register operand that holds the JNI pointer */

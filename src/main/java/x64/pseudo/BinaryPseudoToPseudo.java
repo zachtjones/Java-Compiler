@@ -3,22 +3,23 @@ package x64.pseudo;
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
-import x64.operands.MemoryAtPseudo;
+import x64.operands.X64NativeRegister;
 import x64.operands.X64PreservedRegister;
 
 import java.util.Map;
 
 /***
- * Represents a binary instruction that involves a memory at pseudo register source and pseudo register destination.
+ * Represents a binary instruction that involves a pseudo register source and native register destination.
  */
-public abstract class BinaryPseudoAbsoluteToPseudo implements PseudoInstruction {
-	@NotNull public final MemoryAtPseudo source;
+public abstract class BinaryPseudoToPseudo implements PseudoInstruction {
+
+	@NotNull public final X64PreservedRegister source;
 	@NotNull public final X64PreservedRegister destination;
-	private final String name;
+	@NotNull private final String name;
 
 
-	public BinaryPseudoAbsoluteToPseudo(String name, @NotNull MemoryAtPseudo source,
-										@NotNull X64PreservedRegister destination) {
+	public BinaryPseudoToPseudo(@NotNull String name, @NotNull X64PreservedRegister source,
+								@NotNull X64PreservedRegister destination) {
 		this.name = name;
 		this.source = source;
 		this.destination = destination;
@@ -26,12 +27,12 @@ public abstract class BinaryPseudoAbsoluteToPseudo implements PseudoInstruction 
 
 	@Override
 	public void markRegisters(int i, RegistersUsed usedRegs) {
-		usedRegs.markDefined(destination, i);
+		usedRegs.markUsed(source, i);
 	}
 
 	@Override
 	public void prioritizeRegisters(Map<X64PreservedRegister, RegisterMapped> mapping) {
-		mapping.get(destination).increment();
+		mapping.get(source).increment();
 	}
 
 	/** Represents how this instruction should be represented */

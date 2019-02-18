@@ -6,10 +6,7 @@ import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-import x64.instructions.MoveInstruction;
-
-import static x64.allocation.CallingConvention.argumentRegister;
-
+import x64.pseudo.MoveRegToPseudoReg;
 
 /** getParam %register = name */
 public class GetParamStatement implements InterStatement {
@@ -58,7 +55,7 @@ public class GetParamStatement implements InterStatement {
 		// the args are as follows: JNI, obj/class, actual args
 		if (localName.equals("this")) {
 			context.addInstruction(
-				new MoveInstruction(
+				new MoveRegToPseudoReg(
 					context.argumentRegister(2),
 					r.toX64()
 				)
@@ -70,7 +67,7 @@ public class GetParamStatement implements InterStatement {
 			int paramIndex = (func.isInstance ? 3 : 2) + func.paramNames.indexOf(localName);
 
 			context.addInstruction(
-				new MoveInstruction(
+				new MoveRegToPseudoReg(
 					context.argumentRegister(paramIndex),
 					r.toX64()
 				)
