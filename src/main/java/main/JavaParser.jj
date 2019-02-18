@@ -18,7 +18,7 @@ import tree.*;
 import intermediate.SetConditionStatement;
 import java.util.ArrayList;
 import java.nio.charset.Charset;
-import helper.Types;
+import helper.*;
 
 // hide the warnings from dead code -- there's no way to block it
 @SuppressWarnings("unused")
