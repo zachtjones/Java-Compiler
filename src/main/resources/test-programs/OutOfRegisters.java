@@ -9,7 +9,7 @@ public class OutOfRegisters {
 
 		// this is a special case for optimizations that would be perfect, it could be boiled down
 		//  pretty easily to 91 (copy propogation, constant folding) -- full code could be equivalent to:
-		// System.out.print(91L);
+		// System.out.println(91L);
 
 		long a = 1L;
 		long b = 2L;
@@ -27,6 +27,6 @@ public class OutOfRegisters {
 
 		long z = a + b + c + d + e + f + g + h + i + j + k + l + m;
 
-		System.out.print(z); // should be 91
+		System.out.println(z); // should be 91
 	}
 }

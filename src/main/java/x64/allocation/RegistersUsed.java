@@ -11,7 +11,7 @@ public class RegistersUsed {
 	// map of 1 register -> many usages
 	private Map<X64PreservedRegister, TreeSet<Integer>> usages;
 
-	private Map<X64PreservedRegister, Integer> definition;
+	private Map<X64PreservedRegister, TreeSet<Integer>> definition;
 
 	private TreeSet<Integer> functionCallLines;
 
@@ -30,7 +30,9 @@ public class RegistersUsed {
 
 	/** Marks a register as being defined at line (aka given a value) */
 	public void markDefined(X64PreservedRegister defined, int line) {
-		definition.put(defined, line);
+		TreeSet<Integer> mapping = definition.getOrDefault(defined, new TreeSet<>());
+		mapping.add(line);
+		definition.putIfAbsent(defined, mapping);
 	}
 
 	/** Marks a function call occurring at the line specified */
@@ -43,13 +45,18 @@ public class RegistersUsed {
 		return usages.get(register).last();
 	}
 
+	/** Returns the index of the instruction that last uses the register */
+	private int getFirstDefinition(X64PreservedRegister register) {
+		return definition.get(register).first();
+	}
+
 	/** Utility method for determining if a register in the function can be temporary */
 	boolean canBeTemporary(X64PreservedRegister register) {
 
 		// TODO this will be more complicated with branches backwards
 
 		if (usages.containsKey(register)) {
-			int defined = definition.get(register);
+			int defined = getFirstDefinition(register);
 			int lastUsed = getLastUsage(register);
 
 			// it can be temporary if not used across function call
@@ -78,7 +85,7 @@ public class RegistersUsed {
 	 */
 	Map<Integer, X64PreservedRegister> getDefinitions() {
 		HashMap<Integer, X64PreservedRegister> temp = new HashMap<>();
-		definition.forEach(((x64PreservedRegister, integer) -> temp.put(integer, x64PreservedRegister)));
+		definition.forEach(((register, integers) -> temp.put(integers.first(), register)));
 		return temp;
 	}
 }
