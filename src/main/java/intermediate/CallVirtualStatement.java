@@ -12,11 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
 import x64.instructions.CallLabel;
-import x64.instructions.MoveInstruction;
 import x64.jni.CallMethodJNI;
 import x64.jni.GetMethodIdJNI;
 import x64.jni.GetObjectClassJNI;
 import x64.operands.X64PreservedRegister;
+import x64.pseudo.MovePseudoToReg;
+import x64.pseudo.MoveRegToPseudo;
 
 import static x64.allocation.CallingConvention.returnValueRegister;
 
@@ -98,13 +99,13 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 			context.loadJNI1();
 
 			context.addInstruction(
-				new MoveInstruction(obj.toX64(), context.argumentRegister(2))
+				new MovePseudoToReg(obj.toX64(), context.argumentRegister(2))
 			);
 
 			// the rest of the args
 			for (int i = 0; i < args.length; i++) {
 				context.addInstruction(
-					new MoveInstruction(args[i].toX64(), context.argumentRegister(3 + i))
+					new MovePseudoToReg(args[i].toX64(), context.argumentRegister(3 + i))
 				);
 			}
 
@@ -114,7 +115,7 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 			// move result -- unless null (meaning void method)
 			if (returnVal != null)
 				context.addInstruction(
-					new MoveInstruction(returnValueRegister(), returnVal.toX64())
+					new MoveRegToPseudo(returnValueRegister(), returnVal.toX64())
 				);
 		}
 	}

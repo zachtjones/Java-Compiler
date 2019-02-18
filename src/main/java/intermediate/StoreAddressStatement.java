@@ -13,6 +13,7 @@ import x64.jni.*;
 import x64.operands.RIPRelativeData;
 import x64.operands.PseudoDisplacement;
 import x64.operands.X64PreservedRegister;
+import x64.pseudo.MovePseudoToPseudoDisplacement;
 import x64.pseudo.MovePseudoToRIPRelative;
 
 /** store %src at %addr */

@@ -7,7 +7,7 @@ import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-import x64.instructions.MoveInstruction;
+import x64.pseudo.MovePseudoToPseudo;
 
 public class CopyStatement implements InterStatement {
 	@NotNull private final Register src;
@@ -42,7 +42,7 @@ public class CopyStatement implements InterStatement {
 	public void compile(@NotNull X64Context context) throws CompileException {
 		// simple move from source to destination
 		context.addInstruction(
-			new MoveInstruction(
+			new MovePseudoToPseudo(
 				src.toX64(),
 				dest.toX64()
 			)

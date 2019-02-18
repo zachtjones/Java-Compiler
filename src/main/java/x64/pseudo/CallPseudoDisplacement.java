@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Map;
 
 /** Represents a call to a register relative memory pointer, callq *16(%q10) for example */
-public class CallPseudoRegDisplacement implements PseudoInstruction {
+public class CallPseudoDisplacement implements PseudoInstruction {
 
 	@NotNull private final PseudoDisplacement temp;
 
-	public CallPseudoRegDisplacement(@NotNull PseudoDisplacement temp) {
+	public CallPseudoDisplacement(@NotNull PseudoDisplacement temp) {
 		this.temp = temp;
 	}
 

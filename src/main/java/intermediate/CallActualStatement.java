@@ -12,11 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
 import x64.instructions.CallLabel;
-import x64.instructions.MoveInstruction;
 import x64.jni.CallNonVirtualMethodJNI;
 import x64.jni.FindClassJNI;
 import x64.jni.GetMethodIdJNI;
 import x64.operands.X64PreservedRegister;
+import x64.pseudo.MovePseudoToReg;
+import x64.pseudo.MoveRegToPseudo;
 
 import static x64.allocation.CallingConvention.returnValueRegister;
 
@@ -94,7 +95,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 
 			// object
 			context.addInstruction(
-				new MoveInstruction(
+				new MovePseudoToReg(
 					obj.toX64(),
 					context.argumentRegister(2)
 				)
@@ -103,7 +104,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			// the rest of the args
 			for (int i = 0; i < args.length; i++) {
 				context.addInstruction(
-					new MoveInstruction(
+					new MovePseudoToReg(
 						args[i].toX64(),
 						context.argumentRegister(3 + i)
 					)
@@ -118,7 +119,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			// 3. mov %rax, result
 			if (returnVal != null)
 			context.addInstruction(
-				new MoveInstruction(
+				new MoveRegToPseudo(
 					returnValueRegister(),
 					returnVal.toX64()
 				)

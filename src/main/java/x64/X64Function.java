@@ -6,7 +6,7 @@ import x64.directives.*;
 import x64.instructions.*;
 import x64.operands.Immediate;
 import x64.operands.X64PreservedRegister;
-import x64.pseudo.MoveRegToPseudoReg;
+import x64.pseudo.MoveRegToPseudo;
 import x64.pseudo.PseudoInstruction;
 
 import java.util.*;
@@ -38,7 +38,7 @@ public class X64Function {
 		header.add(new LabelInstruction(symbolName));
 
 		// save the first argument, the java environment pointer to a dedicated virtual register.
-		contents.add(new MoveRegToPseudoReg(argumentRegister(1), jniEnvPointer));
+		contents.add(new MoveRegToPseudo(argumentRegister(1), jniEnvPointer));
 	}
 
 	/** Adds an instruction to this function */

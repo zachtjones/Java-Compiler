@@ -12,10 +12,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class MoveRegToPseudoReg extends BinaryRegToPseudoReg {
+public class MoveRegToPseudo extends BinaryRegToPseudoReg {
 
-	public MoveRegToPseudoReg(@NotNull X64NativeRegister source,
-							  @NotNull X64PreservedRegister destination) {
+	public MoveRegToPseudo(@NotNull X64NativeRegister source,
+						   @NotNull X64PreservedRegister destination) {
 		super("mov", source, destination);
 	}
 

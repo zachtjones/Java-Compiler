@@ -8,11 +8,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
 import x64.instructions.CallLabel;
-import x64.instructions.MoveInstruction;
 import x64.jni.CallStaticMethodJNI;
 import x64.jni.FindClassJNI;
 import x64.jni.GetStaticMethodIdJNI;
 import x64.operands.X64PreservedRegister;
+import x64.pseudo.MovePseudoToReg;
+import x64.pseudo.MoveRegToPseudo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,7 +93,7 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 			// the rest of the args, the actual ones to the method
 			for (int i = 0; i < args.length; i++) {
 				context.addInstruction(
-					new MoveInstruction(
+					new MovePseudoToReg(
 						args[i].toX64(),
 						context.argumentRegister(2 + i)
 					)
@@ -107,7 +108,7 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 			// 3. mov %rax, result
 			if (returnVal != null) {
 				context.addInstruction(
-					new MoveInstruction(
+					new MoveRegToPseudo(
 						returnValueRegister(),
 						returnVal.toX64()
 					)
