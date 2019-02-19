@@ -25,7 +25,7 @@ public class X64PseudoRegister {
     @Override
     public boolean equals(Object other) {
         return other instanceof X64PseudoRegister &&
-            ("%" + ((X64PseudoRegister) other).size.size + ((X64PseudoRegister) other).number).equals("%" + size.size + number);
+            ((X64PseudoRegister) other).number == this.number;
     }
 
     @Override
