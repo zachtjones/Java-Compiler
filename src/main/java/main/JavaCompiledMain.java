@@ -8,7 +8,7 @@ import intermediate.RegisterAllocator;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.X64File;
-import x64.instructions.CallClassMethod;
+import x64.instructions.CallLabel;
 
 import java.io.File;
 
@@ -43,7 +43,7 @@ public class JavaCompiledMain {
         final X64Context context = new X64Context(bridgeFile, new RegisterAllocator(), "mainMethod");
 
         context.addInstruction(
-            new CallClassMethod(mainClass.getName(), "main")
+            new CallLabel(mainClass.getName(), "main")
         );
 
         context.addFunctionToFile();

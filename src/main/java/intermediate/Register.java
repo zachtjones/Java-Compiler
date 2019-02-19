@@ -7,11 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import tree.Expression;
 import tree.NodeImpl;
 import tree.SymbolTable;
-import x64.Instruction;
-import x64.operands.X64PreservedRegister;
-import x64.operands.X64RegisterOperand;
-
-import static x64.operands.X64RegisterOperand.of;
+import x64.X64InstructionSize;
+import x64.operands.X64PseudoRegister;
 
 /**
  * Represents an abstraction of a hardware Register.
@@ -101,12 +98,12 @@ public class Register extends NodeImpl implements Expression {
 	}
 
 	/** Returns the instruction size that is suitable for this instruction, for the x64 architecture */
-	public Instruction.Size x64Type() {
+	public X64InstructionSize x64Type() {
 		return type.x64Type();
     }
 
     /** Converts this intermediate language register to the x64 assembly type. */
-    public X64RegisterOperand toX64() {
-		return of(new X64PreservedRegister(this.num, this.x64Type()));
+    public X64PseudoRegister toX64() {
+		return new X64PseudoRegister(this.num, this.x64Type());
 	}
 }

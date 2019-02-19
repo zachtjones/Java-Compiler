@@ -1,7 +1,7 @@
 package helper;
 
 import org.jetbrains.annotations.NotNull;
-import x64.Instruction;
+import x64.X64InstructionSize;
 
 public class Types {
 
@@ -121,27 +121,27 @@ public class Types {
 	}
 
 	/** returns the x64 instruction size that would be used with this types instance. */
-	public Instruction.Size x64Type() {
+	public X64InstructionSize x64Type() {
 		if (this == BOOLEAN || this == BYTE) {
-			return Instruction.Size.BYTE;
+			return X64InstructionSize.BYTE;
 		}
 		if (this == CHAR || this == SHORT) {
-			return Instruction.Size.WORD;
+			return X64InstructionSize.WORD;
 		}
 		if (this == INT) {
-			return Instruction.Size.LONG;
+			return X64InstructionSize.LONG;
 		}
 		if (this == LONG) {
-			return Instruction.Size.QUAD;
+			return X64InstructionSize.QUAD;
 		}
 		if (this == FLOAT) {
-			return Instruction.Size.SINGLE;
+			return X64InstructionSize.SINGLE;
 		}
 		if (this == DOUBLE) {
-			return Instruction.Size.DOUBLE;
+			return X64InstructionSize.DOUBLE;
 		}
 		// pointers to classes
-		return Instruction.Size.QUAD;
+		return X64InstructionSize.QUAD;
 	}
 
 	/** returns true if this resembles a primitive type */

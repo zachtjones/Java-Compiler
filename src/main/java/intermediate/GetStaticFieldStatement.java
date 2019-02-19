@@ -7,13 +7,13 @@ import helper.Types;
 import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import x64.*;
-import x64.instructions.MoveInstruction;
 import x64.jni.FindClassJNI;
 import x64.jni.GetStaticFieldIdJNI;
 import x64.jni.GetStaticFieldJNI;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PseudoRegister;
+import x64.pseudo.MoveRIPRelativeToPseudo;
 
-import static x64.operands.PCRelativeData.fromField;
+import static x64.operands.RIPRelativeData.fromField;
 
 public class GetStaticFieldStatement implements InterStatement, FindClassJNI, GetStaticFieldIdJNI, GetStaticFieldJNI {
 	@NotNull private final String className;
@@ -67,10 +67,10 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 
 			// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
 			//    - name is like: java/lang/String
-			final X64RegisterOperand classReg = addFindClassJNICall(context, className);
+			final X64PseudoRegister classReg = addFindClassJNICall(context, className);
 
 			// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
-			final X64RegisterOperand fieldIDReg =
+			final X64PseudoRegister fieldIDReg =
 				addGetStaticFieldIdJNICall(result, fieldName, classReg, context);
 
 
@@ -80,8 +80,8 @@ public class GetStaticFieldStatement implements InterStatement, FindClassJNI, Ge
 		} else {
 			// mov CLASS_NAME_FIELD_NAME(%rip), %destination
 			context.addInstruction(
-				new MoveInstruction(
-					fromField(className, fieldName, result),
+				new MoveRIPRelativeToPseudo(
+					fromField(className, fieldName),
 					result.toX64()
 				)
 			);

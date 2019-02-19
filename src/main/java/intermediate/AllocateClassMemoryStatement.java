@@ -6,9 +6,10 @@ import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.allocation.CallingConvention;
-import x64.instructions.CallClassMethod;
-import x64.instructions.MoveInstruction;
+import x64.instructions.CallLabel;
+import x64.instructions.MoveImmToReg;
 import x64.operands.Immediate;
+import x64.pseudo.MoveRegToPseudo;
 
 import java.util.HashMap;
 
@@ -48,19 +49,19 @@ public class AllocateClassMemoryStatement implements InterStatement {
 		InterFile temp = JavaCompiler.parseAndCompile(type.getClassName("", -1), "", -1);
 		int size = temp.getClassSize();
 		context.addInstruction(
-			new MoveInstruction(
+			new MoveImmToReg(
 				new Immediate(size),
 				context.argumentRegister(1)
 			)
 		);
 
 		context.addInstruction(
-			new CallClassMethod(CallingConvention.libraryFunc("malloc"))
+			new CallLabel(CallingConvention.libraryFunc("malloc"))
 		);
 
 		// move returned value
 		context.addInstruction(
-			new MoveInstruction(
+			new MoveRegToPseudo(
 				returnValueRegister(),
 				result.toX64()
 			)

@@ -8,12 +8,12 @@ import helper.UsageCheck;
 import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-import x64.instructions.MoveInstruction;
 import x64.jni.FindClassJNI;
 import x64.jni.GetInstanceFieldIdJNI;
 import x64.jni.GetInstanceFieldJNI;
-import x64.operands.RegisterRelativePointer;
-import x64.operands.X64RegisterOperand;
+import x64.operands.PseudoDisplacement;
+import x64.operands.X64PseudoRegister;
+import x64.pseudo.MovePseudoDisplacementToPseudo;
 
 public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, GetInstanceFieldIdJNI, GetInstanceFieldJNI {
 	@NotNull private Register instance;
@@ -65,11 +65,11 @@ public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, 
 
 			// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
 			//    - name is like: java/lang/String
-			final X64RegisterOperand classReg = addFindClassJNICall(context, className);
+			final X64PseudoRegister classReg = addFindClassJNICall(context, className);
 
 			// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
 			// src holds the type
-			final X64RegisterOperand fieldIDReg =
+			final X64PseudoRegister fieldIDReg =
 				addGetInstanceFieldIdJNICall(instance, fieldName, classReg, context);
 
 
@@ -85,8 +85,8 @@ public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, 
 
 			// mov field_offset(%instance), result
 			context.addInstruction(
-				new MoveInstruction(
-					new RegisterRelativePointer(fieldOffset, instance.toX64()),
+				new MovePseudoDisplacementToPseudo(
+					new PseudoDisplacement(fieldOffset, instance.toX64()),
 					result.toX64()
 				)
 			);

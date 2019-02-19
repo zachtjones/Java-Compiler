@@ -1,6 +1,6 @@
 package x64.directives;
 
-public class TypeDirective implements Directive {
+public class TypeDirective extends Directive {
 	private String symbolName;
 
 	public TypeDirective(String symbolName) {
@@ -8,7 +8,7 @@ public class TypeDirective implements Directive {
 	}
 
 	@Override
-	public String toString() {
+	public String assemblyRepresentation() {
 		return ".type " + symbolName + ", @function";
 	}
 }

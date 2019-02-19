@@ -1,5 +1,6 @@
 package tree;
 
+import helper.BinaryOperation;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.BinaryOpStatement;
@@ -41,7 +42,7 @@ public class BinaryExpressionNode extends NodeImpl implements Expression {
 
 		f.statements.add(new BinaryOpStatement(
 			leftResult, rightResult,
-			destination, op.getRepresentation(),
+			destination, op,
 			getFileName(), getLine()));
 	}
 }

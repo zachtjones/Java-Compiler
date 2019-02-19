@@ -2,11 +2,10 @@ package x64.jni;
 
 import intermediate.Register;
 import x64.X64Context;
-import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PseudoRegister;
+import x64.pseudo.MovePseudoToReg;
 
-import static x64.allocation.CallingConvention.argumentRegister;
 import static x64.jni.JNIOffsets.getCallStaticMethodOffset;
 
 public interface CallStaticMethodJNI extends CallJNIMethod {
@@ -19,8 +18,8 @@ public interface CallStaticMethodJNI extends CallJNIMethod {
      * @param args The program arguments to the function
      * @param returnVal Where to store the returned value
      */
-    default void addCallStaticMethodJNI(X64Context context, X64RegisterOperand classReg, X64RegisterOperand methodId,
-                                        Register[] args, Register returnVal) {
+    default void addCallStaticMethodJNI(X64Context context, X64PseudoRegister classReg, X64PseudoRegister methodId,
+										Register[] args, Register returnVal) {
 
         // 3 options for the method call, but will use the first one
         // %result = CallNonVirtual<type>Method(JNIEnv, obj, class, methodID, ...);
@@ -30,7 +29,7 @@ public interface CallStaticMethodJNI extends CallJNIMethod {
 
         // arg 2
         context.addInstruction(
-            new MoveInstruction(
+            new MovePseudoToReg(
                 classReg,
                 context.argumentRegister(2)
             )
@@ -38,7 +37,7 @@ public interface CallStaticMethodJNI extends CallJNIMethod {
 
         // arg 3
         context.addInstruction(
-            new MoveInstruction(
+            new MovePseudoToReg(
                 methodId,
                 context.argumentRegister(3)
             )
@@ -48,7 +47,7 @@ public interface CallStaticMethodJNI extends CallJNIMethod {
         // insert up to the number of registers required to fill up the args
         for (int i = 0; i < args.length; i++) {
             context.addInstruction(
-                new MoveInstruction(
+                new MovePseudoToReg(
                     args[i].toX64(),
                     context.argumentRegister(i + 4)
                 )

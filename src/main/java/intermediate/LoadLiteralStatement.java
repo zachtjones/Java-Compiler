@@ -4,15 +4,14 @@ import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-import x64.instructions.LoadEffectiveAddressInstruction;
-import x64.instructions.MoveInstruction;
+import x64.pseudo.LoadEffectiveAddressRIPPseudo;
 import x64.jni.NewStringUTF_JNI;
 import x64.operands.Immediate;
-import x64.operands.X64RegisterOperand;
+import x64.operands.RIPRelativeData;
+import x64.operands.X64PseudoRegister;
+import x64.pseudo.MoveImmToPseudo;
 
 import java.util.HashMap;
-
-import static x64.operands.PCRelativeData.pointerFromLabel;
 
 /** load 10 into %i12; load "hello, world" into %r4, ... */
 public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
@@ -90,14 +89,14 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 		if (r.getType() == Types.BOOLEAN) {
 			if (value.equals("true")) {
 				context.addInstruction(
-					new MoveInstruction(
+					new MoveImmToPseudo(
 						new Immediate(1),
 						r.toX64()
 					)
 				);
 			} else {
 				context.addInstruction(
-					new MoveInstruction(
+					new MoveImmToPseudo(
 						new Immediate(0),
 						r.toX64()
 					)
@@ -105,14 +104,14 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 			}
 		} else if (r.getType() == Types.BYTE) {
 			context.addInstruction(
-				new MoveInstruction(
+				new MoveImmToPseudo(
 					new Immediate(Byte.parseByte(value)),
 					r.toX64()
 				)
 			);
 		} else if (r.getType() == Types.CHAR) {
 			context.addInstruction(
-				new MoveInstruction(
+				new MoveImmToPseudo(
 					// there is a char literal allows by the GNU as, but will just use the byte number
 					new Immediate(value.charAt(0)),
 					r.toX64()
@@ -120,21 +119,21 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 			);
 		} else if (r.getType() == Types.SHORT) {
 			context.addInstruction(
-				new MoveInstruction(
+				new MoveImmToPseudo(
 					new Immediate(Short.parseShort(value)),
 					r.toX64()
 				)
 			);
 		} else if (r.getType() == Types.INT) {
 			context.addInstruction(
-				new MoveInstruction(
+				new MoveImmToPseudo(
 					new Immediate(Integer.parseInt(value)),
 					r.toX64()
 				)
 			);
 		} else if (r.getType() == Types.LONG) {
 			context.addInstruction(
-				new MoveInstruction(
+				new MoveImmToPseudo(
 					new Immediate(Long.parseLong(value)),
 					r.toX64()
 				)
@@ -144,10 +143,10 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 			String label = context.insertDataString(value.substring(1, value.length() - 1));
 
 			// leaq LABEL(%rip), %temp
-			X64RegisterOperand chars = context.getNextQuadRegister();
+			X64PseudoRegister chars = context.getNextQuadRegister();
 			context.addInstruction(
-				new LoadEffectiveAddressInstruction(
-					pointerFromLabel(label),
+				new LoadEffectiveAddressRIPPseudo(
+					RIPRelativeData.pointerFromLabel(label),
 					chars
 				)
 			);

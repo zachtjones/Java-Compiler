@@ -9,11 +9,12 @@ import helper.UsageCheck;
 import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-import x64.instructions.MoveInstruction;
 import x64.jni.*;
-import x64.operands.PCRelativeData;
-import x64.operands.RegisterRelativePointer;
-import x64.operands.X64RegisterOperand;
+import x64.operands.RIPRelativeData;
+import x64.operands.PseudoDisplacement;
+import x64.operands.X64PseudoRegister;
+import x64.pseudo.MovePseudoToPseudoDisplacement;
+import x64.pseudo.MovePseudoToRIPRelative;
 
 /** store %src at %addr */
 public class StoreAddressStatement implements InterStatement,
@@ -60,11 +61,11 @@ public class StoreAddressStatement implements InterStatement,
 
 				// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
 				//    - name is like: java/lang/String
-				final X64RegisterOperand classReg = addFindClassJNICall(context, className);
+				final X64PseudoRegister classReg = addFindClassJNICall(context, className);
 
 				// Step 2. fieldID = javaEnv -> GetFieldID(JNIEnv *env, class, char *name, char *sig);
 				// src holds the type
-				final X64RegisterOperand fieldIDReg =
+				final X64PseudoRegister fieldIDReg =
 					addGetInstanceFieldIdJNICall(src, fieldName, classReg, context);
 
 
@@ -80,9 +81,9 @@ public class StoreAddressStatement implements InterStatement,
 
 				// mov %src, field_offset(%instance)
 				context.addInstruction(
-					new MoveInstruction(
+					new MovePseudoToPseudoDisplacement(
 						src.toX64(),
-						new RegisterRelativePointer(fieldOffset, object.toX64())
+						new PseudoDisplacement(fieldOffset, object.toX64())
 					)
 				);
 			}
@@ -93,11 +94,11 @@ public class StoreAddressStatement implements InterStatement,
 			if (className.startsWith("java/")) {
 
 				// Step 1. class = javaEnv -> FindClass(JNIEnv *env, char* name);
-				final X64RegisterOperand classReg = addFindClassJNICall(context, className);
+				final X64PseudoRegister classReg = addFindClassJNICall(context, className);
 
 				// Step 2. fieldID = javaEnv -> GetStaticFieldID(JNIEnv *env, class, char *name, char *sig);
 				// src holds the type
-				final X64RegisterOperand fieldIDReg =
+				final X64PseudoRegister fieldIDReg =
 					addGetStaticFieldIdJNICall(src, fieldName, classReg, context);
 
 				// Step 3. javaEnv -> SetStatic<Type>Field(JNIEnv *env, class, fieldID, value)
@@ -106,9 +107,9 @@ public class StoreAddressStatement implements InterStatement,
 			} else {
 				// mov %src, class_name_field_offset(%rip), src is used in the destination for the data size
 				context.addInstruction(
-					new MoveInstruction(
+					new MovePseudoToRIPRelative(
 						src.toX64(),
-						PCRelativeData.fromField(className, fieldName, src)
+						RIPRelativeData.fromField(className, fieldName)
 					)
 				);
 			}

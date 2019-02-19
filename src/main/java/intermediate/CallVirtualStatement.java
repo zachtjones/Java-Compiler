@@ -3,7 +3,6 @@ package intermediate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.stream.Collectors;
 
 import helper.CompileException;
 import helper.Types;
@@ -12,12 +11,13 @@ import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
-import x64.instructions.CallClassMethod;
-import x64.instructions.MoveInstruction;
+import x64.instructions.CallLabel;
 import x64.jni.CallMethodJNI;
 import x64.jni.GetMethodIdJNI;
 import x64.jni.GetObjectClassJNI;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PseudoRegister;
+import x64.pseudo.MovePseudoToReg;
+import x64.pseudo.MoveRegToPseudo;
 
 import static x64.allocation.CallingConvention.returnValueRegister;
 
@@ -81,13 +81,13 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 		final String classname = obj.getType().getClassName(fileName, line);
 		if (classname.startsWith("java/")) {
 
-			final X64RegisterOperand objReg = obj.toX64();
+			final X64PseudoRegister objReg = obj.toX64();
 
 			// clazz = GetClass
-			final X64RegisterOperand clazz = addGetObjectClass(context, objReg);
+			final X64PseudoRegister clazz = addGetObjectClass(context, objReg);
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
-			X64RegisterOperand methodId = addGetMethodId(context, clazz, name, args, returnVal);
+			final X64PseudoRegister methodId = addGetMethodId(context, clazz, name, args, returnVal);
 
 			// result = Call<Type>Method(JNIEnv, obj, methodID, ...)
 			addCallMethodJNI(context, objReg, methodId, args, returnVal);
@@ -99,23 +99,23 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 			context.loadJNI1();
 
 			context.addInstruction(
-				new MoveInstruction(obj.toX64(), context.argumentRegister(2))
+				new MovePseudoToReg(obj.toX64(), context.argumentRegister(2))
 			);
 
 			// the rest of the args
 			for (int i = 0; i < args.length; i++) {
 				context.addInstruction(
-					new MoveInstruction(args[i].toX64(), context.argumentRegister(3 + i))
+					new MovePseudoToReg(args[i].toX64(), context.argumentRegister(3 + i))
 				);
 			}
 
 			// call
-			context.addInstruction(new CallClassMethod(classname, name));
+			context.addInstruction(new CallLabel(classname, name));
 
 			// move result -- unless null (meaning void method)
 			if (returnVal != null)
 				context.addInstruction(
-					new MoveInstruction(returnValueRegister(), returnVal.toX64())
+					new MoveRegToPseudo(returnValueRegister(), returnVal.toX64())
 				);
 		}
 	}

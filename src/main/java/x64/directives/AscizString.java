@@ -1,6 +1,6 @@
 package x64.directives;
 
-public class AscizString implements Directive {
+public class AscizString extends Directive {
 
     private String content;
 
@@ -9,8 +9,7 @@ public class AscizString implements Directive {
     }
 
     @Override
-    public String toString() {
-        // fill with the NOP instruction (0x90)
+    public String assemblyRepresentation() {
         return String.format(".asciz \"%s\"", content);
     }
 

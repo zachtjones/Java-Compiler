@@ -8,8 +8,8 @@ import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-import x64.instructions.MoveInstruction;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PseudoRegister;
+import x64.pseudo.MovePseudoToPseudo;
 
 /** PutLocal name = %register */
 public class PutLocalStatement implements InterStatement {
@@ -50,11 +50,11 @@ public class PutLocalStatement implements InterStatement {
 
 	@Override
 	public void compile(@NotNull X64Context context) throws CompileException {
-		final X64RegisterOperand destination = context.getLocalVariable(localName);
+		final X64PseudoRegister destination = context.getLocalVariable(localName);
 
 		// copy the result over to the destination
 		context.addInstruction(
-			new MoveInstruction(r.toX64(), destination)
+			new MovePseudoToPseudo(r.toX64(), destination)
 		);
 	}
 }

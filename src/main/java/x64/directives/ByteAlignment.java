@@ -1,6 +1,6 @@
 package x64.directives;
 
-public class ByteAlignment implements Directive {
+public class ByteAlignment extends Directive {
 
     private final int alignment;
 
@@ -9,7 +9,7 @@ public class ByteAlignment implements Directive {
     }
 
     @Override
-    public String toString() {
+    public String assemblyRepresentation() {
         // fill with the NOP instruction (0x90)
         return String.format(".balign %d, 0x90", alignment);
     }

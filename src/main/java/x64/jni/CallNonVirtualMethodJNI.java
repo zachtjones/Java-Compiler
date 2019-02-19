@@ -2,9 +2,9 @@ package x64.jni;
 
 import intermediate.Register;
 import x64.X64Context;
-import x64.instructions.MoveInstruction;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.*;
+import x64.pseudo.MovePseudoToReg;
 
 import static x64.jni.JNIOffsets.getCallNonVirtualMethodOffset;
 
@@ -19,8 +19,8 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
      * @param args The program arguments to the function
      * @param returnVal Where to store the returned value
      */
-    default void addCallNonVirtualMethodJNI(X64Context context, X64RegisterOperand classReg,
-            X64RegisterOperand objReg, X64RegisterOperand methodId, Register[] args, Register returnVal) {
+    default void addCallNonVirtualMethodJNI(X64Context context, X64PseudoRegister classReg,
+											X64PseudoRegister objReg, X64PseudoRegister methodId, Register[] args, Register returnVal) {
 
         // 3 options for the method call, but will use the first one
         // %result = CallNonVirtual<type>Method(JNIEnv, obj, class, methodID, ...);
@@ -30,7 +30,7 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
 
         // arg 2
         context.addInstruction(
-            new MoveInstruction(
+            new MovePseudoToReg(
                 objReg,
                 context.argumentRegister(2)
             )
@@ -38,7 +38,7 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
 
         // arg 3
         context.addInstruction(
-            new MoveInstruction(
+            new MovePseudoToReg(
                 classReg,
                 context.argumentRegister(3)
             )
@@ -46,7 +46,7 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
 
         // arg 4
         context.addInstruction(
-            new MoveInstruction(
+            new MovePseudoToReg(
                 methodId,
                 context.argumentRegister(4)
             )
@@ -56,22 +56,12 @@ public interface CallNonVirtualMethodJNI extends CallJNIMethod {
         // insert up to the number of registers required to fill up the args
         for (int i = 0; i < args.length; i++) {
             context.addInstruction(
-                new MoveInstruction(
+                new MovePseudoToReg(
                     args[i].toX64(),
                     context.argumentRegister(i + 5)
                 )
             );
         }
-
-        // load the function pointer
-        // Call<type>Method(JNIEnv *env, jobject obj, jmethodID methodID, ...);
-        final X64RegisterOperand temp2 = context.getNextQuadRegister();
-        context.addInstruction(
-            new MoveInstruction(
-                new MemoryAtRegister(context.getJniPointer()),
-                temp2
-            )
-        );
 
         addCallJNI(context, getCallNonVirtualMethodOffset(returnVal.getType()), returnVal.toX64());
     }

@@ -3,6 +3,7 @@ package x64;
 import intermediate.InterStructure;
 import org.jetbrains.annotations.NotNull;
 import x64.directives.*;
+import x64.pseudo.PseudoInstruction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,11 +15,11 @@ public class X64File {
     private final String javaClassName;
     private final String fileName;
 
-    private final ArrayList<Instruction> dataSection;
+    private final ArrayList<PseudoInstruction> dataSection;
 
     private final ArrayList<X64Function> functions;
 
-    private final ArrayList<Instruction> dataStrings;
+    private final ArrayList<PseudoInstruction> dataStrings;
 
     private int nextDataItem = 0;
 
@@ -94,7 +95,7 @@ public class X64File {
     @Override
     public String toString() {
         return dataSection.stream()
-                .map(Instruction::toString)
+                .map(PseudoInstruction::toString)
                 .collect(Collectors.joining("\n"))
             + "\n\n" +
             functions.stream()
@@ -102,7 +103,7 @@ public class X64File {
                 .collect(Collectors.joining("\n\n"))
                 + '\n' +
             dataStrings.stream()
-                .map(Instruction::toString)
+                .map(PseudoInstruction::toString)
                 .collect(Collectors.joining("\n"))
             + '\n' +
             StackMarkings.instance.toString();

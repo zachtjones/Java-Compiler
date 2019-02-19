@@ -11,12 +11,13 @@ import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
-import x64.instructions.CallClassMethod;
-import x64.instructions.MoveInstruction;
+import x64.instructions.CallLabel;
 import x64.jni.CallNonVirtualMethodJNI;
 import x64.jni.FindClassJNI;
 import x64.jni.GetMethodIdJNI;
-import x64.operands.X64RegisterOperand;
+import x64.operands.X64PseudoRegister;
+import x64.pseudo.MovePseudoToReg;
+import x64.pseudo.MoveRegToPseudo;
 
 import static x64.allocation.CallingConvention.returnValueRegister;
 
@@ -75,13 +76,13 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 		// if the type of the register is java/*, use JNI
 		if (obj.getType().getClassName(fileName, line).startsWith("java/")) {
 
-			final X64RegisterOperand objReg = obj.toX64();
+			final X64PseudoRegister objReg = obj.toX64();
 
 			// clazz = FindClass
-			final X64RegisterOperand clazz = addFindClassJNICall(context, className);
+			final X64PseudoRegister clazz = addFindClassJNICall(context, className);
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
-			final X64RegisterOperand methodId =
+			final X64PseudoRegister methodId =
 				addGetMethodId(context, clazz, name, args, returnVal);
 
 			// result = CallNonVirtual<Type>Method(JNIEnv, obj, methodID, ...)
@@ -94,7 +95,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 
 			// object
 			context.addInstruction(
-				new MoveInstruction(
+				new MovePseudoToReg(
 					obj.toX64(),
 					context.argumentRegister(2)
 				)
@@ -103,7 +104,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			// the rest of the args
 			for (int i = 0; i < args.length; i++) {
 				context.addInstruction(
-					new MoveInstruction(
+					new MovePseudoToReg(
 						args[i].toX64(),
 						context.argumentRegister(3 + i)
 					)
@@ -112,12 +113,13 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 
 			// 2. call CLASS_NAME_METHOD_NAME
 			context.addInstruction(
-				new CallClassMethod(className, name)
+				new CallLabel(className, name)
 			);
 
 			// 3. mov %rax, result
+			if (returnVal != null)
 			context.addInstruction(
-				new MoveInstruction(
+				new MoveRegToPseudo(
 					returnValueRegister(),
 					returnVal.toX64()
 				)

@@ -1,12 +1,12 @@
 package x64.jni;
 
 import x64.X64Context;
-import x64.instructions.LoadEffectiveAddressInstruction;
+import x64.instructions.LoadEffectiveAddressRIPRelativeToReg;
 import x64.jni.helpers.CallJNIMethod;
 import x64.operands.*;
 
 import static x64.jni.JNIOffsets.FIND_CLASS;
-import static x64.operands.PCRelativeData.pointerFromLabel;
+import static x64.operands.RIPRelativeData.pointerFromLabel;
 
 public interface FindClassJNI extends CallJNIMethod {
 
@@ -17,7 +17,7 @@ public interface FindClassJNI extends CallJNIMethod {
      * @param className The java class name to load
      * @return The newly allocated preserved register holding a reference to the JNI class
      */
-    default X64RegisterOperand addFindClassJNICall(X64Context context, String className) {
+    default X64PseudoRegister addFindClassJNICall(X64Context context, String className) {
 
         // mov %javaEnvOne, %arg1
         context.loadJNI1();
@@ -25,14 +25,14 @@ public interface FindClassJNI extends CallJNIMethod {
         // leaq NEW_STRING_REFERENCE(%rip), %arg2
         String label = context.insertDataString(className);
         context.addInstruction(
-            new LoadEffectiveAddressInstruction(
+            new LoadEffectiveAddressRIPRelativeToReg(
                 pointerFromLabel(label),
                 context.argumentRegister(2)
             )
         );
 
         // call JNI find class with the arguments, storing result in class register
-        final X64RegisterOperand classReg = context.getNextQuadRegister();
+        final X64PseudoRegister classReg = context.getNextQuadRegister();
 
         addCallJNI(context, FIND_CLASS, classReg);
 

@@ -1,5 +1,6 @@
 package tree;
 
+import helper.BinaryOperation;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;

@@ -1,12 +1,10 @@
 package x64.jni.helpers;
 
 import x64.X64Context;
-import x64.instructions.LoadEffectiveAddressInstruction;
-import x64.instructions.MoveInstruction;
+import x64.instructions.LoadEffectiveAddressRIPRelativeToReg;
 import x64.jni.JNIOffsets;
 import x64.operands.*;
-
-import static x64.allocation.CallingConvention.argumentRegister;
+import x64.pseudo.MovePseudoToReg;
 
 
 public interface GetIdJNI extends CallJNIMethod {
@@ -15,15 +13,15 @@ public interface GetIdJNI extends CallJNIMethod {
      * method call, the difference being the class/object param and how to determine the char* sig parameter.
      * This interface is created as a helper for those specific ones
      * Returns the allocated register for the methodId/fieldId */
-    default X64RegisterOperand addGetIdJNICall(JNIOffsets jniOffset, String fieldOrMethodName, String signature,
-                                               X64Context context, X64RegisterOperand classReg) {
+    default X64PseudoRegister addGetIdJNICall(JNIOffsets jniOffset, String fieldOrMethodName, String signature,
+											  X64Context context, X64PseudoRegister classReg) {
 
         // mov %javaEnvOne, %arg1
         context.loadJNI1();
 
         // mov %classReg, %arg2
         context.addInstruction(
-            new MoveInstruction(
+            new MovePseudoToReg(
                 classReg,
                 context.argumentRegister(2)
             )
@@ -32,8 +30,8 @@ public interface GetIdJNI extends CallJNIMethod {
         // add field name to the data strings -> %arg3
         String fieldNameLabel = context.insertDataString(fieldOrMethodName);
         context.addInstruction(
-            new LoadEffectiveAddressInstruction(
-                PCRelativeData.pointerFromLabel(fieldNameLabel),
+            new LoadEffectiveAddressRIPRelativeToReg(
+                RIPRelativeData.pointerFromLabel(fieldNameLabel),
                 context.argumentRegister(3)
             )
         );
@@ -41,14 +39,14 @@ public interface GetIdJNI extends CallJNIMethod {
         // add the signature of the field type -> %arg4
         final String fieldTypeLabel = context.insertDataString(signature);
         context.addInstruction(
-            new LoadEffectiveAddressInstruction(
-                PCRelativeData.pointerFromLabel(fieldTypeLabel),
+            new LoadEffectiveAddressRIPRelativeToReg(
+                RIPRelativeData.pointerFromLabel(fieldTypeLabel),
                 context.argumentRegister(4)
             )
         );
 
         // call the method, storing result in fieldIDReg
-        final X64RegisterOperand fieldIDReg = context.getNextQuadRegister();
+        final X64PseudoRegister fieldIDReg = context.getNextQuadRegister();
         addCallJNI(context, jniOffset, fieldIDReg);
 
         return fieldIDReg;
