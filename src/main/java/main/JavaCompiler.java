@@ -67,6 +67,10 @@ public class JavaCompiler {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, ParseException, CompileException {
+
+		// clear the cache between iterations
+		cache.clear();
+
 		System.out.println("os.name: " + System.getProperty("os.name"));
 		System.out.println("os.arch: " + System.getProperty("os.arch"));
 		if (args.length < 1) {
