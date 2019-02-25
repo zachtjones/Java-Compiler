@@ -1132,25 +1132,25 @@ Expression PostfixExpression() :
 
 Expression CastExpression() :
 {
-    PrimitiveCastExpressionNode p = new PrimitiveCastExpressionNode(fileName, token.beginLine);
+    Types type;
+    Expression expr;
+
     NameNode t;
-    ObjectCastExpressionNode o = new ObjectCastExpressionNode(fileName, token.beginLine);
 }
 {
     LOOKAHEAD(2)
-    "(" p.type=PrimitiveType()
-    ( "[" "]" { p.arrayDims++; } )* ")"
-    p.expr=UnaryExpression()
+    "(" type=PrimitiveType()
+    ( "[" "]" { type = Types.arrayOf(type); } )* ")"
+    expr=UnaryExpression()
     {
-        return p;
+        return new CastExpressionNode(fileName, token.beginLine, type, expr);
     }
 |
-    "(" t=Name()
-    ( "[" "]" { o.arrayDims++; })* ")"
-    o.expr=UnaryExpressionNotPlusMinus()
+    "(" t=Name() { type = Types.fromFullyQualifiedClass(t.primaryName); }
+    ( "[" "]" { type = Types.arrayOf(type); })* ")"
+    expr=UnaryExpressionNotPlusMinus()
     {
-        o.type = Types.fromFullyQualifiedClass(t.primaryName);
-        return o;
+        return new CastExpressionNode(fileName, token.beginLine, type, expr);
     }
 }
 
