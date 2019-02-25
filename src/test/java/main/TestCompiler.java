@@ -1,5 +1,6 @@
 package main;
 
+import com.sun.org.apache.xpath.internal.Arg;
 import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ExpectedScenarioState;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
@@ -46,7 +47,15 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
             Arguments.of("HelloWorld", 0, "Hello, World!\n", ""),
             Arguments.of("BasicClass", 0, "b is: 5\na is: 1\n", ""),
             Arguments.of("OutOfRegisters", 0, "91\n", ""),
-            Arguments.of("PrintALot", 0, "4a6bcde63\n", "")
+            Arguments.of("PrintALot", 0, "4a6bcde63\n", ""),
+            Arguments.of("DataSizes", 0, "true\n" +
+                "false\n" +
+                "ab\n" +
+                "-18690\n" +
+                "-2147483648\n" +
+                "2147483648\n" +
+                "7.0\n" +
+                "Infinity\n", "")
         );
     }
 
