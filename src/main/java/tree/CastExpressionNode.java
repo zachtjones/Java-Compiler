@@ -7,13 +7,14 @@ import intermediate.InterFunction;
 import org.jetbrains.annotations.NotNull;
 
 /** (type[]...)expr */
-public class PrimitiveCastExpressionNode extends NodeImpl implements Expression {
-    public Expression expr;
-    public Types type;
-    public int arrayDims = 0;
-    
-    public PrimitiveCastExpressionNode(String fileName, int line) {
+public class CastExpressionNode extends NodeImpl implements Expression {
+    @NotNull private final Expression expr;
+    @NotNull private Types type;
+
+    public CastExpressionNode(@NotNull String fileName, int line, @NotNull Types type, @NotNull Expression expr) {
     	super(fileName, line);
+    	this.type = type;
+    	this.expr = expr;
     }
     
     @Override
@@ -25,6 +26,6 @@ public class PrimitiveCastExpressionNode extends NodeImpl implements Expression 
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// TODO
-		throw new CompileException("Primitive cast not implemented yet.", getFileName(), getLine());
+		throw new CompileException("Casting not implemented yet.", getFileName(), getLine());
 	}
 }
