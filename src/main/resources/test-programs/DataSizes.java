@@ -21,7 +21,7 @@ public class DataSizes {
 		System.out.println(i + 1); // should be Integer.MIN_VALUE
 
 		long l = Integer.MAX_VALUE;
-		System.out.println(l + 1); // should just be 2^32.
+		System.out.println(l + 1L); // should just be 2^32.
 
 		float f = 3.5f;
 		System.out.println(f * 2.0f); // should be 7.0

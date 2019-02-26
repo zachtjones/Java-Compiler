@@ -3,7 +3,9 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import helper.Types;
+import intermediate.CastStatement;
 import intermediate.InterFunction;
+import intermediate.Register;
 import org.jetbrains.annotations.NotNull;
 
 /** (type[]...)expr */
@@ -25,7 +27,10 @@ public class CastExpressionNode extends NodeImpl implements Expression {
 
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
-		// TODO
-		throw new CompileException("Casting not implemented yet.", getFileName(), getLine());
+    	expr.compile(s, f);
+    	// do the cast from expr to the final result
+    	Register exprResult = f.allocator.getLast();
+    	Register result = f.allocator.getNext(type);
+    	f.statements.add(new CastStatement(exprResult, result, type, getFileName(), getLine()));
 	}
 }
