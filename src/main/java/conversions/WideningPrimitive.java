@@ -3,10 +3,11 @@ package conversions;
 import helper.Types;
 import intermediate.InterStatement;
 import intermediate.Register;
+import intermediate.SignExtendStatement;
+import intermediate.ZeroExtendStatement;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import static helper.Types.*;
@@ -19,12 +20,11 @@ public class WideningPrimitive extends Conversion {
 	 * Precondition: WideningPrimitive.matches(source.getType(), destination.getType())
 	 */
 	WideningPrimitive(Register source, Register destination) {
-		conversion = new LinkedList<>();
 
 		if (source.getType().equals(CHAR)) { // char is the only unsigned type, zero extend
-			return Collections.singletonList(new ZeroExtendStatement(source, destination));
+			conversion = Collections.singletonList(new ZeroExtendStatement(source, destination));
 		} else { // sign extend
-			return Collections.singletonList(new SignExtendStatement(source, destination));
+			conversion = Collections.singletonList(new SignExtendStatement(source, destination));
 		}
 	}
 
