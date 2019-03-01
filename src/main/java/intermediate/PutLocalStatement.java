@@ -1,17 +1,15 @@
 package intermediate;
 
-import java.util.HashMap;
-
+import conversions.Conversion;
 import helper.CompileException;
-import helper.TypeChecker;
 import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
-import x64.Boxing;
 import x64.X64Context;
-import x64.operands.X64PseudoRegister;
-import x64.pseudo.ConvertPseudoInstruction;
 import x64.pseudo.MovePseudoToPseudo;
+
+import java.util.HashMap;
+import java.util.List;
 
 /** PutLocal name = %register */
 public class PutLocalStatement implements InterStatement {
@@ -21,8 +19,10 @@ public class PutLocalStatement implements InterStatement {
 	@NotNull private final String fileName;
 	private final int line;
 
-	private Types localType;
-	
+	// set by the type check phase, used in the compile -> pseudo asm
+	private Register intermediateReg;
+	private List<InterStatement> conversions;
+
 	/**
 	 * Creates a new put local variable statement.
 	 * @param r The register to use it's value
@@ -49,40 +49,27 @@ public class PutLocalStatement implements InterStatement {
 			throw new CompileException("local variable: " + localName + " is not defined.",
 					fileName, line);
 		}
-		localType = locals.get(localName);
-		TypeChecker.assertCanAssign(locals.get(localName), r.getType(), fileName, line);
+		Types localType = locals.get(localName);
+
+		// create temporary register to act as copy
+		intermediateReg = func.allocator.getNext(localType);
+		conversions = Conversion.assignmentConversion(r, intermediateReg, fileName, line);
 	}
 
 	@Override
 	public void compile(@NotNull X64Context context) throws CompileException {
 
-		// TODO everywhere canDirectlyAssign is invoked, can do an extra instruction that converts between types.
-
-		final X64PseudoRegister destination = context.getLocalVariable(localName);
-
-		final Types sourceType = r.getType();
-
-		if (TypeChecker.isDirectlyAssignable(sourceType, localType)) {
-			// simple copy the result over to the destination
-			context.addInstruction(
-				new MovePseudoToPseudo(r.toX64(), destination)
-			);
-		} else if (TypeChecker.isCastAssignable(sourceType, localType)) {
-			// convert source to middle
-			// move middle to destination
-			X64PseudoRegister temp = context.getNextRegister(localType);
-			context.addInstruction(
-				ConvertPseudoInstruction.from(r.toX64(), temp)
-			);
-			context.addInstruction(
-				new MovePseudoToPseudo(temp, destination)
-			);
-
-		} else if (TypeChecker.isBoxingAssignable(sourceType, localType)) {
-			// box/unbox operation
-			Boxing.insertNecessaryCode(r.toX64(), destination);
+		// add in the conversion
+		for (InterStatement i : conversions) {
+			i.compile(context);
 		}
 
-
+		// move the intermediate result to the final part
+		context.addInstruction(
+			new MovePseudoToPseudo(
+				intermediateReg.toX64(),
+				context.getLocalVariable(localName)
+			)
+		);
 	}
 }

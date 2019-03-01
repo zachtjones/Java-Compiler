@@ -1,10 +1,7 @@
 package conversions;
 
 import helper.Types;
-import intermediate.InterStatement;
-import intermediate.Register;
-import intermediate.SignExtendStatement;
-import intermediate.ZeroExtendStatement;
+import intermediate.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -21,7 +18,10 @@ public class WideningPrimitive extends Conversion {
 	 */
 	WideningPrimitive(Register source, Register destination) {
 
-		if (source.getType().equals(CHAR)) { // char is the only unsigned type, zero extend
+		// converting to float or double, this is normally an instruction on most platforms
+		if (destination.getType().equals(FLOAT) || destination.getType().equals(DOUBLE)) {
+			conversion = Collections.singletonList(new FloatExtendStatement(source, destination));
+		} else if (source.getType().equals(CHAR)) { // char is the only unsigned type, zero extend
 			conversion = Collections.singletonList(new ZeroExtendStatement(source, destination));
 		} else { // sign extend
 			conversion = Collections.singletonList(new SignExtendStatement(source, destination));
