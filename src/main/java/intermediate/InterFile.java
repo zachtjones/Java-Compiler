@@ -1,13 +1,17 @@
 package intermediate;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
+import conversions.Conversion;
 import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import x64.X64File;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import static helper.Types.fromFullyQualifiedClass;
 
@@ -19,10 +23,6 @@ public class InterFile {
 	@NotNull private final InterStructure staticPart;
 	@NotNull private final InterStructure instancePart;
 	@NotNull private final ArrayList<InterFunction> functions;
-
-
-	/** name -> Map of list of args to return value */
-	private final Map<String, Map<List<Types>, Types>> typesOfFunctions;
 
 	/**
 	 * Creates an intermediate file, given the name
@@ -38,7 +38,6 @@ public class InterFile {
 		this.staticPart = new InterStructure(false);
 		this.instancePart = new InterStructure(true);
 		this.functions = new ArrayList<>();
-		typesOfFunctions = new HashMap<>();
 	}
 
 	/**
@@ -156,10 +155,6 @@ public class InterFile {
 		
 		for (InterFunction f : functions) {
 			f.typeCheck(fromFullyQualifiedClass(name));
-			// add it to the set
-			Map<List<Types>, Types> existing = typesOfFunctions.getOrDefault(f.name, new HashMap<>());
-			existing.put(f.paramTypes, f.returnType);
-			typesOfFunctions.putIfAbsent(f.name, existing);
 		}
 
 	}
@@ -186,27 +181,91 @@ public class InterFile {
 		return staticPart.getFieldType(fieldName, fileName, line);
 	}
 
+	/** Data class used for the information required when calling functions. */
+	public static class MethodMatch {
+		final @NotNull List<List<InterStatement>> conversionsToArgs;
+		final @NotNull InterFunction match;
+
+		MethodMatch(@NotNull List<List<InterStatement>> conversionsToArgs, @NotNull InterFunction match) {
+			this.conversionsToArgs = conversionsToArgs;
+			this.match = match;
+		}
+	}
+
 	/**
-	 * Finds the method with the signature given, and returns the type of the return object
+	 * Finds the method with the signature that matches.
+	 * The destArgs will have their types filled in to the match, and the returned data class will have
+	 * the necessary instructions to convert everything over.
 	 * @param name The method's name.
 	 * @param args The array of arguments.
 	 * @return The return object type, or null if there's no method with that signature
 	 */
 	@NotNull
-	public Types getReturnType(@NotNull String name, @NotNull ArrayList<Types> args,
-							   @NotNull String fileName, int line) throws CompileException {
+	public MethodMatch getReturnType(@NotNull String name, @NotNull List<Register> args,
+									 @NotNull List<Register> destArgs,
+									 @NotNull String fileName, int line) throws CompileException {
 
-		if (typesOfFunctions.containsKey(name)) {
-			return typesOfFunctions.get(name).get(args);
-		} else {
-			final String signature = name + "(" +
-				args.stream()
-					.map(Types::getIntermediateRepresentation)
-					.collect(Collectors.joining()) + ")";
+		// TODO support varargs
 
-			throw new CompileException("no method found with signature, " + signature
+		// overloading methods -- decided which one to take at compile time
+
+		// functions number of args -> matching functions
+		//   the mapping list will never be empty
+		//   the key is the number of args that are implicitly converted.
+		HashMap<Integer, List<MethodMatch>> matches = new HashMap<>();
+
+		// iterate through all, finding the count of arguments that are convertible
+		for (InterFunction f : functions) {
+			try {
+				if (f.name.equals(name) && f.paramTypes.size() == args.size()) {
+					ArrayList<List<InterStatement>> conversionsToArgs = new ArrayList<>();
+					int numDifferences = 0;
+					for (int i = 0; i < args.size(); i++) {
+						Register source = args.get(i);
+						Types destType = f.paramTypes.get(i);
+						Register destination = destArgs.get(i);
+						destination.setType(destType);
+
+						// capture the conversion
+						conversionsToArgs.add(Conversion.methodInvocation(source, destination, fileName, line));
+					}
+					// the args match -- add it into the list
+					List<MethodMatch> values = matches.getOrDefault(numDifferences, new ArrayList<>());
+					values.add(new MethodMatch(conversionsToArgs, f));
+					matches.putIfAbsent(numDifferences, values);
+
+				}
+			} catch (CompileException ignored) {} // doesn't match
+		}
+
+		final String goalSignature = name + "(" +
+			args.stream()
+				.map(r -> r.getType().getIntermediateRepresentation())
+				.collect(Collectors.joining()) + ")";
+
+
+		// no function matching this
+		if (matches.isEmpty()) {
+			throw new CompileException("no method found with signature, " + goalSignature
 				+ ", referenced", fileName, line);
 		}
+
+		// could be multiple functions that have the same number of differences
+		//  in this case it's an ambiguous method call
+		TreeSet<Integer> integers = new TreeSet<>(matches.keySet());
+
+		List<MethodMatch> candidates = matches.get(integers.first());
+		if (candidates.size() != 1) {
+			// construct message from the list of options
+			String message = candidates.stream().map(
+				f -> name + "(" + f.match.paramTypes.stream()
+					.map(Types::getIntermediateRepresentation)
+					.collect(Collectors.joining()) + ")"
+			).collect(Collectors.joining(", "));
+			throw new CompileException("Ambiguous method call " + goalSignature + " matches: " + message,
+				fileName, line);
+		}
+		return candidates.get(0);
 	}
 
 	/**
