@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import static helper.Types.STRING;
 import static helper.Types.fromFullyQualifiedClass;
 
 public class InterFile {
@@ -149,10 +150,19 @@ public class InterFile {
 		}
 	}
 
-	/** Type checks all the functions 
+	/** Returns if there is a main method. */
+	public boolean hasMainMethod() {
+		// name is main, it has 1 arg, type is String[].
+		return functions.stream()
+			.filter(f -> f.name.equals("main"))
+			.filter(f -> f.paramTypes.size() == 1)
+			.anyMatch(f -> f.paramTypes.get(0).equals(Types.arrayOf(STRING)));
+	}
+
+	/** Type checks all the functions
 	 * @throws CompileException If there is an error with type checking.*/
 	public void typeCheck() throws CompileException {
-		
+
 		for (InterFunction f : functions) {
 			f.typeCheck(fromFullyQualifiedClass(name));
 		}

@@ -1,18 +1,18 @@
 package main;
 
-import java.io.*;
+import helper.CompileException;
+import helper.ProcessRunner;
+import intermediate.InterFile;
+import javaLibrary.JavaLibraryLookup;
+import org.jetbrains.annotations.NotNull;
+import tree.CompilationUnit;
+import x64.X64File;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import helper.CompileException;
-import helper.ProcessRunner;
-import helper.Types;
-import javaLibrary.JavaLibraryLookup;
-import org.jetbrains.annotations.NotNull;
-import tree.*;
-import intermediate.*;
-import x64.X64File;
 
 public class JavaCompiler {
 
@@ -101,15 +101,11 @@ public class JavaCompiler {
 
 		InterFile mainClass = null;
 
-		final ArrayList<Types> arg = new ArrayList<>();
-		arg.add(Types.arrayOf(Types.STRING));
-
+		// find main method based class
 		for (InterFile f : files) {
-			// verify there is a main method
-			try {
-				f.getReturnType("main", arg, f.getName(), -1);
+			if (f.hasMainMethod()) {
 				mainClass = f;
-			} catch (CompileException ignored) {}
+			}
 		}
 
 		// enforce there is a `static void main(String[] args)`
