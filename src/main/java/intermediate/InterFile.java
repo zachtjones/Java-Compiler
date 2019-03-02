@@ -208,6 +208,7 @@ public class InterFile {
 	 * the necessary instructions to convert everything over.
 	 * @param name The method's name.
 	 * @param args The array of arguments.
+	 * @param destArgs The destination arguments, these should be unique for each call
 	 * @return The return object type, or null if there's no method with that signature
 	 */
 	@NotNull
@@ -222,12 +223,18 @@ public class InterFile {
 		// functions number of args -> matching functions
 		//   the mapping list will never be empty
 		//   the key is the number of args that are implicitly converted.
+
+		// TODO there is probably a better way to do this -- the param types should be mutable since they
+		//  get changed, but don't want them to be changed for a non-match.
+
 		HashMap<Integer, List<MethodMatch>> matches = new HashMap<>();
 
 		// iterate through all, finding the count of arguments that are convertible
-		for (InterFunction f : functions) {
-			try {
-				if (f.name.equals(name) && f.paramTypes.size() == args.size()) {
+		functions.stream()
+			.filter(f -> f.name.equals(name))
+			.filter(f -> f.paramTypes.size() == args.size())
+			.forEach(f -> {
+				try {
 					ArrayList<List<InterStatement>> conversionsToArgs = new ArrayList<>();
 					int numDifferences = 0;
 					for (int i = 0; i < args.size(); i++) {
@@ -235,6 +242,14 @@ public class InterFile {
 						Types destType = f.paramTypes.get(i);
 						Register destination = destArgs.get(i);
 						destination.setType(destType);
+
+						// not the exact same, increment it
+						//   we will need a more specific way for java.io.PrintStream#println(S)
+						//     should map to the int version, but long, float, and double match
+						//     with the same number of differences
+						if (!source.getType().equals(destType)) {
+							numDifferences++;
+						}
 
 						// capture the conversion
 						conversionsToArgs.add(Conversion.methodInvocation(source, destination, fileName, line));
@@ -244,9 +259,10 @@ public class InterFile {
 					values.add(new MethodMatch(conversionsToArgs, f));
 					matches.putIfAbsent(numDifferences, values);
 
-				}
-			} catch (CompileException ignored) {} // doesn't match
-		}
+					// if we have the exception thrown, it means it's not a match, so don't add it.
+				} catch (CompileException ignored){}
+			});
+
 
 		final String goalSignature = name + "(" +
 			args.stream()
@@ -275,7 +291,15 @@ public class InterFile {
 			throw new CompileException("Ambiguous method call " + goalSignature + " matches: " + message,
 				fileName, line);
 		}
-		return candidates.get(0);
+
+		// valid, set the parameters to their proper types
+		MethodMatch match = candidates.get(0);
+
+		for (int i = 0; i < destArgs.size(); i++) {
+			destArgs.get(i).setType(match.match.paramTypes.get(i));
+		}
+
+		return match;
 	}
 
 	/**

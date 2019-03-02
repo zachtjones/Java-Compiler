@@ -3,8 +3,8 @@ package x64;
 import intermediate.Register;
 import intermediate.RegisterAllocator;
 import x64.allocation.CallingConvention;
-import x64.operands.X64Register;
 import x64.operands.X64PseudoRegister;
+import x64.operands.X64Register;
 import x64.pseudo.MovePseudoToReg;
 import x64.pseudo.PseudoInstruction;
 
@@ -48,8 +48,13 @@ public class X64Context {
 
 	/** Returns the next pseudo register available that is a quad-word size (64-bit) */
 	public X64PseudoRegister getNextQuadRegister() {
+		return getNextRegister(X64InstructionSize.QUAD);
+	}
+
+	/** Returns the next pseudo register available for the instruction size instance. */
+	X64PseudoRegister getNextRegister(X64InstructionSize size) {
 		nextRegister++;
-		return new X64PseudoRegister(nextRegister, X64InstructionSize.QUAD);
+		return new X64PseudoRegister(nextRegister, size);
 	}
 
 	/** returns the argument number that is the highest number used */

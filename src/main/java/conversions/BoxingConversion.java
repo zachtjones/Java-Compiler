@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static helper.Types.*;
-import static helper.Types.fromFullyQualifiedClass;
 
 /** Represents a conversion from primitive to their representative class type. */
 public class BoxingConversion extends Conversion {
