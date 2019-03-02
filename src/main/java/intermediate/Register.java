@@ -20,7 +20,6 @@ import x64.operands.X64PseudoRegister;
 public class Register extends NodeImpl implements Expression {
 	
 	public static final int BOOLEAN = 0;
-	public static final int BYTE = 1;
 
 	int num;
 	@NotNull private Types type;
