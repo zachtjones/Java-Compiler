@@ -11,6 +11,7 @@ import x64.jni.*;
 import x64.operands.PseudoDisplacement;
 import x64.operands.RIPRelativeData;
 import x64.operands.X64PseudoRegister;
+import x64.pseudo.MovePseudoToPseudo;
 import x64.pseudo.MovePseudoToPseudoDisplacement;
 import x64.pseudo.MovePseudoToRIPRelative;
 
@@ -127,6 +128,20 @@ public class StoreAddressStatement implements InterStatement,
 					)
 				);
 			}
+		} else if (context.registerIsLocalRegisterAddress(addr)) {
+
+			// no special logic for JNI, just need to set the register
+			//   the local is just an alias
+
+			// this is an assignment to the local variable
+			String name = context.getLocalAddressLocalName(addr);
+			X64PseudoRegister localHolding = context.getLocalVariable(name);
+			context.addInstruction(
+				new MovePseudoToPseudo(
+					intermediate.toX64(),
+					localHolding
+				)
+			);
 		} else {
 			throw new CompileException("store address statement unknown type", fileName, line);
 		}

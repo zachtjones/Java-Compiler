@@ -198,7 +198,7 @@ public class InterFile {
 	 * @return The return object type, or null if there's no method with that signature
 	 */
 	@NotNull
-	public MethodMatch getReturnType(@NotNull String name, @NotNull List<Register> args,
+	MethodMatch getReturnType(@NotNull String name, @NotNull List<Register> args,
 									 @NotNull List<Register> destArgs,
 									 @NotNull String fileName, int line) throws CompileException {
 

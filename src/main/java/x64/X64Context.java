@@ -1,5 +1,6 @@
 package x64;
 
+import helper.Types;
 import intermediate.Register;
 import intermediate.RegisterAllocator;
 import x64.allocation.CallingConvention;
@@ -28,6 +29,7 @@ public class X64Context {
 	private final Map<Register, String> staticFieldAddressClasses = new HashMap<>();
 	private final Map<Register, String> staticFieldAddressFields = new HashMap<>();
 	private final Map<String, X64PseudoRegister> locals = new HashMap<>();
+	private final Map<Register, String> localsAddresses = new HashMap<>(); // address -> localName
 
 	/** Returns the highest number of argument register used */
 	private int highestArgUsed = 1; // reserve the JNI register as always used
@@ -52,9 +54,14 @@ public class X64Context {
 	}
 
 	/** Returns the next pseudo register available for the instruction size instance. */
-	X64PseudoRegister getNextRegister(X64InstructionSize size) {
+	public X64PseudoRegister getNextRegister(X64InstructionSize size) {
 		nextRegister++;
 		return new X64PseudoRegister(nextRegister, size);
+	}
+
+	/** Returns the next pseudo register available for the given type. */
+	public X64PseudoRegister getNextRegister(Types type) {
+		return getNextRegister(type.x64Type());
 	}
 
 	/** returns the argument number that is the highest number used */
@@ -138,5 +145,20 @@ public class X64Context {
 	 * There isn't a need for an is local variable, since intermediate language is already type checked. */
 	public X64PseudoRegister getLocalVariable(String name) {
 		return locals.get(name);
+	}
+
+	/** marks the register as a local variable address */
+	public void markRegisterAsLocalVariableAddress(String localName, Register destination) {
+		localsAddresses.put(destination, localName);
+	}
+
+	/** returns if the register holds an local register address */
+	public boolean registerIsLocalRegisterAddress(Register address) {
+		return localsAddresses.containsKey(address);
+	}
+
+	/** Returns the mapping to the local name that the address means */
+	public String getLocalAddressLocalName(Register address) {
+		return localsAddresses.get(address);
 	}
 }
