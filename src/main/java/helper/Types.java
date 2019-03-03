@@ -3,7 +3,7 @@ package helper;
 import org.jetbrains.annotations.NotNull;
 import x64.X64InstructionSize;
 
-public class Types {
+public class Types implements Comparable<Types> {
 
 	@NotNull private final String rep;
 	private final boolean isPrimitive;
@@ -197,5 +197,45 @@ public class Types {
 		}
 		// float, double, or pointers are 8 bytes
 		return 8;
+	}
+
+	/** This is used to compare the ordering of specificity for method selection with overloaded methods.
+	 * Precondition -- these must be types that Conversions.methodInvocation are convertible.
+	 */
+	@Override
+	public int compareTo(@NotNull Types o) {
+
+		int thisPrimitive = this.primitiveOrdering();
+		int otherPrimitive = o.primitiveOrdering();
+
+		if (thisPrimitive != -1 && otherPrimitive != -1) {
+			// both are comparable primitives
+			if (thisPrimitive < otherPrimitive) {
+				// this is more specific, return -1
+				return -1;
+			} else if (thisPrimitive > otherPrimitive) {
+				return 1;
+			}
+			return 0; // they are the same primitive
+		}
+		// TODO compare object / primitives
+		return 0;
+	}
+
+	/** Returns an int signifying the ordering among primitives for specificity. */
+	private int primitiveOrdering() {
+		// byte < short < int < long < float < double
+		//      < char  <  ...
+
+		if (this.equals(BYTE)) return 0;
+		if (this.equals(SHORT)) return 1;
+		if (this.equals(CHAR)) return 1; // same as char
+		if (this.equals(INT)) return 2;
+		if (this.equals(LONG)) return 3;
+		if (this.equals(FLOAT)) return 4;
+		if (this.equals(DOUBLE)) return 5;
+
+		// not a primitive or boolean -- can't be converted from other primitives
+		return -1;
 	}
 }

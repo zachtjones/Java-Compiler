@@ -7,10 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import x64.X64File;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static helper.Types.STRING;
@@ -191,17 +188,6 @@ public class InterFile {
 		return staticPart.getFieldType(fieldName, fileName, line);
 	}
 
-	/** Data class used for the information required when calling functions. */
-	public static class MethodMatch {
-		final @NotNull List<List<InterStatement>> conversionsToArgs;
-		final @NotNull InterFunction match;
-
-		MethodMatch(@NotNull List<List<InterStatement>> conversionsToArgs, @NotNull InterFunction match) {
-			this.conversionsToArgs = conversionsToArgs;
-			this.match = match;
-		}
-	}
-
 	/**
 	 * Finds the method with the signature that matches.
 	 * The destArgs will have their types filled in to the match, and the returned data class will have
@@ -280,26 +266,50 @@ public class InterFile {
 		//  in this case it's an ambiguous method call
 		TreeSet<Integer> integers = new TreeSet<>(matches.keySet());
 
+		// potential list of candidates -- these ones would work, all are convertible
 		List<MethodMatch> candidates = matches.get(integers.first());
-		if (candidates.size() != 1) {
-			// construct message from the list of options
-			String message = candidates.stream().map(
-				f -> name + "(" + f.match.paramTypes.stream()
-					.map(Types::getIntermediateRepresentation)
-					.collect(Collectors.joining()) + ")"
-			).collect(Collectors.joining(", "));
-			throw new CompileException("Ambiguous method call " + goalSignature + " matches: " + message,
-				fileName, line);
-		}
 
-		// valid, set the parameters to their proper types
-		MethodMatch match = candidates.get(0);
+		// find the first one, that one will be it if there's no ties
+		MethodMatch first = candidates.get(0);
+
+		if (candidates.size() != 1) {
+
+			// evaluate specificity, through the ordering when sorted
+			//  can't use a set as there might be ones of equal specificity
+			// the most specific are first (smallest value in compareTo)
+			Collections.sort(candidates);
+
+			// we know candidates.size() >= 2, so compare the first 2
+			//   if equal, then stop, there's an ambiguous method call
+			first = candidates.get(0);
+			MethodMatch second = candidates.get(1);
+
+			if (first.compareTo(second) == 0) {
+				final MethodMatch firstOne = first;
+				// determine the equal ones
+				List<MethodMatch> options = candidates.stream()
+					.filter(i -> i.compareTo(firstOne) == 0)
+					.collect(Collectors.toList());
+
+				// construct message from the list of options
+				String message = options.stream().map(
+					f -> name + "(" + f.match.paramTypes.stream()
+						.map(Types::getIntermediateRepresentation)
+						.collect(Collectors.joining()) + ")"
+				).collect(Collectors.joining(", "));
+				throw new CompileException("Ambiguous method call " + goalSignature + " matches: " + message,
+					fileName, line);
+			}
+
+			// we know it is the first one, which we already set.
+
+		}
 
 		for (int i = 0; i < destArgs.size(); i++) {
-			destArgs.get(i).setType(match.match.paramTypes.get(i));
+			destArgs.get(i).setType(first.match.paramTypes.get(i));
 		}
 
-		return match;
+		return first;
 	}
 
 	/**

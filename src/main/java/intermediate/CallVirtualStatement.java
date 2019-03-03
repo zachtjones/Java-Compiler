@@ -33,7 +33,7 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 	private final int line;
 
 	// filled in during type check
-	private InterFile.MethodMatch match;
+	private MethodMatch match;
 	private List<Register> convertedArgs;
 
 	public CallVirtualStatement(@NotNull Register obj, @NotNull String name, @NotNull Register[] args,

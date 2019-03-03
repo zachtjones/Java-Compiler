@@ -33,7 +33,7 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 	private final int line;
 
 	// filled in during type check
-	private InterFile.MethodMatch match;
+	private MethodMatch match;
 	private List<Register> convertedArgs;
 
 

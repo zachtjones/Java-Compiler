@@ -34,7 +34,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 	private final int line;
 
 	// filled in during type check
-	private InterFile.MethodMatch match;
+	private MethodMatch match;
 	private List<Register> convertedArgs;
 	
 	public CallActualStatement(@NotNull Register obj, @NotNull String className, @NotNull String name,
