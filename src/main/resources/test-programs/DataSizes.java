@@ -29,6 +29,11 @@ public class DataSizes {
 		double g = 0.1;
 		System.out.println(g / 0.0); // +infinity
 
+		// from the javase specification
+		int big = 1234567890;
+		float approx = big;
+		System.out.println(big - (int)approx); // should be -46
+
 	}
 
 }

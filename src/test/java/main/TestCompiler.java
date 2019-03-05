@@ -54,7 +54,8 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
                 "-2147483648\n" +
                 "2147483648\n" +
                 "7.0\n" +
-                "Infinity\n", "")
+                "Infinity\n" +
+                "-46\n", "")
         );
     }
 

@@ -103,8 +103,10 @@ public abstract class Conversion {
 		if (WideningPrimitive.matches(sourceType, destinationType)) {
 			return new WideningPrimitive(source, destination).statements();
 		}
-
-		// TODO narrowing primitive conversion
+		// narrowing primitive conversion  (example float -> int)
+		if (NarrowingPrimitive.matches(sourceType, destinationType)) {
+			return new NarrowingPrimitive(source, destination).statements();
+		}
 
 		// TODO widening and narrowing primitive conversion
 
