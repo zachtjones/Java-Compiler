@@ -46,7 +46,8 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
             Arguments.of("HelloWorld", 0, "Hello, World!\n", ""),
             Arguments.of("BasicClass", 0, "b is: 5\na is: 1\n", ""),
             Arguments.of("OutOfRegisters", 0, "91\n", ""),
-            Arguments.of("PrintALot", 0, "4a6bcde63\n", "")
+            Arguments.of("PrintALot", 0, "4a6bcde63\n", ""),
+            Arguments.of("IfStatements", 0, "a is 6\na is 7\na is positive\na is negative", "")
         );
     }
 
