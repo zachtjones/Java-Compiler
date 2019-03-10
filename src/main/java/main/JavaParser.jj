@@ -1294,12 +1294,12 @@ LiteralExpressionNode Literal() :
 
 ArrayList<Expression> Arguments() :
 {
-    ArrayList<Expression> expressions;
+    ArrayList<Expression> expressions = new ArrayList<Expression>();
 }
 {
-    "(" [ expressions=ArgumentList() { return expressions; } ] ")"
+    "(" [ expressions=ArgumentList() ] ")"
     {
-        return new ArrayList<Expression>();
+        return expressions;
     }
 }
 
