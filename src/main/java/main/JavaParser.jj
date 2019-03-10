@@ -1185,11 +1185,12 @@ Expression PrimaryExpression() :
     (
         builtUp = Literal()
     |
-        tempName = Name()
+        t=<IDENTIFIER>
         {
-            // treat as this.Name, will always work (even static methods/fields work)
+            // treat as this.Name, will always work (even static methods/fields work), just have to add
+            //  in the catch with field accesses, if the field is a class name.
             builtUp = new ThisExpressionNode(fileName, token.beginLine);
-            fieldName = tempName.primaryName;
+            fieldName = t.image;
         }
     |
         "this" { primaryThis = true; }

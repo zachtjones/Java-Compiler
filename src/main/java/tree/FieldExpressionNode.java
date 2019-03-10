@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 /** Represents accessing a field of an object. */
 public class FieldExpressionNode extends NodeImpl implements Expression, LValue {
 	@NotNull private final Expression object;
-	@NotNull private final String identifier;
+	@NotNull private String identifier;
 
     public FieldExpressionNode(@NotNull Expression object, @NotNull String identifier,
 							   @NotNull String fileName, int line) {
@@ -27,14 +27,25 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 	@Override
 	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
     	object.resolveImports(c);
+    	identifier = c.getFullName(identifier);
 	}
 
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 
-    	// conditional logic based on whether the object is 'this', a class name, or an object calculation
+		// check if the parent is also a field access, and the parent's identifier is a class name
+		if (object instanceof FieldExpressionNode) {
+			String id = ((FieldExpressionNode)object).identifier;
+			if (s.lookup(id) == SymbolTable.className) {
+				// don't compile the object, just do the static field
+				Register result = f.allocator.getNext(Types.UNKNOWN);
+				f.statements.add(new GetStaticFieldStatement(id, identifier, result, getFileName(), getLine()));
+				return;
+			}
+		}
 
+		// conditional logic based on whether the object is 'this', a class name, or an object calculation
 		if (object instanceof ThisExpressionNode) {
 			int tableValue = s.lookup(identifier);
 

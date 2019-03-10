@@ -172,7 +172,7 @@ public class InterFile {
 	 */
 	@NotNull
 	Types getInstFieldType(String fieldName, String fileName, int line) throws CompileException {
-		return instancePart.getFieldType(fieldName, fileName, line);
+		return instancePart.getFieldType(fieldName, name + "-instance", fileName, line);
 	}
 
 	/**
@@ -183,7 +183,7 @@ public class InterFile {
 	 */
 	@NotNull
 	Types getStatFieldType(String fieldName, String fileName, int line) throws CompileException {
-		return staticPart.getFieldType(fieldName, fileName, line);
+		return staticPart.getFieldType(fieldName, name + "-static", fileName, line);
 	}
 
 	/**
