@@ -9,10 +9,11 @@ import org.jetbrains.annotations.NotNull;
  * Note that fields are not inherited, need a way to qualify in IL
  */
 public class SuperFieldExpressionNode extends NodeImpl implements Expression {
-    public String fieldName;
+    private final String fieldName;
 
-    public SuperFieldExpressionNode(String fileName, int line) {
+    public SuperFieldExpressionNode(@NotNull String fieldName, @NotNull String fileName, int line) {
     	super(fileName, line);
+    	this.fieldName = fieldName;
     }
 
 	@Override
