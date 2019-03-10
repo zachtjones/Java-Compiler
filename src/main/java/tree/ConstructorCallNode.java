@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 /** new Name (args) */
 public class ConstructorCallNode extends NodeImpl implements Expression {
     public NameNode name;
-    public ArgumentExpressionNode args;
+    public ArrayList<Expression> args;
 
     public ConstructorCallNode(String fileName, int line) {
     	super(fileName, line);
@@ -24,7 +24,8 @@ public class ConstructorCallNode extends NodeImpl implements Expression {
 	@Override
 	public void resolveImports(@NotNull ClassLookup c) throws CompileException {
 		name.resolveImports(c);
-		args.resolveImports(c);
+		for (Expression e : args)
+			e.resolveImports(c);
 	}
 
 	@Override
@@ -32,11 +33,10 @@ public class ConstructorCallNode extends NodeImpl implements Expression {
     	Types resultType = Types.fromFullyQualifiedClass(name.primaryName);
 		Register result = f.allocator.getNext(resultType);
 
-		ArrayList<Expression> expressions = args.getExpressions();
 		// compile in the args
-		Register[] results = new Register[expressions.size()];
-		for(int i = 0; i < expressions.size(); i++) {
-			expressions.get(i).compile(s, f);
+		Register[] results = new Register[args.size()];
+		for(int i = 0; i < args.size(); i++) {
+			args.get(i).compile(s, f);
 			results[i] = f.allocator.getLast();
 		}
 		
