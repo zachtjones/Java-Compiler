@@ -33,21 +33,21 @@ public class UnknownIdentifierNode extends NodeImpl implements Expression, LValu
 
         if (tableLookup == SymbolTable.local) {
             // get local statement
-            f.statements.add(new GetLocalStatement(result, identifier, getFileName(), getLine()));
+            f.addStatement(new GetLocalStatement(result, identifier, getFileName(), getLine()));
 
         } else if (tableLookup == SymbolTable.parameter) {
             // get param statement
-            f.statements.add(new GetParamStatement(result, identifier, getFileName(), getLine()));
+            f.addStatement(new GetParamStatement(result, identifier, getFileName(), getLine()));
 
         } else if (tableLookup == SymbolTable.staticFields) {
             // get static field of this class
-            f.statements.add(new GetStaticFieldStatement(f.parentClass, identifier, result, getFileName(), getLine()));
+            f.addStatement(new GetStaticFieldStatement(f.parentClass, identifier, result, getFileName(), getLine()));
 
         } else if (tableLookup == SymbolTable.instanceFields) {
             // get instance field of this class
-            f.statements.add(new GetParamStatement(result, "this", getFileName(), getLine()));
+            f.addStatement(new GetParamStatement(result, "this", getFileName(), getLine()));
             Register field = f.allocator.getNext(Types.UNKNOWN);
-            f.statements.add(new GetInstanceFieldStatement(result, identifier, field, getFileName(), getLine()));
+            f.addStatement(new GetInstanceFieldStatement(result, identifier, field, getFileName(), getLine()));
 
         } else if (tableLookup == SymbolTable.className) {
             // mark the past as a class use
@@ -66,22 +66,22 @@ public class UnknownIdentifierNode extends NodeImpl implements Expression, LValu
 
         if (tableLookup == SymbolTable.local) {
             // get local statement
-            f.statements.add(new GetLocalAddressStatement(result, identifier, getFileName(), getLine()));
+            f.addStatement(new GetLocalAddressStatement(result, identifier, getFileName(), getLine()));
 
         } else if (tableLookup == SymbolTable.parameter) {
             // get param statement
-            f.statements.add(new GetParamAddressStatement(result, identifier, getFileName(), getLine()));
+            f.addStatement(new GetParamAddressStatement(result, identifier, getFileName(), getLine()));
 
         } else if (tableLookup == SymbolTable.staticFields) {
             // get static field of this class
-            f.statements.add(new GetStaticFieldAddressStatement(f.parentClass, identifier, result,
+            f.addStatement(new GetStaticFieldAddressStatement(f.parentClass, identifier, result,
                 getFileName(), getLine()));
 
         } else if (tableLookup == SymbolTable.instanceFields) {
             // get instance field of this class
-            f.statements.add(new GetParamStatement(result, "this", getFileName(), getLine()));
+            f.addStatement(new GetParamStatement(result, "this", getFileName(), getLine()));
             Register field = f.allocator.getNext(Types.UNKNOWN);
-            f.statements.add(new GetInstanceFieldAddressStatement(result, identifier, field,
+            f.addStatement(new GetInstanceFieldAddressStatement(result, identifier, field,
                 getFileName(), getLine()));
 
         } else if (tableLookup == SymbolTable.className) {

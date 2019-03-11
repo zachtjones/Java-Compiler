@@ -36,7 +36,7 @@ public class ArrayIndexExpressionNode extends NodeImpl implements Expression, LV
 		Register index = f.allocator.getLast();
 		// load the memory at the address
 		Register result = f.allocator.getNext(Types.UNKNOWN);
-		f.statements.add(new GetArrayValueStatement(array, index, result, getFileName(), getLine()));
+		f.addStatement(new GetArrayValueStatement(array, index, result, getFileName(), getLine()));
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class ArrayIndexExpressionNode extends NodeImpl implements Expression, LV
 		Register index = f.allocator.getLast();
 		// load the memory at the address
 		Register result = f.allocator.getNext(Types.UNKNOWN);
-		f.statements.add(new GetArrayValueStatement(array, index, result, getFileName(), getLine()));
+		f.addStatement(new GetArrayValueStatement(array, index, result, getFileName(), getLine()));
 	}
 
 	

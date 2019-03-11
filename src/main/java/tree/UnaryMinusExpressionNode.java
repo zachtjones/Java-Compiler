@@ -26,6 +26,6 @@ public class UnaryMinusExpressionNode extends NodeImpl implements Expression {
 		expr.compile(s, f);
 		Register exprResult = f.allocator.getLast();
 		Register result = f.allocator.getNext(exprResult.getType());
-		f.statements.add(new UnaryOpStatement(exprResult, result, '-', getFileName(), getLine()));
+		f.addStatement(new UnaryOpStatement(exprResult, result, '-', getFileName(), getLine()));
 	}
 }

@@ -78,7 +78,7 @@ public class Register extends NodeImpl implements Expression {
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// make a copy statement so the result can be gotten with r.getLast()
 		Register result = f.allocator.getNext(type);
-		f.statements.add(new CopyStatement(this, result, getFileName(), getLine()));
+		f.addStatement(new CopyStatement(this, result, getFileName(), getLine()));
 	}
 	
 	@Override

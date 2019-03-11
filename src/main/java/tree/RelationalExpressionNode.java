@@ -37,6 +37,6 @@ public class RelationalExpressionNode extends NodeImpl implements Expression {
 		
 		// add in the condition
 		Register result = f.allocator.getNext(Types.BOOLEAN);
-		f.statements.add(new SetConditionStatement(type, leftResult, rightResult, result, getFileName(), getLine()));
+		f.addStatement(new SetConditionStatement(type, leftResult, rightResult, result, getFileName(), getLine()));
 	}
 }

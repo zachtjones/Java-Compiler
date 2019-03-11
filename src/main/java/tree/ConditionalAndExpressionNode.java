@@ -32,16 +32,16 @@ public class ConditionalAndExpressionNode extends NodeImpl implements Expression
 		LabelStatement end = new LabelStatement("L_" + f.allocator.getNextLabel());
 		Register leftResult = f.allocator.getLast();
 		// if left is false, jump to end
-		f.statements.add(new BranchStatementFalse(end, leftResult, getFileName(), getLine()));
+		f.addStatement(new BranchStatementFalse(end, leftResult, getFileName(), getLine()));
 		
 		// compile in right half
 		right.compile(s, f);
 		Register rightResult = f.allocator.getLast();
 		
-		f.statements.add(end);
+		f.addStatement(end);
 
 		// keep in SSA, need choose statement
 		Register newReg = f.allocator.getNext(Types.BOOLEAN); // result is boolean
-		f.statements.add(new ChooseStatement(leftResult, rightResult, newReg, getFileName(), getLine()));
+		f.addStatement(new ChooseStatement(leftResult, rightResult, newReg, getFileName(), getLine()));
 	}
 }

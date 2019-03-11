@@ -36,12 +36,12 @@ public class LocalVariableDecNode extends NodeImpl implements StatementNode, For
 		// place in symbol table and add intermediate code
 		for (VariableDecNode d : declarations) {
 			s.putEntry(d.id.name, type, getFileName(), getLine());
-			f.statements.add(new StartScopeStatement(d.id.name, type));
+			f.addStatement(new StartScopeStatement(d.id.name, type));
 			if (d.init != null) {
 				// put in the code to compute initial value.
 				d.init.compile(s, f);
 				// store the initial value into the local variable.
-				f.statements.add(new PutLocalStatement(f.allocator.getLast(), d.id.name, getFileName(), getLine()));
+				f.addStatement(new PutLocalStatement(f.allocator.getLast(), d.id.name, getFileName(), getLine()));
 			}
 		}
 	}

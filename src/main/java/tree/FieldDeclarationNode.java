@@ -61,21 +61,21 @@ public class FieldDeclarationNode extends NodeImpl {
 				// store in the field
 				if (isStatic) {
 					// save value back to the static field
-					func.statements.add(
+					func.addStatement(
 						new GetStaticFieldAddressStatement(f.getName(), d.id.name, pointer, getFileName(), getLine()));
 				} else {
 					// save value back to the instance field of this
 					Register thisPointer = func.allocator.getNext(Types.UNKNOWN);
-					func.statements.add(
+					func.addStatement(
 						new GetParamStatement(thisPointer, "this", getFileName(), getLine())
 					);
-					func.statements.add(
+					func.addStatement(
 						new GetInstanceFieldAddressStatement(thisPointer, d.id.name, pointer, getFileName(), getLine())
 					);
 
 				}
 				// store at the pointer
-				func.statements.add(
+				func.addStatement(
 					new StoreAddressStatement(value, pointer, getFileName(), getLine())
 				);
 

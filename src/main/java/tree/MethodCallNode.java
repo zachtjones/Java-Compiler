@@ -46,13 +46,13 @@ public class MethodCallNode extends NodeImpl implements Expression {
 		if (f.history.hasClassName()) {
 			// static function call
 			String className = f.history.getClassName();
-			f.statements.add(new CallStaticStatement(className, methodName, argCompiled,
+			f.addStatement(new CallStaticStatement(className, methodName, argCompiled,
 				f.allocator.getNext(Types.UNKNOWN), getFileName(), getLine()));
 
 		} else {
 			// instance function call of the last register allocated
 			Register objectPointer = f.allocator.getLast();
-			f.statements.add(new CallVirtualStatement(objectPointer, methodName, argCompiled,
+			f.addStatement(new CallVirtualStatement(objectPointer, methodName, argCompiled,
 				f.allocator.getNext(Types.UNKNOWN), getFileName(), getLine()));
 		}
 	}

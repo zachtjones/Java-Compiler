@@ -42,13 +42,13 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 			// static field access
 			String name = f.history.getClassName();
 			Register next = f.allocator.getNext(Types.UNKNOWN);
-			f.statements.add(new GetStaticFieldStatement(name, identifier, next, getFileName(), getLine()));
+			f.addStatement(new GetStaticFieldStatement(name, identifier, next, getFileName(), getLine()));
 		} else {
 
 			// instance field access
 			Register object = f.allocator.getLast();
 			Register next = f.allocator.getNext(Types.UNKNOWN);
-			f.statements.add(new GetInstanceFieldStatement(object, identifier, next, getFileName(), getLine()));
+			f.addStatement(new GetInstanceFieldStatement(object, identifier, next, getFileName(), getLine()));
 		}
 		f.history.clearClassName();
 	}
@@ -65,13 +65,13 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 			// static field access
 			String name = f.history.getClassName();
 			Register next = f.allocator.getNext(Types.UNKNOWN);
-			f.statements.add(new GetStaticFieldAddressStatement(name, identifier, next, getFileName(), getLine()));
+			f.addStatement(new GetStaticFieldAddressStatement(name, identifier, next, getFileName(), getLine()));
 		} else {
 
 			// instance field access
 			Register object = f.allocator.getLast();
 			Register next = f.allocator.getNext(Types.UNKNOWN);
-			f.statements.add(new GetInstanceFieldAddressStatement(object, identifier, next, getFileName(), getLine()));
+			f.addStatement(new GetInstanceFieldAddressStatement(object, identifier, next, getFileName(), getLine()));
 		}
 		f.history.clearClassName();
 	}

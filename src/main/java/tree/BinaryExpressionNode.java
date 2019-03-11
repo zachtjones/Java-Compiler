@@ -40,7 +40,7 @@ public class BinaryExpressionNode extends NodeImpl implements Expression {
 		Register destination = f.allocator.getNext(
 			Register.getLarger(leftResult.getType(), rightResult.getType()));
 
-		f.statements.add(new BinaryOpStatement(
+		f.addStatement(new BinaryOpStatement(
 			leftResult, rightResult,
 			destination, op,
 			getFileName(), getLine()));
