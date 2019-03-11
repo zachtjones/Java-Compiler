@@ -34,6 +34,6 @@ public class InstanceOfExpressionNode extends NodeImpl implements Expression {
 		
 		Register result = f.allocator.getNext(Types.BOOLEAN);
 		
-		f.statements.add(new InstanceOfStatement(value, className, result, getFileName(), getLine()));
+		f.addStatement(new InstanceOfStatement(value, className, result, getFileName(), getLine()));
 	}
 }

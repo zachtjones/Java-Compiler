@@ -25,6 +25,6 @@ public class ThrowStatementNode extends NodeImpl implements StatementNode {
 		// compile in the expression
 		expression.compile(s, f);
 		// throw the result of the expression.
-		f.statements.add(new ThrowStatement(f.allocator.getLast(), getFileName(), getLine()));
+		f.addStatement(new ThrowStatement(f.allocator.getLast(), getFileName(), getLine()));
 	}
 }

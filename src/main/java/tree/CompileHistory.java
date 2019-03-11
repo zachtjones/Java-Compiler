@@ -10,24 +10,25 @@ import org.jetbrains.annotations.Nullable;
  * so if the next Node is (a+b, c), the compiler knows what to do.
  */
 public class CompileHistory {
-	
+
 	private boolean lastWasThis;
 
-	@Nullable private String twoNamesAgo;
 	@Nullable private String lastName; // name last used
-	
+
+
+	@Nullable private String className;
+
 	/** Call if the last expression parsed was "this" */
 	public void setThis() {
 		lastWasThis = true;
 	}
-	
+
 	public boolean wasThisLast() {
 		return lastWasThis;
 	}
 
 	/** Call if the last expression was a name. */
 	public void setName(String name) {
-		twoNamesAgo = lastName;
 		lastName = name;
 		lastWasThis = false;
 	}
@@ -38,9 +39,21 @@ public class CompileHistory {
 		return lastName;
 	}
 
-	/** Returns null, or the name used before the last used name. */
-	@Nullable
-	public String getTwoNamesAgo() throws CompileException {
-		return twoNamesAgo;
+	public void clearClassName() {
+		className = null;
+	}
+
+	public void setClassName(@NotNull String className) {
+		this.className = className;
+	}
+
+	@NotNull
+	public String getClassName() {
+		if (className == null) throw new RuntimeException("use hasClassName before accessing getClassName");
+		return className;
+	}
+
+	public boolean hasClassName() {
+		return className != null;
 	}
 }

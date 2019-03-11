@@ -30,12 +30,12 @@ public class DoStatementNode extends NodeImpl implements StatementNode {
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// label at top of statement
 		LabelStatement l = new LabelStatement("L_L" + f.allocator.getNextLabel());
-		f.statements.add(l);
+		f.addStatement(l);
 		// then follows the statement
 		statement.compile(s, f);
 		// immediately followed by expression
 		expression.compile(s, f);
 		// conditional jump to top of statement
-		f.statements.add(new BranchStatementTrue(l, f.allocator.getLast(), getFileName(), getLine()));
+		f.addStatement(new BranchStatementTrue(l, f.allocator.getLast(), getFileName(), getLine()));
 	}
 }

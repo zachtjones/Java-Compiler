@@ -1,9 +1,7 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
-import x64.instructions.Instruction;
-import x64.instructions.MoveBasePointerOffsetToReg;
-import x64.instructions.MoveRegToRegDisplacement;
+import x64.instructions.*;
 import x64.operands.*;
 
 import java.util.Arrays;
@@ -68,16 +66,29 @@ public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplace
 			} else {
 				// %q1 = -24(%rbp), %q2 = -16(%rbp)
 				//  mov -24(%rbp), 8(-16(%rbp))
+
 				// want to do these 3 instructions (but uses 2 temps, which we don't have)
 				//  mov -24(%rbp), %temp1  # source loaded
 				//  mov -16(%rbp), %temp2  # destination loaded
 				//  mov %temp1, 8(%temp2)
-				// TODO maybe push/pop from stack:
+
+				// instead can push/pop from stack: (may complicate optimizations)
 				//   push -24(%rbp)
 				//   mov  -16(%rbp), %temp
 				//   pop  8(%temp)
-				throw new RuntimeException(
-					"MovePseudoToPseudoDisplacement not able to be converted to real arguments without 2 temporaries");
+
+				return Arrays.asList(
+					new PushBasePointerOffset(
+						locals.get(source)
+					),
+					new MoveBasePointerOffsetToReg(
+						locals.get(destination.register),
+						temporaryImmediate
+					),
+					new PopDisplacement(
+						new RegDisplacement(destination.offset, temporaryImmediate)
+					)
+				);
 			}
 		}
 	}

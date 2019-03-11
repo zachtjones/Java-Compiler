@@ -33,20 +33,20 @@ public class WhileStatementNode extends NodeImpl implements StatementNode {
 		LabelStatement endLbl = new LabelStatement("L_END_" + f.allocator.getNextLabel());
 		
 		// add in the label for expression
-		f.statements.add(exprLbl);
+		f.addStatement(exprLbl);
 		// compile in expression
 		expression.compile(s, f);
 		
 		// if false, goto end
-		f.statements.add(new BranchStatementFalse(endLbl, f.allocator.getLast(), getFileName(), getLine()));
+		f.addStatement(new BranchStatementFalse(endLbl, f.allocator.getLast(), getFileName(), getLine()));
 		
 		// compile in the block
 		statement.compile(s, f);
 		
 		// unconditional jump to the expression
-		f.statements.add(new JumpStatement(exprLbl));
+		f.addStatement(new JumpStatement(exprLbl));
 		
 		// add in the ending label
-		f.statements.add(endLbl);
+		f.addStatement(endLbl);
 	}
 }

@@ -24,7 +24,7 @@ public class InterFunction {
 
 	@NotNull public final ArrayList<String> throwsList;
 
-	@NotNull public final ArrayList<InterStatement> statements;
+	@NotNull private final ArrayList<InterStatement> statements;
 
 	@NotNull public final RegisterAllocator allocator;
 	@NotNull public final CompileHistory history;
@@ -43,6 +43,14 @@ public class InterFunction {
 
 		allocator = new RegisterAllocator();
 		history = new CompileHistory();
+	}
+
+	/**
+	 * Adds a intemediate language statement to the list of statements.
+	 * @param statement The statement to add.
+	 */
+	public void addStatement(InterStatement statement) {
+		statements.add(statement);
 	}
 
 	/** Returns true if and only if this method is a constructor */

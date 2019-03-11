@@ -54,7 +54,8 @@ public class GetInstanceFieldStatement implements InterStatement, FindClassJNI, 
 		
 		InterFile object = JavaCompiler.parseAndCompile(type.getClassName(fileName, line), fileName, line);
 		Types resultType = object.getInstFieldType(fieldName, fileName, line);
-		
+
+		result.setType(resultType);
 		regs.put(result, resultType);
 	}
 

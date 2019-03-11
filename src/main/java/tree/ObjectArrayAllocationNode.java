@@ -39,7 +39,7 @@ public class ObjectArrayAllocationNode extends NodeImpl implements Expression {
    			expressions.get(0).compile(s, f);
    			Register size = f.allocator.getLast();
    			Register result = f.allocator.getNext(Types.UNKNOWN);
-   			f.statements.add(new CreateArrayStatement(size, type, result));
+   			f.addStatement(new CreateArrayStatement(size, type, result));
    		} else {
    			// TODO handle multi-dimensional arrays.
    			throw new CompileException("Multi-dimensional array creation not done yet.", "", -1);
