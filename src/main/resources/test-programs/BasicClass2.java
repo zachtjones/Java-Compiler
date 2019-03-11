@@ -40,6 +40,6 @@ public class BasicClass2 {
 
 		// check assignment to the static variable without qualification
 		a = 5L;
-		System.out.print(a);
+		System.out.println(a);
 	}
 }
