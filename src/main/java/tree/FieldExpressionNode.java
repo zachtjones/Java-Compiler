@@ -50,6 +50,7 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 			Register next = f.allocator.getNext(Types.UNKNOWN);
 			f.statements.add(new GetInstanceFieldStatement(object, identifier, next, getFileName(), getLine()));
 		}
+		f.history.clearClassName();
 	}
 
 	@Override
@@ -72,5 +73,6 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 			Register next = f.allocator.getNext(Types.UNKNOWN);
 			f.statements.add(new GetInstanceFieldAddressStatement(object, identifier, next, getFileName(), getLine()));
 		}
+		f.history.clearClassName();
 	}
 }

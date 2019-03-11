@@ -39,39 +39,18 @@ public class MethodCallNode extends NodeImpl implements Expression {
 			argCompiled[i] = f.allocator.getLast();
 		}
 
-    	// conditional logic based on whether the object is 'this', a class name, or an object calculation
+		// compile the object/class/whatever field chain that could be
+		object.compile(s, f);
 
-		if (object instanceof ThisExpressionNode) {
-			int tableValue = s.lookup(methodName);
-
-			// could be static or instance field
-			if (tableValue == SymbolTable.instanceFields) {
-
-				// this get instance field
-				object.compile(s, f);
-				Register objectPointer = f.allocator.getLast();
-				f.statements.add(new CallVirtualStatement(objectPointer, methodName, argCompiled,
-					f.allocator.getNext(Types.UNKNOWN), getFileName(), getLine()));
-			} else {
-
-				// thisClass static method call
-				final String className = f.parentClass;
-				final Register result = f.allocator.getNext(Types.UNKNOWN);
-				f.statements.add(new CallStaticStatement(className, methodName, argCompiled, result,
-					getFileName(), getLine()));
-			}
-
-			// check if object is a Name and if the name represents a class name.
-		} else if (object instanceof NameNode && s.lookup(((NameNode) object).primaryName) == SymbolTable.className) {
-			// static method call
-			final String className = ((NameNode)object).primaryName;
-			final Register result = f.allocator.getNext(Types.UNKNOWN);
-			f.statements.add(new CallStaticStatement(className, methodName, argCompiled, result,
-				getFileName(), getLine()));
+    	// determine if the last thing compiled was just a class name
+		if (f.history.hasClassName()) {
+			// static function call
+			String className = f.history.getClassName();
+			f.statements.add(new CallStaticStatement(className, methodName, argCompiled,
+				f.allocator.getNext(Types.UNKNOWN), getFileName(), getLine()));
 
 		} else {
-			// object method call
-			object.compile(s, f);
+			// instance function call of the last register allocated
 			Register objectPointer = f.allocator.getLast();
 			f.statements.add(new CallVirtualStatement(objectPointer, methodName, argCompiled,
 				f.allocator.getNext(Types.UNKNOWN), getFileName(), getLine()));
