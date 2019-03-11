@@ -1187,9 +1187,7 @@ Expression PrimaryExpression() :
     |
         t=<IDENTIFIER>
         {
-            // treat as this.Name, will always work (even static methods/fields work), just have to add
-            //  in the catch with field accesses, if the field is a class name.
-            builtUp = new ThisExpressionNode(fileName, token.beginLine);
+            // keep it for this iteration, use in the next one.
             fieldName = t.image;
         }
     |
@@ -1214,9 +1212,12 @@ Expression PrimaryExpression() :
                 if (builtUp == null) {
                     if (primaryThis) {
                         throw new ParseException("Can't array index 'this' qualifier.");
-                    } else {
+                    } else if (superIdentifier != null){
                         // represents super.fieldName[expression]
                         builtUp = new SuperFieldExpressionNode(superIdentifier, fileName, token.beginLine);
+                    } else {
+                        // fieldName is not null, build up from that
+                        builtUp = new UnknownIdentifierNode(fieldName, fileName, token.beginLine);
                     }
                 }
                 // here builtUp is definitely not null
@@ -1236,12 +1237,14 @@ Expression PrimaryExpression() :
                     if (primaryThis) {
                         // this.identifier
                         builtUp = new ThisExpressionNode(fileName, token.beginLine);
-                        fieldName = t.image;
-                    } else {
+                    } else if (superIdentifier != null){
                         // super.fieldName.identifier
                         builtUp = new SuperFieldExpressionNode(fieldName, fileName, token.beginLine);
-                        fieldName = t.image;
+                    } else {
+                        // don't know what the specific type is
+                        builtUp = new UnknownIdentifierNode(fieldName, fileName, token.beginLine);
                     }
+                    fieldName = t.image;
                 } else if (fieldName != null){
                     // builtUp is already something, set the field name
                     builtUp = new FieldExpressionNode(builtUp, fieldName, fileName, token.beginLine);
@@ -1269,7 +1272,11 @@ Expression PrimaryExpression() :
     {
         // potential the last result was a .name, so we have to add that in.
         if (fieldName != null) {
-            builtUp = new FieldExpressionNode(builtUp, fieldName, fileName, token.beginLine);
+            if (builtUp == null) {
+                builtUp = new UnknownIdentifierNode(fieldName, fileName, token.beginLine);
+            } else {
+                builtUp = new FieldExpressionNode(builtUp, fieldName, fileName, token.beginLine);
+            }
         }
         return builtUp;
     }

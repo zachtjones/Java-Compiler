@@ -34,50 +34,21 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 
-		// check if the parent is also a field access, and the parent's identifier is a class name
-		if (object instanceof FieldExpressionNode) {
-			String id = ((FieldExpressionNode)object).identifier;
-			if (s.lookup(id) == SymbolTable.className) {
-				// don't compile the object, just do the static field
-				Register result = f.allocator.getNext(Types.UNKNOWN);
-				f.statements.add(new GetStaticFieldStatement(id, identifier, result, getFileName(), getLine()));
-				return;
-			}
-		}
+    	// compile the object
+		object.compile(s, f);
 
-		// conditional logic based on whether the object is 'this', a class name, or an object calculation
-		if (object instanceof ThisExpressionNode) {
-			int tableValue = s.lookup(identifier);
-
-			// could be static or instance field
-			if (tableValue == SymbolTable.instanceFields) {
-
-				// this get instance field
-				object.compile(s, f);
-				Register objectPointer = f.allocator.getLast();
-				f.statements.add(new GetInstanceFieldStatement(objectPointer, identifier,
-					f.allocator.getNext(Types.UNKNOWN), getFileName(), getLine()));
-			} else {
-
-				// thisClass get static field
-				final String className = f.parentClass;
-				final Register result = f.allocator.getNext(Types.UNKNOWN);
-				f.statements.add(new GetStaticFieldStatement(className, identifier, result, getFileName(), getLine()));
-			}
-
-			// check if object is a Name and if the name represents a class name.
-		} else if (object instanceof NameNode && s.lookup(((NameNode) object).primaryName) == SymbolTable.className) {
+		// check if it was a class name
+		if (f.history.hasClassName()) {
 			// static field access
-			final String className = ((NameNode)object).primaryName;
-			final Register result = f.allocator.getNext(Types.UNKNOWN);
-			f.statements.add(new GetStaticFieldStatement(className, identifier, result, getFileName(), getLine()));
-
+			String name = f.history.getClassName();
+			Register next = f.allocator.getNext(Types.UNKNOWN);
+			f.statements.add(new GetStaticFieldStatement(name, identifier, next, getFileName(), getLine()));
 		} else {
-			// object get instance field
-			object.compile(s, f);
-			Register objectPointer = f.allocator.getLast();
-			f.statements.add(new GetInstanceFieldStatement(objectPointer, identifier,
-				f.allocator.getNext(Types.UNKNOWN), getFileName(), getLine()));
+
+			// instance field access
+			Register object = f.allocator.getLast();
+			Register next = f.allocator.getNext(Types.UNKNOWN);
+			f.statements.add(new GetInstanceFieldStatement(object, identifier, next, getFileName(), getLine()));
 		}
 	}
 
@@ -85,43 +56,21 @@ public class FieldExpressionNode extends NodeImpl implements Expression, LValue 
 	public void compileAddress(@NotNull SymbolTable s, @NotNull InterFunction f)
 			throws CompileException {
 
-		// conditional logic based on whether the object is 'this', a class name, or an object calculation
+		// compile the object
+		object.compile(s, f);
 
-		// same as compile, but has Addresses instead of field values.
-		if (object instanceof ThisExpressionNode) {
-			int tableValue = s.lookup(identifier);
-
-			// could be static or instance field
-			if (tableValue == SymbolTable.instanceFields) {
-
-				// this get instance field
-				object.compile(s, f);
-				Register objectPointer = f.allocator.getLast();
-				f.statements.add(new GetInstanceFieldAddressStatement(objectPointer, identifier,
-					f.allocator.getNext(Types.UNKNOWN), getFileName(), getLine()));
-			} else {
-
-				// thisClass get static field
-				final String className = f.parentClass;
-				final Register result = f.allocator.getNext(Types.UNKNOWN);
-				f.statements.add(new GetStaticFieldAddressStatement(className, identifier, result,
-					getFileName(), getLine()));
-			}
-
-			// check if object is a Name and if the name represents a class name.
-		} else if (object instanceof NameNode && s.lookup(((NameNode) object).primaryName) == SymbolTable.className) {
+		// check if it was a class name
+		if (f.history.hasClassName()) {
 			// static field access
-			final String className = ((NameNode)object).primaryName;
-			final Register result = f.allocator.getNext(Types.UNKNOWN);
-			f.statements.add(new GetStaticFieldAddressStatement(className, identifier, result, getFileName(), getLine()));
-
+			String name = f.history.getClassName();
+			Register next = f.allocator.getNext(Types.UNKNOWN);
+			f.statements.add(new GetStaticFieldAddressStatement(name, identifier, next, getFileName(), getLine()));
 		} else {
-			// object get instance field
-			object.compile(s, f);
-			Register objectPointer = f.allocator.getLast();
-			f.statements.add(new GetInstanceFieldAddressStatement(objectPointer, identifier,
-				f.allocator.getNext(Types.UNKNOWN), getFileName(), getLine()));
-		}
 
+			// instance field access
+			Register object = f.allocator.getLast();
+			Register next = f.allocator.getNext(Types.UNKNOWN);
+			f.statements.add(new GetInstanceFieldAddressStatement(object, identifier, next, getFileName(), getLine()));
+		}
 	}
 }

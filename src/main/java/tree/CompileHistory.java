@@ -15,6 +15,9 @@ public class CompileHistory {
 
 	@Nullable private String twoNamesAgo;
 	@Nullable private String lastName; // name last used
+
+
+	@Nullable private String className;
 	
 	/** Call if the last expression parsed was "this" */
 	public void setThis() {
@@ -42,5 +45,23 @@ public class CompileHistory {
 	@Nullable
 	public String getTwoNamesAgo() throws CompileException {
 		return twoNamesAgo;
+	}
+
+	public void clearClassName() {
+		className = null;
+	}
+
+	public void setClassName(@NotNull String className) {
+		this.className = className;
+	}
+
+	@NotNull
+	public String getClassName() {
+		if (className == null) throw new RuntimeException("use hasClassName before accessing getClassName");
+		return className;
+	}
+
+	public boolean hasClassName() {
+		return className != null;
 	}
 }
