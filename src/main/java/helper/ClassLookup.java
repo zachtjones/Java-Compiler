@@ -92,15 +92,6 @@ public class ClassLookup {
 			return items.get(shortName).replace('.', '/');
 		}
 
-		// handle System.in -> java/lang/System.in
-		if (shortName.contains(".")) {
-			String firstPart = shortName.substring(0, shortName.indexOf("."));
-			String rest = shortName.substring(shortName.indexOf(".") + 1);
-			if (items.containsKey(firstPart)) {
-				return items.get(firstPart) + "." + rest;
-			}
-		}
-
 		// return the short name, assume default package;
 		return shortName;
 	}

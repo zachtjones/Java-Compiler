@@ -37,7 +37,7 @@ public class BlockNode extends NodeImpl implements StatementNode {
 		// remove all new symbols from the table
 		HashMap<String, Types> entries = s.getCurrentEntries();
 		entries.forEach((name, type) ->
-			f.statements.add(new EndScopeStatement(name))
+			f.addStatement(new EndScopeStatement(name))
 		);
 	}
 

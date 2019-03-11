@@ -24,7 +24,7 @@ public class LogicalNotExpressionNode extends NodeImpl implements Expression {
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		expr.compile(s, f);
-		f.statements.add(new UnaryOpStatement(f.allocator.getLast(),
+		f.addStatement(new UnaryOpStatement(f.allocator.getLast(),
 				f.allocator.getNext(Types.BYTE), UnaryOpStatement.LOGNOT, getFileName(), getLine()));
 	}
 }

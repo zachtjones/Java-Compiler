@@ -33,10 +33,10 @@ public class PreDecrementExpressionNode extends NodeImpl implements StatementExp
 		Register result = f.allocator.getLast();
 		
 		// subtract 1
-		f.statements.add(new LoadLiteralStatement("1", f.allocator, getFileName(), getLine()));
+		f.addStatement(new LoadLiteralStatement("1", f.allocator, getFileName(), getLine()));
 		Register one = f.allocator.getLast();
 		
-		f.statements.add(new BinaryOpStatement(result, one, f.allocator.getNext(result.getType()), SUBTRACT,
+		f.addStatement(new BinaryOpStatement(result, one, f.allocator.getNext(result.getType()), SUBTRACT,
 			getFileName(), getLine()));
 		Register minusOne = f.allocator.getLast();
 		// compile in the store to the address
@@ -45,9 +45,9 @@ public class PreDecrementExpressionNode extends NodeImpl implements StatementExp
 		}
 		((LValue)expr).compileAddress(s, f);
 		// store it back
-		f.statements.add(new CopyStatement(minusOne, f.allocator.getLast(), getFileName(), getLine()));
+		f.addStatement(new CopyStatement(minusOne, f.allocator.getLast(), getFileName(), getLine()));
 		
 		// result is before the subtraction
-		f.statements.add(new CopyStatement(result, f.allocator.getNext(result.getType()), getFileName(), getLine()));
+		f.addStatement(new CopyStatement(result, f.allocator.getNext(result.getType()), getFileName(), getLine()));
 	}
 }

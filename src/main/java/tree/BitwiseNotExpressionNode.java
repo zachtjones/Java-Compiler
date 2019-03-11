@@ -24,7 +24,7 @@ public class BitwiseNotExpressionNode extends NodeImpl implements Expression {
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		expr.compile(s, f);
 		// take bitwise not of the result.
-		f.statements.add(new UnaryOpStatement(f.allocator.getLast(),
+		f.addStatement(new UnaryOpStatement(f.allocator.getLast(),
 				f.allocator.getNext(f.allocator.getLast().getType()), UnaryOpStatement.BITNOT,
 			getFileName(), getLine()));
 	}

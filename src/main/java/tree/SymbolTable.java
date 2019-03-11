@@ -12,8 +12,7 @@ import helper.Types;
  *
  */
 public class SymbolTable {
-	public static boolean printOut = false; // change to print the symbol table.
-	
+
 	/** Reference to an outer scope */
 	private final SymbolTable outer;
 	/** The scope level of this symbol table */
@@ -99,20 +98,6 @@ public class SymbolTable {
 		
 		// good, the variable can be defined here
 		entries.put(identifier, type);
-		
-		if (printOut) {
-			// print out adding the symbol
-			int numParents = numParents();
-			for (int i = 0; i < numParents; i++) {
-				System.out.print("  ");
-			}
-			System.out.println(identifier + " (" + type + ")");
-		}
-	}
-	
-	private int numParents() {
-		if (outer != null) return 1 + outer.numParents();
-		return 0;
 	}
 	
 	/**

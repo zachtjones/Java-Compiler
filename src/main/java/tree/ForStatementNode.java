@@ -47,14 +47,14 @@ public class ForStatementNode extends NodeImpl implements StatementNode {
 		LabelStatement endLabel = new LabelStatement("L_END_" + f.allocator.getNextLabel());
 		
 		// add in condition label
-		f.statements.add(conditionLabel);
+		f.addStatement(conditionLabel);
 		
 		// compile in the condition
 		condition.compile(newTable, f);
 		
 		// conditional branch to end
 		// if false (zero) take the branch.
-		f.statements.add(new BranchStatementFalse(endLabel, f.allocator.getLast(), getFileName(), getLine()));
+		f.addStatement(new BranchStatementFalse(endLabel, f.allocator.getLast(), getFileName(), getLine()));
 		
 		// compile in the body
 		block.compile(newTable, f);
@@ -64,6 +64,6 @@ public class ForStatementNode extends NodeImpl implements StatementNode {
 		if (update != null) update.compile(s, f);
 		
 		// add in the ending label
-		f.statements.add(endLabel);
+		f.addStatement(endLabel);
 	}
 }
