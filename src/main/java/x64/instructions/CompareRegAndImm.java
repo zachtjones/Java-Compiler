@@ -15,6 +15,6 @@ public class CompareRegAndImm extends Instruction {
 
     @Override
     public String assemblyRepresentation() {
-        return "cmp" + src1.getSuffix() + "\t" + src2 + ", " + src1;
+        return "\tcmp" + src1.getSuffix() + " " + src2 + ", " + src1;
     }
 }

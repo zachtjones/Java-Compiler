@@ -16,6 +16,6 @@ public class CompareBasePointerOffsetAndReg extends Instruction{
     @Override
     public String assemblyRepresentation() {
         // reversed syntax with at&t style.
-        return "cmp" + src2.getSuffix() + "\t" + src2 + ", " + src1;
+        return "\tcmp" + src2.getSuffix() + " " + src2 + ", " + src1;
     }
 }

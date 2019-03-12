@@ -20,6 +20,6 @@ public class CompareBasePointerOffsetAndImm extends Instruction{
     @Override
     public String assemblyRepresentation() {
         // reversed syntax with at&t style.
-        return "cmp" + size + "\t" + src2 + ", " + src1;
+        return "\tcmp" + size + " " + src2 + ", " + src1;
     }
 }
