@@ -15,7 +15,6 @@ package main;
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import tree.*;
-import intermediate.SetConditionStatement;
 import java.util.ArrayList;
 import java.nio.charset.Charset;
 import helper.*;
@@ -864,23 +863,15 @@ Expression EqualityExpression() :
 
     Expression one;
     Expression two;
-    boolean isEqual;
+    ConditionCode code;
 }
 {
     one=InstanceOfExpression()
-    ( ( "==" { isEqual = true; }
-      | "!=" { isEqual = false; })
+    ( ( "==" { code = ConditionCode.EQUAL; }
+      | "!=" { code = ConditionCode.NOT_EQUAL; })
     two=InstanceOfExpression()
     {
-        if (isEqual) {
-            RelationalExpressionNode eq = new RelationalExpressionNode(fileName, token.beginLine,
-                one, two, SetConditionStatement.EQUAL);
-            one = eq; // base for next tree element
-        } else {
-            RelationalExpressionNode neq = new RelationalExpressionNode(fileName, token.beginLine,
-                one, two, SetConditionStatement.NOTEQUAL);
-            one = neq; // base for next tree element
-        }
+        one = new RelationalExpressionNode(fileName, token.beginLine, one, two, code);
     })*
     {
         // one is built up, or just the expression
@@ -912,34 +903,18 @@ Expression RelationalExpression() :
 
     Expression one;
     Expression two;
-    int type;
+    ConditionCode type;
 }
 {
     one=ShiftExpression()
     (
-        ( "<" { type = 0; }
-        | ">" { type = 1; }
-        | "<=" { type = 2;}
-        | ">=" { type = 3; })
+        ( "<" { type = ConditionCode.LESS; }
+        | ">" { type = ConditionCode.GREATER; }
+        | "<=" { type = ConditionCode.LESS_EQUAL;}
+        | ">=" { type = ConditionCode.GREATER_EQUAL; })
         two=ShiftExpression()
         {
-            if (type == 0) {
-                RelationalExpressionNode lt = new RelationalExpressionNode(fileName, token.beginLine,
-                    one, two, SetConditionStatement.LESS);
-                one = lt;
-            } else if (type == 1) {
-                RelationalExpressionNode gt = new RelationalExpressionNode(fileName, token.beginLine,
-                    one, two, SetConditionStatement.GREATER);
-                one = gt;
-            } else if (type == 2) {
-                RelationalExpressionNode lte = new RelationalExpressionNode(fileName, token.beginLine,
-                    one, two, SetConditionStatement.LESSEQUAL);
-                one = lte;
-            } else {
-                RelationalExpressionNode gte = new RelationalExpressionNode(fileName, token.beginLine,
-                    one, two, SetConditionStatement.GREATEREQUAL);
-                one = gte;
-            }
+            one = new RelationalExpressionNode(fileName, token.beginLine, one, two, type);
         }
     )*
     {
