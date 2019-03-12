@@ -52,6 +52,12 @@ public class X64Context {
 		return new X64PseudoRegister(nextRegister, X64InstructionSize.QUAD);
 	}
 
+	/** Returns the next pseudo register available that is a quad-word size (64-bit) */
+	public X64PseudoRegister getNextByteRegister() {
+		nextRegister++;
+		return new X64PseudoRegister(nextRegister, X64InstructionSize.BYTE);
+	}
+
 	/** returns the argument number that is the highest number used */
 	public int getHighestArgUsed() {
 		return highestArgUsed;
