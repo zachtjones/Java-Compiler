@@ -54,11 +54,4 @@ public class UnaryOpStatement implements InterStatement {
 		dest.setType(src1.getType());
 		regs.put(dest, src1.getType());
 	}
-
-	@Override
-	public void compile(@NotNull X64Context context) throws CompileException {
-		if (type == NEGATIVE) {
-
-		}
-	}
 }

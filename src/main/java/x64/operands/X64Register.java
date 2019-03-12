@@ -1,5 +1,6 @@
 package x64.operands;
 
+import org.jetbrains.annotations.NotNull;
 import x64.X64InstructionSize;
 
 /**
@@ -8,25 +9,46 @@ import x64.X64InstructionSize;
  *   which can only be used indirectly as an offset.
  */
 public enum X64Register {
-	RAX("rax"), RBX("rbx"), RCX("rcx"), RDX("rdx"),
-	RDI("rdi"), RSI("rsi"), RBP("rbp"), RSP("rsp"),
-	R8("r8"),   R9("r9"),   R10("r10"), R11("r11"),
-	R12("r12"), R13("r13"), R14("r14"), R15("r15");
+	RAX("rax", "eax", "ax", "al"),
+	RBX("rbx", "ebx", "bx", "bl"),
+	RCX("rcx", "ecx", "cx", "cl"),
+	RDX("rdx", "edx", "dx", "dl"),
+	RDI("rdi", "edi", "di", "dil"),
+	RSI("rsi", "esi", "si", "sil"),
+	RBP("rbp", "ebp", "bp", "bpl"),
+	RSP("rsp", "esp", "sp", "spl"),
+	R8("r8", "r8d", "r8w", "r8b"),
+	R9("r9", "r9d", "r9w", "r9b"),
+	R10("r10", "r10d", "r10w", "r10b"),
+	R11("r11", "r11d", "r11w", "r11b"),
+	R12("r12", "r12d", "r12w", "r12b"),
+	R13("r13", "r13d", "r13w", "r13b"),
+	R14("r14", "r14d", "r14w", "r14b"),
+	R15("r15", "r15d", "r15w", "r15b");
 
 
 	/** How this x64 machine register is represented in the assembly language*/
-	private final String representation;
+	@NotNull private final String quadSize, doubleSize, wordSize, byteSize;
 
-	X64Register(String representation) {
-		this.representation = "%" + representation;
+	X64Register(String quadSize, String doubleSize, String wordSize, String byteSize) {
+		this.quadSize = "%" + quadSize;
+		this.doubleSize = "%" + doubleSize;
+		this.wordSize = "%" + wordSize;
+		this.byteSize = "%" + byteSize;
 	}
 
 	public X64InstructionSize getSuffix() {
 		return X64InstructionSize.QUAD;
 	}
 
+	/** Returns the representation as a quad word */
 	public String assemblyRep() {
-		return representation;
+		return quadSize;
+	}
+
+	/** Returns the representation as a byte sized register */
+	public String byteSizeRep() {
+		return byteSize;
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import helper.ConditionCode;
 import org.jetbrains.annotations.NotNull;
 import x64.operands.BasePointerOffset;
 
+/** If the condition passes, makes the register hold the value 1, otherwise 0.*/
 public class SetConditionBasePointerOffset extends Instruction {
     @NotNull private final ConditionCode type;
     @NotNull private final BasePointerOffset offset;
