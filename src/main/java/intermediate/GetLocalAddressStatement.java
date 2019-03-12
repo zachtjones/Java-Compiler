@@ -6,6 +6,7 @@ import helper.CompileException;
 import helper.TypeChecker;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
+import x64.X64Context;
 
 public class GetLocalAddressStatement implements InterStatement {
 	@NotNull private final Register r;
@@ -40,10 +41,15 @@ public class GetLocalAddressStatement implements InterStatement {
 			throw new CompileException("local variable: " + localName + " is not defined.",
 					fileName, line);
 		}
-		TypeChecker.canDirectlyAssign(locals.get(localName), r.getType(), fileName, line);
-		
+
 		// define the register
 		r.setType(Types.pointerOf(locals.get(localName)));
 		regs.put(r, r.getType());
+	}
+
+	@Override
+	public void compile(@NotNull X64Context context) throws CompileException {
+		// handle the details in the store instruction later on
+		context.markRegisterAsLocalVariableAddress(r, localName);
 	}
 }

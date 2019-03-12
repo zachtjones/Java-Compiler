@@ -29,6 +29,8 @@ public class X64Context {
 	private final Map<Register, String> staticFieldAddressFields = new HashMap<>();
 	private final Map<String, X64PseudoRegister> locals = new HashMap<>();
 
+	private final Map<Register, String> localAddresses = new HashMap<>();
+
 	/** Returns the highest number of argument register used */
 	private int highestArgUsed = 1; // reserve the JNI register as always used
 
@@ -139,5 +141,20 @@ public class X64Context {
 	 * There isn't a need for an is local variable, since intermediate language is already type checked. */
 	public X64PseudoRegister getLocalVariable(String name) {
 		return locals.get(name);
+	}
+
+	/** marks the register as holding the address to the local variable */
+	public void markRegisterAsLocalVariableAddress(Register r, String localName) {
+		localAddresses.put(r, localName);
+	}
+
+	/** returns if the register holds the address of a local variable */
+	public boolean registerIsLocalVariableAddress(Register r) {
+		return localAddresses.containsKey(r);
+	}
+
+	/** Returns the local variable name that this register address points to. */
+	public String getLocalNameForAddress(Register r) {
+		return localAddresses.get(r);
 	}
 }

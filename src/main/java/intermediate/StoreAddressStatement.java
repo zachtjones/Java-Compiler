@@ -113,6 +113,11 @@ public class StoreAddressStatement implements InterStatement,
 					)
 				);
 			}
+		} else if (context.registerIsLocalVariableAddress(addr)) {
+			final String localName = context.getLocalNameForAddress(addr);
+			// compile as if putLocal  src @ address
+			new PutLocalStatement(src, localName, fileName, line).compile(context);
+
 		} else {
 			throw new CompileException("store address statement unknown type", fileName, line);
 		}
