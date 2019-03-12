@@ -17,7 +17,7 @@ public class SetConditionStatement implements InterStatement {
 	@NotNull private final ConditionCode type;
 	@NotNull private final Register left;
 	@NotNull private final Register right;
-	@NotNull final Register result;
+	@NotNull private final Register result;
 	
 	@NotNull private final String fileName;
 	private final int line;
@@ -65,7 +65,7 @@ public class SetConditionStatement implements InterStatement {
 		);
 
 		context.addInstruction(
-			new SetConditionPseudo(type, context.getNextByteRegister())
+			new SetConditionPseudo(type, result.toX64())
 		);
 	}
 }
