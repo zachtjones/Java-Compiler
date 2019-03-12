@@ -18,6 +18,6 @@ public class IfStatements {
         value(7L);
         value(8L);
         value(10L);
-        value(-283L);
+        value(10L - 283L);
     }
 }

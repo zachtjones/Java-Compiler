@@ -15,6 +15,6 @@ public class SetConditionReg extends Instruction {
 
     @Override
     public String assemblyRepresentation() {
-        return "set" + type.x64Code() + "\t" + register;
+        return "\tset" + type.x64Code() + " " + register;
     }
 }

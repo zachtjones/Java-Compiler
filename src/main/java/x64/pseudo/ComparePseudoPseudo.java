@@ -1,6 +1,8 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
+import x64.allocation.RegisterMapped;
+import x64.allocation.RegistersUsed;
 import x64.instructions.*;
 import x64.operands.BasePointerOffset;
 import x64.operands.X64PseudoRegister;
@@ -19,6 +21,18 @@ public class ComparePseudoPseudo implements PseudoInstruction {
     public ComparePseudoPseudo(@NotNull X64PseudoRegister src1, @NotNull X64PseudoRegister src2) {
         this.src1 = src1;
         this.src2 = src2;
+    }
+
+    @Override
+    public void markRegisters(int i, RegistersUsed usedRegs) {
+        usedRegs.markUsed(src1, i);
+        usedRegs.markUsed(src2, i);
+    }
+
+    @Override
+    public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
+        mapping.get(src1).increment();
+        mapping.get(src2).increment();
     }
 
     @Override
@@ -67,5 +81,11 @@ public class ComparePseudoPseudo implements PseudoInstruction {
                 );
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        // compare has reversed order in at&t to what you expect
+        return "\tcmp" + src1.getSuffix() + " " + src2 + ", " + src1;
     }
 }

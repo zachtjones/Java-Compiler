@@ -6,6 +6,7 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
+import x64.X64Context;
 
 /** dest = OP src2 */
 public class UnaryOpStatement implements InterStatement {
@@ -52,5 +53,12 @@ public class UnaryOpStatement implements InterStatement {
 		}
 		dest.setType(src1.getType());
 		regs.put(dest, src1.getType());
+	}
+
+	@Override
+	public void compile(@NotNull X64Context context) throws CompileException {
+		if (type == NEGATIVE) {
+
+		}
 	}
 }

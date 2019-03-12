@@ -13,6 +13,6 @@ public class JumpInstruction extends Instruction {
 
     @Override
     public String assemblyRepresentation() {
-        return "jmp\t" + name;
+        return "\tjmp\t" + name;
     }
 }

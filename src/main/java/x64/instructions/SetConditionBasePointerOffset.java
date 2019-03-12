@@ -15,6 +15,6 @@ public class SetConditionBasePointerOffset extends Instruction {
 
     @Override
     public String assemblyRepresentation() {
-        return "set" + type.x64Code() + "\t" + offset;
+        return "\tset" + type.x64Code() + " " + offset;
     }
 }

@@ -17,6 +17,6 @@ public class JumpConditionInstruction extends Instruction {
 
     @Override
     public String assemblyRepresentation() {
-        return "j" + code.x64Code() + "\t" + name;
+        return "\tj" + code.x64Code() + "\t" + name;
     }
 }
