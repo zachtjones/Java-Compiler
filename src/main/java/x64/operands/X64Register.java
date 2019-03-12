@@ -17,8 +17,8 @@ public enum X64Register {
 	RSI("rsi", "esi", "si", "sil"),
 	RBP("rbp", "ebp", "bp", "bpl"),
 	RSP("rsp", "esp", "sp", "spl"),
-	R8("r8", "r8d", "r8w", "r8b"),
-	R9("r9", "r9d", "r9w", "r9b"),
+	R8 ("r8",  "r8d",  "r8w",  "r8b"),
+	R9 ("r9",  "r9d",  "r9w",  "r9b"),
 	R10("r10", "r10d", "r10w", "r10b"),
 	R11("r11", "r11d", "r11w", "r11b"),
 	R12("r12", "r12d", "r12w", "r12b"),
@@ -44,6 +44,22 @@ public enum X64Register {
 	/** Returns the representation as a quad word */
 	public String assemblyRep() {
 		return quadSize;
+	}
+
+	/** Returns the representation for the size specified. */
+	public String assemblyRep(X64InstructionSize size) {
+		switch (size) {
+			case BYTE:
+				return byteSize;
+			case WORD:
+				return wordSize;
+			case LONG:
+				return doubleSize;
+			case QUAD:
+				return quadSize;
+			default:
+				throw new RuntimeException("x64 general purpose register used for floating point size.");
+		}
 	}
 
 	/** Returns the representation as a byte sized register */

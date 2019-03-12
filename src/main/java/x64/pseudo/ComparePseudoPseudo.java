@@ -46,7 +46,8 @@ public class ComparePseudoPseudo implements PseudoInstruction {
                 return Collections.singletonList(
                     new CompareRegAndReg(
                         mapping.get(src1),
-                        mapping.get(src2)
+                        mapping.get(src2),
+                        src1.getSuffix()
                     )
                 );
             } else {
@@ -54,7 +55,8 @@ public class ComparePseudoPseudo implements PseudoInstruction {
                 return Collections.singletonList(
                     new CompareRegAndBasePointerOffset(
                         mapping.get(src1),
-                        locals.get(src2)
+                        locals.get(src2),
+                        src1.getSuffix()
                     )
                 );
             }
@@ -64,7 +66,8 @@ public class ComparePseudoPseudo implements PseudoInstruction {
                 return Collections.singletonList(
                     new CompareBasePointerOffsetAndReg(
                         locals.get(src1),
-                        mapping.get(src2)
+                        mapping.get(src2),
+                        src1.getSuffix()
                     )
                 );
             } else {
@@ -76,7 +79,8 @@ public class ComparePseudoPseudo implements PseudoInstruction {
                     ),
                     new CompareRegAndBasePointerOffset(
                         temporaryImmediate,
-                        locals.get(src2)
+                        locals.get(src2),
+                        src2.getSuffix()
                     )
                 );
             }

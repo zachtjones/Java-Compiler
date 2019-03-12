@@ -42,7 +42,7 @@ public class ComparePseudoAndImmediate implements PseudoInstruction {
                                                         @NotNull X64Register temporaryImmediate) {
         if (mapping.containsKey(src1)) {
             return Collections.singletonList(
-                new CompareRegAndImm(mapping.get(src1), src2)
+                new CompareRegAndImm(mapping.get(src1), src2, src1.getSuffix())
             );
         } else {
             return Collections.singletonList(
