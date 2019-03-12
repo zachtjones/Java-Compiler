@@ -8,7 +8,7 @@ import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-import x64.instructions.JumpInstruction;
+import x64.instructions.JumpConditionInstruction;
 import x64.operands.Immediate;
 import x64.pseudo.ComparePseudoAndImmediate;
 
@@ -57,7 +57,7 @@ public class BranchStatementFalse implements InterStatement {
 			)
 		);
 		context.addInstruction(
-			new JumpInstruction(
+			new JumpConditionInstruction(
 				ConditionCode.EQUAL,
 				destination.name
 			)
