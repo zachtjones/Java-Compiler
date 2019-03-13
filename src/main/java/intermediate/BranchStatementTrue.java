@@ -3,9 +3,14 @@ package intermediate;
 import java.util.HashMap;
 
 import helper.CompileException;
+import helper.ConditionCode;
 import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
+import x64.X64Context;
+import x64.instructions.JumpConditionInstruction;
+import x64.operands.Immediate;
+import x64.pseudo.ComparePseudoAndImmediate;
 
 /** branch when register is not equal to 0. */
 public class BranchStatementTrue implements InterStatement {
@@ -39,5 +44,22 @@ public class BranchStatementTrue implements InterStatement {
 			throw new CompileException("cannot convert from: " + r.getType() + " to boolean.",
 					fileName, line);
 		}
+	}
+
+	@Override
+	public void compile(@NotNull X64Context context) throws CompileException {
+		// compare r to 0, if it's not equal, then take the branch
+		context.addInstruction(
+			new ComparePseudoAndImmediate(
+				r.toX64(),
+				new Immediate(0)
+			)
+		);
+		context.addInstruction(
+			new JumpConditionInstruction(
+				ConditionCode.NOT_EQUAL,
+				destination.name
+			)
+		);
 	}
 }
