@@ -44,8 +44,13 @@ public class ForStatementNode extends NodeImpl implements StatementNode {
 		
 		// label condition -> condition -> if false, branch end 
 		//   -> block -> jump condition -> label end
-		LabelStatement conditionLabel = new LabelStatement("L_COND_" + f.allocator.getNextLabel());
-		LabelStatement endLabel = new LabelStatement("L_END_" + f.allocator.getNextLabel());
+		LabelStatement conditionLabel = new LabelStatement("L_FOR_COND_" + f.allocator.getNextLabel());
+		LabelStatement endLabel = new LabelStatement("L_FOR_END_" + f.allocator.getNextLabel());
+		LabelStatement updateLabel = new LabelStatement("L_FOR_UPDATE_" + f.allocator.getNextLabel());
+
+		// give the destinations for break and continue statements.
+		newTable.setBreakLabel(endLabel);
+		newTable.setContinueLabel(updateLabel);
 		
 		// add in condition label
 		f.addStatement(conditionLabel);
@@ -59,9 +64,9 @@ public class ForStatementNode extends NodeImpl implements StatementNode {
 		
 		// compile in the body
 		block.compile(newTable, f);
-		
-		// TODO continue should have a label here to go to.
-		// compile in the update
+
+		// update
+		f.addStatement(updateLabel);
 		if (update != null) update.compile(newTable, f);
 
 		// jump to condition label

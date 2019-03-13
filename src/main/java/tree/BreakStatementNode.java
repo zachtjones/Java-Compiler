@@ -3,6 +3,8 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
+import intermediate.JumpStatement;
+import intermediate.LabelStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,6 +23,11 @@ public class BreakStatementNode extends NodeImpl implements StatementNode {
 
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
-		throw new CompileException("break statement not implemented yet", "", -1);
+
+    	// get the destination from the table, throws CompileEx if not set
+		LabelStatement destination = s.getBreakLabel(getFileName(), getLine());
+
+		// jump to that label
+		f.addStatement(new JumpStatement(destination));
 	}
 }

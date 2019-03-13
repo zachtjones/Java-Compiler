@@ -3,6 +3,8 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFunction;
+import intermediate.JumpStatement;
+import intermediate.LabelStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,6 +23,11 @@ public class ContinueStatementNode extends NodeImpl implements StatementNode {
 
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
-		throw new CompileException("continue not implemented yet", "", -1);
+
+    	// symbol table holds the destination, throws CompileEx if not set there.
+    	LabelStatement destination = s.getContinueLabel(getFileName(), getLine());
+
+    	// jump to the destination
+    	f.addStatement(new JumpStatement(destination));
 	}
 }

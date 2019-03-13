@@ -6,6 +6,9 @@ import helper.CompileException;
 import helper.Types;
 import intermediate.EndScopeStatement;
 import intermediate.InterFunction;
+import intermediate.LabelStatement;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents an entry in the symbol table, with a reference to the outer
@@ -19,6 +22,10 @@ public class SymbolTable {
 	private final SymbolTable outer;
 	/** The scope level of this symbol table */
 	private final int scopeLevel;
+
+	/** label to jump to with a break; May be null */
+	@Nullable private LabelStatement breakLabel = null;
+	@Nullable private LabelStatement continueLabel = null;
 	
 	// places where the symbol is defined -- valid values of scope level
 	public static final int className = 0;
@@ -110,5 +117,45 @@ public class SymbolTable {
 		for (String local : entries.keySet()) {
 			function.addStatement(new EndScopeStatement(local));
 		}
+	}
+
+	/**
+	 * Gets the label associated with the break statement, throwing an exception if not found.
+	 * @param fileName The filename being currently compiled.
+	 * @param line The line number in that file.
+	 * @return The Label that break should take the jump to.
+	 * @throws CompileException
+	 */
+	public LabelStatement getBreakLabel(@NotNull String fileName, int line) throws CompileException {
+		if (breakLabel != null) return breakLabel;
+
+		if (outer != null) return outer.getBreakLabel(fileName, line);
+
+		throw new CompileException("break is not allowed here.", fileName, line);
+	}
+
+	/**
+	 * Gets the label associated with the continue statement, throwing an exception if not found.
+	 * @param fileName The filename being currently compiled.
+	 * @param line The line number in that file.
+	 * @return The Label that continue should take the jump to.
+	 * @throws CompileException
+	 */
+	public LabelStatement getContinueLabel(@NotNull String fileName, int line) throws CompileException {
+		if (continueLabel != null) return continueLabel;
+
+		if (outer != null) return outer.getContinueLabel(fileName, line);
+
+		throw new CompileException("continue is not allowed here.", fileName, line);
+	}
+
+	/** Sets the label to go to on 'break'*/
+	void setBreakLabel(@NotNull LabelStatement label) {
+		breakLabel = label;
+	}
+
+	/** Sets the label to go to on 'continue' */
+	void setContinueLabel(@NotNull LabelStatement label) {
+		continueLabel = label;
 	}
 }
