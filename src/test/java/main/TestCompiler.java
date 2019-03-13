@@ -50,7 +50,8 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
             Arguments.of("PrintALot", 0, "4a6bcde63\n", ""),
             Arguments.of("SimpleIfStatement", 0, "a is 6\nalways run\nalways run\n", ""),
             Arguments.of("IfStatements", 0, "a is 6\na is 7\na is positive\na is negative\n", ""),
-            Arguments.of("SimpleWhileLoop", 0, "123456789\n", "")
+            Arguments.of("SimpleWhileLoop", 0, "123456789\n", ""),
+            Arguments.of("SimpleForLoop", 0, "123456789\n", "")
         );
     }
 

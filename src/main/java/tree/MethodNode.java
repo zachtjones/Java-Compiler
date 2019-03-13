@@ -109,7 +109,15 @@ public class MethodNode {
 		if (content != null) {
 			SymbolTable codeTable = new SymbolTable(paramTable, SymbolTable.local);
 			content.compile(codeTable, func);
+
+			// done with codeTable
+			codeTable.endScope(func);
 		}
+
+		// done with param table
+		paramTable.endScope(func);
+
+		// done with the method
 		f.addFunction(func);
 	}
 

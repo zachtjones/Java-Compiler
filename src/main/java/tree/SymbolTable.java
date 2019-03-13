@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 import helper.CompileException;
 import helper.Types;
+import intermediate.EndScopeStatement;
+import intermediate.InterFunction;
 
 /**
  * Represents an entry in the symbol table, with a reference to the outer
@@ -99,11 +101,14 @@ public class SymbolTable {
 		// good, the variable can be defined here
 		entries.put(identifier, type);
 	}
-	
-	/**
-	 * Gets all the entries in the current scope only.
+
+	/***
+	 * Inserts the code for ending the scope of all variables in this scope into the function.
+	 * @param function The function to add the end scope statements.
 	 */
-	HashMap<String, Types> getCurrentEntries() {
-		return entries;
+	void endScope(InterFunction function) {
+		for (String local : entries.keySet()) {
+			function.addStatement(new EndScopeStatement(local));
+		}
 	}
 }

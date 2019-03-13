@@ -59,5 +59,8 @@ public class IfStatementNode extends NodeImpl implements StatementNode {
 		
 		// add in end label
 		f.addStatement(endLbl);
+
+		// done with newTable
+		newTable.endScope(f);
 	}
 }

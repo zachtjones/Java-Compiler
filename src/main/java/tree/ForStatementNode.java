@@ -4,6 +4,7 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.BranchStatementFalse;
 import intermediate.InterFunction;
+import intermediate.JumpStatement;
 import intermediate.LabelStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,9 +62,15 @@ public class ForStatementNode extends NodeImpl implements StatementNode {
 		
 		// TODO continue should have a label here to go to.
 		// compile in the update
-		if (update != null) update.compile(s, f);
+		if (update != null) update.compile(newTable, f);
+
+		// jump to condition label
+		f.addStatement(new JumpStatement(conditionLabel));
 		
 		// add in the ending label
 		f.addStatement(endLabel);
+
+		// newTable is done, add in the end scope statements
+		newTable.endScope(f);
 	}
 }
