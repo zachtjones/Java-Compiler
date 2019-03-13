@@ -60,7 +60,7 @@ public class AssignmentNode extends NodeImpl implements StatementExprNode, Expre
 		} else {
 			// dissolve the compound assignment down to left = left OPERATION right
 			BinaryExpressionNode rightSide = new BinaryExpressionNode(getFileName(), getLine(), left, right, type);
-			AssignmentNode assign = new AssignmentNode(getFileName(), getLine(), left, rightSide, type);
+			AssignmentNode assign = new AssignmentNode(getFileName(), getLine(), left, rightSide, null);
 			assign.compile(s,f);
 		}
 	}
