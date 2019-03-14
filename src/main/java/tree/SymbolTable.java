@@ -31,8 +31,8 @@ public class SymbolTable {
 	public static final int className = 0;
 	public static final int parameter = 1;
 	public static final int local = 2;
-	public static final int staticFields = 3;
-	public static final int instanceFields = 4;
+	static final int staticFields = 3;
+	static final int instanceFields = 4;
 	
 	// hash map of identifier to the type
 	private HashMap<String, Types> entries;
@@ -126,7 +126,7 @@ public class SymbolTable {
 	 * @return The Label that break should take the jump to.
 	 * @throws CompileException
 	 */
-	public LabelStatement getBreakLabel(@NotNull String fileName, int line) throws CompileException {
+	LabelStatement getBreakLabel(@NotNull String fileName, int line) throws CompileException {
 		if (breakLabel != null) return breakLabel;
 
 		if (outer != null) return outer.getBreakLabel(fileName, line);
@@ -141,7 +141,7 @@ public class SymbolTable {
 	 * @return The Label that continue should take the jump to.
 	 * @throws CompileException
 	 */
-	public LabelStatement getContinueLabel(@NotNull String fileName, int line) throws CompileException {
+	LabelStatement getContinueLabel(@NotNull String fileName, int line) throws CompileException {
 		if (continueLabel != null) return continueLabel;
 
 		if (outer != null) return outer.getContinueLabel(fileName, line);

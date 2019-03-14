@@ -52,7 +52,10 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
             Arguments.of("IfStatements", 0, "a is 6\na is 7\na is positive\na is negative\n", ""),
             Arguments.of("SimpleWhileLoop", 0, "123456789\n", ""),
             Arguments.of("SimpleDoWhileLoop", 0, "123456789\n", ""),
-            Arguments.of("SimpleForLoop", 0, "123456789\n", "")
+            Arguments.of("SimpleForLoop", 0, "123456789\n", ""),
+            Arguments.of("IntermediateForLoop", 0, "12346789\n", ""),
+            Arguments.of("IntermediateWhileLoop", 0, "12346789\n", ""),
+            Arguments.of("IntermediateDoWhileLoop", 0, "12346789\n", "")
         );
     }
 
