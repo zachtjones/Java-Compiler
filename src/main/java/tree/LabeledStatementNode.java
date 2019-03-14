@@ -24,11 +24,9 @@ public class LabeledStatementNode extends NodeImpl implements StatementNode {
 
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
+    	// any statement can have a label, but will only be useful for loops
 		// put the label into the table
 		s.putEntry(name, Types.LABEL, getFileName(), getLine());
-		
-		// java doesn't have goto, so the only jumping of labeled statements is
-		//  in break or continue statements.
-		throw new CompileException("Labeled statements are not supported (yet).", getFileName(), getLine());
+		s.markStatementAsLabeled(statement, name);
 	}
 }

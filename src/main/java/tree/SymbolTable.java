@@ -1,6 +1,7 @@
 package tree;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import helper.CompileException;
 import helper.Types;
@@ -18,6 +19,13 @@ import org.jetbrains.annotations.Nullable;
  */
 public class SymbolTable {
 
+	// places where the symbol is defined -- valid values of scope level
+	public static final int className = 0;
+	public static final int parameter = 1;
+	public static final int local = 2;
+	static final int staticFields = 3;
+	static final int instanceFields = 4;
+
 	/** Reference to an outer scope */
 	private final SymbolTable outer;
 	/** The scope level of this symbol table */
@@ -27,20 +35,19 @@ public class SymbolTable {
 	@Nullable private LabelStatement breakLabel = null;
 	@Nullable private LabelStatement continueLabel = null;
 	
-	// places where the symbol is defined -- valid values of scope level
-	public static final int className = 0;
-	public static final int parameter = 1;
-	public static final int local = 2;
-	static final int staticFields = 3;
-	static final int instanceFields = 4;
-	
 	// hash map of identifier to the type
-	private HashMap<String, Types> entries;
+	@NotNull private final HashMap<String, Types> entries;
+	@NotNull private final Map<StatementNode, String> labeledStatements;
+	@NotNull private final Map<String, LabelStatement> breakLabels;
+	@NotNull private final Map<String, LabelStatement> continueLabels;
 	
 	public SymbolTable(SymbolTable outer, int scopeLevel) {
 		this.outer = outer;
 		this.scopeLevel = scopeLevel;
 		this.entries = new HashMap<>();
+		this.labeledStatements = new HashMap<>();
+		this.breakLabels = new HashMap<>();
+		this.continueLabels = new HashMap<>();
 	}
 	
 	/**
@@ -121,30 +128,45 @@ public class SymbolTable {
 
 	/**
 	 * Gets the label associated with the break statement, throwing an exception if not found.
+	 * @param label The label to break on, null if there isn't one.
 	 * @param fileName The filename being currently compiled.
 	 * @param line The line number in that file.
 	 * @return The Label that break should take the jump to.
 	 * @throws CompileException
 	 */
-	LabelStatement getBreakLabel(@NotNull String fileName, int line) throws CompileException {
-		if (breakLabel != null) return breakLabel;
+	LabelStatement getBreakLabel(@Nullable String label, @NotNull String fileName, int line) throws CompileException {
 
-		if (outer != null) return outer.getBreakLabel(fileName, line);
+		if (label == null) { // break; --> breaks nearest loop
+			if (breakLabel != null) return breakLabel;
+
+		} else { // break label; --> breaks only the loop with the name
+			if (breakLabels.containsKey(label)) return breakLabels.get(label);
+		}
+
+		// not found in this symbol table, recursively check parent
+		if (outer != null) return outer.getBreakLabel(label, fileName, line);
 
 		throw new CompileException("break is not allowed here.", fileName, line);
 	}
 
 	/**
 	 * Gets the label associated with the continue statement, throwing an exception if not found.
+	 * @param label The label to continue on, null if there isn't one.
 	 * @param fileName The filename being currently compiled.
 	 * @param line The line number in that file.
 	 * @return The Label that continue should take the jump to.
 	 * @throws CompileException
 	 */
-	LabelStatement getContinueLabel(@NotNull String fileName, int line) throws CompileException {
-		if (continueLabel != null) return continueLabel;
+	LabelStatement getContinueLabel(@Nullable String label, @NotNull String fileName, int line) throws CompileException {
+		if (label == null) { // continue; --> continues nearest loop
+			if (continueLabel != null) return continueLabel;
 
-		if (outer != null) return outer.getContinueLabel(fileName, line);
+		} else { // continue label; --> continues only the loop with the name
+			if (continueLabels.containsKey(label)) return breakLabels.get(label);
+		}
+
+		// not found in this symbol table, recursively check parent
+		if (outer != null) return outer.getContinueLabel(label, fileName, line);
 
 		throw new CompileException("continue is not allowed here.", fileName, line);
 	}
@@ -157,5 +179,45 @@ public class SymbolTable {
 	/** Sets the label to go to on 'continue' */
 	void setContinueLabel(@NotNull LabelStatement label) {
 		continueLabel = label;
+	}
+
+	/** Sets the label to go to on 'break' for a loop with a label. */
+	void setBreakLabel(@NotNull LabelStatement destination, String label) {
+		breakLabels.put(label, destination);
+	}
+
+	/** Sets the label to go to on 'continue' for a loop with a label. */
+	void setContinueLabel(@NotNull LabelStatement destination, String label) {
+		continueLabels.put(label, destination);
+	}
+
+	/**
+	 * Marks the next statement as labeled with the name.
+	 */
+	void markStatementAsLabeled(@NotNull StatementNode statement, @NotNull String name) {
+		// default object hashcode and equals should be sufficient for these
+		this.labeledStatements.put(statement, name);
+	}
+
+	/** Returns if this statement is labeled with the name */
+	boolean thisStatementIsLabeled(@NotNull StatementNode statement) {
+		if (labeledStatements.containsKey(statement))
+			return true;
+
+		if (outer != null)
+			return outer.thisStatementIsLabeled(statement);
+
+		return false;
+	}
+
+	/** Returns the label for this statement. */
+	@NotNull String getLabelForThisStatement(@NotNull StatementNode statement) {
+		if (labeledStatements.containsKey(statement))
+			return labeledStatements.get(statement);
+
+		if (outer != null)
+			return outer.getLabelForThisStatement(statement);
+
+		throw new RuntimeException("Call thisStatementIsLabeled before calling getLabelForThisStatement.");
 	}
 }

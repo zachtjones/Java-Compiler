@@ -25,7 +25,7 @@ public class ContinueStatementNode extends NodeImpl implements StatementNode {
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 
     	// symbol table holds the destination, throws CompileEx if not set there.
-    	LabelStatement destination = s.getContinueLabel(getFileName(), getLine());
+    	LabelStatement destination = s.getContinueLabel(name, getFileName(), getLine());
 
     	// jump to the destination
     	f.addStatement(new JumpStatement(destination));

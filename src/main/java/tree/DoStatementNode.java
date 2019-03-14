@@ -38,6 +38,10 @@ public class DoStatementNode extends NodeImpl implements StatementNode {
 		// mark the labels in the table
 		newTable.setContinueLabel(startLabel);
 		newTable.setBreakLabel(endLabel);
+		if (s.thisStatementIsLabeled(this)) {
+			newTable.setContinueLabel(startLabel, s.getLabelForThisStatement(this));
+			newTable.setBreakLabel(endLabel, s.getLabelForThisStatement(this));
+		}
 
 		// label at top of statement
 		f.addStatement(startLabel);

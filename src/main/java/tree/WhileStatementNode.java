@@ -40,6 +40,10 @@ public class WhileStatementNode extends NodeImpl implements StatementNode {
 		// mark them in the symbol table
 		loopTable.setBreakLabel(endLbl);
 		loopTable.setContinueLabel(exprLbl);
+		if (s.thisStatementIsLabeled(this)) {
+			loopTable.setBreakLabel(endLbl, s.getLabelForThisStatement(this));
+			loopTable.setContinueLabel(exprLbl, s.getLabelForThisStatement(this));
+		}
 		
 		// add in the label for expression
 		f.addStatement(exprLbl);

@@ -25,7 +25,7 @@ public class BreakStatementNode extends NodeImpl implements StatementNode {
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 
     	// get the destination from the table, throws CompileEx if not set
-		LabelStatement destination = s.getBreakLabel(getFileName(), getLine());
+		LabelStatement destination = s.getBreakLabel(name, getFileName(), getLine());
 
 		// jump to that label
 		f.addStatement(new JumpStatement(destination));

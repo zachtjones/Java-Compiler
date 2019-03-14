@@ -51,6 +51,10 @@ public class ForStatementNode extends NodeImpl implements StatementNode {
 		// give the destinations for break and continue statements.
 		newTable.setBreakLabel(endLabel);
 		newTable.setContinueLabel(updateLabel);
+		if (s.thisStatementIsLabeled(this)) {
+			newTable.setBreakLabel(endLabel, s.getLabelForThisStatement(this));
+			newTable.setContinueLabel(updateLabel, s.getLabelForThisStatement(this));
+		}
 		
 		// add in condition label
 		f.addStatement(conditionLabel);
