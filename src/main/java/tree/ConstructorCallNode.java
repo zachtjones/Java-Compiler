@@ -42,12 +42,15 @@ public class ConstructorCallNode extends NodeImpl implements Expression {
 		
 		// allocate memory
 		f.addStatement(new AllocateClassMemoryStatement(resultType, result));
-		
-		// copy
+
+		// returns void
+		Register returnVal = f.allocator.getNext(Types.VOID);
+
+		// copy -- need the allocator.getLast() to return the instance
 		Register finalResult = f.allocator.getNext(result.getType());
 		
 		// add in the call virtual statement
-		f.addStatement(new CallVirtualStatement(result, "<init>", results, null,
+		f.addStatement(new CallVirtualStatement(result, "<init>", results, returnVal,
 			getFileName(), getLine()));
 		
 		// result is the finalResult
