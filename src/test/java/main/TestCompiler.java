@@ -55,7 +55,8 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
             Arguments.of("SimpleForLoop", 0, "123456789\n", ""),
             Arguments.of("IntermediateForLoop", 0, "12346789\n", ""),
             Arguments.of("IntermediateWhileLoop", 0, "12346789\n", ""),
-            Arguments.of("IntermediateDoWhileLoop", 0, "12346789\n", "")
+            Arguments.of("IntermediateDoWhileLoop", 0, "12346789\n", ""),
+            Arguments.of("TwoVariableForLoop", 0, "123456789\n", "")
         );
     }
 
