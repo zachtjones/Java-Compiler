@@ -5,11 +5,7 @@ import java.util.ArrayList;
 import helper.ClassLookup;
 import helper.CompileException;
 import helper.Types;
-import intermediate.AllocateClassMemoryStatement;
-import intermediate.CallVirtualStatement;
-import intermediate.CopyStatement;
-import intermediate.InterFunction;
-import intermediate.Register;
+import intermediate.*;
 import org.jetbrains.annotations.NotNull;
 
 /** new Name (args) */
@@ -41,7 +37,7 @@ public class ConstructorCallNode extends NodeImpl implements Expression {
 		}
 		
 		// allocate memory
-		f.addStatement(new AllocateClassMemoryStatement(resultType, result));
+		f.addStatement(new AllocateClassMemoryStatement(resultType, result, getFileName(), getLine()));
 
 		// returns void
 		Register returnVal = f.allocator.getNext(Types.VOID);
@@ -49,8 +45,8 @@ public class ConstructorCallNode extends NodeImpl implements Expression {
 		// copy -- need the allocator.getLast() to return the instance
 		Register finalResult = f.allocator.getNext(result.getType());
 		
-		// add in the call virtual statement
-		f.addStatement(new CallVirtualStatement(result, "<init>", results, returnVal,
+		// add in the call actual statement
+		f.addStatement(new CallActualStatement(result, name.primaryName,"<init>", results, returnVal,
 			getFileName(), getLine()));
 		
 		// result is the finalResult
