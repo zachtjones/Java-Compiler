@@ -137,6 +137,11 @@ public class X64Context {
 		locals.put(name, allocated);
 	}
 
+	/** Deletes the local variable */
+	public void clearLocalVariable(String name) {
+		locals.remove(name);
+	}
+
 	/** returns the local variable's register that holds it's value (used for get/set)
 	 * There isn't a need for an is local variable, since intermediate language is already type checked. */
 	public X64PseudoRegister getLocalVariable(String name) {

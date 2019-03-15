@@ -28,14 +28,34 @@ public class DoStatementNode extends NodeImpl implements StatementNode {
 
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
+    	// introduce new scope for break & continue
+		SymbolTable newTable = new SymbolTable(s, SymbolTable.local);
+
+		// labels used for the loop
+		LabelStatement startLabel = new LabelStatement("L_DO_WHILE_START" + f.allocator.getNextLabel());
+		LabelStatement endLabel = new LabelStatement("L_DO_WHILE_END" + f.allocator.getNextLabel());
+
+		// mark the labels in the table
+		newTable.setContinueLabel(startLabel);
+		newTable.setBreakLabel(endLabel);
+		if (s.thisStatementIsLabeled(this)) {
+			newTable.setContinueLabel(startLabel, s.getLabelForThisStatement(this));
+			newTable.setBreakLabel(endLabel, s.getLabelForThisStatement(this));
+		}
+
 		// label at top of statement
-		LabelStatement l = new LabelStatement("L_L" + f.allocator.getNextLabel());
-		f.addStatement(l);
+		f.addStatement(startLabel);
+
 		// then follows the statement
-		statement.compile(s, f);
+		statement.compile(newTable, f);
+
 		// immediately followed by expression
-		expression.compile(s, f);
+		expression.compile(newTable, f);
+
 		// conditional jump to top of statement
-		f.addStatement(new BranchStatementTrue(l, f.allocator.getLast(), getFileName(), getLine()));
+		f.addStatement(new BranchStatementTrue(startLabel, f.allocator.getLast(), getFileName(), getLine()));
+
+		// end label, only jumped to on break, fallthrough will happen otherwise when the loop is done
+		f.addStatement(endLabel);
 	}
 }

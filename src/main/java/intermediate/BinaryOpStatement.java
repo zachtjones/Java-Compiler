@@ -62,42 +62,10 @@ public class BinaryOpStatement implements InterStatement {
 				throw new CompileException("Can't perform operator: " + type.getRepresentation() + " on boolean.",
 					fileName, line);
 			}
-			dest.setType(getLarger(src1.getType(), src2.getType()));
+			Types larger = src1.getType().getLarger(src2.getType());
+			dest.setType(larger);
 		}
 		regs.put(dest, dest.getType());
-	}
-
-	/** Helper method for the larger primitive type */
-	private Types getLarger(Types one, Types two) {
-		if (one.equals(DOUBLE)) {
-			return one;
-		}
-		if (one.equals(FLOAT)) {
-			return two.equals(DOUBLE) ? DOUBLE : FLOAT;
-		}
-		if (one.equals(LONG)) {
-			if (two.equals(FLOAT) || two.equals(DOUBLE)) {
-				return two;
-			} else {
-				return one;
-			}
-		}
-		if (one.equals(INT)) {
-			if (two.equals(LONG) || two.equals(FLOAT) || two.equals(DOUBLE)) {
-				return two;
-			} else {
-				return one;
-			}
-		}
-		if (one.equals(SHORT) || one.equals(CHAR)) {
-			if (two.equals(INT) || two.equals(LONG) || two.equals(FLOAT) || two.equals(DOUBLE)) {
-				return two;
-			} else {
-				return one;
-			}
-		}
-		// one is byte, return the other one
-		return two;
 	}
 
 	@Override

@@ -47,23 +47,6 @@ public class Register extends NodeImpl implements Expression {
 		this.type = type;
 	}
 
-	/**
-	 * Gets the larger type (the one with the most width)
-	 * Ex: float & long = float;
-	 * @param first The Register constant type of the first item.
-	 * @param second The Register constant type of the second item.
-	 * @return The Register constant type of the result.
-	 */
-	public static Types getLarger(Types first, Types second) {
-		if (first == second) return first;
-		if (first == Types.DOUBLE || second == Types.DOUBLE) return Types.DOUBLE;
-		if (first == Types.FLOAT || second == Types.FLOAT) return Types.FLOAT;
-		if (first == Types.LONG || second == Types.LONG) return Types.LONG;
-		if (first == Types.INT || second == Types.INT) return Types.INT;
-		if (first == Types.SHORT || second == Types.SHORT) return Types.SHORT;
-		return Types.BYTE;
-	}
-	
 	/** Helper function if this register holds a primitive value. */
 	boolean isPrimitive() {
 		return type.isPrimitive();

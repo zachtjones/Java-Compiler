@@ -79,6 +79,22 @@ public class Types {
 		}
 	}
 
+	/**
+	 * Gets the larger type (the one with the most range of values)
+	 * Ex: float & long = float;
+	 * @param other The Register constant type of the second item.
+	 * @return The Register constant type of the result.
+	 */
+	public Types getLarger(@NotNull Types other) {
+		if (this.equals(other)) return this;
+		if (this.equals(DOUBLE) || other.equals(DOUBLE)) return DOUBLE;
+		if (this.equals(FLOAT) || other.equals(FLOAT)) return FLOAT;
+		if (this.equals(LONG) || other.equals(LONG)) return LONG;
+		if (this.equals(INT) || other.equals(INT)) return INT;
+		if (this.equals(SHORT) || other.equals(SHORT)) return SHORT;
+		return BYTE;
+	}
+
 	/** Removes an array dimension, returning the new type. If it can't be removed, throws a CompileException */
 	public Types removeArray(@NotNull String fileName, int line) throws CompileException {
 		if (isArrayType()) {
