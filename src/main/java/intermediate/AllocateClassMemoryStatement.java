@@ -8,26 +8,35 @@ import x64.X64Context;
 import x64.allocation.CallingConvention;
 import x64.instructions.CallLabel;
 import x64.instructions.MoveImmToReg;
+import x64.jni.AllocObjectJNI;
+import x64.jni.FindClassJNI;
 import x64.operands.Immediate;
+import x64.operands.X64PseudoRegister;
+import x64.pseudo.MovePseudoToPseudo;
 import x64.pseudo.MoveRegToPseudo;
 
 import java.util.HashMap;
 
 import static x64.allocation.CallingConvention.returnValueRegister;
 
-public class AllocateClassMemoryStatement implements InterStatement {
+public class AllocateClassMemoryStatement implements InterStatement, FindClassJNI, AllocObjectJNI {
 
 	@NotNull private final Types type;
 	@NotNull private final Register result;
+	@NotNull private final String fileName;
+	private final int line;
 
 	/**
 	 * Represents an allocation of memory for a class instance.
 	 * @param type The fully-qualified class name.
 	 * @param result The register to hold a reference to the memory allocated.
 	 */
-	public AllocateClassMemoryStatement(@NotNull Types type, @NotNull Register result) {
+	public AllocateClassMemoryStatement(@NotNull Types type, @NotNull Register result,
+										@NotNull String fileName, int line) {
 		this.type = type;
 		this.result = result;
+		this.fileName = fileName;
+		this.line = line;
 	}
 	
 	@Override
@@ -45,28 +54,51 @@ public class AllocateClassMemoryStatement implements InterStatement {
 
 	@Override
 	public void compile(@NotNull X64Context context) throws CompileException {
-		// malloc (size_of class' instance structure) -> result
-		InterFile temp = JavaCompiler.parseAndCompile(type.getClassName("", -1), "", -1);
-		int size = temp.getClassSize();
-		context.addInstruction(
-			new MoveImmToReg(
-				new Immediate(size),
-				context.argumentRegister(1)
-			)
-		);
 
-		context.addInstruction(
-			new CallLabel(CallingConvention.libraryFunc("malloc"))
-		);
+		String className = type.getClassName(this.fileName, this.line);
 
-		// move returned value
-		context.addInstruction(
-			new MoveRegToPseudo(
-				returnValueRegister(),
-				result.toX64()
-			)
-		);
+		if (className.startsWith("java/")) {
 
-		// TODO result->function_table = Class_function_table used in virtual function calls
+			// use JNI
+			// class = FindClass(JNIEnv*, className)
+			X64PseudoRegister classReg = addFindClassJNICall(context, className);
+
+			// object = AllocObject(JNIEnv*, class);
+			X64PseudoRegister objectReg = addAllocObjectJNICall(context, classReg);
+
+			// move object -> return value
+			context.addInstruction(
+				new MovePseudoToPseudo(
+					objectReg,
+					result.toX64()
+				)
+			);
+
+		} else {
+
+			// malloc (size_of class' instance structure) -> result
+			InterFile temp = JavaCompiler.parseAndCompile(className, fileName, line);
+			int size = temp.getClassSize();
+			context.addInstruction(
+				new MoveImmToReg(
+					new Immediate(size),
+					context.argumentRegister(1)
+				)
+			);
+
+			context.addInstruction(
+				new CallLabel(CallingConvention.libraryFunc("malloc"))
+			);
+
+			// move returned value
+			context.addInstruction(
+				new MoveRegToPseudo(
+					returnValueRegister(),
+					result.toX64()
+				)
+			);
+
+			// TODO result->function_table = Class_function_table used in virtual function calls
+		}
 	}
 }

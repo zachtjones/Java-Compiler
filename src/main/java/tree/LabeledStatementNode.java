@@ -28,5 +28,8 @@ public class LabeledStatementNode extends NodeImpl implements StatementNode {
 		// put the label into the table
 		s.putEntry(name, Types.LABEL, getFileName(), getLine());
 		s.markStatementAsLabeled(statement, name);
+
+		// add in the statement
+		statement.compile(s, f);
 	}
 }

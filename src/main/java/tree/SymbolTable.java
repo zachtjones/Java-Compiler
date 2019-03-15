@@ -132,7 +132,7 @@ public class SymbolTable {
 	 * @param fileName The filename being currently compiled.
 	 * @param line The line number in that file.
 	 * @return The Label that break should take the jump to.
-	 * @throws CompileException
+	 * @throws CompileException If the label is not found, or break is not allowed.
 	 */
 	LabelStatement getBreakLabel(@Nullable String label, @NotNull String fileName, int line) throws CompileException {
 
@@ -155,14 +155,14 @@ public class SymbolTable {
 	 * @param fileName The filename being currently compiled.
 	 * @param line The line number in that file.
 	 * @return The Label that continue should take the jump to.
-	 * @throws CompileException
+	 * @throws CompileException If the label is not found, or if continue is not allowed.
 	 */
 	LabelStatement getContinueLabel(@Nullable String label, @NotNull String fileName, int line) throws CompileException {
 		if (label == null) { // continue; --> continues nearest loop
 			if (continueLabel != null) return continueLabel;
 
 		} else { // continue label; --> continues only the loop with the name
-			if (continueLabels.containsKey(label)) return breakLabels.get(label);
+			if (continueLabels.containsKey(label)) return continueLabels.get(label);
 		}
 
 		// not found in this symbol table, recursively check parent
