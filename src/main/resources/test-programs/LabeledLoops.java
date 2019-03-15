@@ -3,7 +3,7 @@
 //   note that the inner labels aren't really needed, but still want to verify they work.
 //  each one of the loop functions should have the same output.
 // Could test all 9 variations, but nested of each in itself should be sufficient.
-public class TwoVariableForLoop {
+public class LabeledLoops {
 
     public static StringBuilder forLoop() {
         // should be printing:
@@ -27,7 +27,8 @@ public class TwoVariableForLoop {
 
                 result.append(i);
                 result.append(", ");
-                result.append('\n');
+                result.append(j);
+                result.append("\n");
             }
         }
 
@@ -53,7 +54,8 @@ public class TwoVariableForLoop {
 
                 result.append(i);
                 result.append(", ");
-                result.append('\n');
+                result.append(j);
+                result.append("\n");
 
                 j++;
 
@@ -85,7 +87,8 @@ public class TwoVariableForLoop {
 
                 result.append(i);
                 result.append(", ");
-                result.append('\n');
+                result.append(j);
+                result.append("\n");
 
                 j++;
 
@@ -100,12 +103,12 @@ public class TwoVariableForLoop {
 
     public static void main(String[] args) {
         System.out.println("For loop:");
-        System.out.println(forLoop().toString());
+        System.out.print(forLoop().toString());
 
         System.out.println("Do loop:");
-        System.out.println(doLoop().toString());
+        System.out.print(doLoop().toString());
 
         System.out.println("While loop:");
-        System.out.println(whileLoop().toString());
+        System.out.print(whileLoop().toString());
     }
 }
