@@ -43,21 +43,24 @@ public class IfStatementNode extends NodeImpl implements StatementNode {
 		// start with the expression
 		expression.compile(newTable, f);
 		// branch if == 0 to else (false)
-		f.statements.add(new BranchStatementFalse(elseLbl, f.allocator.getLast(), getFileName(), getLine()));
+		f.addStatement(new BranchStatementFalse(elseLbl, f.allocator.getLast(), getFileName(), getLine()));
 		
 		// compile in the true part
 		statement.compile(newTable, f);
 		// true part -> jump to end
-		f.statements.add(new JumpStatement(endLbl));
+		f.addStatement(new JumpStatement(endLbl));
 		
 		// add in else label
-		f.statements.add(elseLbl);
+		f.addStatement(elseLbl);
 		// compile in the else part
 		if (elsePart != null) {
 			elsePart.compile(newTable, f);
 		}
 		
 		// add in end label
-		f.statements.add(endLbl);
+		f.addStatement(endLbl);
+
+		// done with newTable
+		newTable.endScope(f);
 	}
 }

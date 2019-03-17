@@ -51,16 +51,16 @@ public class AssignmentNode extends NodeImpl implements StatementExprNode, Expre
 			StoreAddressStatement store = new StoreAddressStatement(rightResult, leftAddress,
 					getFileName(), getLine());
 			
-			f.statements.add(store);
+			f.addStatement(store);
 			
 			// the result of an assign is the expression on the right
 			// this allows for x = y = 5;
 			Register result = f.allocator.getNext(rightResult.getType());
-			f.statements.add(new CopyStatement(rightResult, result, getFileName(), getLine()));
+			f.addStatement(new CopyStatement(rightResult, result, getFileName(), getLine()));
 		} else {
 			// dissolve the compound assignment down to left = left OPERATION right
 			BinaryExpressionNode rightSide = new BinaryExpressionNode(getFileName(), getLine(), left, right, type);
-			AssignmentNode assign = new AssignmentNode(getFileName(), getLine(), left, rightSide, type);
+			AssignmentNode assign = new AssignmentNode(getFileName(), getLine(), left, rightSide, null);
 			assign.compile(s,f);
 		}
 	}

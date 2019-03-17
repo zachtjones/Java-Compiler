@@ -11,6 +11,8 @@ import x64.X64Context;
 import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToPseudo;
 
+import static helper.Types.*;
+
 /** dest = src1 OP src2 */
 public class BinaryOpStatement implements InterStatement {
 
@@ -54,6 +56,14 @@ public class BinaryOpStatement implements InterStatement {
 		if (!src1.isPrimitive() || !src2.isPrimitive()) {
 			type = BinaryOperation.CONCAT;
 			dest.setType(Types.STRING);
+		} else {
+			// larger size is the resulting type
+			if (src1.getType().equals(BOOLEAN) || src2.getType().equals(BOOLEAN)) {
+				throw new CompileException("Can't perform operator: " + type.getRepresentation() + " on boolean.",
+					fileName, line);
+			}
+			Types larger = src1.getType().getLarger(src2.getType());
+			dest.setType(larger);
 		}
 		regs.put(dest, dest.getType());
 	}

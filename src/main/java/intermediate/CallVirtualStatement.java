@@ -5,7 +5,6 @@ import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
 import x64.instructions.CallLabel;
 import x64.jni.CallMethodJNI;
@@ -27,8 +26,7 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 	@NotNull private final Register obj;
 	@NotNull private final String name;
 	@NotNull private final Register[] unconvertedArgs;
-	@Nullable private final Register returnVal;
-	
+	@NotNull private final Register returnVal;
 	@NotNull private final String fileName;
 	private final int line;
 
@@ -37,7 +35,7 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 	private List<Register> convertedArgs;
 
 	public CallVirtualStatement(@NotNull Register obj, @NotNull String name, @NotNull Register[] args,
-								@Nullable Register returnVal, @NotNull String fileName, int line) {
+								@NotNull Register returnVal, @NotNull String fileName, int line) {
 		
 		this.obj = obj;
 		this.name = name;
@@ -50,19 +48,19 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 	@Override
 	public String toString() {
 		// use the Arrays.toString and remove '[' and ']', also handle no return
-		String leftPart = "callVirtual " + obj + " " + name + "(" + 
+		String leftPart = "callVirtual " + obj + " " + name + "(" +
 		Arrays.toString(unconvertedArgs).replaceAll("[\\[\\]]", "") + ")";
-		if (returnVal != null) {
-			return leftPart + " -> " + returnVal + ";";	
-		} else {
+		if (returnVal.getType().equals(Types.VOID)) {
 			return leftPart + ";";
+		} else {
+			return leftPart + " -> " + returnVal + ";";
 		}
 	}
 
 	@Override
 	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
 						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
-		
+
 		for (Register r : unconvertedArgs) {
 			UsageCheck.verifyDefined(r, regs, fileName, line);
 		}
@@ -78,11 +76,9 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 
 		match = e.getReturnType(name, ogArgs, convertedArgs, fileName, line);
 
-		if (returnVal != null) {
-
-			returnVal.setType(match.match.returnType);
-			regs.put(returnVal, returnVal.getType());
-		}
+		// fill in the return type
+		returnVal.setType(match.match.returnType);
+		regs.put(returnVal, returnVal.getType());
 	}
 
 	@Override
@@ -135,8 +131,8 @@ public class CallVirtualStatement implements InterStatement, GetObjectClassJNI, 
 			// call
 			context.addInstruction(new CallLabel(classname, name));
 
-			// move result -- unless null (meaning void method)
-			if (returnVal != null)
+			// move result -- unless void result
+			if (!returnVal.getType().equals(Types.VOID))
 				context.addInstruction(
 					new MoveRegToPseudo(returnValueRegister(), returnVal.toX64())
 				);

@@ -23,6 +23,6 @@ public class LiteralExpressionNode extends NodeImpl implements Expression {
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
 		// the IL code does the work here
-		f.statements.add(new LoadLiteralStatement(value, f.allocator, getFileName(), getLine()));
+		f.addStatement(new LoadLiteralStatement(value, f.allocator, getFileName(), getLine()));
 	}
 }

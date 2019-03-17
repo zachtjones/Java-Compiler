@@ -5,6 +5,7 @@ import java.util.HashMap;
 import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
+import x64.X64Context;
 
 /** Represents the ending of a scope of a local variable. */
 public class EndScopeStatement implements InterStatement {
@@ -29,5 +30,10 @@ public class EndScopeStatement implements InterStatement {
 		
 		// remove name from the locally defined variables
 		locals.remove(name);
+	}
+
+	@Override
+	public void compile(@NotNull X64Context context) throws CompileException {
+		context.clearLocalVariable(name);
 	}
 }

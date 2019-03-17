@@ -4,7 +4,6 @@ import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
-
 import java.util.HashMap;
 
 public class GetLocalAddressStatement implements InterStatement {

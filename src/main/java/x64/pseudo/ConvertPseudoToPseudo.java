@@ -6,7 +6,6 @@ import x64.operands.BasePointerOffset;
 import x64.operands.X64PseudoRegister;
 import x64.operands.X64Register;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -48,9 +47,9 @@ public class ConvertPseudoToPseudo implements PseudoInstruction {
 		if (source.isFloatingPoint()) {
 			if (destination.isFloatingPoint()) {
 				// double -> float(single)
-				return Collections.singletonList(
-					new ConvertScalarDoubleToScalarSingle(source, destination)
-				);
+//				return Collections.singletonList(
+//					new ConvertScalarDoubleToScalarSingle(source, destination)
+//				);
 			} else {
 				// double/single -> integral type
 
@@ -64,5 +63,6 @@ public class ConvertPseudoToPseudo implements PseudoInstruction {
 				// can use a movePseudoToPseudo of sourceConverted, destination
 			}
 		}
+		throw new RuntimeException("Not implemented yet");
 	}
 }

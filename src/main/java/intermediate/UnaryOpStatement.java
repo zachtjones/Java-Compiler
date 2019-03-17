@@ -6,6 +6,7 @@ import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
+import x64.X64Context;
 
 /** dest = OP src2 */
 public class UnaryOpStatement implements InterStatement {

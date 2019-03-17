@@ -27,26 +27,42 @@ public class WhileStatementNode extends NodeImpl implements StatementNode {
 
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
+    	// create new symbol table for this loop, the break and continue destinations are specific
+		//   to this loop
+
+		SymbolTable loopTable = new SymbolTable(s, SymbolTable.local);
+
 		// label for expression
 		LabelStatement exprLbl = new LabelStatement("L_COND_" + f.allocator.getNextLabel());
 		// label for ending
 		LabelStatement endLbl = new LabelStatement("L_END_" + f.allocator.getNextLabel());
+
+		// mark them in the symbol table
+		loopTable.setBreakLabel(endLbl);
+		loopTable.setContinueLabel(exprLbl);
+		if (s.thisStatementIsLabeled(this)) {
+			loopTable.setBreakLabel(endLbl, s.getLabelForThisStatement(this));
+			loopTable.setContinueLabel(exprLbl, s.getLabelForThisStatement(this));
+		}
 		
 		// add in the label for expression
-		f.statements.add(exprLbl);
+		f.addStatement(exprLbl);
 		// compile in expression
-		expression.compile(s, f);
+		expression.compile(loopTable, f);
 		
 		// if false, goto end
-		f.statements.add(new BranchStatementFalse(endLbl, f.allocator.getLast(), getFileName(), getLine()));
+		f.addStatement(new BranchStatementFalse(endLbl, f.allocator.getLast(), getFileName(), getLine()));
 		
 		// compile in the block
-		statement.compile(s, f);
+		statement.compile(loopTable, f);
 		
 		// unconditional jump to the expression
-		f.statements.add(new JumpStatement(exprLbl));
+		f.addStatement(new JumpStatement(exprLbl));
 		
 		// add in the ending label
-		f.statements.add(endLbl);
+		f.addStatement(endLbl);
+
+		// loopTable falls out of scope
+		loopTable.endScope(f);
 	}
 }

@@ -2,6 +2,7 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
+import helper.ConditionCode;
 import helper.Types;
 import intermediate.InterFunction;
 import intermediate.Register;
@@ -12,10 +13,10 @@ import org.jetbrains.annotations.NotNull;
  * relational operator is one of: less than, greater than, less than or equal, greater than or equal */
 public class RelationalExpressionNode extends NodeImpl implements Expression {
 	@NotNull private final Expression left, right;
-	private final int type; // one of SetConditionStatement constants
+	private final ConditionCode type; // one of SetConditionStatement constants
 
     public RelationalExpressionNode(String fileName, int line,
-									@NotNull Expression left, @NotNull Expression right, int type) {
+									@NotNull Expression left, @NotNull Expression right, ConditionCode type) {
     	super(fileName, line);
     	this.left = left;
     	this.right = right;
@@ -37,6 +38,6 @@ public class RelationalExpressionNode extends NodeImpl implements Expression {
 		
 		// add in the condition
 		Register result = f.allocator.getNext(Types.BOOLEAN);
-		f.statements.add(new SetConditionStatement(type, leftResult, rightResult, result, getFileName(), getLine()));
+		f.addStatement(new SetConditionStatement(type, leftResult, rightResult, result, getFileName(), getLine()));
 	}
 }

@@ -21,6 +21,11 @@ public class CallLabel extends Instruction {
     }
 
     @Override
+    public boolean isCalling() {
+        return true;
+    }
+
+    @Override
     public String assemblyRepresentation() {
         return "\tcall " + label;
     }

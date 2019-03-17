@@ -15,7 +15,6 @@ package main;
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import tree.*;
-import intermediate.SetConditionStatement;
 import java.util.ArrayList;
 import java.nio.charset.Charset;
 import helper.*;
@@ -864,23 +863,15 @@ Expression EqualityExpression() :
 
     Expression one;
     Expression two;
-    boolean isEqual;
+    ConditionCode code;
 }
 {
     one=InstanceOfExpression()
-    ( ( "==" { isEqual = true; }
-      | "!=" { isEqual = false; })
+    ( ( "==" { code = ConditionCode.EQUAL; }
+      | "!=" { code = ConditionCode.NOT_EQUAL; })
     two=InstanceOfExpression()
     {
-        if (isEqual) {
-            RelationalExpressionNode eq = new RelationalExpressionNode(fileName, token.beginLine,
-                one, two, SetConditionStatement.EQUAL);
-            one = eq; // base for next tree element
-        } else {
-            RelationalExpressionNode neq = new RelationalExpressionNode(fileName, token.beginLine,
-                one, two, SetConditionStatement.NOTEQUAL);
-            one = neq; // base for next tree element
-        }
+        one = new RelationalExpressionNode(fileName, token.beginLine, one, two, code);
     })*
     {
         // one is built up, or just the expression
@@ -912,34 +903,18 @@ Expression RelationalExpression() :
 
     Expression one;
     Expression two;
-    int type;
+    ConditionCode type;
 }
 {
     one=ShiftExpression()
     (
-        ( "<" { type = 0; }
-        | ">" { type = 1; }
-        | "<=" { type = 2;}
-        | ">=" { type = 3; })
+        ( "<" { type = ConditionCode.LESS; }
+        | ">" { type = ConditionCode.GREATER; }
+        | "<=" { type = ConditionCode.LESS_EQUAL;}
+        | ">=" { type = ConditionCode.GREATER_EQUAL; })
         two=ShiftExpression()
         {
-            if (type == 0) {
-                RelationalExpressionNode lt = new RelationalExpressionNode(fileName, token.beginLine,
-                    one, two, SetConditionStatement.LESS);
-                one = lt;
-            } else if (type == 1) {
-                RelationalExpressionNode gt = new RelationalExpressionNode(fileName, token.beginLine,
-                    one, two, SetConditionStatement.GREATER);
-                one = gt;
-            } else if (type == 2) {
-                RelationalExpressionNode lte = new RelationalExpressionNode(fileName, token.beginLine,
-                    one, two, SetConditionStatement.LESSEQUAL);
-                one = lte;
-            } else {
-                RelationalExpressionNode gte = new RelationalExpressionNode(fileName, token.beginLine,
-                    one, two, SetConditionStatement.GREATEREQUAL);
-                one = gte;
-            }
+            one = new RelationalExpressionNode(fileName, token.beginLine, one, two, type);
         }
     )*
     {
@@ -1156,82 +1131,132 @@ Expression CastExpression() :
 
 Expression PrimaryExpression() :
 {
-    PrimaryExpressionNode p = new PrimaryExpressionNode(fileName, token.beginLine);
+    // temporary expression used in combinations
     Expression temp;
+    NameNode tempName;
+    ArrayList<Expression> tempList;
+    Token t;
+
+
+    // if the primary expression part is just 'this', which is just a qualifier for the
+    //   current object; distinguishes the field or method call as of the current object.
+    boolean primaryThis = false;
+
+    // super.identifier.  Could be either super.thing(), or super.thing. The arguments later could be the call
+    String superIdentifier = null;
+
+
+    // the final result
+    //   initially could be a primitive literal, String literal, local variable, class name, field name
+    //   the suffixes will build up this value
+    Expression builtUp = null;
+
+    // field name parsed in last suffix iteration -- might be the method name, so we have to deal with
+    //   it in the next iteration
+    String fieldName = null;
 }
 {
-    p.prefix=PrimaryPrefix()
-    ( temp=PrimarySuffix() { p.suffixes.add(temp); } )*
-    {
-        if (p.suffixes.size() == 0) {
-            return p.prefix; // just the prefix
+    // the primary prefix -- literal, name, this, super, parentheses(expression), allocation expression.
+    (
+        builtUp = Literal()
+    |
+        t=<IDENTIFIER>
+        {
+            // keep it for this iteration, use in the next one.
+            fieldName = t.image;
         }
-        return p; // the entire expression
+    |
+        "this" { primaryThis = true; }
+    |
+        "super" "." t=<IDENTIFIER> { superIdentifier = t.image; }
+    |
+        // parentheses are for specifying tree order, so don't need them in the result
+        //  also we can't have anything after these expressions be part of the primary expression.
+        "(" temp=Expression() ")" { return temp; }
+    |
+        // new Something(), or new type[]...
+        builtUp=AllocationExpression()
+    )
+
+    // primary suffixes -- 0...many
+    //  can be either a [expression], .identifier, or (arg1, arg...)
+    (
+        // requires the builtUp to not be null, meaning we have a valid object in builtUp
+        "[" temp=Expression() "]"
+            {
+                if (builtUp == null) {
+                    if (primaryThis) {
+                        throw new ParseException("Can't array index 'this' qualifier.");
+                    } else if (superIdentifier != null){
+                        // represents super.fieldName[expression]
+                        builtUp = new SuperFieldExpressionNode(superIdentifier, fileName, token.beginLine);
+                    } else {
+                        // fieldName is not null, build up from that
+                        builtUp = new UnknownIdentifierNode(fieldName, fileName, token.beginLine);
+                    }
+                }
+                // here builtUp is definitely not null
+                if (fieldName != null) {
+                    // this means it's a true field name
+                    builtUp = new FieldExpressionNode(builtUp, fieldName, fileName, token.beginLine);
+                    fieldName = null; // clear for next iteration
+                }
+
+                // builtUp = the array indexing operator of builtUp
+                builtUp = new ArrayIndexExpressionNode(builtUp, temp, fileName, token.beginLine);
+            }
+        |
+            "." t=<IDENTIFIER>
+            {
+                if (builtUp == null) {
+                    if (primaryThis) {
+                        // this.identifier
+                        builtUp = new ThisExpressionNode(fileName, token.beginLine);
+                    } else if (superIdentifier != null){
+                        // super.fieldName.identifier
+                        builtUp = new SuperFieldExpressionNode(fieldName, fileName, token.beginLine);
+                    } else {
+                        // don't know what the specific type is
+                        builtUp = new UnknownIdentifierNode(fieldName, fileName, token.beginLine);
+                    }
+                    fieldName = t.image;
+                } else if (fieldName != null){
+                    // builtUp is already something, set the field name
+                    builtUp = new FieldExpressionNode(builtUp, fieldName, fileName, token.beginLine);
+                    fieldName = t.image;
+                } else {
+                    // fieldName == null, there's not anything extra we need to build up
+                    fieldName = t.image;
+                }
+
+            }
+        |
+            tempList=Arguments() // just grab the args
+            {
+                if (fieldName == null) {
+                    throw new ParseException("Method call specified without a name.");
+                }
+                // builtUp = a function call of builtUp.fieldName(arguments)
+                builtUp = new MethodCallNode(builtUp, fieldName, tempList, fileName, token.beginLine);
+
+                // consumes the field name that was previously set
+                fieldName = null;
+            }
+    )*
+
+    {
+        // potential the last result was a .name, so we have to add that in.
+        if (fieldName != null) {
+            if (builtUp == null) {
+                builtUp = new UnknownIdentifierNode(fieldName, fileName, token.beginLine);
+            } else {
+                builtUp = new FieldExpressionNode(builtUp, fieldName, fileName, token.beginLine);
+            }
+        }
+        return builtUp;
     }
 }
 
-Expression PrimaryPrefix() :
-{
-    Expression temp;
-    Token t;
-}
-{
-    temp=Literal()
-    {
-        return temp;
-    }
-|
-    temp=Name()
-    {
-        return temp;
-    }
-|
-    "this"
-    {
-        return new ThisExpressionNode(fileName, token.beginLine);
-    }
-|
-    "super" "." t=<IDENTIFIER>
-    {
-        SuperFieldExpressionNode s = new SuperFieldExpressionNode(fileName, token.beginLine);
-        s.fieldName = t.image;
-        return s;
-    }
-|
-    // parentheses are for specifying tree order,
-    // so don't need them in the result
-    "(" temp=Expression() ")"
-    {
-        return temp;
-    }
-|
-    temp=AllocationExpression()
-    {
-        return temp;
-    }
-}
-
-Expression PrimarySuffix() :
-{
-    Expression temp;
-    Token t;
-}
-{
-    "[" temp=Expression() "]"
-    {
-        return new ArrayIndexExpressionNode(fileName, token.beginLine, temp);
-    }
-|
-    "." t=<IDENTIFIER>
-    {
-        return new FieldExpressionNode(fileName, token.beginLine, t.image);
-    }
-|
-    temp=Arguments() // just grab the args
-    {
-        return temp;
-    }
-}
 
 LiteralExpressionNode Literal() :
 {
@@ -1250,14 +1275,14 @@ LiteralExpressionNode Literal() :
     }
 }
 
-ArgumentExpressionNode Arguments() :
+ArrayList<Expression> Arguments() :
 {
-    ArrayList<Expression> expressions = null;
+    ArrayList<Expression> expressions = new ArrayList<Expression>();
 }
 {
     "(" [ expressions=ArgumentList() ] ")"
     {
-        return new ArgumentExpressionNode(fileName, token.beginLine, expressions);
+        return expressions;
     }
 }
 
@@ -1280,7 +1305,6 @@ Expression AllocationExpression() :
     ArrayList<Expression> list;
     Types p;
     NameNode n;
-    ArgumentExpressionNode args;
 }
 {
     LOOKAHEAD(2)
@@ -1293,11 +1317,11 @@ Expression AllocationExpression() :
     }
 |
     "new" n=Name()
-    ( args=Arguments()
+    ( list=Arguments()
         {
             ConstructorCallNode c = new ConstructorCallNode(fileName, token.beginLine);
             c.name = n;
-            c.args = args;
+            c.args = list;
             return c;
         }
     | list=ArrayDimensions()

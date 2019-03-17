@@ -64,6 +64,12 @@ public class X64Context {
 		return getNextRegister(type.x64Type());
 	}
 
+	/** Returns the next pseudo register available that is a quad-word size (64-bit) */
+	public X64PseudoRegister getNextByteRegister() {
+		nextRegister++;
+		return new X64PseudoRegister(nextRegister, X64InstructionSize.BYTE);
+	}
+
 	/** returns the argument number that is the highest number used */
 	public int getHighestArgUsed() {
 		return highestArgUsed;
@@ -141,13 +147,18 @@ public class X64Context {
 		locals.put(name, allocated);
 	}
 
+	/** Deletes the local variable */
+	public void clearLocalVariable(String name) {
+		locals.remove(name);
+	}
+
 	/** returns the local variable's register that holds it's value (used for get/set)
 	 * There isn't a need for an is local variable, since intermediate language is already type checked. */
 	public X64PseudoRegister getLocalVariable(String name) {
 		return locals.get(name);
 	}
 
-	/** marks the register as a local variable address */
+	/** marks the register as holding the address to the local variable */
 	public void markRegisterAsLocalVariableAddress(String localName, Register destination) {
 		localsAddresses.put(destination, localName);
 	}

@@ -5,7 +5,6 @@ import helper.Types;
 import helper.UsageCheck;
 import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
 import x64.instructions.CallLabel;
 import x64.jni.CallNonVirtualMethodJNI;
@@ -27,9 +26,8 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 	@NotNull private final Register obj;
 	@NotNull private final String className;
 	@NotNull final String name;
+	@NotNull private final Register returnVal;
 	@NotNull private final Register[] unconvertedArgs;
-	@Nullable private final Register returnVal;
-	
 	@NotNull private final String fileName;
 	private final int line;
 
@@ -38,7 +36,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 	private List<Register> convertedArgs;
 	
 	public CallActualStatement(@NotNull Register obj, @NotNull String className, @NotNull String name,
-			@NotNull Register[] args, @Nullable Register returnVal, @NotNull String fileName, int line) {
+			@NotNull Register[] args, @NotNull Register returnVal, @NotNull String fileName, int line) {
 		
 		this.obj = obj;
 		this.className = className;
@@ -75,11 +73,9 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 
 		match = e.getReturnType(name, ogArgs, convertedArgs, fileName, line);
 
-		if (returnVal != null) {
-
-			returnVal.setType(match.match.returnType);
-			regs.put(returnVal, returnVal.getType());
-		}
+		// fill in the return type
+		returnVal.setType(match.match.returnType);
+		regs.put(returnVal, returnVal.getType());
 	}
 
 	@Override
@@ -141,7 +137,7 @@ public class CallActualStatement implements InterStatement, FindClassJNI, GetMet
 			);
 
 			// 3. mov %rax, result
-			if (returnVal != null)
+			if (!returnVal.getType().equals(Types.VOID))
 			context.addInstruction(
 				new MoveRegToPseudo(
 					returnValueRegister(),

@@ -4,6 +4,7 @@ import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.BranchStatementFalse;
 import intermediate.InterFunction;
+import intermediate.JumpStatement;
 import intermediate.LabelStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,27 +44,42 @@ public class ForStatementNode extends NodeImpl implements StatementNode {
 		
 		// label condition -> condition -> if false, branch end 
 		//   -> block -> jump condition -> label end
-		LabelStatement conditionLabel = new LabelStatement("L_COND_" + f.allocator.getNextLabel());
-		LabelStatement endLabel = new LabelStatement("L_END_" + f.allocator.getNextLabel());
+		LabelStatement conditionLabel = new LabelStatement("L_FOR_COND_" + f.allocator.getNextLabel());
+		LabelStatement endLabel = new LabelStatement("L_FOR_END_" + f.allocator.getNextLabel());
+		LabelStatement updateLabel = new LabelStatement("L_FOR_UPDATE_" + f.allocator.getNextLabel());
+
+		// give the destinations for break and continue statements.
+		newTable.setBreakLabel(endLabel);
+		newTable.setContinueLabel(updateLabel);
+		if (s.thisStatementIsLabeled(this)) {
+			newTable.setBreakLabel(endLabel, s.getLabelForThisStatement(this));
+			newTable.setContinueLabel(updateLabel, s.getLabelForThisStatement(this));
+		}
 		
 		// add in condition label
-		f.statements.add(conditionLabel);
+		f.addStatement(conditionLabel);
 		
 		// compile in the condition
 		condition.compile(newTable, f);
 		
 		// conditional branch to end
 		// if false (zero) take the branch.
-		f.statements.add(new BranchStatementFalse(endLabel, f.allocator.getLast(), getFileName(), getLine()));
+		f.addStatement(new BranchStatementFalse(endLabel, f.allocator.getLast(), getFileName(), getLine()));
 		
 		// compile in the body
 		block.compile(newTable, f);
-		
-		// TODO continue should have a label here to go to.
-		// compile in the update
-		if (update != null) update.compile(s, f);
+
+		// update
+		f.addStatement(updateLabel);
+		if (update != null) update.compile(newTable, f);
+
+		// jump to condition label
+		f.addStatement(new JumpStatement(conditionLabel));
 		
 		// add in the ending label
-		f.statements.add(endLabel);
+		f.addStatement(endLabel);
+
+		// newTable is done, add in the end scope statements
+		newTable.endScope(f);
 	}
 }

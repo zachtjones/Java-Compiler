@@ -94,6 +94,9 @@ public class ConstructorNode {
 		for (BlockStatementNode b : this.code) {
 			b.compile(newTable, func);
 		}
+
+		// done with newTable
+		newTable.endScope(func);
 		
 		// add the function to the intermediate file.
 		f.addFunction(func);		

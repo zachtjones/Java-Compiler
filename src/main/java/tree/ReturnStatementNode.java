@@ -27,10 +27,10 @@ public class ReturnStatementNode extends NodeImpl implements StatementNode {
 		// compile in the expression
 		if (expression != null) {
 			expression.compile(s, f);
-			f.statements.add(new ReturnRegStatement(f.allocator.getLast(), getFileName(), getLine()));
+			f.addStatement(new ReturnRegStatement(f.allocator.getLast(), getFileName(), getLine()));
 		} else {
 			// just compile in the return statement.
-			f.statements.add(new ReturnVoidStatement(getFileName(), getLine()));
+			f.addStatement(new ReturnVoidStatement(getFileName(), getLine()));
 		}
 	}
 }

@@ -38,9 +38,9 @@ public class BinaryExpressionNode extends NodeImpl implements Expression {
 
 		// perform the binary operation on the 2
 		Register destination = f.allocator.getNext(
-			Register.getLarger(leftResult.getType(), rightResult.getType()));
+			leftResult.getType().getLarger(rightResult.getType()));
 
-		f.statements.add(new BinaryOpStatement(
+		f.addStatement(new BinaryOpStatement(
 			leftResult, rightResult,
 			destination, op,
 			getFileName(), getLine()));
