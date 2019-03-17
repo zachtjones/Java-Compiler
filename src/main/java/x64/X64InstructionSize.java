@@ -16,4 +16,9 @@ public enum X64InstructionSize {
 	public String toString() {
 		return Character.toString(size);
 	}
+
+	/** Returns if this is a floating point size. */
+	public boolean isFloatingPoint() {
+		return size == 's' || size == 'd';
+	}
 }

@@ -32,4 +32,9 @@ public class X64PseudoRegister {
     public String toString() {
         return "%" + size.size + number;
     }
+
+    /** Returns if this represents a floating point register. */
+	public boolean isFloatingPoint() {
+		return size.isFloatingPoint();
+	}
 }

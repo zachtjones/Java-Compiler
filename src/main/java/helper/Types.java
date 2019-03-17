@@ -238,4 +238,9 @@ public class Types implements Comparable<Types> {
 		// not a primitive or boolean -- can't be converted from other primitives
 		return -1;
 	}
+
+	/** Returns if this type is a floating point one (float or double) */
+	public boolean isFloatingPoint() {
+		return this.equals(FLOAT) || this.equals(DOUBLE);
+	}
 }
