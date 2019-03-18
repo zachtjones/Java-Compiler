@@ -3,6 +3,8 @@ package intermediate;
 import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
+import x64.X64Context;
+import x64.pseudo.SignExtendPseudoToPseudo;
 
 import java.util.HashMap;
 
@@ -26,5 +28,16 @@ public class SignExtendStatement implements InterStatement {
 	@Override
 	public String toString() {
 		return "signExtend " + destination + " = " + source;
+	}
+
+	@Override
+	public void compile(@NotNull X64Context context) throws CompileException {
+		// between integral types only
+		context.addInstruction(
+			new SignExtendPseudoToPseudo(
+				source.toX64(),
+				destination.toX64()
+			)
+		);
 	}
 }

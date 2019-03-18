@@ -25,19 +25,29 @@ public class AddPseudoToPseudo extends BinaryPseudoToPseudo {
 			if (mapping.containsKey(destination)) {
 				// add %r1, %r2
 				return Collections.singletonList(
-					new AddRegToReg(mapping.get(source), mapping.get(destination))
+					new AddRegToReg(
+						mapping.get(source),
+						mapping.get(destination),
+						destination.getSuffix()
+					)
 				);
 			} else {
 				// add %r1, -16(%rbp)
 				return Collections.singletonList(
-					new AddRegToBasePointerOffset(mapping.get(source), locals.get(destination))
+					new AddRegToBasePointerOffset(
+						mapping.get(source),
+						locals.get(destination)
+					)
 				);
 			}
 		} else {
 			if (mapping.containsKey(destination)) {
 				// add -16(%rbp), %r2
 				return Collections.singletonList(
-					new AddBasePointerOffsetToReg(locals.get(source), mapping.get(destination))
+					new AddBasePointerOffsetToReg(
+						locals.get(source),
+						mapping.get(destination),
+						source.getSuffix())
 				);
 			} else {
 				// add -16(%rbp), -24(%rbp)
@@ -45,8 +55,15 @@ public class AddPseudoToPseudo extends BinaryPseudoToPseudo {
 				// mov -16(%rbp), %temp
 				// add %temp, -24(%rbp)
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(locals.get(source), temporaryImmediate),
-					new AddRegToBasePointerOffset(temporaryImmediate, locals.get(destination))
+					new MoveBasePointerOffsetToReg(
+						locals.get(source),
+						temporaryImmediate,
+						source.getSuffix()
+					),
+					new AddRegToBasePointerOffset(
+						temporaryImmediate,
+						locals.get(destination)
+					)
 				);
 			}
 		}

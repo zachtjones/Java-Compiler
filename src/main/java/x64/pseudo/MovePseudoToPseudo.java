@@ -30,25 +30,43 @@ public class MovePseudoToPseudo extends BinaryPseudoToPseudo {
 			if (mapping.containsKey(destination)) {
 				// both are real registers
 				return Collections.singletonList(
-					new MoveRegToReg(mapping.get(source), mapping.get(destination))
+					new MoveRegToReg(
+						mapping.get(source),
+						mapping.get(destination),
+						destination.getSuffix()
+					)
 				);
 			} else {
 				// destination is a local
 				return Collections.singletonList(
-					new MoveRegToBasePointerOffset(mapping.get(source), locals.get(destination))
+					new MoveRegToBasePointerOffset(
+						mapping.get(source),
+						locals.get(destination)
+					)
 				);
 			}
 		} else {
 			if (mapping.containsKey(destination)) {
 				// source -- base pointer, destination, real
 				return Collections.singletonList(
-					new MoveBasePointerOffsetToReg(locals.get(source), mapping.get(destination))
+					new MoveBasePointerOffsetToReg(
+						locals.get(source),
+						mapping.get(destination),
+						destination.getSuffix()
+					)
 				);
 			} else {
 				// both are base pointer offset, need to use the temporary one
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(locals.get(source), temporaryImmediate),
-					new MoveRegToBasePointerOffset(temporaryImmediate, locals.get(destination))
+					new MoveBasePointerOffsetToReg(
+						locals.get(source),
+						temporaryImmediate,
+						destination.getSuffix()
+					),
+					new MoveRegToBasePointerOffset(
+						temporaryImmediate,
+						locals.get(destination)
+					)
 				);
 			}
 		}

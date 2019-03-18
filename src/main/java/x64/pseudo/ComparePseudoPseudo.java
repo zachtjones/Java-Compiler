@@ -75,12 +75,13 @@ public class ComparePseudoPseudo implements PseudoInstruction {
                 return Arrays.asList(
                     new MoveBasePointerOffsetToReg(
                         locals.get(src1),
-                        temporaryImmediate
+                        temporaryImmediate,
+                        src1.getSuffix()
                     ),
                     new CompareRegAndBasePointerOffset(
                         temporaryImmediate,
                         locals.get(src2),
-                        src2.getSuffix()
+                        src1.getSuffix()
                     )
                 );
             }

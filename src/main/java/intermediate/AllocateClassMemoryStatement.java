@@ -5,6 +5,7 @@ import helper.Types;
 import main.JavaCompiler;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
+import x64.X64InstructionSize;
 import x64.allocation.CallingConvention;
 import x64.instructions.CallLabel;
 import x64.instructions.MoveImmToReg;
@@ -82,7 +83,8 @@ public class AllocateClassMemoryStatement implements InterStatement, FindClassJN
 			context.addInstruction(
 				new MoveImmToReg(
 					new Immediate(size),
-					context.argumentRegister(1)
+					context.argumentRegister(1),
+					X64InstructionSize.QUAD
 				)
 			);
 

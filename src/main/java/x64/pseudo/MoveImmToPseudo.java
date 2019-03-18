@@ -25,11 +25,18 @@ public class MoveImmToPseudo extends BinaryImmediateToPseudo {
 														@NotNull X64Register temporaryImmediate) {
 		if (mapping.containsKey(destination)) {
 			return Collections.singletonList(
-				new MoveImmToReg(source, mapping.get(destination))
+				new MoveImmToReg(
+					source,
+					mapping.get(destination),
+					destination.getSuffix()
+				)
 			);
 		} else {
 			return Collections.singletonList(
-				new MoveImmToBasePointerOffset(source, locals.get(destination))
+				new MoveImmToBasePointerOffset(
+					source,
+					locals.get(destination)
+				)
 			);
 		}
 	}

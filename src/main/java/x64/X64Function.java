@@ -12,6 +12,7 @@ import x64.pseudo.PseudoInstruction;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static x64.X64InstructionSize.QUAD;
 import static x64.allocation.CallingConvention.*;
 import static x64.operands.X64Register.RSP;
 
@@ -62,7 +63,7 @@ public class X64Function {
 		if (au != null) allInstructions.addAll(au.prologue);
 
 		if (needsToAllocate32BytesForArgs())
-			allInstructions.add(new SubtractImmToReg(new Immediate(32), RSP));
+			allInstructions.add(new SubtractImmToReg(new Immediate(32), RSP, QUAD));
 
 		if (au == null) {
 			allInstructions.addAll(contents);
@@ -71,7 +72,7 @@ public class X64Function {
 		}
 
 		if (needsToAllocate32BytesForArgs())
-			allInstructions.add(new AddImmReg(new Immediate(32), RSP));
+			allInstructions.add(new AddImmReg(new Immediate(32), RSP, QUAD));
 
 		if (au != null) allInstructions.addAll(au.epilogue);
 
