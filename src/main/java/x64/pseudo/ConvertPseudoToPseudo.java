@@ -1,6 +1,8 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
+import x64.allocation.RegisterMapped;
+import x64.allocation.RegistersUsed;
 import x64.instructions.Instruction;
 import x64.operands.BasePointerOffset;
 import x64.operands.X64PseudoRegister;
@@ -43,26 +45,29 @@ public class ConvertPseudoToPseudo implements PseudoInstruction {
 		// also have the 4 choices for source and destination allocation.
 
 		// TODO create the instructions
-
-		if (source.isFloatingPoint()) {
-			if (destination.isFloatingPoint()) {
-				// double -> float(single)
-//				return Collections.singletonList(
-//					new ConvertScalarDoubleToScalarSingle(source, destination)
-//				);
-			} else {
-				// double/single -> integral type
-
-			}
-		} else {
-			if (destination.isFloatingPoint()) {
-				// integral type -> floating point
-
-			} else {
-				// both are integers, just read source as a smaller type to destination
-				// can use a movePseudoToPseudo of sourceConverted, destination
-			}
+		if (source.isFloatingPoint() || destination.isFloatingPoint()) {
+			throw new RuntimeException("Floating point conversions not implemented yet.");
 		}
-		throw new RuntimeException("Not implemented yet");
+
+		// truncation of integral types -- simple read as smaller type in a later instruction
+		X64PseudoRegister newDest = new X64PseudoRegister(destination.getNumber(), source.getSuffix());
+		return new MovePseudoToPseudo(source, newDest).allocate(mapping, locals, temporaryImmediate);
+	}
+
+	@Override
+	public String toString() {
+		return "cvt " + source + ", " + destination;
+	}
+
+	@Override
+	public void markRegisters(int i, RegistersUsed usedRegs) {
+		usedRegs.markUsed(source, i);
+		usedRegs.markDefined(destination, i);
+	}
+
+	@Override
+	public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
+		mapping.get(source).increment();
+		mapping.get(destination).increment();
 	}
 }

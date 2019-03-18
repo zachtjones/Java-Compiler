@@ -68,7 +68,8 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
                 "ab\n" +
                 "-18690\n" +
                 "-2147483648\n" +
-                "2147483648\n" +
+                "2147483648\n", ""),
+            Arguments.of("FloatingPoint", 0,
                 "7.0\n" +
                 "Infinity\n" +
                 "-46\n", "")
