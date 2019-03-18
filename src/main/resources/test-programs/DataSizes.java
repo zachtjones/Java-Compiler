@@ -8,6 +8,12 @@ public class DataSizes {
 		b = false;
 		System.out.println(b);
 
+		byte b2 = (byte) 127;
+		System.out.println(b2);
+		System.out.println(b2 + 1); // should be 128 -- conversion to int with +
+		b2 = (byte) (b2 + 1); // should overflow to -128
+		System.out.println(b2);
+
 		char a = 'a';
 		System.out.print(a);
 		a = (char) (a + 1);
