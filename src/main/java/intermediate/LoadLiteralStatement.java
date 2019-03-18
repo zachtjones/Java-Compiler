@@ -110,10 +110,11 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 				)
 			);
 		} else if (r.getType() == Types.CHAR) {
+			// value = '2', or 'a', or something like that
 			context.addInstruction(
 				new MoveImmToPseudo(
 					// there is a char literal allows by the GNU as, but will just use the byte number
-					new Immediate(value.charAt(0)),
+					new Immediate(value.charAt(1)),
 					r.toX64()
 				)
 			);
