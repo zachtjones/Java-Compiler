@@ -11,6 +11,7 @@ import x64.jni.*;
 import x64.operands.PseudoDisplacement;
 import x64.operands.RIPRelativeData;
 import x64.operands.X64PseudoRegister;
+import x64.pseudo.MovePseudoToPseudo;
 import x64.pseudo.MovePseudoToPseudoDisplacement;
 import x64.pseudo.MovePseudoToRIPRelative;
 
@@ -134,8 +135,24 @@ public class StoreAddressStatement implements InterStatement,
 
 			// this is an assignment to the local variable
 			final String localName = context.getLocalAddressLocalName(addr);
-			// compile as if putLocal  src @ address
-			new PutLocalStatement(src, localName, fileName, line).compile(context);
+
+			// create temporary register to act as copy
+			Types localType = addr.getType().dereferencePointer(fileName, line);
+			Register intermediateReg = context.getNextILRegister(localType);
+			conversions = Conversion.assignmentConversion(src, intermediateReg, fileName, line);
+
+			// add in the conversion
+			for (InterStatement i : conversions) {
+				i.compile(context);
+			}
+
+			// move the intermediate result to the final part
+			context.addInstruction(
+				new MovePseudoToPseudo(
+					intermediateReg.toX64(),
+					context.getLocalVariable(localName)
+				)
+			);
 
 		} else {
 			throw new CompileException("store address statement unknown type", fileName, line);

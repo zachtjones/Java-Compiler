@@ -70,6 +70,13 @@ public class X64Context {
 		return new X64PseudoRegister(nextRegister, X64InstructionSize.BYTE);
 	}
 
+	/** Returns the next intermediate language register. This is used when you need a register to be
+	 * operated on at the intermediate level code. */
+	public Register getNextILRegister(Types type) {
+		nextRegister++;
+		return new Register(nextRegister, type, "auto-generated", -1);
+	}
+
 	/** returns the argument number that is the highest number used */
 	public int getHighestArgUsed() {
 		return highestArgUsed;

@@ -31,6 +31,6 @@ public class CastExpressionNode extends NodeImpl implements Expression {
     	// do the cast from expr to the final result
     	Register exprResult = f.allocator.getLast();
     	Register result = f.allocator.getNext(type);
-    	f.statements.add(new CastStatement(exprResult, result, type, getFileName(), getLine()));
+    	f.addStatement(new CastStatement(exprResult, result, type, getFileName(), getLine()));
 	}
 }

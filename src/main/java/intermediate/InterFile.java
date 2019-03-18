@@ -192,13 +192,13 @@ public class InterFile {
 	 * Finds the method with the signature that matches.
 	 * The destArgs will have their types filled in to the match, and the returned data class will have
 	 * the necessary instructions to convert everything over.
-	 * @param name The method's name.
+	 * @param methodName The method's name.
 	 * @param args The array of arguments.
 	 * @param destArgs The destination arguments, these should be unique for each call
 	 * @return The return object type, or null if there's no method with that signature
 	 */
 	@NotNull
-	MethodMatch getReturnType(@NotNull String name, @NotNull List<Register> args,
+	MethodMatch getReturnType(@NotNull String methodName, @NotNull List<Register> args,
 									 @NotNull List<Register> destArgs,
 									 @NotNull String fileName, int line) throws CompileException {
 
@@ -217,7 +217,7 @@ public class InterFile {
 
 		// iterate through all, finding the count of arguments that are convertible
 		functions.stream()
-			.filter(f -> f.name.equals(name))
+			.filter(f -> f.name.equals(methodName))
 			.filter(f -> f.paramTypes.size() == args.size())
 			.forEach(f -> {
 				try {
@@ -250,7 +250,7 @@ public class InterFile {
 			});
 
 
-		final String goalSignature = name + "(" +
+		final String goalSignature = methodName + "(" +
 			args.stream()
 				.map(r -> r.getType().getIntermediateRepresentation())
 				.collect(Collectors.joining()) + ")";
@@ -259,7 +259,7 @@ public class InterFile {
 		// no function matching this
 		if (matches.isEmpty()) {
 			throw new CompileException("no method found with signature, " + goalSignature
-				+ ", referenced", fileName, line);
+				+ " in " + this.name + ", referenced", fileName, line);
 		}
 
 		// could be multiple functions that have the same number of differences
@@ -293,7 +293,7 @@ public class InterFile {
 
 				// construct message from the list of options
 				String message = options.stream().map(
-					f -> name + "(" + f.match.paramTypes.stream()
+					f -> methodName + "(" + f.match.paramTypes.stream()
 						.map(Types::getIntermediateRepresentation)
 						.collect(Collectors.joining()) + ")"
 				).collect(Collectors.joining(", "));
