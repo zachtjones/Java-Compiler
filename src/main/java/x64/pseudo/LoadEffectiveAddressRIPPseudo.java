@@ -26,12 +26,26 @@ public class LoadEffectiveAddressRIPPseudo extends BinaryRIPRelativeToPseudo {
                                                         @NotNull X64Register temporaryImmediate) {
 
         if (mapping.containsKey(destination)) {
-            return Collections.singletonList(new LoadEffectiveAddressRIPRelativeToReg(source, mapping.get(destination)));
+            return Collections.singletonList(
+                new LoadEffectiveAddressRIPRelativeToReg(
+                    source,
+                    mapping.get(destination),
+                    destination.getSuffix()
+                )
+            );
         } else {
             // can't do direct swap, need the temporary
             return Arrays.asList(
-                new LoadEffectiveAddressRIPRelativeToReg(source, temporaryImmediate),
-                new MoveRegToBasePointerOffset(temporaryImmediate, locals.get(destination))
+                new LoadEffectiveAddressRIPRelativeToReg(
+                    source,
+                    temporaryImmediate,
+                    destination.getSuffix()
+                ),
+                new MoveRegToBasePointerOffset(
+                    temporaryImmediate,
+                    locals.get(destination),
+                    destination.getSuffix()
+                )
             );
         }
     }

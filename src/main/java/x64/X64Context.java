@@ -1,10 +1,11 @@
 package x64;
 
+import helper.Types;
 import intermediate.Register;
 import intermediate.RegisterAllocator;
 import x64.allocation.CallingConvention;
-import x64.operands.X64Register;
 import x64.operands.X64PseudoRegister;
+import x64.operands.X64Register;
 import x64.pseudo.MovePseudoToReg;
 import x64.pseudo.PseudoInstruction;
 
@@ -28,8 +29,7 @@ public class X64Context {
 	private final Map<Register, String> staticFieldAddressClasses = new HashMap<>();
 	private final Map<Register, String> staticFieldAddressFields = new HashMap<>();
 	private final Map<String, X64PseudoRegister> locals = new HashMap<>();
-
-	private final Map<Register, String> localAddresses = new HashMap<>();
+	private final Map<Register, String> localsAddresses = new HashMap<>(); // address -> localName
 
 	/** Returns the highest number of argument register used */
 	private int highestArgUsed = 1; // reserve the JNI register as always used
@@ -50,14 +50,31 @@ public class X64Context {
 
 	/** Returns the next pseudo register available that is a quad-word size (64-bit) */
 	public X64PseudoRegister getNextQuadRegister() {
+		return getNextRegister(X64InstructionSize.QUAD);
+	}
+
+	/** Returns the next pseudo register available for the instruction size instance. */
+	public X64PseudoRegister getNextRegister(X64InstructionSize size) {
 		nextRegister++;
-		return new X64PseudoRegister(nextRegister, X64InstructionSize.QUAD);
+		return new X64PseudoRegister(nextRegister, size);
+	}
+
+	/** Returns the next pseudo register available for the given type. */
+	public X64PseudoRegister getNextRegister(Types type) {
+		return getNextRegister(type.x64Type());
 	}
 
 	/** Returns the next pseudo register available that is a quad-word size (64-bit) */
 	public X64PseudoRegister getNextByteRegister() {
 		nextRegister++;
 		return new X64PseudoRegister(nextRegister, X64InstructionSize.BYTE);
+	}
+
+	/** Returns the next intermediate language register. This is used when you need a register to be
+	 * operated on at the intermediate level code. */
+	public Register getNextILRegister(Types type) {
+		nextRegister++;
+		return new Register(nextRegister, type, "auto-generated", -1);
 	}
 
 	/** returns the argument number that is the highest number used */
@@ -149,17 +166,17 @@ public class X64Context {
 	}
 
 	/** marks the register as holding the address to the local variable */
-	public void markRegisterAsLocalVariableAddress(Register r, String localName) {
-		localAddresses.put(r, localName);
+	public void markRegisterAsLocalVariableAddress(String localName, Register destination) {
+		localsAddresses.put(destination, localName);
 	}
 
-	/** returns if the register holds the address of a local variable */
-	public boolean registerIsLocalVariableAddress(Register r) {
-		return localAddresses.containsKey(r);
+	/** returns if the register holds an local register address */
+	public boolean registerIsLocalRegisterAddress(Register address) {
+		return localsAddresses.containsKey(address);
 	}
 
-	/** Returns the local variable name that this register address points to. */
-	public String getLocalNameForAddress(Register r) {
-		return localAddresses.get(r);
+	/** Returns the mapping to the local name that the address means */
+	public String getLocalAddressLocalName(Register address) {
+		return localsAddresses.get(address);
 	}
 }

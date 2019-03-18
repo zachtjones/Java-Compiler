@@ -37,15 +37,6 @@ public enum X64Register {
 		this.byteSize = "%" + byteSize;
 	}
 
-	public X64InstructionSize getSuffix() {
-		return X64InstructionSize.QUAD;
-	}
-
-	/** Returns the representation as a quad word */
-	public String assemblyRep() {
-		return quadSize;
-	}
-
 	/** Returns the representation for the size specified. */
 	public String assemblyRep(X64InstructionSize size) {
 		switch (size) {
@@ -69,6 +60,6 @@ public enum X64Register {
 
 	@Override
 	public String toString() {
-		return assemblyRep();
+		return assemblyRep(X64InstructionSize.QUAD);
 	}
 }

@@ -1,17 +1,19 @@
 package intermediate;
 
-import java.util.HashMap;
-
+import conversions.Conversion;
+import helper.BinaryOperation;
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
-import helper.BinaryOperation;
 import x64.X64Context;
 import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToPseudo;
 
-import static helper.Types.*;
+import java.util.HashMap;
+import java.util.List;
+
+import static helper.Types.BOOLEAN;
 
 /** dest = src1 OP src2 */
 public class BinaryOpStatement implements InterStatement {
@@ -23,6 +25,12 @@ public class BinaryOpStatement implements InterStatement {
 
 	@NotNull private final String fileName;
 	private final int line;
+
+	// conversion used in assignment for the first one
+	private List<InterStatement> conversionSrc1;
+	private List<InterStatement> conversionSrc2;
+	private Register src1Converted;
+	private Register src2Converted;
 	
 	/** Creates a binary operation of the type specified statement */
 	public BinaryOpStatement(@NotNull Register src1, @NotNull Register src2, @NotNull Register dest,
@@ -63,6 +71,13 @@ public class BinaryOpStatement implements InterStatement {
 					fileName, line);
 			}
 			Types larger = src1.getType().getLarger(src2.getType());
+
+			// add the conversions necessary
+			src1Converted = func.allocator.getNext(larger);
+			src2Converted = func.allocator.getNext(larger);
+			conversionSrc1 = Conversion.assignmentConversion(src1, src1Converted, fileName, line);
+			conversionSrc2 = Conversion.assignmentConversion(src2, src2Converted, fileName, line);
+
 			dest.setType(larger);
 		}
 		regs.put(dest, dest.getType());
@@ -79,10 +94,20 @@ public class BinaryOpStatement implements InterStatement {
 
 		X64PseudoRegister temp = context.getNextQuadRegister();
 
-		context.addInstruction(new MovePseudoToPseudo(src1.toX64(), temp));
+		// convert src1 to src1Converted
+		for (InterStatement s : conversionSrc1) {
+			s.compile(context);
+		}
+		context.addInstruction(new MovePseudoToPseudo(src1Converted.toX64(), temp));
 
-		context.addInstruction(type.getInstruction(src2.toX64(), temp));
+		// convert src2 to src2Converted
+		for (InterStatement s : conversionSrc2) {
+			s.compile(context);
+		}
+		// do the math operation
+		context.addInstruction(type.getInstruction(src2Converted.toX64(), temp));
 
+		// store the result, no assignment conversion needed
 		context.addInstruction(new MovePseudoToPseudo(temp, dest.toX64()));
 
 	}

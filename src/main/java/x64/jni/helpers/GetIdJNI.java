@@ -3,8 +3,11 @@ package x64.jni.helpers;
 import x64.X64Context;
 import x64.instructions.LoadEffectiveAddressRIPRelativeToReg;
 import x64.jni.JNIOffsets;
-import x64.operands.*;
+import x64.operands.RIPRelativeData;
+import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToReg;
+
+import static x64.X64InstructionSize.QUAD;
 
 
 public interface GetIdJNI extends CallJNIMethod {
@@ -32,7 +35,8 @@ public interface GetIdJNI extends CallJNIMethod {
         context.addInstruction(
             new LoadEffectiveAddressRIPRelativeToReg(
                 RIPRelativeData.pointerFromLabel(fieldNameLabel),
-                context.argumentRegister(3)
+                context.argumentRegister(3),
+                QUAD
             )
         );
 
@@ -41,7 +45,8 @@ public interface GetIdJNI extends CallJNIMethod {
         context.addInstruction(
             new LoadEffectiveAddressRIPRelativeToReg(
                 RIPRelativeData.pointerFromLabel(fieldTypeLabel),
-                context.argumentRegister(4)
+                context.argumentRegister(4),
+                QUAD
             )
         );
 

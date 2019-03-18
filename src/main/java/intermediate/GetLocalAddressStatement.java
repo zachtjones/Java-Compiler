@@ -1,15 +1,13 @@
 package intermediate;
 
-import java.util.HashMap;
-
 import helper.CompileException;
-import helper.TypeChecker;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
+import java.util.HashMap;
 
 public class GetLocalAddressStatement implements InterStatement {
-	@NotNull private final Register r;
+	@NotNull private final Register destination;
 	@NotNull private String localName;
 	
 	@NotNull private final String fileName;
@@ -22,7 +20,7 @@ public class GetLocalAddressStatement implements InterStatement {
 	 */
 	public GetLocalAddressStatement(@NotNull Register r, @NotNull String localName,
 									@NotNull String fileName, int line) {
-		this.r = r;
+		this.destination = r;
 		this.localName = localName;
 		this.fileName = fileName;
 		this.line = line;
@@ -30,7 +28,7 @@ public class GetLocalAddressStatement implements InterStatement {
 	
 	@Override
 	public String toString() {
-		return "getLocalAddress " + r.toString() + " = " + localName + ";";
+		return "getLocalAddress " + destination.toString() + " = " + localName + ";";
 	}
 
 	@Override
@@ -41,15 +39,16 @@ public class GetLocalAddressStatement implements InterStatement {
 			throw new CompileException("local variable: " + localName + " is not defined.",
 					fileName, line);
 		}
+		// all the type checking needed is done with the store address that gets used
 
 		// define the register
-		r.setType(Types.pointerOf(locals.get(localName)));
-		regs.put(r, r.getType());
+		destination.setType(Types.pointerOf(locals.get(localName)));
+		regs.put(destination, destination.getType());
 	}
 
 	@Override
 	public void compile(@NotNull X64Context context) throws CompileException {
 		// handle the details in the store instruction later on
-		context.markRegisterAsLocalVariableAddress(r, localName);
+		context.markRegisterAsLocalVariableAddress(localName, destination);
 	}
 }

@@ -43,7 +43,11 @@ public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplace
 				//   mov 16(%rbp), %temp
 				//   mov %r12, 8(%temp)
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(locals.get(destination.register), temporaryImmediate),
+					new MoveBasePointerOffsetToReg(
+						locals.get(destination.register),
+						temporaryImmediate,
+						source.getSuffix()
+					),
 					new MoveRegToRegDisplacement(
 						temporaryImmediate,
 						new RegDisplacement(destination.offset, temporaryImmediate)
@@ -57,7 +61,11 @@ public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplace
 				// mov -16(%rbp), 8(%r14), which can't be done
 				// mov -16(%rbp), %temp; mov %temp, 8(%r14)
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(locals.get(source), temporaryImmediate),
+					new MoveBasePointerOffsetToReg(
+						locals.get(source),
+						temporaryImmediate,
+						source.getSuffix()
+					),
 					new MoveRegToRegDisplacement(
 						temporaryImmediate,
 						new RegDisplacement(destination.offset, mapping.get(destination.register))
@@ -83,7 +91,8 @@ public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplace
 					),
 					new MoveBasePointerOffsetToReg(
 						locals.get(destination.register),
-						temporaryImmediate
+						temporaryImmediate,
+						source.getSuffix()
 					),
 					new PopDisplacement(
 						new RegDisplacement(destination.offset, temporaryImmediate)

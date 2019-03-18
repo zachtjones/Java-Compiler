@@ -6,6 +6,8 @@ import x64.jni.helpers.CallJNIMethod;
 import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToReg;
 
+import java.util.List;
+
 import static x64.jni.JNIOffsets.getCallStaticMethodOffset;
 
 public interface CallStaticMethodJNI extends CallJNIMethod {
@@ -19,7 +21,7 @@ public interface CallStaticMethodJNI extends CallJNIMethod {
      * @param returnVal Where to store the returned value
      */
     default void addCallStaticMethodJNI(X64Context context, X64PseudoRegister classReg, X64PseudoRegister methodId,
-										Register[] args, Register returnVal) {
+                                        List<Register> args, Register returnVal) {
 
         // 3 options for the method call, but will use the first one
         // %result = CallNonVirtual<type>Method(JNIEnv, obj, class, methodID, ...);
@@ -45,10 +47,10 @@ public interface CallStaticMethodJNI extends CallJNIMethod {
 
         // arg 4+, the actual program arguments to the function
         // insert up to the number of registers required to fill up the args
-        for (int i = 0; i < args.length; i++) {
+        for (int i = 0; i < args.size(); i++) {
             context.addInstruction(
                 new MovePseudoToReg(
-                    args[i].toX64(),
+                    args.get(i).toX64(),
                     context.argumentRegister(i + 4)
                 )
             );

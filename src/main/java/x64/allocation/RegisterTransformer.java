@@ -2,14 +2,18 @@ package x64.allocation;
 
 import helper.MapUtils;
 import org.jetbrains.annotations.NotNull;
-import x64.pseudo.PseudoInstruction;
 import x64.X64Context;
 import x64.instructions.*;
-import x64.operands.*;
+import x64.operands.BasePointerOffset;
+import x64.operands.Immediate;
+import x64.operands.X64PseudoRegister;
+import x64.operands.X64Register;
+import x64.pseudo.PseudoInstruction;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static x64.X64InstructionSize.QUAD;
 import static x64.allocation.CallingConvention.preservedRegistersNotRBP;
 import static x64.operands.X64Register.*;
 
@@ -146,8 +150,8 @@ public class RegisterTransformer {
 			}
 			if (totalPreserved % 2 == 0) {
 				// move another 8 bytes to maintains 16 byte alignment on function calls
-				au.prologue.add(new SubtractImmToReg(new Immediate(8), RSP));
-				au.epilogue.addFirst(new AddImmReg(new Immediate(8), RSP));
+				au.prologue.add(new SubtractImmToReg(new Immediate(8), RSP, QUAD));
+				au.epilogue.addFirst(new AddImmReg(new Immediate(8), RSP, QUAD));
 			}
 
 			return au;
@@ -172,14 +176,14 @@ public class RegisterTransformer {
 
 			// preserve base pointer & set to the base of the stack frame
 			au.prologue.add(new PushNativeReg(RBP)); // stack now has even number pushed
-			au.prologue.add(new MoveRegToReg(RSP, RBP));
+			au.prologue.add(new MoveRegToReg(RSP, RBP, QUAD));
 
 			// spaceNeeded should be oddNumber * 8.
-			au.prologue.add(new SubtractImmToReg(new Immediate(spaceNeeded), RSP));
+			au.prologue.add(new SubtractImmToReg(new Immediate(spaceNeeded), RSP, QUAD));
 
 			// restore stack and base pointer
 			au.epilogue.addFirst(new PopNativeReg(RBP));
-			au.epilogue.addFirst(new MoveRegToReg(RBP, RSP));
+			au.epilogue.addFirst(new MoveRegToReg(RBP, RSP, QUAD));
 
 			return au;
 		}

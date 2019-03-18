@@ -15,9 +15,10 @@ import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToReg;
 import x64.pseudo.MoveRegToPseudo;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static x64.allocation.CallingConvention.returnValueRegister;
 
@@ -25,11 +26,15 @@ import static x64.allocation.CallingConvention.returnValueRegister;
 public class CallStaticStatement implements InterStatement, FindClassJNI, GetStaticMethodIdJNI, CallStaticMethodJNI {
 	@NotNull private final String className;
 	@NotNull private final String functionName;
-	@NotNull private final Register[] args;
+	@NotNull private final List<Register> unconvertedArgs;
 	@Nullable private final Register returnVal;
 
 	@NotNull private final String fileName;
 	private final int line;
+
+	// filled in during type check
+	private MethodMatch match;
+	private List<Register> convertedArgs;
 
 
 	public CallStaticStatement(@NotNull String className, @NotNull String functionName, @NotNull Register[] args,
@@ -37,7 +42,7 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 
 		this.className = className;
 		this.functionName = functionName;
-		this.args = args;
+		this.unconvertedArgs = Arrays.asList(args);
 		this.returnVal = returnVal;
 		this.fileName = fileName;
 		this.line = line;
@@ -47,26 +52,32 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 	public String toString() {
 		// use the Arrays.toString and remove '[' and ']'
 		return "callStatic " + className + '.' + functionName + "("
-				+ Arrays.toString(args).replaceAll("[]\\[]", "") + ") -> " + returnVal + ";";
+				+ unconvertedArgs.stream().map(Register::toString).collect(Collectors.joining(", "))
+				+ ") -> " + returnVal + ";";
 	}
 
 	@Override
 	public void typeCheck(@NotNull HashMap<Register, Types> regs, @NotNull HashMap<String, Types> locals,
 						  @NotNull HashMap<String, Types> params, @NotNull InterFunction func) throws CompileException {
 		
-		for (Register r : args) {
+		for (Register r : unconvertedArgs) {
 			UsageCheck.verifyDefined(r, regs, fileName, line);
 		}
-		
-		if (returnVal != null) {
-			// fill in the return type
-			InterFile e = JavaCompiler.parseAndCompile(className, fileName, line);
-			ArrayList<Types> argsList = new ArrayList<>();
-			Arrays.stream(args).map(Register::getType).forEachOrdered(argsList::add);
-			Types returnType = e.getReturnType(functionName, argsList, fileName, line);
 
-			returnVal.setType(returnType);
-			regs.put(returnVal, returnType);
+		// get information on converting the arguments
+		InterFile e = JavaCompiler.parseAndCompile(className, fileName, line);
+
+		// one for each where the destination will be
+		convertedArgs = unconvertedArgs.stream()
+			.map(i -> func.allocator.getNext(Types.UNKNOWN))
+			.collect(Collectors.toList());
+
+		match = e.getReturnType(functionName, unconvertedArgs, convertedArgs, fileName, line);
+
+		if (returnVal != null) {
+			// fill in return type
+			returnVal.setType(match.match.returnType);
+			regs.put(returnVal, returnVal.getType());
 		}
 	}
 
@@ -80,10 +91,18 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 
 			// methodID =  GetMethodID(JNIEnv *env, jclass clazz, char *name, char *sig);
 			final X64PseudoRegister methodId =
-				addGetStaticMethodId(context, clazz, functionName, args, returnVal);
+				addGetStaticMethodId(context, clazz, functionName, convertedArgs, returnVal);
+
+			// add the conversion for the args
+			for (List<InterStatement> statementList : match.conversionsToArgs) {
+				// each arg
+				for (InterStatement j : statementList) {
+					j.compile(context);
+				}
+			}
 
 			// result = CallNonVirtual<Type>Method(JNIEnv, clazz, methodID, ...)
-			addCallStaticMethodJNI(context, clazz, methodId, args, returnVal);
+			addCallStaticMethodJNI(context, clazz, methodId, convertedArgs, returnVal);
 
 		} else {
 
@@ -91,10 +110,16 @@ public class CallStaticStatement implements InterStatement, FindClassJNI, GetSta
 			context.loadJNI1(); // JNIEnv
 
 			// the rest of the args, the actual ones to the method
-			for (int i = 0; i < args.length; i++) {
+			for (int i = 0; i < unconvertedArgs.size(); i++) {
+				// compile in the conversion
+				for (InterStatement j : match.conversionsToArgs.get(i)) {
+					j.compile(context);
+				}
+
+				// move to hardware regs
 				context.addInstruction(
 					new MovePseudoToReg(
-						args[i].toX64(),
+						convertedArgs.get(i).toX64(),
 						context.argumentRegister(2 + i)
 					)
 				);

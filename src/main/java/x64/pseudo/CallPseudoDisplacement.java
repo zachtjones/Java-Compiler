@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static x64.X64InstructionSize.QUAD;
+
 /** Represents a call to a register relative memory pointer, callq *16(%q10) for example */
 public class CallPseudoDisplacement implements PseudoInstruction {
 
@@ -44,7 +46,8 @@ public class CallPseudoDisplacement implements PseudoInstruction {
 		} else {
 			return Arrays.asList(
 				// can't to a displacement of a displacement of the base pointer
-				new MoveBasePointerOffsetToReg(locals.get(temp.register), temporaryImmediate),
+				//  also we know it's going to be a quad word since address
+				new MoveBasePointerOffsetToReg(locals.get(temp.register), temporaryImmediate, QUAD),
 				new CallRegDisplacement(new RegDisplacement(temp.offset, temporaryImmediate))
 			);
 		}

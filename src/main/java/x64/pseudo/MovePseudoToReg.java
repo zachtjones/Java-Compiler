@@ -26,11 +26,19 @@ public class MovePseudoToReg extends BinaryPseudoToReg {
 
 		if (mapping.containsKey(source)) {
 			return Collections.singletonList(
-				new MoveRegToReg(mapping.get(source), destination)
+				new MoveRegToReg(
+					mapping.get(source),
+					destination,
+					source.getSuffix()
+				)
 			);
 		} else {
 			return Collections.singletonList(
-				new MoveBasePointerOffsetToReg(locals.get(source), destination)
+				new MoveBasePointerOffsetToReg(
+					locals.get(source),
+					destination,
+					source.getSuffix()
+				)
 			);
 		}
 	}

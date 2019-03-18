@@ -19,7 +19,7 @@ public class X64PseudoRegister {
 
     @Override
     public int hashCode() {
-        return number ^ size.hashCode();
+        return number;
     }
 
     @Override
@@ -31,5 +31,15 @@ public class X64PseudoRegister {
     @Override
     public String toString() {
         return "%" + size.size + number;
+    }
+
+    /** Returns if this represents a floating point register. */
+	public boolean isFloatingPoint() {
+		return size.isFloatingPoint();
+	}
+
+	/** Returns the number there is. */
+    public int getNumber() {
+        return this.number;
     }
 }

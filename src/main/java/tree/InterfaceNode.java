@@ -2,7 +2,6 @@ package tree;
 
 import helper.ClassLookup;
 import helper.CompileException;
-import helper.Types;
 import intermediate.InterFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

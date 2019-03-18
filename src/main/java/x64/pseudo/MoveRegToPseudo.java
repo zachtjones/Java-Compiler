@@ -25,11 +25,19 @@ public class MoveRegToPseudo extends BinaryRegToPseudoReg {
 														@NotNull X64Register temporaryImmediate) {
 		if (mapping.containsKey(destination)) {
 			return Collections.singletonList(
-				new MoveRegToReg(source, mapping.get(destination))
+				new MoveRegToReg(
+					source,
+					mapping.get(destination),
+					destination.getSuffix()
+				)
 			);
 		} else {
 			return Collections.singletonList(
-				new MoveRegToBasePointerOffset(source, locals.get(destination))
+				new MoveRegToBasePointerOffset(
+					source,
+					locals.get(destination),
+					destination.getSuffix()
+				)
 			);
 		}
 	}

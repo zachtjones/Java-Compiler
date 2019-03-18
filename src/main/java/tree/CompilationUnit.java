@@ -1,13 +1,12 @@
 package tree;
 
-import java.util.ArrayList;
-
 import helper.ClassLookup;
 import helper.CompileException;
 import intermediate.InterFile;
-import intermediate.InterFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
 
 /** Represents a CompilationUnit, that is a source file.
 *  @author Zach Jones */

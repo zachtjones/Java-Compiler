@@ -1,14 +1,13 @@
 package tree;
 
-import java.util.ArrayList;
-
 import helper.ClassLookup;
 import helper.CompileException;
 import helper.Types;
 import intermediate.InterFile;
-import intermediate.InterFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
 
 public class EnumNode implements TypeDecNode {
     @NotNull private final String fileName;

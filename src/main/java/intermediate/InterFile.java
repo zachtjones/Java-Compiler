@@ -1,14 +1,16 @@
 package intermediate;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
+import conversions.Conversion;
 import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import x64.X64File;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static helper.Types.STRING;
 import static helper.Types.fromFullyQualifiedClass;
 
 public class InterFile {
@@ -19,10 +21,6 @@ public class InterFile {
 	@NotNull private final InterStructure staticPart;
 	@NotNull private final InterStructure instancePart;
 	@NotNull private final ArrayList<InterFunction> functions;
-
-
-	/** name -> Map of list of args to return value */
-	private final Map<String, Map<List<Types>, Types>> typesOfFunctions;
 
 	/**
 	 * Creates an intermediate file, given the name
@@ -38,7 +36,6 @@ public class InterFile {
 		this.staticPart = new InterStructure(false);
 		this.instancePart = new InterStructure(true);
 		this.functions = new ArrayList<>();
-		typesOfFunctions = new HashMap<>();
 	}
 
 	/**
@@ -150,16 +147,21 @@ public class InterFile {
 		}
 	}
 
-	/** Type checks all the functions 
+	/** Returns if there is a main method. */
+	public boolean hasMainMethod() {
+		// name is main, it has 1 arg, type is String[].
+		return functions.stream()
+			.filter(f -> f.name.equals("main"))
+			.filter(f -> f.paramTypes.size() == 1)
+			.anyMatch(f -> f.paramTypes.get(0).equals(Types.arrayOf(STRING)));
+	}
+
+	/** Type checks all the functions
 	 * @throws CompileException If there is an error with type checking.*/
 	public void typeCheck() throws CompileException {
-		
+
 		for (InterFunction f : functions) {
 			f.typeCheck(fromFullyQualifiedClass(name));
-			// add it to the set
-			Map<List<Types>, Types> existing = typesOfFunctions.getOrDefault(f.name, new HashMap<>());
-			existing.put(f.paramTypes, f.returnType);
-			typesOfFunctions.putIfAbsent(f.name, existing);
 		}
 
 	}
@@ -187,26 +189,127 @@ public class InterFile {
 	}
 
 	/**
-	 * Finds the method with the signature given, and returns the type of the return object
-	 * @param name The method's name.
+	 * Finds the method with the signature that matches.
+	 * The destArgs will have their types filled in to the match, and the returned data class will have
+	 * the necessary instructions to convert everything over.
+	 * @param methodName The method's name.
 	 * @param args The array of arguments.
+	 * @param destArgs The destination arguments, these should be unique for each call
 	 * @return The return object type, or null if there's no method with that signature
 	 */
 	@NotNull
-	public Types getReturnType(@NotNull String name, @NotNull ArrayList<Types> args,
-							   @NotNull String fileName, int line) throws CompileException {
+	MethodMatch getReturnType(@NotNull String methodName, @NotNull List<Register> args,
+									 @NotNull List<Register> destArgs,
+									 @NotNull String fileName, int line) throws CompileException {
 
-		if (typesOfFunctions.containsKey(name)) {
-			return typesOfFunctions.get(name).get(args);
-		} else {
-			final String signature = name + "(" +
-				args.stream()
-					.map(Types::getIntermediateRepresentation)
-					.collect(Collectors.joining()) + ")";
+		// TODO support varargs
 
-			throw new CompileException("no method found with signature, " + signature
-				+ ", referenced", fileName, line);
+		// overloading methods -- decided which one to take at compile time
+
+		// functions number of args -> matching functions
+		//   the mapping list will never be empty
+		//   the key is the number of args that are implicitly converted.
+
+		// TODO there is probably a better way to do this -- the param types should be mutable since they
+		//  get changed, but don't want them to be changed for a non-match.
+
+		HashMap<Integer, List<MethodMatch>> matches = new HashMap<>();
+
+		// iterate through all, finding the count of arguments that are convertible
+		functions.stream()
+			.filter(f -> f.name.equals(methodName))
+			.filter(f -> f.paramTypes.size() == args.size())
+			.forEach(f -> {
+				try {
+					ArrayList<List<InterStatement>> conversionsToArgs = new ArrayList<>();
+					int numDifferences = 0;
+					for (int i = 0; i < args.size(); i++) {
+						Register source = args.get(i);
+						Types destType = f.paramTypes.get(i);
+						Register destination = destArgs.get(i);
+						destination.setType(destType);
+
+						// not the exact same, increment it
+						//   we will need a more specific way for java.io.PrintStream#println(S)
+						//     should map to the int version, but long, float, and double match
+						//     with the same number of differences
+						if (!source.getType().equals(destType)) {
+							numDifferences++;
+						}
+
+						// capture the conversion
+						conversionsToArgs.add(Conversion.methodInvocation(source, destination, fileName, line));
+					}
+					// the args match -- add it into the list
+					List<MethodMatch> values = matches.getOrDefault(numDifferences, new ArrayList<>());
+					values.add(new MethodMatch(conversionsToArgs, f));
+					matches.putIfAbsent(numDifferences, values);
+
+					// if we have the exception thrown, it means it's not a match, so don't add it.
+				} catch (CompileException ignored){}
+			});
+
+
+		final String goalSignature = methodName + "(" +
+			args.stream()
+				.map(r -> r.getType().getIntermediateRepresentation())
+				.collect(Collectors.joining()) + ")";
+
+
+		// no function matching this
+		if (matches.isEmpty()) {
+			throw new CompileException("no method found with signature, " + goalSignature
+				+ " in " + this.name + ", referenced", fileName, line);
 		}
+
+		// could be multiple functions that have the same number of differences
+		//  in this case it's an ambiguous method call
+		TreeSet<Integer> integers = new TreeSet<>(matches.keySet());
+
+		// potential list of candidates -- these ones would work, all are convertible
+		List<MethodMatch> candidates = matches.get(integers.first());
+
+		// find the first one, that one will be it if there's no ties
+		MethodMatch first = candidates.get(0);
+
+		if (candidates.size() != 1) {
+
+			// evaluate specificity, through the ordering when sorted
+			//  can't use a set as there might be ones of equal specificity
+			// the most specific are first (smallest value in compareTo)
+			Collections.sort(candidates);
+
+			// we know candidates.size() >= 2, so compare the first 2
+			//   if equal, then stop, there's an ambiguous method call
+			first = candidates.get(0);
+			MethodMatch second = candidates.get(1);
+
+			if (first.compareTo(second) == 0) {
+				final MethodMatch firstOne = first;
+				// determine the equal ones
+				List<MethodMatch> options = candidates.stream()
+					.filter(i -> i.compareTo(firstOne) == 0)
+					.collect(Collectors.toList());
+
+				// construct message from the list of options
+				String message = options.stream().map(
+					f -> methodName + "(" + f.match.paramTypes.stream()
+						.map(Types::getIntermediateRepresentation)
+						.collect(Collectors.joining()) + ")"
+				).collect(Collectors.joining(", "));
+				throw new CompileException("Ambiguous method call " + goalSignature + " matches: " + message,
+					fileName, line);
+			}
+
+			// we know it is the first one, which we already set.
+
+		}
+
+		for (int i = 0; i < destArgs.size(); i++) {
+			destArgs.get(i).setType(first.match.paramTypes.get(i));
+		}
+
+		return first;
 	}
 
 	/**

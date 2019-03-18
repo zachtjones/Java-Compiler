@@ -1,12 +1,12 @@
 package intermediate;
 
-import java.util.HashMap;
-
 import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.operands.X64PseudoRegister;
+
+import java.util.HashMap;
 
 /** Represents the starting of a scope of a local variable. */
 public class StartScopeStatement implements InterStatement {
@@ -40,7 +40,7 @@ public class StartScopeStatement implements InterStatement {
 	@Override
 	public void compile(@NotNull X64Context context) throws CompileException {
 		// TODO other sized registers
-		X64PseudoRegister allocated = context.getNextQuadRegister();
+		X64PseudoRegister allocated = context.getNextRegister(type);
 		context.markRegisterAsLocalVariable(name, allocated);
 	}
 }

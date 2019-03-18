@@ -25,19 +25,31 @@ public class SubtractPseudoToPseudo extends BinaryPseudoToPseudo {
 			if (mapping.containsKey(destination)) {
 				// sub %r1, %r2
 				return Collections.singletonList(
-					new SubtractRegToReg(mapping.get(source), mapping.get(destination))
+					new SubtractRegToReg(
+						mapping.get(source),
+						mapping.get(destination),
+						destination.getSuffix()
+					)
 				);
 			} else {
 				// sub %r1, -16(%rbp)
 				return Collections.singletonList(
-					new SubtractRegToBasePointerOffset(mapping.get(source), locals.get(destination))
+					new SubtractRegToBasePointerOffset(
+						mapping.get(source),
+						locals.get(destination),
+						destination.getSuffix()
+					)
 				);
 			}
 		} else {
 			if (mapping.containsKey(destination)) {
 				// sub -16(%rbp), %r2
 				return Collections.singletonList(
-					new SubtractBasePointerOffsetToReg(locals.get(source), mapping.get(destination))
+					new SubtractBasePointerOffsetToReg(
+						locals.get(source),
+						mapping.get(destination),
+						destination.getSuffix()
+					)
 				);
 			} else {
 				// sub -16(%rbp), -24(%rbp)
@@ -45,8 +57,16 @@ public class SubtractPseudoToPseudo extends BinaryPseudoToPseudo {
 				// mov -16(%rbp), %temp
 				// sub %temp, -24(%rbp)
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(locals.get(source), temporaryImmediate),
-					new SubtractRegToBasePointerOffset(temporaryImmediate, locals.get(destination))
+					new MoveBasePointerOffsetToReg(
+						locals.get(source),
+						temporaryImmediate,
+						destination.getSuffix()
+					),
+					new SubtractRegToBasePointerOffset(
+						temporaryImmediate,
+						locals.get(destination),
+						destination.getSuffix()
+					)
 				);
 			}
 		}

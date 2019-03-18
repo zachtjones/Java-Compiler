@@ -3,8 +3,9 @@ package x64.jni;
 import x64.X64Context;
 import x64.instructions.LoadEffectiveAddressRIPRelativeToReg;
 import x64.jni.helpers.CallJNIMethod;
-import x64.operands.*;
+import x64.operands.X64PseudoRegister;
 
+import static x64.X64InstructionSize.QUAD;
 import static x64.jni.JNIOffsets.FIND_CLASS;
 import static x64.operands.RIPRelativeData.pointerFromLabel;
 
@@ -22,12 +23,13 @@ public interface FindClassJNI extends CallJNIMethod {
         // mov %javaEnvOne, %arg1
         context.loadJNI1();
 
-        // leaq NEW_STRING_REFERENCE(%rip), %arg2
+        // leaq NEW_STRING_REFERENCE(%rip), %arg2 -- quad size since pointer
         String label = context.insertDataString(className);
         context.addInstruction(
             new LoadEffectiveAddressRIPRelativeToReg(
                 pointerFromLabel(label),
-                context.argumentRegister(2)
+                context.argumentRegister(2),
+                QUAD
             )
         );
 

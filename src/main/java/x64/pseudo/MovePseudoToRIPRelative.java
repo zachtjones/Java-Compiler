@@ -25,13 +25,25 @@ public class MovePseudoToRIPRelative extends BinaryPseudoToRIPRelative {
 														@NotNull X64Register temporaryImmediate) {
 		if (mapping.containsKey(source)) {
 			return Collections.singletonList(
-				new MoveRegToRIPRelative(mapping.get(source), destination)
+				new MoveRegToRIPRelative(
+					mapping.get(source),
+					destination,
+					source.getSuffix()
+				)
 			);
 		} else {
 			// need temp, can't have 2 memory operands in 1 instruction
 			return Arrays.asList(
-				new MoveBasePointerOffsetToReg(locals.get(source), temporaryImmediate),
-				new MoveRegToRIPRelative(temporaryImmediate, destination)
+				new MoveBasePointerOffsetToReg(
+					locals.get(source),
+					temporaryImmediate,
+					source.getSuffix()
+				),
+				new MoveRegToRIPRelative(
+					temporaryImmediate,
+					destination,
+					source.getSuffix()
+				)
 			);
 		}
 	}

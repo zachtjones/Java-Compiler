@@ -29,7 +29,8 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 				return Collections.singletonList(
 					new MoveRegDisplacementToReg(
 						new RegDisplacement(source.offset, mapping.get(source.register)),
-						mapping.get(destination)
+						mapping.get(destination),
+						destination.getSuffix()
 					)
 				);
 			} else {
@@ -38,11 +39,13 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 				return Arrays.asList(
 					new MoveRegDisplacementToReg(
 						new RegDisplacement(source.offset, mapping.get(source.register)),
-						temporaryImmediate
+						temporaryImmediate,
+						destination.getSuffix()
 					),
 					new MoveRegToBasePointerOffset(
 						temporaryImmediate,
-						locals.get(destination)
+						locals.get(destination),
+						destination.getSuffix()
 					)
 				);
 			}
@@ -55,10 +58,15 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 				// mov -16(%rbp), %temp
 				// mov 8(%temp), %r2
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(locals.get(source.register), temporaryImmediate),
+					new MoveBasePointerOffsetToReg(
+						locals.get(source.register),
+						temporaryImmediate,
+						destination.getSuffix()
+					),
 					new MoveRegDisplacementToReg(
 						new RegDisplacement(source.offset, temporaryImmediate),
-						mapping.get(destination)
+						mapping.get(destination),
+						destination.getSuffix()
 					)
 				);
 
@@ -69,12 +77,21 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 				// mov 8(%temp), %temp
 				// mov %temp, -24(%rbp)
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(locals.get(source.register), temporaryImmediate),
+					new MoveBasePointerOffsetToReg(
+						locals.get(source.register),
+						temporaryImmediate,
+						destination.getSuffix()
+					),
 					new MoveRegDisplacementToReg(
 						new RegDisplacement(source.offset, temporaryImmediate),
-						temporaryImmediate
+						temporaryImmediate,
+						destination.getSuffix()
 					),
-					new MoveRegToBasePointerOffset(temporaryImmediate, locals.get(destination))
+					new MoveRegToBasePointerOffset(
+						temporaryImmediate,
+						locals.get(destination),
+						destination.getSuffix()
+					)
 				);
 			}
 		}
