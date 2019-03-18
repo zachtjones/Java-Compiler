@@ -44,7 +44,8 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 					),
 					new MoveRegToBasePointerOffset(
 						temporaryImmediate,
-						locals.get(destination)
+						locals.get(destination),
+						destination.getSuffix()
 					)
 				);
 			}
@@ -86,7 +87,11 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 						temporaryImmediate,
 						destination.getSuffix()
 					),
-					new MoveRegToBasePointerOffset(temporaryImmediate, locals.get(destination))
+					new MoveRegToBasePointerOffset(
+						temporaryImmediate,
+						locals.get(destination),
+						destination.getSuffix()
+					)
 				);
 			}
 		}

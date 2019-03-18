@@ -36,7 +36,8 @@ public class AddPseudoToPseudo extends BinaryPseudoToPseudo {
 				return Collections.singletonList(
 					new AddRegToBasePointerOffset(
 						mapping.get(source),
-						locals.get(destination)
+						locals.get(destination),
+						destination.getSuffix()
 					)
 				);
 			}
@@ -62,7 +63,8 @@ public class AddPseudoToPseudo extends BinaryPseudoToPseudo {
 					),
 					new AddRegToBasePointerOffset(
 						temporaryImmediate,
-						locals.get(destination)
+						locals.get(destination),
+						destination.getSuffix()
 					)
 				);
 			}

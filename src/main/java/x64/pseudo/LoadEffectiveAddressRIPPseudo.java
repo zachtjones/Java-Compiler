@@ -43,7 +43,8 @@ public class LoadEffectiveAddressRIPPseudo extends BinaryRIPRelativeToPseudo {
                 ),
                 new MoveRegToBasePointerOffset(
                     temporaryImmediate,
-                    locals.get(destination)
+                    locals.get(destination),
+                    destination.getSuffix()
                 )
             );
         }

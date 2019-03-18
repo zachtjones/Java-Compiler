@@ -35,7 +35,8 @@ public class MoveRegToPseudo extends BinaryRegToPseudoReg {
 			return Collections.singletonList(
 				new MoveRegToBasePointerOffset(
 					source,
-					locals.get(destination)
+					locals.get(destination),
+					destination.getSuffix()
 				)
 			);
 		}

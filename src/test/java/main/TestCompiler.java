@@ -65,14 +65,13 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
                                             "1, 0\n2, 0\n2, 1\n4, 0\n4, 1\n4, 2\n4, 3\n", ""),
             Arguments.of("DataSizes", 0, "true\n" +
                 "false\n" +
+                "127\n" +
+                "128\n" +
+                "-128\n" +
                 "ab\n" +
                 "-18690\n" +
                 "-2147483648\n" +
-                "2147483648\n", ""),
-            Arguments.of("FloatingPoint", 0,
-                "7.0\n" +
-                "Infinity\n" +
-                "-46\n", "")
+                "2147483648\n", "")
         );
     }
 

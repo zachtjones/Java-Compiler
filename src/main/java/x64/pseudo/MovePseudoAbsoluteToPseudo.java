@@ -44,7 +44,8 @@ public class MovePseudoAbsoluteToPseudo extends BinaryPseudoAbsoluteToPseudo {
 					),
 					new MoveRegToBasePointerOffset(
 						temporaryImmediate,
-						locals.get(destination)
+						locals.get(destination),
+						destination.getSuffix()
 					)
 				);
 			}
@@ -77,7 +78,8 @@ public class MovePseudoAbsoluteToPseudo extends BinaryPseudoAbsoluteToPseudo {
 					),
 					new MoveRegToBasePointerOffset(
 						temporaryImmediate,
-						locals.get(destination)
+						locals.get(destination),
+						destination.getSuffix()
 					)
 				);
 			}
