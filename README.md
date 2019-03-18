@@ -16,7 +16,6 @@ The supported output language is x86-64 / AMD64.
  - java/javac 8+ in the path
  - gcc, also in the PATH (used to assemble and link results)
    - clang may be aliased to gcc on Mac OS is there is XCode installed; this is not a problem
- - If using Intellij, there is a plugin for JavaCC; this will make editing the parser easier
 
 ### GCC / java instillation on Windows
  - For the other platforms, having the two on the path works fine for all versions I've tested
@@ -37,10 +36,6 @@ The supported output language is x86-64 / AMD64.
  - Implement the fix / feature
  - Run the tests, `mvn clean test jacoco:report`
  - Create a Pull request
- 
-The idea for progress is as follows:
-  1. Make lots of test classes for basic java syntax & how it works
-  2. Do some optimizations (and create issues from the list that I want to do next)
 
 ## Usage
 1. Install Java 8+ and Apache Maven
@@ -61,7 +56,7 @@ The idea for progress is as follows:
 5. Convert to pseudo-assembly (see below)
    - package intermediate - method compile()
 6. Allocate the hardware registers
-   - package x64.allocation
+   - package x64.allocation and method allocate in all pseudo instructions
 7. Write out the x64 assembly
 8. Use the assembler to create the dynamic linked library
 
@@ -113,9 +108,9 @@ This makes some optimizations work in linear time that wouldn't work otherwise.
 
 
 ## Tests
-- Currently the only 'test' is the HelloWorld.java in tests/
-- plans are to compare the javac and java ClassName vs java JavaCompiler & ./ClassName output to be compared
-- this is really the only way to test the features, especially as optimizations become more prevalent
+- there are tests involving several of the language features implemented so far.
+- these compare the output of running java with the dynamic linked library created.
+- use `mvn test jacoco:report` to get the code coverage report as well.
 
 # Debugging
 - When a test program fails, it can be difficult to know why it breaks.
@@ -152,9 +147,8 @@ These ones will give an error like: try statement not implemented yet.
 - synchronized methods
 - try ... catch blocks
 - switch statements
-- break and continue
-- labeled statements (used in break and continue)
-- array initializer (using the {} syntax: a = new int[] { 2, 5 }; )
+- arrays
+- generics
 
 ## Current known bugs
 - Nested generics (ex: <code>HashMap&lt;String, ArrayList&lt;String&gt;&gt;</code>) have to be written without the <code>&gt;&gt;</code>
