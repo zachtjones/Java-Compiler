@@ -1,11 +1,11 @@
 package intermediate;
 
-import java.util.HashMap;
-
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
 
 public class GetArrayValueAddressStatement implements InterStatement {
 	
@@ -27,7 +27,7 @@ public class GetArrayValueAddressStatement implements InterStatement {
 	}
 
 	public String toString() {
-		return "getArrayValue " + result + " = " + array + " @ " + index + ";";
+		return "getArrayValueAddress " + result + " = " + array + " @ " + index + ";";
 	}
 
 	@Override

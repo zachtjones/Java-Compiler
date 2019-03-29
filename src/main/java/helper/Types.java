@@ -45,7 +45,7 @@ public class Types implements Comparable<Types> {
 
 	/** Creates a types instance from the fully qualified class name */
 	public static Types fromFullyQualifiedClass(String className) {
-		return new Types("L" + className + ";", false);
+		return new Types("L" + className.replace('.', '/') + ";", false);
 	}
 
 	/** Creates a type instance that is an array of the type passed in. */
@@ -67,16 +67,18 @@ public class Types implements Comparable<Types> {
 			case "float": return FLOAT;
 			case "double": return DOUBLE;
 		}
+
+		// recursive case for array types, it's an array of the
+		if (type.endsWith("[]")) {
+			String sub = type.substring(0, type.length() - 2);
+			return arrayOf(fromJavaRepresentation(sub));
+		}
 		return Types.fromFullyQualifiedClass(type);
 	}
 
 	/** Creates a types instance from the Class instance, obtained via classLoader reflection. */
 	public static Types fromReflection(@NotNull Class<?> type) {
-		if (type.isPrimitive()) {
-			return fromJavaRepresentation(type.getName());
-		} else {
-			return Types.fromFullyQualifiedClass(type.getName().replace('.', '/'));
-		}
+		return fromJavaRepresentation(type.getCanonicalName());
 	}
 
 	/**

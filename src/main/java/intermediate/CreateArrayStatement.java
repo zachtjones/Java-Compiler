@@ -1,10 +1,10 @@
 package intermediate;
 
-import java.util.HashMap;
-
 import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
 
 public class CreateArrayStatement implements InterStatement {
 
@@ -32,4 +32,8 @@ public class CreateArrayStatement implements InterStatement {
 		regs.put(result, result.getType());
 	}
 
+	@Override
+	public String toString() {
+		return "createArray " + result + " = new " + type + "[" + size + "]";
+	}
 }
