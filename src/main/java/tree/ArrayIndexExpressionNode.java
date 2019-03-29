@@ -3,6 +3,7 @@ package tree;
 import helper.ClassLookup;
 import helper.CompileException;
 import helper.Types;
+import intermediate.GetArrayValueAddressStatement;
 import intermediate.GetArrayValueStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
@@ -50,7 +51,7 @@ public class ArrayIndexExpressionNode extends NodeImpl implements Expression, LV
 		Register index = f.allocator.getLast();
 		// load the memory at the address
 		Register result = f.allocator.getNext(Types.UNKNOWN);
-		f.addStatement(new GetArrayValueStatement(array, index, result, getFileName(), getLine()));
+		f.addStatement(new GetArrayValueAddressStatement(array, index, result, getFileName(), getLine()));
 	}
 
 	

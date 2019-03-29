@@ -50,7 +50,7 @@ public class Types implements Comparable<Types> {
 
 	/** Creates a type instance that is an array of the type passed in. */
 	public static Types arrayOf(Types typeOfArray) {
-		return new Types("[" + typeOfArray.rep, false);
+		return new Types("[" + typeOfArray.rep, typeOfArray.isPrimitive);
 	}
 
 	/** Creates a type from the java representation
@@ -160,9 +160,10 @@ public class Types implements Comparable<Types> {
 		return X64InstructionSize.QUAD;
 	}
 
-	/** returns true if this resembles a primitive type */
+	/** returns true if this resembles a primitive type.
+	 * Note that arrays of primitive types are not primitive. */
 	public boolean isPrimitive() {
-		return isPrimitive;
+		return isPrimitive && !rep.startsWith("[");
 	}
 
 	/** Resolves the imports on this type, replacing partially qualified names with fully qualified ones
