@@ -42,7 +42,11 @@ public enum JNIOffsets {
     SET_STATIC_CHAR_FIELD(157), SET_STATIC_SHORT_FIELD(158), SET_STATIC_INT_FIELD(159),
     SET_STATIC_LONG_FIELD(160), SET_STATIC_FLOAT_FIELD(161), SET_STATIC_DOUBLE_FIELD(162),
 
-    NEW_STRING_UTF(167);
+    NEW_STRING_UTF(167),
+
+    NEW_OBJECT_ARRAY(172), NEW_BOOLEAN_ARRAY(175), NEW_BYTE_ARRAY(176),
+    NEW_CHAR_ARRAY(177), NEW_SHORT_ARRAY(178), NEW_INT_ARRAY(179),
+    NEW_LONG_ARRAY(180), NEW_FLOAT_ARRAY(181), NEW_DOUBLE_ARRAY(182);
 
     /** Represents the index in the JNI function table */
     private final int index;
@@ -150,5 +154,17 @@ public enum JNIOffsets {
      */
     public static JNIOffsets getCallStaticMethodOffset(Types type) {
         return callStaticMethods[getIndexFromType(type)];
+    }
+    
+    private static JNIOffsets[] createArrays = { NEW_OBJECT_ARRAY, NEW_BOOLEAN_ARRAY, NEW_BYTE_ARRAY,
+        NEW_CHAR_ARRAY, NEW_SHORT_ARRAY, NEW_INT_ARRAY, NEW_LONG_ARRAY, NEW_FLOAT_ARRAY, NEW_DOUBLE_ARRAY };
+
+    /**
+     * Gets the JNI offset for the create array (either object or primitive)
+     * @param type The JNI type that is used to determine the offset
+     * @return The JNIOffsets instance that corresponds to that type passed in.
+     */
+    public static JNIOffsets getCreateArrayOffset(Types type) {
+        return createArrays[getIndexFromType(type)];
     }
 }

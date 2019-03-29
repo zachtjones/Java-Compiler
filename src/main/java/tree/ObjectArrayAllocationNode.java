@@ -1,7 +1,5 @@
 package tree;
 
-import java.util.ArrayList;
-
 import helper.ClassLookup;
 import helper.CompileException;
 import helper.Types;
@@ -9,6 +7,8 @@ import intermediate.CreateArrayStatement;
 import intermediate.InterFunction;
 import intermediate.Register;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 
 /** new type[expression or empty] ... */
 public class ObjectArrayAllocationNode extends NodeImpl implements Expression {
@@ -39,7 +39,7 @@ public class ObjectArrayAllocationNode extends NodeImpl implements Expression {
    			expressions.get(0).compile(s, f);
    			Register size = f.allocator.getLast();
    			Register result = f.allocator.getNext(Types.UNKNOWN);
-   			f.addStatement(new CreateArrayStatement(size, type, result));
+   			f.addStatement(new CreateArrayStatement(size, type, result, getFileName(), getLine()));
    		} else {
    			// TODO handle multi-dimensional arrays.
    			throw new CompileException("Multi-dimensional array creation not done yet.", "", -1);
