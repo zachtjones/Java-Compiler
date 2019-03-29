@@ -71,7 +71,8 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
                 "ab\n" +
                 "-18690\n" +
                 "-2147483648\n" +
-                "2147483648\n", "")
+                "2147483648\n", ""),
+            Arguments.of("BasicArray", 0, "[1, 2, 3, 4]\n", "")
         );
     }
 
