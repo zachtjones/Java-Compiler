@@ -22,7 +22,7 @@ import java.util.List;
 public class StoreAddressStatement implements InterStatement,
 		FindClassJNI, GetInstanceFieldIdJNI, SetInstanceFieldJNI,
 		GetStaticFieldIdJNI, SetStaticFieldJNI,
-	SetObjectArrayElementJNI, GetPrimitiveArrayElements {
+	SetObjectArrayElementJNI, GetPrimitiveArrayElements, ReleasePrimitiveArrayElements {
 
 	@NotNull private final Register src;
 	@NotNull private final Register addr;
@@ -160,6 +160,7 @@ public class StoreAddressStatement implements InterStatement,
 
 				// Release<PrimitiveType>ArrayElements(JNIEnv *env, array, void* elements, int mode)
 				//   mode should always be 0, want to copy back the content and free the buffer
+				addReleasePrimitiveArrayElements(context, x.first, buffer, destinationType);
 
 				throw new RuntimeException("store address for primitive arrays not done yet.");
 			} else {

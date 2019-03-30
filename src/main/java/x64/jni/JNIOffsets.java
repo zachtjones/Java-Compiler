@@ -54,7 +54,12 @@ public enum JNIOffsets {
     
     GET_BOOLEAN_ARRAY_ELEMENTS(183), GET_BYTE_ARRAY_ELEMENTS(184),
     GET_CHAR_ARRAY_ELEMENTS(185), GET_SHORT_ARRAY_ELEMENTS(186), GET_INT_ARRAY_ELEMENTS(187),
-    GET_LONG_ARRAY_ELEMENTS(188), GET_FLOAT_ARRAY_ELEMENTS(189), GET_DOUBLE_ARRAY_ELEMENTS(190);
+    GET_LONG_ARRAY_ELEMENTS(188), GET_FLOAT_ARRAY_ELEMENTS(189), GET_DOUBLE_ARRAY_ELEMENTS(190),
+
+    RELEASE_BOOLEAN_ARRAY_ELEMENTS(191), RELEASE_BYTE_ARRAY_ELEMENTS(192),
+    RELEASE_CHAR_ARRAY_ELEMENTS(193), RELEASE_SHORT_ARRAY_ELEMENTS(194), 
+    RELEASE_INT_ARRAY_ELEMENTS(195), RELEASE_LONG_ARRAY_ELEMENTS(196), 
+    RELEASE_FLOAT_ARRAY_ELEMENTS(197), RELEASE_DOUBLE_ARRAY_ELEMENTS(198);
 
     /** Represents the index in the JNI function table */
     private final int index;
@@ -176,8 +181,20 @@ public enum JNIOffsets {
         return createArrays[getIndexFromType(type)];
     }
 
-    private static JNIOffsets[] getPrimitiveArrayElements = { }
+    private static JNIOffsets[] getPrimitiveArrayElements = { GET_BOOLEAN_ARRAY_ELEMENTS, GET_BYTE_ARRAY_ELEMENTS,
+        GET_CHAR_ARRAY_ELEMENTS, GET_SHORT_ARRAY_ELEMENTS, GET_INT_ARRAY_ELEMENTS, GET_LONG_ARRAY_ELEMENTS, 
+        GET_FLOAT_ARRAY_ELEMENTS, GET_DOUBLE_ARRAY_ELEMENTS };
     
     public static JNIOffsets getPrimitiveArrayElementsOffset(Types type) {
+        return getPrimitiveArrayElements[getIndexFromType(type) - 1]; // no object type
+    }
+
+    private static JNIOffsets[] releasePrimitiveArrayElements = { RELEASE_BOOLEAN_ARRAY_ELEMENTS,
+        RELEASE_BYTE_ARRAY_ELEMENTS, RELEASE_CHAR_ARRAY_ELEMENTS, RELEASE_SHORT_ARRAY_ELEMENTS,
+        RELEASE_INT_ARRAY_ELEMENTS, RELEASE_LONG_ARRAY_ELEMENTS,
+        RELEASE_FLOAT_ARRAY_ELEMENTS, RELEASE_DOUBLE_ARRAY_ELEMENTS };
+
+    public static JNIOffsets getReleasePrimitiveArrayElementsOffset(Types type) {
+        return releasePrimitiveArrayElements[getIndexFromType(type) - 1]; // no object type
     }
 }
