@@ -3,6 +3,7 @@ package x64;
 import helper.Types;
 import intermediate.Register;
 import intermediate.RegisterAllocator;
+import org.jetbrains.annotations.NotNull;
 import x64.allocation.CallingConvention;
 import x64.operands.X64PseudoRegister;
 import x64.operands.X64Register;
@@ -19,6 +20,16 @@ import java.util.Map;
  */
 public class X64Context {
 
+	public static class Pair<X, Y> {
+		public final X first;
+		public final Y second;
+
+		Pair(X first, Y second) {
+			this.first = first;
+			this.second = second;
+		}
+	}
+
 	private final X64File enclosingFile;
 	private final X64Function function;
 	private int nextRegister;
@@ -30,6 +41,9 @@ public class X64Context {
 	private final Map<Register, String> staticFieldAddressFields = new HashMap<>();
 	private final Map<String, X64PseudoRegister> locals = new HashMap<>();
 	private final Map<Register, String> localsAddresses = new HashMap<>(); // address -> localName
+
+	/** mapping of address -> (array, index) */
+	private final Map<Register, Pair<Register, Register>> arrayValueAddresses = new HashMap<>();
 
 	/** Returns the highest number of argument register used */
 	private int highestArgUsed = 1; // reserve the JNI register as always used
@@ -62,12 +76,6 @@ public class X64Context {
 	/** Returns the next pseudo register available for the given type. */
 	public X64PseudoRegister getNextRegister(Types type) {
 		return getNextRegister(type.x64Type());
-	}
-
-	/** Returns the next pseudo register available that is a quad-word size (64-bit) */
-	public X64PseudoRegister getNextByteRegister() {
-		nextRegister++;
-		return new X64PseudoRegister(nextRegister, X64InstructionSize.BYTE);
 	}
 
 	/** Returns the next intermediate language register. This is used when you need a register to be
@@ -178,5 +186,20 @@ public class X64Context {
 	/** Returns the mapping to the local name that the address means */
 	public String getLocalAddressLocalName(Register address) {
 		return localsAddresses.get(address);
+	}
+
+	/** Marks the register as holding the array and index address. */
+	public void markRegisterAsArrayValueAddress(@NotNull Register address, @NotNull Register array,
+												@NotNull Register index) {
+		arrayValueAddresses.put(address, new Pair<>(array, index));
+	}
+
+	/** Returns if the register is an array value address. */
+	public boolean registerIsArrayValueAddress(@NotNull Register address) {
+		return arrayValueAddresses.containsKey(address);
+	}
+
+	public Pair<Register, Register> getRegisterArrayAndIndex(@NotNull Register address) {
+		return arrayValueAddresses.get(address);
 	}
 }

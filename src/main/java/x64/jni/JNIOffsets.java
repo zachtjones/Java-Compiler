@@ -44,9 +44,17 @@ public enum JNIOffsets {
 
     NEW_STRING_UTF(167),
 
-    NEW_OBJECT_ARRAY(172), NEW_BOOLEAN_ARRAY(175), NEW_BYTE_ARRAY(176),
+    NEW_OBJECT_ARRAY(172),
+    GET_OBJECT_ARRAY_ELEMENT(173),
+    SET_OBJECT_ARRAY_ELEMENT(174),
+
+    NEW_BOOLEAN_ARRAY(175), NEW_BYTE_ARRAY(176),
     NEW_CHAR_ARRAY(177), NEW_SHORT_ARRAY(178), NEW_INT_ARRAY(179),
-    NEW_LONG_ARRAY(180), NEW_FLOAT_ARRAY(181), NEW_DOUBLE_ARRAY(182);
+    NEW_LONG_ARRAY(180), NEW_FLOAT_ARRAY(181), NEW_DOUBLE_ARRAY(182),
+    
+    GET_BOOLEAN_ARRAY_ELEMENTS(183), GET_BYTE_ARRAY_ELEMENTS(184),
+    GET_CHAR_ARRAY_ELEMENTS(185), GET_SHORT_ARRAY_ELEMENTS(186), GET_INT_ARRAY_ELEMENTS(187),
+    GET_LONG_ARRAY_ELEMENTS(188), GET_FLOAT_ARRAY_ELEMENTS(189), GET_DOUBLE_ARRAY_ELEMENTS(190);
 
     /** Represents the index in the JNI function table */
     private final int index;
@@ -54,7 +62,7 @@ public enum JNIOffsets {
         this.index = index;
     }
 
-    /** Returns the offset into the virtual function table for the JNI object for this method.
+	/** Returns the offset into the virtual function table for the JNI object for this method.
      * Use like: <code>mov OFFSET(JNI*), %temp; callq *%temp</code>*/
     public int getOffset() {
         return index * 8;
@@ -84,6 +92,7 @@ public enum JNIOffsets {
     private static JNIOffsets[] setInstanceFields = { SET_INSTANCE_OBJECT_FIELD, GET_STATIC_BOOLEAN_FIELD,
         GET_STATIC_BYTE_FIELD, GET_STATIC_CHAR_FIELD, GET_STATIC_SHORT_FIELD, GET_STATIC_INT_FIELD,
         GET_STATIC_LONG_FIELD, GET_STATIC_FLOAT_FIELD, GET_STATIC_DOUBLE_FIELD };
+
     /**
      * Returns the JNI offsets instance used to set an object's field
      * @param type The types instance to determine which SET_&lt;TYPE&gt;_FIELD
@@ -92,10 +101,10 @@ public enum JNIOffsets {
     public static JNIOffsets setInstanceFieldOffset(Types type) {
         return setInstanceFields[getIndexFromType(type)];
     }
-
     private static JNIOffsets[] getStaticFields = { GET_STATIC_OBJECT_FIELD, GET_STATIC_BOOLEAN_FIELD,
         GET_STATIC_BYTE_FIELD, GET_STATIC_CHAR_FIELD, GET_STATIC_SHORT_FIELD, GET_STATIC_INT_FIELD,
         GET_STATIC_LONG_FIELD, GET_STATIC_FLOAT_FIELD, GET_STATIC_DOUBLE_FIELD };
+
     /**
      * Gets the offset for the GetStatic&lt;Type&gt;Field calls
      * @param type The JNI type that is used to determine the offset
@@ -104,10 +113,10 @@ public enum JNIOffsets {
     public static JNIOffsets getStaticFieldOffset(Types type) {
         return getStaticFields[getIndexFromType(type)];
     }
-
     private static JNIOffsets[] setStaticFields = { SET_STATIC_OBJECT_FIELD, SET_STATIC_BOOLEAN_FIELD,
         SET_STATIC_BYTE_FIELD, SET_STATIC_CHAR_FIELD, SET_STATIC_SHORT_FIELD, SET_STATIC_INT_FIELD,
         SET_STATIC_LONG_FIELD, SET_STATIC_FLOAT_FIELD, SET_STATIC_DOUBLE_FIELD };
+
     /**
      * Gets the JNI offsets instance used  for the SetStatic&lt;Type&gt;Field calls
      * @param type The JNI type that is used to determine the offset
@@ -116,11 +125,11 @@ public enum JNIOffsets {
     public static JNIOffsets setStaticFieldOffset(Types type) {
         return setStaticFields[getIndexFromType(type)];
     }
-
     private static JNIOffsets[] callMethods = { CALL_OBJECT_METHOD, CALL_BOOLEAN_METHOD,
         CALL_BYTE_METHOD, CALL_CHAR_METHOD, CALL_SHORT_METHOD, CALL_INT_METHOD,
         CALL_LONG_METHOD, CALL_FLOAT_METHOD, CALL_DOUBLE_METHOD,
         CALL_VOID_METHOD };
+
     /**
      * Gets the offset for the Call&lt;Type&gt;Method calls
      * @param type The JNI type that is used to determine the offset
@@ -129,11 +138,11 @@ public enum JNIOffsets {
     public static JNIOffsets getCallMethodOffset(Types type) {
         return callMethods[getIndexFromType(type)];
     }
-
     private static JNIOffsets[] callNonVirtualMethods = { CALL_NON_VIRTUAL_OBJECT_METHOD,
         CALL_NON_VIRTUAL_BOOLEAN_METHOD, CALL_NON_VIRTUAL_BYTE_METHOD, CALL_NON_VIRTUAL_CHAR_METHOD,
         CALL_NON_VIRTUAL_SHORT_METHOD, CALL_NON_VIRTUAL_INT_METHOD, CALL_NON_VIRTUAL_LONG_METHOD,
         CALL_NON_VIRTUAL_FLOAT_METHOD, CALL_NON_VIRTUAL_DOUBLE_METHOD, CALL_NON_VIRTUAL_VOID_METHOD };
+
     /**
      * Gets the offset for the CallNonVirtual&lt;Type&gt;Method calls
      * @param type The JNI type that is used to determine the offset
@@ -142,11 +151,11 @@ public enum JNIOffsets {
     public static JNIOffsets getCallNonVirtualMethodOffset(Types type) {
         return callNonVirtualMethods[getIndexFromType(type)];
     }
-
     private static JNIOffsets[] callStaticMethods = { CALL_STATIC_OBJECT_METHOD,
         CALL_STATIC_BOOLEAN_METHOD, CALL_STATIC_BYTE_METHOD, CALL_STATIC_CHAR_METHOD,
         CALL_STATIC_SHORT_METHOD, CALL_STATIC_INT_METHOD, CALL_STATIC_LONG_METHOD,
         CALL_STATIC_FLOAT_METHOD, CALL_STATIC_DOUBLE_METHOD, CALL_STATIC_VOID_METHOD };
+
     /**
      * Gets the offset for the CallStatic&lt;Type&gt;Method calls
      * @param type The JNI type that is used to determine the offset
@@ -155,7 +164,6 @@ public enum JNIOffsets {
     public static JNIOffsets getCallStaticMethodOffset(Types type) {
         return callStaticMethods[getIndexFromType(type)];
     }
-    
     private static JNIOffsets[] createArrays = { NEW_OBJECT_ARRAY, NEW_BOOLEAN_ARRAY, NEW_BYTE_ARRAY,
         NEW_CHAR_ARRAY, NEW_SHORT_ARRAY, NEW_INT_ARRAY, NEW_LONG_ARRAY, NEW_FLOAT_ARRAY, NEW_DOUBLE_ARRAY };
 
@@ -166,5 +174,10 @@ public enum JNIOffsets {
      */
     public static JNIOffsets getCreateArrayOffset(Types type) {
         return createArrays[getIndexFromType(type)];
+    }
+
+    private static JNIOffsets[] getPrimitiveArrayElements = { }
+    
+    public static JNIOffsets getPrimitiveArrayElementsOffset(Types type) {
     }
 }

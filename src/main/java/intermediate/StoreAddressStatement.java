@@ -21,7 +21,8 @@ import java.util.List;
 /** store %src at %addr */
 public class StoreAddressStatement implements InterStatement,
 		FindClassJNI, GetInstanceFieldIdJNI, SetInstanceFieldJNI,
-		GetStaticFieldIdJNI, SetStaticFieldJNI {
+		GetStaticFieldIdJNI, SetStaticFieldJNI,
+	SetObjectArrayElementJNI, GetPrimitiveArrayElements {
 
 	@NotNull private final Register src;
 	@NotNull private final Register addr;
@@ -32,6 +33,7 @@ public class StoreAddressStatement implements InterStatement,
 	// set in type checking, used for converting to the result.
 	private Register intermediate;
 	private List<InterStatement> conversions;
+	private Types destinationType;
 
 	public StoreAddressStatement(@NotNull Register src, @NotNull Register addr,
 								 @NotNull String fileName, int line) {
@@ -54,7 +56,7 @@ public class StoreAddressStatement implements InterStatement,
 		UsageCheck.verifyDefined(src, regs, fileName, line);
 
 		// this is an assignment, allocate another reg and save the conversion
-		Types destinationType = addr.getType().dereferencePointer(fileName, line);
+		destinationType = addr.getType().dereferencePointer(fileName, line);
 		intermediate = func.allocator.getNext(destinationType);
 		conversions = Conversion.assignmentConversion(src, intermediate, fileName, line);
 	}
@@ -136,23 +138,34 @@ public class StoreAddressStatement implements InterStatement,
 			// this is an assignment to the local variable
 			final String localName = context.getLocalAddressLocalName(addr);
 
-			// create temporary register to act as copy
-			Types localType = addr.getType().dereferencePointer(fileName, line);
-			Register intermediateReg = context.getNextILRegister(localType);
-			conversions = Conversion.assignmentConversion(src, intermediateReg, fileName, line);
-
-			// add in the conversion
-			for (InterStatement i : conversions) {
-				i.compile(context);
-			}
-
 			// move the intermediate result to the final part
 			context.addInstruction(
 				new MovePseudoToPseudo(
-					intermediateReg.toX64(),
+					intermediate.toX64(),
 					context.getLocalVariable(localName)
 				)
 			);
+		} else if (context.registerIsArrayValueAddress(addr)) {
+
+			X64Context.Pair<Register, Register> x = context.getRegisterArrayAndIndex(addr);
+			// store intermediate at the array[index]
+			// have to see if the array is a primitive array or not
+			if (destinationType.isPrimitive()) {
+				// buffer = Get<PrimitiveType>ArrayElements(JNIEnv *env, array, jboolean* isCopy)
+				//   isCopy can be used to determine if it's able to make a copy, or actually memory map it
+				//   can just pass null in instead, as we're going to do the release anyways
+				X64PseudoRegister buffer = addGetPrimitiveArrayElements(context, x.first);
+
+				//  set the memory at the buffer+index*scaling
+
+				// Release<PrimitiveType>ArrayElements(JNIEnv *env, array, void* elements, int mode)
+				//   mode should always be 0, want to copy back the content and free the buffer
+
+				throw new RuntimeException("store address for primitive arrays not done yet.");
+			} else {
+				// void SetObjectArrayElement(JNIEnv *env, jobjectArray array, jsize index, jobject value)
+				addSetObjectArrayElement(context, x.first, x.second, intermediate);
+			}
 
 		} else {
 			throw new CompileException("store address statement unknown type", fileName, line);

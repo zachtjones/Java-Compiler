@@ -113,7 +113,7 @@ public class Types implements Comparable<Types> {
 
 	/** Creates a new type that is a pointer to the argument */
 	public static Types pointerOf(@NotNull Types type) {
-		return new Types("*" + type.rep, false);
+		return new Types("*" + type.rep, type.isPrimitive);
 	}
 
 	/** Dereferences this pointer type, throwing an CompileException if this isn't a pointer */
