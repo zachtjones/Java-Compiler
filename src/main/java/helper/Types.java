@@ -262,4 +262,13 @@ public class Types implements Comparable<Types> {
 	public boolean isFloatingPoint() {
 		return this.equals(FLOAT) || this.equals(DOUBLE);
 	}
+
+	/** Returns the number of bytes required to represent this register. 1, 2, 4, or 8. */
+	public int byteSize() {
+		if (this.equals(BYTE) || this.equals(BOOLEAN)) return 1;
+		if (this.equals(SHORT) || this.equals(CHAR)) return 2;
+		if (this.equals(INT) || this.equals(FLOAT)) return 4;
+
+		return 8; // long, double, pointers.
+	}
 }

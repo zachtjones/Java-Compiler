@@ -11,6 +11,7 @@ import x64.jni.*;
 import x64.operands.PseudoDisplacement;
 import x64.operands.RIPRelativeData;
 import x64.operands.X64PseudoRegister;
+import x64.pseudo.MoveArrayIndexPseudo;
 import x64.pseudo.MovePseudoToPseudo;
 import x64.pseudo.MovePseudoToPseudoDisplacement;
 import x64.pseudo.MovePseudoToRIPRelative;
@@ -150,22 +151,33 @@ public class StoreAddressStatement implements InterStatement,
 			X64Context.Pair<Register, Register> x = context.getRegisterArrayAndIndex(addr);
 			// store intermediate at the array[index]
 			// have to see if the array is a primitive array or not
+			final Register array = x.first;
+			final Register index = x.second;
+
 			if (destinationType.isPrimitive()) {
 				// buffer = Get<PrimitiveType>ArrayElements(JNIEnv *env, array, jboolean* isCopy)
 				//   isCopy can be used to determine if it's able to make a copy, or actually memory map it
 				//   can just pass null in instead, as we're going to do the release anyways
-				X64PseudoRegister buffer = addGetPrimitiveArrayElements(context, x.first);
+				X64PseudoRegister buffer = addGetPrimitiveArrayElements(context, array);
 
 				//  set the memory at the buffer+index*scaling
+				// mov %source, (%baseReg, %indexReg, scale factor)
+				context.addInstruction(
+					new MoveArrayIndexPseudo(
+						intermediate.toX64(),
+						buffer,
+						index.toX64(),
+						destinationType.byteSize()
+					)
+				);
 
 				// Release<PrimitiveType>ArrayElements(JNIEnv *env, array, void* elements, int mode)
 				//   mode should always be 0, want to copy back the content and free the buffer
-				addReleasePrimitiveArrayElements(context, x.first, buffer, destinationType);
+				addReleasePrimitiveArrayElements(context, array, buffer, destinationType);
 
-				throw new RuntimeException("store address for primitive arrays not done yet.");
 			} else {
 				// void SetObjectArrayElement(JNIEnv *env, jobjectArray array, jsize index, jobject value)
-				addSetObjectArrayElement(context, x.first, x.second, intermediate);
+				addSetObjectArrayElement(context, array, index, intermediate);
 			}
 
 		} else {
