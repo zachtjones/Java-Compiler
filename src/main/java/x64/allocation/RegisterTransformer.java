@@ -161,7 +161,7 @@ public class RegisterTransformer {
 			// here we use the base pointer for that allocation
 
 			// this function also changes the instructions
-			int spaceNeeded = rbpTransform(mapping, tempsAvailable);
+			int spaceNeeded = rbpTransform(mapping, tempsAvailable, usedRegs);
 
 			// we know we use all the registers, can't use the base pointer elsewhere
 			AllocationUnit au = new AllocationUnit(results);
@@ -249,24 +249,21 @@ public class RegisterTransformer {
 	 * @param mapping The mapping of allocation if there were infinite registers,
 	 *                each being used as many times as possible.
 	 * @param tempsAvailable The hardware registers available as temporaries (may contain unused argument registers)
+	 * @param usedRegs The registers that are allocated if there's enough registers.
 	 * @return The number of bytes of stack space that needs allocated.
 	 * This amount will maintain stack alignment.
 	 */
 	private int rbpTransform(@NotNull HashMap<X64PseudoRegister, RegisterMapped> mapping,
-							 @NotNull List<X64Register> tempsAvailable) {
+							 @NotNull List<X64Register> tempsAvailable, @NotNull RegistersUsed usedRegs) {
 
 		// todo, loop through counting jumps to increase priority level,
 		//  jumps backwards = 3x as much, conditional jumps backwards 2x as much
 		// Could also do some prediction based on other heuristics, like forward jumps as well
-
 		// right now, a simple priority incremented by the number of usages
-		for (PseudoInstruction i : initialContents) {
-			i.prioritizeRegisters(mapping);
-		}
 
 		// now we can determine the which registers are more important, lower important ones get mapped
 		//  to base-pointer offsets
-		TreeSet<RegisterMapped> priorities = new TreeSet<>(mapping.values());
+		TreeSet<RegisterMapped> priorities = usedRegs.prioritize(mapping);
 
 		LinkedList<X64Register> tempsLeft = new LinkedList<>(tempsAvailable);
 

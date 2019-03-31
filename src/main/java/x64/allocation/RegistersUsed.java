@@ -102,4 +102,11 @@ public class RegistersUsed {
 		sets.forEach(((register, integers) -> temp.put(integers.first(), register)));
 		return temp;
 	}
+
+	public TreeSet<RegisterMapped> prioritize(HashMap<X64PseudoRegister, RegisterMapped> mapping) {
+		for (X64PseudoRegister reg : mapping.keySet()) {
+			mapping.get(reg).add(numberUsages.get(reg));
+		}
+		return new TreeSet<>(mapping.values());
+	}
 }
