@@ -129,9 +129,9 @@ public class RegisterTransformer {
 			Map<X64PseudoRegister, X64Register> nativeMapping = getNatives(maxTemp, mapping);
 
 			// obtain the new list of instructions, with them swapped out
-			Map<X64PseudoRegister, BasePointerOffset> locals = new HashMap<>();
+			AllocationContext context = new AllocationContext(nativeMapping, new HashMap<>(), R10);
 			List<Instruction> results = initialContents.stream()
-				.map(i -> i.allocate(nativeMapping, locals, R10))
+				.map(i -> i.allocate(context))
 				.flatMap(Collection::stream)
 				.collect(Collectors.toList());
 
@@ -301,9 +301,10 @@ public class RegisterTransformer {
 
 		HashMap<X64PseudoRegister, X64Register> natives = MapUtils.map(mapping, nativeAllocations);
 		HashMap<X64PseudoRegister, BasePointerOffset> locals = MapUtils.map(mapping, basePointerOffsets);
+		AllocationContext context = new AllocationContext(natives, locals, temporaryIntermediate);
 
 		this.results = initialContents.stream()
-			.map(i -> i.allocate(natives, locals, temporaryIntermediate)) // Stream<List<Instruction>>
+			.map(i -> i.allocate(context)) // Stream<List<Instruction>>
 			.flatMap(Collection::stream) // 'flattens' the stream of lists into a stream of instructions
 			.collect(Collectors.toList());
 
