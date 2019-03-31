@@ -19,14 +19,12 @@ public class MoveRIPRelativeToPseudo extends BinaryRIPRelativeToPseudo {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
-		if (mapping.containsKey(destination)) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
+		if (context.isRegister(destination)) {
 			return Collections.singletonList(
 				new MoveRIPRelativeToReg(
 					source,
-					mapping.get(destination),
+					context.getRegister(destination),
 					destination.getSuffix()
 				)
 			);
@@ -35,12 +33,12 @@ public class MoveRIPRelativeToPseudo extends BinaryRIPRelativeToPseudo {
 			return Arrays.asList(
 				new MoveRIPRelativeToReg(
 					source,
-					temporaryImmediate,
+					context.getScratchRegister(),
 					destination.getSuffix()
 				),
 				new MoveRegToBasePointerOffset(
-					temporaryImmediate,
-					locals.get(destination),
+					context.getScratchRegister(),
+					context.getBasePointer(destination),
 					destination.getSuffix()
 				)
 			);

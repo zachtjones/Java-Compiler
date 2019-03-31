@@ -19,17 +19,15 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
 		// example: mov 8(%q1), %q2
-		if (mapping.containsKey(source.register)) {
-			if (mapping.containsKey(destination)) {
+		if (context.isRegister(source.register)) {
+			if (context.isRegister(destination)) {
 				// mov 8(%r1), %r2
 				return Collections.singletonList(
 					new MoveRegDisplacementToReg(
-						new RegDisplacement(source.offset, mapping.get(source.register)),
-						mapping.get(destination),
+						new RegDisplacement(source.offset, context.getRegister(source.register)),
+						context.getRegister(destination),
 						destination.getSuffix()
 					)
 				);
@@ -38,13 +36,13 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 				// mov 8(%r1), -16(%rbp) -- use temporary in the middle
 				return Arrays.asList(
 					new MoveRegDisplacementToReg(
-						new RegDisplacement(source.offset, mapping.get(source.register)),
-						temporaryImmediate,
+						new RegDisplacement(source.offset, context.getRegister(source.register)),
+						context.getScratchRegister(),
 						destination.getSuffix()
 					),
 					new MoveRegToBasePointerOffset(
-						temporaryImmediate,
-						locals.get(destination),
+						context.getScratchRegister(),
+						context.getBasePointer(destination),
 						destination.getSuffix()
 					)
 				);
@@ -52,20 +50,20 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 		} else {
 			// example: mov 8(%q1), %q2
 
-			if (mapping.containsKey(destination)) {
+			if (context.isRegister(destination)) {
 				// mov 8(-16(%rbp)), %r2
 				//  goes to:
 				// mov -16(%rbp), %temp
 				// mov 8(%temp), %r2
 				return Arrays.asList(
 					new MoveBasePointerOffsetToReg(
-						locals.get(source.register),
-						temporaryImmediate,
+						context.getBasePointer(source.register),
+						context.getScratchRegister(),
 						destination.getSuffix()
 					),
 					new MoveRegDisplacementToReg(
-						new RegDisplacement(source.offset, temporaryImmediate),
-						mapping.get(destination),
+						new RegDisplacement(source.offset, context.getScratchRegister()),
+						context.getRegister(destination),
 						destination.getSuffix()
 					)
 				);
@@ -78,18 +76,18 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 				// mov %temp, -24(%rbp)
 				return Arrays.asList(
 					new MoveBasePointerOffsetToReg(
-						locals.get(source.register),
-						temporaryImmediate,
+						context.getBasePointer(source.register),
+						context.getScratchRegister(),
 						destination.getSuffix()
 					),
 					new MoveRegDisplacementToReg(
-						new RegDisplacement(source.offset, temporaryImmediate),
-						temporaryImmediate,
+						new RegDisplacement(source.offset, context.getScratchRegister()),
+						context.getScratchRegister(),
 						destination.getSuffix()
 					),
 					new MoveRegToBasePointerOffset(
-						temporaryImmediate,
-						locals.get(destination),
+						context.getScratchRegister(),
+						context.getBasePointer(destination),
 						destination.getSuffix()
 					)
 				);

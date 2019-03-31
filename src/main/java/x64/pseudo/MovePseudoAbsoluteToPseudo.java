@@ -23,43 +23,41 @@ public class MovePseudoAbsoluteToPseudo extends BinaryPseudoAbsoluteToPseudo {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
-		if (mapping.containsKey(source.source)) {
-			if (mapping.containsKey(destination)) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
+		if (context.isRegister(source.source)) {
+			if (context.isRegister(destination)) {
 				return Collections.singletonList(
 					new MoveRegAbsoluteToReg(
-						mapping.get(source.source),
-						mapping.get(destination),
+						context.getRegister(source.source),
+						context.getRegister(destination),
 						destination.getSuffix()
 					)
 				);
 			} else {
 				return Arrays.asList(
 					new MoveRegAbsoluteToReg(
-						mapping.get(source.source),
-						temporaryImmediate,
+						context.getRegister(source.source),
+						context.getScratchRegister(),
 						destination.getSuffix()
 					),
 					new MoveRegToBasePointerOffset(
-						temporaryImmediate,
-						locals.get(destination),
+						context.getScratchRegister(),
+						context.getBasePointer(destination),
 						destination.getSuffix()
 					)
 				);
 			}
 		} else {
-			if (mapping.containsKey(destination)) {
+			if (context.isRegister(destination)) {
 				return Arrays.asList(
 					new MoveBasePointerOffsetToReg(
-						locals.get(source.source),
-						temporaryImmediate,
+						context.getBasePointer(source.source),
+						context.getScratchRegister(),
 						destination.getSuffix()
 					),
 					new MoveRegAbsoluteToReg(
-						temporaryImmediate,
-						mapping.get(destination),
+						context.getScratchRegister(),
+						context.getRegister(destination),
 						destination.getSuffix()
 					)
 				);
@@ -67,18 +65,18 @@ public class MovePseudoAbsoluteToPseudo extends BinaryPseudoAbsoluteToPseudo {
 				// both are mapped to memory, but the first is already mapped to memory
 				return Arrays.asList(
 					new MoveBasePointerOffsetToReg(
-						locals.get(source.source),
-						temporaryImmediate,
+						context.getBasePointer(source.source),
+						context.getScratchRegister(),
 						destination.getSuffix()
 					),
 					new MoveRegAbsoluteToReg(
-						temporaryImmediate,
-						temporaryImmediate,
+						context.getScratchRegister(),
+						context.getScratchRegister(),
 						destination.getSuffix()
 					),
 					new MoveRegToBasePointerOffset(
-						temporaryImmediate,
-						locals.get(destination),
+						context.getScratchRegister(),
+						context.getBasePointer(destination),
 						destination.getSuffix()
 					)
 				);

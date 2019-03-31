@@ -32,7 +32,7 @@ public abstract class BinaryPseudoToPseudoDisplacement implements PseudoInstruct
 
 	@Override
 	public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-		mapping.get(source).increment();
+		context.getRegister(source).increment();
 	}
 
 	/** Represents how this instruction should be represented */

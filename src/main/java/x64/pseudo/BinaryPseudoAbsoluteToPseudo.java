@@ -31,7 +31,7 @@ public abstract class BinaryPseudoAbsoluteToPseudo implements PseudoInstruction 
 
 	@Override
 	public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-		mapping.get(destination).increment();
+		context.getRegister(destination).increment();
 	}
 
 	/** Represents how this instruction should be represented */

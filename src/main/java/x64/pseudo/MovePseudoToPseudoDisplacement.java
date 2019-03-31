@@ -18,22 +18,20 @@ public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplace
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
 
 		// destination is always a memory operand, the displacement
 
 		// an example is useful to think of for this one:
 		// mov %q1, 8(%q2)
-		if (mapping.containsKey(source)) {
-			if (mapping.containsKey(destination.register)) {
+		if (context.isRegister(source)) {
+			if (context.isRegister(destination.register)) {
 				// %q1 = %r12, %q2 = %r13
 				// becomes: mov %r12, 8(%r13)
 				return Collections.singletonList(
 					new MoveRegToRegDisplacement(
-						mapping.get(source),
-						new RegDisplacement(destination.offset, mapping.get(destination.register))
+						context.getRegister(source),
+						new RegDisplacement(destination.offset, context.getRegister(destination.register))
 					)
 				);
 			} else {
@@ -44,31 +42,31 @@ public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplace
 				//   mov %r12, 8(%temp)
 				return Arrays.asList(
 					new MoveBasePointerOffsetToReg(
-						locals.get(destination.register),
-						temporaryImmediate,
+						context.getBasePointer(destination.register),
+						context.getScratchRegister(),
 						source.getSuffix()
 					),
 					new MoveRegToRegDisplacement(
-						temporaryImmediate,
-						new RegDisplacement(destination.offset, temporaryImmediate)
+						context.getScratchRegister(),
+						new RegDisplacement(destination.offset, context.getScratchRegister())
 					)
 				);
 			}
 		} else { // mov %q1, 8(%q2)
-			if (mapping.containsKey(destination.register)) {
+			if (context.isRegister(destination.register)) {
 				// %q1 = -16(%rbp), %q2 = %r14
 				// becomes:
 				// mov -16(%rbp), 8(%r14), which can't be done
 				// mov -16(%rbp), %temp; mov %temp, 8(%r14)
 				return Arrays.asList(
 					new MoveBasePointerOffsetToReg(
-						locals.get(source),
-						temporaryImmediate,
+						context.getBasePointer(source),
+						context.getScratchRegister(),
 						source.getSuffix()
 					),
 					new MoveRegToRegDisplacement(
-						temporaryImmediate,
-						new RegDisplacement(destination.offset, mapping.get(destination.register))
+						context.getScratchRegister(),
+						new RegDisplacement(destination.offset, context.getRegister(destination.register))
 					)
 				);
 			} else {
@@ -87,15 +85,15 @@ public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplace
 
 				return Arrays.asList(
 					new PushBasePointerOffset(
-						locals.get(source)
+						context.getBasePointer(source)
 					),
 					new MoveBasePointerOffsetToReg(
-						locals.get(destination.register),
-						temporaryImmediate,
+						context.getBasePointer(destination.register),
+						context.getScratchRegister(),
 						source.getSuffix()
 					),
 					new PopDisplacement(
-						new RegDisplacement(destination.offset, temporaryImmediate)
+						new RegDisplacement(destination.offset, context.getScratchRegister())
 					)
 				);
 			}

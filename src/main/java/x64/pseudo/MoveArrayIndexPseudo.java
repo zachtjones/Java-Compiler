@@ -1,17 +1,15 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
+import x64.allocation.AllocationContext;
 import x64.instructions.Instruction;
 import x64.instructions.MoveArrayIndexReg;
 import x64.instructions.MoveBasePointerOffsetToReg;
-import x64.operands.BasePointerOffset;
 import x64.operands.X64PseudoRegister;
-import x64.operands.X64Register;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static x64.X64InstructionSize.QUAD;
 
@@ -31,17 +29,15 @@ public class MoveArrayIndexPseudo implements PseudoInstruction {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
 
 		// mov source, (base, index, scaling).
-		if (mapping.containsKey(source)) {
-			if (mapping.containsKey(base)) {
-				if (mapping.containsKey(index)) {
+		if (context.isRegister(source)) {
+			if (context.isRegister(base)) {
+				if (context.isRegister(index)) {
 					// all 3 are hardware registers, just a simple move
 					return Collections.singletonList(
-						new MoveArrayIndexReg(mapping.get(source), mapping.get(base), mapping.get(index),
+						new MoveArrayIndexReg(context.getRegister(source), context.getRegister(base), context.getRegister(index),
 							scaling, source.getSuffix()
 						)
 					);
@@ -49,19 +45,19 @@ public class MoveArrayIndexPseudo implements PseudoInstruction {
 					// source, base are regs, index is a base pointer offset
 					// move the index to temp immediate, then do the indexing operation
 					return Arrays.asList(
-						new MoveBasePointerOffsetToReg(locals.get(index), temporaryImmediate, QUAD),
-						new MoveArrayIndexReg(mapping.get(source), mapping.get(base), temporaryImmediate,
+						new MoveBasePointerOffsetToReg(context.getBasePointer(index), context.getScratchRegister(), QUAD),
+						new MoveArrayIndexReg(context.getRegister(source), context.getRegister(base), context.getScratchRegister(),
 							scaling, source.getSuffix()
 						)
 					);
 				}
 			} else {
-				if (mapping.containsKey(index)) {
+				if (context.isRegister(index)) {
 					// index and source are registers; base is not
 					// move the base to the temp immediate, then do the indexing operation
 					return Arrays.asList(
-						new MoveBasePointerOffsetToReg(locals.get(base), temporaryImmediate, QUAD),
-						new MoveArrayIndexReg(mapping.get(source), temporaryImmediate, mapping.get(index),
+						new MoveBasePointerOffsetToReg(context.getBasePointer(base), context.getScratchRegister(), QUAD),
+						new MoveArrayIndexReg(context.getRegister(source), context.getScratchRegister(), context.getRegister(index),
 							scaling, source.getSuffix()
 						)
 					);
@@ -71,13 +67,13 @@ public class MoveArrayIndexPseudo implements PseudoInstruction {
 				}
 			}
 		} else {
-			if (mapping.containsKey(base)) {
-				if (mapping.containsKey(index)) {
+			if (context.isRegister(base)) {
+				if (context.isRegister(index)) {
 					// base and index are registers, source is not
 					// move source, tempImm; do the indexing operation with tempImm as the source
 					return Arrays.asList(
-						new MoveBasePointerOffsetToReg(locals.get(source), temporaryImmediate, source.getSuffix()),
-						new MoveArrayIndexReg(temporaryImmediate, mapping.get(base), mapping.get(index),
+						new MoveBasePointerOffsetToReg(context.getBasePointer(source), context.getScratchRegister(), source.getSuffix()),
+						new MoveArrayIndexReg(context.getScratchRegister(), context.getRegister(base), context.getRegister(index),
 							scaling, source.getSuffix()
 						)
 					);
@@ -86,7 +82,7 @@ public class MoveArrayIndexPseudo implements PseudoInstruction {
 
 				}
 			} else {
-				if (mapping.containsKey(index)) {
+				if (context.isRegister(index)) {
 					// index is register, source and base are not
 				} else {
 					// none of them are registers, they are all allocated to base pointer offsets.
@@ -106,6 +102,6 @@ public class MoveArrayIndexPseudo implements PseudoInstruction {
 		
 
 		throw new RuntimeException("MoveArrayIndex allocation can't handle the 3 registers."
-			+ mapping.containsKey(source) + mapping.containsKey(base) + mapping.containsKey(index) );
+			+ context.isRegister(source) + context.isRegister(base) + context.isRegister(index) );
 	}
 }

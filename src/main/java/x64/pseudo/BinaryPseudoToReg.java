@@ -33,7 +33,7 @@ public abstract class BinaryPseudoToReg implements PseudoInstruction {
 
 	@Override
 	public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-		mapping.get(source).increment();
+		context.getRegister(source).increment();
 	}
 
 	/** Represents how this instruction should be represented */

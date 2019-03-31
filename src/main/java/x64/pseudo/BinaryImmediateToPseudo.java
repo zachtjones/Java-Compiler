@@ -30,7 +30,7 @@ public abstract class BinaryImmediateToPseudo implements PseudoInstruction {
 
     @Override
     public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-        mapping.get(destination).increment();
+        context.getRegister(destination).increment();
     }
 
     @Override

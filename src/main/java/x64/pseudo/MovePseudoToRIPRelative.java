@@ -20,13 +20,11 @@ public class MovePseudoToRIPRelative extends BinaryPseudoToRIPRelative {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
-		if (mapping.containsKey(source)) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
+		if (context.isRegister(source)) {
 			return Collections.singletonList(
 				new MoveRegToRIPRelative(
-					mapping.get(source),
+					context.getRegister(source),
 					destination,
 					source.getSuffix()
 				)
@@ -35,12 +33,12 @@ public class MovePseudoToRIPRelative extends BinaryPseudoToRIPRelative {
 			// need temp, can't have 2 memory operands in 1 instruction
 			return Arrays.asList(
 				new MoveBasePointerOffsetToReg(
-					locals.get(source),
-					temporaryImmediate,
+					context.getBasePointer(source),
+					context.getScratchRegister(),
 					source.getSuffix()
 				),
 				new MoveRegToRIPRelative(
-					temporaryImmediate,
+					context.getScratchRegister(),
 					destination,
 					source.getSuffix()
 				)

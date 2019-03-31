@@ -31,22 +31,22 @@ public class ComparePseudoPseudo implements PseudoInstruction {
 
     @Override
     public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-        mapping.get(src1).increment();
-        mapping.get(src2).increment();
+        context.getRegister(src1).increment();
+        context.getRegister(src2).increment();
     }
 
     @Override
     public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
                                                         @NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-                                                        @NotNull X64Register temporaryImmediate) {
+                                                        @NotNull X64Register context.getScratchRegister()) {
 
-        if (mapping.containsKey(src1)) {
-            if (mapping.containsKey(src2)) {
+        if (context.isRegister(src1)) {
+            if (context.isRegister(src2)) {
                 // both get mapped to hardware
                 return Collections.singletonList(
                     new CompareRegAndReg(
-                        mapping.get(src1),
-                        mapping.get(src2),
+                        context.getRegister(src1),
+                        context.getRegister(src2),
                         src1.getSuffix()
                     )
                 );
@@ -54,19 +54,19 @@ public class ComparePseudoPseudo implements PseudoInstruction {
                 // first is reg, second is base pointer offset
                 return Collections.singletonList(
                     new CompareRegAndBasePointerOffset(
-                        mapping.get(src1),
-                        locals.get(src2),
+                        context.getRegister(src1),
+                        context.getBasePointer(src2),
                         src1.getSuffix()
                     )
                 );
             }
         } else {
-            if (mapping.containsKey(src2)) {
+            if (context.isRegister(src2)) {
                 // first is base pointer offset, second is reg
                 return Collections.singletonList(
                     new CompareBasePointerOffsetAndReg(
-                        locals.get(src1),
-                        mapping.get(src2),
+                        context.getBasePointer(src1),
+                        context.getRegister(src2),
                         src1.getSuffix()
                     )
                 );
@@ -74,13 +74,13 @@ public class ComparePseudoPseudo implements PseudoInstruction {
                 // move first to the temp, compare temp and src2
                 return Arrays.asList(
                     new MoveBasePointerOffsetToReg(
-                        locals.get(src1),
-                        temporaryImmediate,
+                        context.getBasePointer(src1),
+                        context.getScratchRegister(),
                         src1.getSuffix()
                     ),
                     new CompareRegAndBasePointerOffset(
-                        temporaryImmediate,
-                        locals.get(src2),
+                        context.getScratchRegister(),
+                        context.getBasePointer(src2),
                         src1.getSuffix()
                     )
                 );

@@ -22,17 +22,15 @@ public class ZeroExtendPseudoToPseudo extends BinaryPseudoToPseudo {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
 
-		if (mapping.containsKey(source)) {
-			if (mapping.containsKey(destination)) {
+		if (context.isRegister(source)) {
+			if (context.isRegister(destination)) {
 				// simple move source to destination
 				return Collections.singletonList(
 					new ZeroExtendRegToReg(
-						mapping.get(source),
-						mapping.get(destination),
+						context.getRegister(source),
+						context.getRegister(destination),
 						source.getSuffix(),
 						destination.getSuffix()
 					)
@@ -41,25 +39,25 @@ public class ZeroExtendPseudoToPseudo extends BinaryPseudoToPseudo {
 				// there isn't a sign extend to memory, only source can be memory
 				return Arrays.asList(
 					new ZeroExtendRegToReg(
-						mapping.get(source),
-						temporaryImmediate,
+						context.getRegister(source),
+						context.getScratchRegister(),
 						source.getSuffix(),
 						destination.getSuffix()
 					),
 					new MoveRegToBasePointerOffset(
-						temporaryImmediate,
-						locals.get(destination),
+						context.getScratchRegister(),
+						context.getBasePointer(destination),
 						destination.getSuffix()
 					)
 				);
 			}
 		} else {
-			if (mapping.containsKey(destination)) {
+			if (context.isRegister(destination)) {
 				// can be done with one instruction too
 				return Collections.singletonList(
 					new ZeroExtendBasePointerOffsetToReg(
-						locals.get(source),
-						mapping.get(destination),
+						context.getBasePointer(source),
+						context.getRegister(destination),
 						source.getSuffix(),
 						destination.getSuffix()
 					)
@@ -72,14 +70,14 @@ public class ZeroExtendPseudoToPseudo extends BinaryPseudoToPseudo {
 				// 2. move temporary immediate to base pointer destination
 				return Arrays.asList(
 					new ZeroExtendBasePointerOffsetToReg(
-						locals.get(source),
-						temporaryImmediate,
+						context.getBasePointer(source),
+						context.getScratchRegister(),
 						source.getSuffix(),
 						destination.getSuffix()
 					),
 					new MoveRegToBasePointerOffset(
-						temporaryImmediate,
-						locals.get(destination),
+						context.getScratchRegister(),
+						context.getBasePointer(destination),
 						destination.getSuffix()
 					)
 				);

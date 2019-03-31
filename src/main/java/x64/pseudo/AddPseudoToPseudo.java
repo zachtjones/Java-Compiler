@@ -1,15 +1,13 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
+import x64.allocation.AllocationContext;
 import x64.instructions.*;
-import x64.operands.BasePointerOffset;
-import x64.operands.X64Register;
 import x64.operands.X64PseudoRegister;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class AddPseudoToPseudo extends BinaryPseudoToPseudo {
 	public AddPseudoToPseudo(@NotNull X64PseudoRegister source, @NotNull X64PseudoRegister destination) {
@@ -17,17 +15,15 @@ public class AddPseudoToPseudo extends BinaryPseudoToPseudo {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
 		// example: add %q1, %q2
-		if (mapping.containsKey(source)) {
-			if (mapping.containsKey(destination)) {
+		if (context.isRegister(source)) {
+			if (context.isRegister(destination)) {
 				// add %r1, %r2
 				return Collections.singletonList(
 					new AddRegToReg(
-						mapping.get(source),
-						mapping.get(destination),
+						context.getRegister(source),
+						context.getRegister(destination),
 						destination.getSuffix()
 					)
 				);
@@ -35,19 +31,19 @@ public class AddPseudoToPseudo extends BinaryPseudoToPseudo {
 				// add %r1, -16(%rbp)
 				return Collections.singletonList(
 					new AddRegToBasePointerOffset(
-						mapping.get(source),
-						locals.get(destination),
+						context.getRegister(source),
+						context.getBasePointer(destination),
 						destination.getSuffix()
 					)
 				);
 			}
 		} else {
-			if (mapping.containsKey(destination)) {
+			if (context.isRegister(destination)) {
 				// add -16(%rbp), %r2
 				return Collections.singletonList(
 					new AddBasePointerOffsetToReg(
-						locals.get(source),
-						mapping.get(destination),
+						context.getBasePointer(source),
+						context.getRegister(destination),
 						source.getSuffix())
 				);
 			} else {
@@ -57,13 +53,13 @@ public class AddPseudoToPseudo extends BinaryPseudoToPseudo {
 				// add %temp, -24(%rbp)
 				return Arrays.asList(
 					new MoveBasePointerOffsetToReg(
-						locals.get(source),
-						temporaryImmediate,
+						context.getBasePointer(source),
+						context.getScratchRegister(),
 						source.getSuffix()
 					),
 					new AddRegToBasePointerOffset(
-						temporaryImmediate,
-						locals.get(destination),
+						context.getScratchRegister(),
+						context.getBasePointer(destination),
 						destination.getSuffix()
 					)
 				);

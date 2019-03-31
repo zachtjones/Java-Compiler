@@ -33,20 +33,20 @@ public class ComparePseudoAndImmediate implements PseudoInstruction {
 
     @Override
     public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-        mapping.get(src1).increment();
+        context.getRegister(src1).increment();
     }
 
     @Override
     public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
                                                         @NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-                                                        @NotNull X64Register temporaryImmediate) {
-        if (mapping.containsKey(src1)) {
+                                                        @NotNull X64Register context.getScratchRegister()) {
+        if (context.isRegister(src1)) {
             return Collections.singletonList(
-                new CompareRegAndImm(mapping.get(src1), src2, src1.getSuffix())
+                new CompareRegAndImm(context.getRegister(src1), src2, src1.getSuffix())
             );
         } else {
             return Collections.singletonList(
-                new CompareBasePointerOffsetAndImm(locals.get(src1), src2, src1.getSuffix())
+                new CompareBasePointerOffsetAndImm(context.getBasePointer(src1), src2, src1.getSuffix())
             );
         }
     }

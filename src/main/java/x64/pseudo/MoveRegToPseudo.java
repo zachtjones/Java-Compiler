@@ -20,14 +20,12 @@ public class MoveRegToPseudo extends BinaryRegToPseudoReg {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
-		if (mapping.containsKey(destination)) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
+		if (context.isRegister(destination)) {
 			return Collections.singletonList(
 				new MoveRegToReg(
 					source,
-					mapping.get(destination),
+					context.getRegister(destination),
 					destination.getSuffix()
 				)
 			);
@@ -35,7 +33,7 @@ public class MoveRegToPseudo extends BinaryRegToPseudoReg {
 			return Collections.singletonList(
 				new MoveRegToBasePointerOffset(
 					source,
-					locals.get(destination),
+					context.getBasePointer(destination),
 					destination.getSuffix()
 				)
 			);

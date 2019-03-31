@@ -31,21 +31,21 @@ public class SetConditionPseudo implements PseudoInstruction {
 
     @Override
     public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-        mapping.get(destination).increment();
+        context.getRegister(destination).increment();
     }
 
     @Override
     public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
                                                         @NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-                                                        @NotNull X64Register temporaryImmediate) {
+                                                        @NotNull X64Register context.getScratchRegister()) {
 
-        if (mapping.containsKey(destination)) {
+        if (context.isRegister(destination)) {
             return Collections.singletonList(
-                new SetConditionReg(type, mapping.get(destination))
+                new SetConditionReg(type, context.getRegister(destination))
             );
         } else {
             return Collections.singletonList(
-                new SetConditionBasePointerOffset(type, locals.get(destination))
+                new SetConditionBasePointerOffset(type, context.getBasePointer(destination))
             );
         }
     }

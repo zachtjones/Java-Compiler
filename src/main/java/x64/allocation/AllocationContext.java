@@ -12,7 +12,7 @@ public class AllocationContext {
 	@NotNull private final Map<X64PseudoRegister, BasePointerOffset> locals;
 	@NotNull private final X64Register scratchRegisters;
 
-	public AllocationContext(@NotNull Map<X64PseudoRegister, X64Register> mapping,
+	AllocationContext(@NotNull Map<X64PseudoRegister, X64Register> mapping,
 							 @NotNull Map<X64PseudoRegister, BasePointerOffset> offsets,
 							 @NotNull X64Register scratchRegisters) {
 
@@ -31,5 +31,9 @@ public class AllocationContext {
 
 	public BasePointerOffset getBasePointer(X64PseudoRegister pseudo) {
 		return locals.get(pseudo);
+	}
+
+	public X64Register getScratchRegister() {
+		return scratchRegisters;
 	}
 }

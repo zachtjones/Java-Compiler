@@ -24,9 +24,7 @@ public class ConvertPseudoToPseudo implements PseudoInstruction {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
 		// instruction notes:
 		//  CVTSS2SD -- scalar single -> scalar double
 		//  cvtsd2ss -- scalar double -> scalar single
@@ -51,7 +49,7 @@ public class ConvertPseudoToPseudo implements PseudoInstruction {
 
 		// truncation of integral types -- simple read as smaller type in a later instruction
 		X64PseudoRegister newDest = new X64PseudoRegister(destination.getNumber(), source.getSuffix());
-		return new MovePseudoToPseudo(source, newDest).allocate(mapping, locals, temporaryImmediate);
+		return new MovePseudoToPseudo(source, newDest).allocate(mapping, locals, context.getScratchRegister());
 	}
 
 	@Override
@@ -67,7 +65,7 @@ public class ConvertPseudoToPseudo implements PseudoInstruction {
 
 	@Override
 	public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-		mapping.get(source).increment();
-		mapping.get(destination).increment();
+		context.getRegister(source).increment();
+		context.getRegister(destination).increment();
 	}
 }

@@ -22,17 +22,15 @@ public class MovePseudoToPseudo extends BinaryPseudoToPseudo {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
 
-		if (mapping.containsKey(source)) {
-			if (mapping.containsKey(destination)) {
+		if (context.isRegister(source)) {
+			if (context.isRegister(destination)) {
 				// both are real registers
 				return Collections.singletonList(
 					new MoveRegToReg(
-						mapping.get(source),
-						mapping.get(destination),
+						context.getRegister(source),
+						context.getRegister(destination),
 						destination.getSuffix()
 					)
 				);
@@ -40,19 +38,19 @@ public class MovePseudoToPseudo extends BinaryPseudoToPseudo {
 				// destination is a local
 				return Collections.singletonList(
 					new MoveRegToBasePointerOffset(
-						mapping.get(source),
-						locals.get(destination),
+						context.getRegister(source),
+						context.getBasePointer(destination),
 						destination.getSuffix()
 					)
 				);
 			}
 		} else {
-			if (mapping.containsKey(destination)) {
+			if (context.isRegister(destination)) {
 				// source -- base pointer, destination, real
 				return Collections.singletonList(
 					new MoveBasePointerOffsetToReg(
-						locals.get(source),
-						mapping.get(destination),
+						context.getBasePointer(source),
+						context.getRegister(destination),
 						destination.getSuffix()
 					)
 				);
@@ -60,13 +58,13 @@ public class MovePseudoToPseudo extends BinaryPseudoToPseudo {
 				// both are base pointer offset, need to use the temporary one
 				return Arrays.asList(
 					new MoveBasePointerOffsetToReg(
-						locals.get(source),
-						temporaryImmediate,
+						context.getBasePointer(source),
+						context.getScratchRegister(),
 						destination.getSuffix()
 					),
 					new MoveRegToBasePointerOffset(
-						temporaryImmediate,
-						locals.get(destination),
+						context.getScratchRegister(),
+						context.getBasePointer(destination),
 						destination.getSuffix()
 					)
 				);
