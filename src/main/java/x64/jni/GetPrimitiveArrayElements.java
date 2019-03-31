@@ -1,5 +1,6 @@
 package x64.jni;
 
+import helper.Types;
 import intermediate.Register;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
@@ -19,8 +20,9 @@ public interface GetPrimitiveArrayElements extends CallJNIMethod {
 	 * @param array The array that is going to be accessed.
 	 * @return The register that holds the buffer allocated by the JVM.
 	 */
-	default X64PseudoRegister addGetPrimitiveArrayElements(@NotNull X64Context context, Register array) {
-		JNIOffsets offset = JNIOffsets.getPrimitiveArrayElementsOffset(array.getType());
+	default X64PseudoRegister addGetPrimitiveArrayElements(@NotNull X64Context context, @NotNull Register array,
+														   @NotNull Types elementType) {
+		JNIOffsets offset = JNIOffsets.getPrimitiveArrayElementsOffset(elementType);
 
 		// arg 1: JNI*
 		context.loadJNI1();
