@@ -2,19 +2,16 @@ package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.AllocationContext;
-import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 import x64.instructions.CallRegDisplacement;
 import x64.instructions.Instruction;
 import x64.instructions.MoveBasePointerOffsetToReg;
 import x64.operands.PseudoDisplacement;
 import x64.operands.RegDisplacement;
-import x64.operands.X64PseudoRegister;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static x64.X64InstructionSize.QUAD;
 
@@ -52,11 +49,6 @@ public class CallPseudoDisplacement implements PseudoInstruction {
 				new CallRegDisplacement(new RegDisplacement(temp.offset, context.getScratchRegister()))
 			);
 		}
-	}
-
-	@Override
-	public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-		context.getRegister(temp.register).increment();
 	}
 
 	@Override

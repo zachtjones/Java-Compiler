@@ -1,15 +1,12 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
-import x64.allocation.RegisterMapped;
+import x64.allocation.AllocationContext;
 import x64.allocation.RegistersUsed;
 import x64.instructions.Instruction;
-import x64.operands.BasePointerOffset;
 import x64.operands.X64PseudoRegister;
-import x64.operands.X64Register;
 
 import java.util.List;
-import java.util.Map;
 
 /** Represents a conversion (truncation) of source -> destination.
  * Note that is the conversion is not to a smaller type, then allocation to real regs will be undefined. */
@@ -49,7 +46,7 @@ public class ConvertPseudoToPseudo implements PseudoInstruction {
 
 		// truncation of integral types -- simple read as smaller type in a later instruction
 		X64PseudoRegister newDest = new X64PseudoRegister(destination.getNumber(), source.getSuffix());
-		return new MovePseudoToPseudo(source, newDest).allocate(mapping, locals, context.getScratchRegister());
+		return new MovePseudoToPseudo(source, newDest).allocate(context);
 	}
 
 	@Override
@@ -61,11 +58,5 @@ public class ConvertPseudoToPseudo implements PseudoInstruction {
 	public void markRegisters(int i, RegistersUsed usedRegs) {
 		usedRegs.markUsed(source, i);
 		usedRegs.markDefined(destination, i);
-	}
-
-	@Override
-	public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-		context.getRegister(source).increment();
-		context.getRegister(destination).increment();
 	}
 }

@@ -1,12 +1,9 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
-import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
-import x64.operands.X64Register;
 import x64.operands.X64PseudoRegister;
-
-import java.util.Map;
+import x64.operands.X64Register;
 
 /***
  * Represents a binary instruction that involves a pseudo register source and native register destination.
@@ -29,11 +26,6 @@ public abstract class BinaryRegToPseudoReg implements PseudoInstruction {
 	@Override
 	public void markRegisters(int i, RegistersUsed usedRegs) {
 		usedRegs.markDefined(destination, i);
-	}
-
-	@Override
-	public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-		context.getRegister(destination).increment();
 	}
 
 	/** Represents how this instruction should be represented */

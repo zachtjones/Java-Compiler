@@ -1,16 +1,15 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
+import x64.allocation.AllocationContext;
 import x64.instructions.Instruction;
 import x64.instructions.MoveBasePointerOffsetToReg;
 import x64.instructions.MoveRegToReg;
-import x64.operands.BasePointerOffset;
-import x64.operands.X64Register;
 import x64.operands.X64PseudoRegister;
+import x64.operands.X64Register;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class MovePseudoToReg extends BinaryPseudoToReg {
 

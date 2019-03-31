@@ -1,19 +1,16 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
-import x64.allocation.RegisterMapped;
+import x64.allocation.AllocationContext;
 import x64.allocation.RegistersUsed;
 import x64.instructions.CompareBasePointerOffsetAndImm;
 import x64.instructions.CompareRegAndImm;
 import x64.instructions.Instruction;
-import x64.operands.BasePointerOffset;
 import x64.operands.Immediate;
 import x64.operands.X64PseudoRegister;
-import x64.operands.X64Register;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class ComparePseudoAndImmediate implements PseudoInstruction {
 
@@ -32,14 +29,7 @@ public class ComparePseudoAndImmediate implements PseudoInstruction {
     }
 
     @Override
-    public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-        context.getRegister(src1).increment();
-    }
-
-    @Override
-    public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-                                                        @NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-                                                        @NotNull X64Register context.getScratchRegister()) {
+    public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
         if (context.isRegister(src1)) {
             return Collections.singletonList(
                 new CompareRegAndImm(context.getRegister(src1), src2, src1.getSuffix())

@@ -8,31 +8,45 @@ import java.util.TreeSet;
 
 public class RegistersUsed {
 
-	// map of 1 register -> many usages
-	private Map<X64PseudoRegister, TreeSet<Integer>> usages;
+	// map of 1 register -> many gets
+	private Map<X64PseudoRegister, TreeSet<Integer>> gets;
 
-	private Map<X64PseudoRegister, TreeSet<Integer>> definition;
+	private Map<X64PseudoRegister, TreeSet<Integer>> sets;
+
+	// map of pseudo to the number of times it is used.
+	private Map<X64PseudoRegister, Integer> numberUsages;
 
 	private TreeSet<Integer> functionCallLines;
 
 	public RegistersUsed() {
-		usages = new HashMap<>();
-		definition = new HashMap<>();
+		gets = new HashMap<>();
+		sets = new HashMap<>();
 		functionCallLines = new TreeSet<>();
+		numberUsages = new HashMap<>();
 	}
 
 	/** Marks a register as being used at line */
 	public void markUsed(X64PseudoRegister used, int line) {
-		TreeSet<Integer> mapping = usages.getOrDefault(used, new TreeSet<>());
+		TreeSet<Integer> mapping = gets.getOrDefault(used, new TreeSet<>());
 		mapping.add(line);
-		usages.putIfAbsent(used, mapping);
+		gets.putIfAbsent(used, mapping);
+		updateUsage(used);
 	}
 
 	/** Marks a register as being defined at line (aka given a value) */
 	public void markDefined(X64PseudoRegister defined, int line) {
-		TreeSet<Integer> mapping = definition.getOrDefault(defined, new TreeSet<>());
+		TreeSet<Integer> mapping = sets.getOrDefault(defined, new TreeSet<>());
 		mapping.add(line);
-		definition.putIfAbsent(defined, mapping);
+		sets.putIfAbsent(defined, mapping);
+		updateUsage(defined);
+	}
+
+	/** Increases the number of times that a register is used.
+	 * @param reg The register that is either get or set. */
+	private void updateUsage(X64PseudoRegister reg) {
+		Integer count = numberUsages.getOrDefault(reg, 0);
+		count++;
+		numberUsages.put(reg, count);
 	}
 
 	/** Marks a function call occurring at the line specified */
@@ -42,12 +56,12 @@ public class RegistersUsed {
 
 	/** Returns the index of the instruction that last uses the register */
 	private int getLastUsage(X64PseudoRegister register) {
-		return usages.get(register).last();
+		return gets.get(register).last();
 	}
 
 	/** Returns the index of the instruction that last uses the register */
 	private int getFirstDefinition(X64PseudoRegister register) {
-		return definition.get(register).first();
+		return sets.get(register).first();
 	}
 
 	/** Utility method for determining if a register in the function can be temporary */
@@ -55,7 +69,7 @@ public class RegistersUsed {
 
 		// TODO this will be more complicated with branches backwards
 
-		if (usages.containsKey(register)) {
+		if (gets.containsKey(register)) {
 			int defined = getFirstDefinition(register);
 			int lastUsed = getLastUsage(register);
 
@@ -71,21 +85,21 @@ public class RegistersUsed {
 
 	/**
 	 * Returns a mapping of line offset to the register that is last used at that line.
-	 * There will be no mapping for a line which has no last usages of a register.
+	 * There will be no mapping for a line which has no last gets of a register.
 	 */
 	Map<Integer, X64PseudoRegister> getLastUsages() {
 		HashMap<Integer, X64PseudoRegister> used = new HashMap<>();
-		usages.forEach((register, integers) -> used.put(integers.last(), register));
+		gets.forEach((register, integers) -> used.put(integers.last(), register));
 		return used;
 	}
 
 	/**
 	 * Returns a mapping of the line offset to the register that is defined at that line.
-	 * There will be no mapping for a line which has no definition of a register.
+	 * There will be no mapping for a line which has no sets of a register.
 	 */
 	Map<Integer, X64PseudoRegister> getDefinitions() {
 		HashMap<Integer, X64PseudoRegister> temp = new HashMap<>();
-		definition.forEach(((register, integers) -> temp.put(integers.first(), register)));
+		sets.forEach(((register, integers) -> temp.put(integers.first(), register)));
 		return temp;
 	}
 }

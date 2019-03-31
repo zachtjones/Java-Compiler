@@ -1,12 +1,9 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
-import x64.allocation.RegisterMapped;
 import x64.allocation.RegistersUsed;
 import x64.operands.Immediate;
 import x64.operands.X64PseudoRegister;
-
-import java.util.Map;
 
 /** Represents a binary instruction that uses an immediate source and a pseudo register destination. */
 public abstract class BinaryImmediateToPseudo implements PseudoInstruction {
@@ -26,11 +23,6 @@ public abstract class BinaryImmediateToPseudo implements PseudoInstruction {
     @Override
     public void markRegisters(int i, RegistersUsed usedRegs) {
         usedRegs.markDefined(destination, i);
-    }
-
-    @Override
-    public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-        context.getRegister(destination).increment();
     }
 
     @Override

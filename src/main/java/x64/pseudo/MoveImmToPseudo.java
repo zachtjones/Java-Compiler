@@ -1,17 +1,15 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
+import x64.allocation.AllocationContext;
 import x64.instructions.Instruction;
 import x64.instructions.MoveImmToBasePointerOffset;
 import x64.instructions.MoveImmToReg;
-import x64.operands.BasePointerOffset;
 import x64.operands.Immediate;
-import x64.operands.X64Register;
 import x64.operands.X64PseudoRegister;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class MoveImmToPseudo extends BinaryImmediateToPseudo {
 
