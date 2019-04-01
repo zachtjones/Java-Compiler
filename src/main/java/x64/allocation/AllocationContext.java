@@ -1,6 +1,7 @@
 package x64.allocation;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import x64.operands.BasePointerOffset;
 import x64.operands.X64PseudoRegister;
 import x64.operands.X64Register;
@@ -10,21 +11,25 @@ import java.util.Map;
 public class AllocationContext {
 	@NotNull private final Map<X64PseudoRegister, X64Register> mapping;
 	@NotNull private final Map<X64PseudoRegister, BasePointerOffset> locals;
-	@NotNull private final X64Register scratchRegisters;
+	@NotNull private final X64Register scratchRegister;
+	@Nullable private final X64Register secondScratch;
 
 	/**
 	 * Holds the information that is required to map out the registers to hardware ones.
 	 * @param mapping The registers that are mapped to hardware registers directly.
 	 * @param offsets The ones that are mapped to base pointer offsets.
-	 * @param scratchRegisters The scratch register to use when needed.
+	 * @param scratchRegister The scratch register to use when needed.
+	 * @param scratchRegister2 The second scratch register if needed.
 	 */
 	AllocationContext(@NotNull Map<X64PseudoRegister, X64Register> mapping,
 							 @NotNull Map<X64PseudoRegister, BasePointerOffset> offsets,
-							 @NotNull X64Register scratchRegisters) {
+							 @NotNull X64Register scratchRegister,
+					  @Nullable X64Register scratchRegister2) {
 
 		this.mapping = mapping;
 		this.locals = offsets;
-		this.scratchRegisters = scratchRegisters;
+		this.scratchRegister = scratchRegister;
+		this.secondScratch = scratchRegister2;
 	}
 
 	/** Utility method for determining if the pseudo get mapped to a hardware register.*/
@@ -44,7 +49,13 @@ public class AllocationContext {
 	}
 
 	/** Returns the scratch register. Used when we would have 2 memory operands in one instruction. */
-	public X64Register getScratchRegister() {
-		return scratchRegisters;
+	@NotNull public X64Register getScratchRegister() {
+		return scratchRegister;
+	}
+
+	/** Returns the second scratch register. Throws an exception if there aren't two */
+	@NotNull public X64Register getSecondScratch() throws NotSecondScratchException {
+		if (secondScratch == null) throw new NotSecondScratchException();
+		return secondScratch;
 	}
 }

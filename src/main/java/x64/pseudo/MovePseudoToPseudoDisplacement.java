@@ -2,6 +2,7 @@ package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.AllocationContext;
+import x64.allocation.NotSecondScratchException;
 import x64.instructions.*;
 import x64.operands.PseudoDisplacement;
 import x64.operands.RegDisplacement;
@@ -10,6 +11,8 @@ import x64.operands.X64PseudoRegister;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static x64.X64InstructionSize.QUAD;
 
 public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplacement {
 
@@ -20,7 +23,8 @@ public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplace
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context)
+		throws NotSecondScratchException {
 
 		// destination is always a memory operand, the displacement
 
@@ -80,22 +84,20 @@ public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplace
 				//  mov -16(%rbp), %temp2  # destination loaded
 				//  mov %temp1, 8(%temp2)
 
-				// instead can push/pop from stack: (may complicate optimizations)
-				//   push -24(%rbp)
-				//   mov  -16(%rbp), %temp
-				//   pop  8(%temp)
-
 				return Arrays.asList(
-					new PushBasePointerOffset(
-						context.getBasePointer(source)
-					),
 					new MoveBasePointerOffsetToReg(
-						context.getBasePointer(destination.register),
+						context.getBasePointer(source),
 						context.getScratchRegister(),
 						source.getSuffix()
 					),
-					new PopDisplacement(
-						new RegDisplacement(destination.offset, context.getScratchRegister())
+					new MoveBasePointerOffsetToReg(
+						context.getBasePointer(destination.register),
+						context.getSecondScratch(),
+						QUAD
+					),
+					new MoveRegToRegDisplacement(
+						context.getScratchRegister(),
+						new RegDisplacement(destination.offset, context.getSecondScratch())
 					)
 				);
 			}

@@ -2,6 +2,7 @@ package x64.allocation;
 
 import helper.MapUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
 import x64.instructions.*;
 import x64.operands.BasePointerOffset;
@@ -11,7 +12,6 @@ import x64.operands.X64Register;
 import x64.pseudo.PseudoInstruction;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static x64.X64InstructionSize.QUAD;
 import static x64.allocation.CallingConvention.preservedRegistersNotRBP;
@@ -129,11 +129,13 @@ public class RegisterTransformer {
 			Map<X64PseudoRegister, X64Register> nativeMapping = getNatives(maxTemp, mapping);
 
 			// obtain the new list of instructions, with them swapped out
-			AllocationContext context = new AllocationContext(nativeMapping, new HashMap<>(), R10);
-			List<Instruction> results = initialContents.stream()
-				.map(i -> i.allocate(context))
-				.flatMap(Collection::stream)
-				.collect(Collectors.toList());
+			AllocationContext context = new AllocationContext(nativeMapping, new HashMap<>(), R10, R11);
+			List<Instruction> results = new ArrayList<>();
+			try {
+				for (PseudoInstruction i : initialContents) {
+					results.addAll(i.allocate(context));
+				}
+			} catch (NotSecondScratchException ignored) {} // won't happen
 
 			// determine the function prologue and epilogue
 			AllocationUnit au = new AllocationUnit(results);
@@ -268,7 +270,35 @@ public class RegisterTransformer {
 		LinkedList<X64Register> tempsLeft = new LinkedList<>(tempsAvailable);
 
 		// this particular register is available for transitions of memory to memory to 2 instructions
-		final X64Register temporaryIntermediate = tempsLeft.remove(0);
+		final X64Register scratchRegister = tempsLeft.removeFirst();
+
+		try {
+			// create a copy of priorities and tempsLeft
+			TreeSet<RegisterMapped> copyPriorities = new TreeSet<>(priorities);
+			LinkedList<X64Register> copyTempsLeft = new LinkedList<>(tempsLeft);
+
+			return 8 * map(mapping, copyPriorities, copyTempsLeft, scratchRegister, null);
+
+		} catch (NotSecondScratchException e) {
+			// need to allocate a second
+			X64Register secondScratch = tempsLeft.removeFirst();
+
+			try {
+				return 8 * map(mapping, priorities, tempsLeft, scratchRegister, secondScratch);
+
+				// exception shouldn't happen here
+			} catch (NotSecondScratchException e2) {
+				throw new RuntimeException("There wasn't a second scratch register when there should have been.", e2);
+			}
+		}
+
+
+	}
+
+	private int map(@NotNull HashMap<X64PseudoRegister, RegisterMapped> mapping,
+					@NotNull TreeSet<RegisterMapped> priorities, @NotNull LinkedList<X64Register> tempsLeft,
+					@NotNull X64Register scratchRegister,
+					@Nullable X64Register scratchRegister2) throws NotSecondScratchException {
 
 		LinkedList<X64Register> preservedLeft = new LinkedList<>(Arrays.asList(preservedRegistersNotRBP()));
 
@@ -298,14 +328,16 @@ public class RegisterTransformer {
 
 		HashMap<X64PseudoRegister, X64Register> natives = MapUtils.map(mapping, nativeAllocations);
 		HashMap<X64PseudoRegister, BasePointerOffset> locals = MapUtils.map(mapping, basePointerOffsets);
-		AllocationContext context = new AllocationContext(natives, locals, temporaryIntermediate);
+		AllocationContext context = new AllocationContext(natives, locals, scratchRegister, scratchRegister2);
 
-		this.results = initialContents.stream()
-			.map(i -> i.allocate(context)) // Stream<List<Instruction>>
-			.flatMap(Collection::stream) // 'flattens' the stream of lists into a stream of instructions
-			.collect(Collectors.toList());
+		// Stream<List<Instruction>>
+		// 'flattens' the stream of lists into a stream of instructions
+		results = new ArrayList<>();
+		for (PseudoInstruction i : initialContents) {
+			results.addAll(i.allocate(context));
+		}
 
-		return stackNumberAllocated * 8;
+		return stackNumberAllocated;
 	}
 }
 

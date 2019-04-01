@@ -2,6 +2,7 @@ package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.AllocationContext;
+import x64.allocation.NotSecondScratchException;
 import x64.allocation.RegistersUsed;
 import x64.instructions.Instruction;
 
@@ -24,8 +25,10 @@ public interface PseudoInstruction {
      * @param context The context that holds which registers are mapped to which ones.
      * @return A list of the instructions that result in the allocation.
      * This will be a list of 1+ elements, usually 2 if there's 2 memory operands, but could be more for edge cases.
+     * @throws NotSecondScratchException When the allocation requires 2 scratch registers.
+     * A second attempt will be made with two scratch registers later.
      */
-    @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context);
+    @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) throws NotSecondScratchException;
 
     /** Represents how this instruction should be represented in x64 assembly */
     String toString();
