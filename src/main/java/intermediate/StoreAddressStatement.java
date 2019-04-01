@@ -11,7 +11,7 @@ import x64.jni.*;
 import x64.operands.PseudoDisplacement;
 import x64.operands.RIPRelativeData;
 import x64.operands.X64PseudoRegister;
-import x64.pseudo.MoveArrayIndexPseudo;
+import x64.pseudo.MovePseudoToArrayIndex;
 import x64.pseudo.MovePseudoToPseudo;
 import x64.pseudo.MovePseudoToPseudoDisplacement;
 import x64.pseudo.MovePseudoToRIPRelative;
@@ -163,7 +163,7 @@ public class StoreAddressStatement implements InterStatement,
 				//  set the memory at the buffer+index*scaling
 				// mov %source, (%baseReg, %indexReg, scale factor)
 				context.addInstruction(
-					new MoveArrayIndexPseudo(
+					new MovePseudoToArrayIndex(
 						intermediate.toX64(),
 						buffer,
 						index.toX64(),
