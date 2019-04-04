@@ -1,15 +1,14 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
-import x64.allocation.AllocationContext;
-import x64.instructions.Instruction;
+import x64.instructions.BinaryImmToBPOffset;
+import x64.instructions.BinaryImmToReg;
 import x64.instructions.MoveImmToBPOffset;
 import x64.instructions.MoveImmToReg;
+import x64.operands.BPOffset;
 import x64.operands.Immediate;
 import x64.operands.X64PseudoRegister;
-
-import java.util.Collections;
-import java.util.List;
+import x64.operands.X64Register;
 
 public class MoveImmToPseudo extends BinaryImmToPseudo {
 
@@ -18,22 +17,12 @@ public class MoveImmToPseudo extends BinaryImmToPseudo {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
-		if (context.isRegister(destination)) {
-			return Collections.singletonList(
-				new MoveImmToReg(
-					source,
-					context.getRegister(destination),
-					destination.getSuffix()
-				)
-			);
-		} else {
-			return Collections.singletonList(
-				new MoveImmToBPOffset(
-					source,
-					context.getBasePointer(destination)
-				)
-			);
-		}
+	BinaryImmToReg createThisImmToReg(@NotNull Immediate source, @NotNull X64Register destination) {
+		return new MoveImmToReg(source, destination, this.destination.getSuffix());
+	}
+
+	@Override
+	BinaryImmToBPOffset createThisImmToBPOffset(@NotNull Immediate source, @NotNull BPOffset destination) {
+		return new MoveImmToBPOffset(source, destination);
 	}
 }
