@@ -1,14 +1,14 @@
 package x64.operands;
 
 /**
- * Represents a negative integer displacement from the register base pointer.
+ * Represents a negative integer displacement from the base pointer register.
  */
-public class BasePointerOffset {
+public class BPOffset {
 
 	private final int offset;
 
 	/** The offset in bytes, this should be a multiple of 8 and negative */
-	public BasePointerOffset(int offset) {
+	public BPOffset(int offset) {
 		this.offset = offset;
 	}
 

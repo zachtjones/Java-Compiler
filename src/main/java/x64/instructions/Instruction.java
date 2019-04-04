@@ -26,7 +26,7 @@ public abstract class Instruction implements PseudoInstruction {
 	public abstract String assemblyRepresentation();
 
 	/** Same as AssemblyRepresentation */
-	public final String toString() {
+	public String toString() {
 		return assemblyRepresentation();
 	}
 }

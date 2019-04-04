@@ -3,7 +3,7 @@ package x64.pseudo;
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.AllocationContext;
 import x64.instructions.Instruction;
-import x64.instructions.MoveImmToBasePointerOffset;
+import x64.instructions.MoveImmToBPOffset;
 import x64.instructions.MoveImmToReg;
 import x64.operands.Immediate;
 import x64.operands.X64PseudoRegister;
@@ -11,7 +11,7 @@ import x64.operands.X64PseudoRegister;
 import java.util.Collections;
 import java.util.List;
 
-public class MoveImmToPseudo extends BinaryImmediateToPseudo {
+public class MoveImmToPseudo extends BinaryImmToPseudo {
 
 	public MoveImmToPseudo(@NotNull Immediate source, @NotNull X64PseudoRegister destination) {
 		super("mov", source, destination);
@@ -29,7 +29,7 @@ public class MoveImmToPseudo extends BinaryImmediateToPseudo {
 			);
 		} else {
 			return Collections.singletonList(
-				new MoveImmToBasePointerOffset(
+				new MoveImmToBPOffset(
 					source,
 					context.getBasePointer(destination)
 				)

@@ -42,7 +42,7 @@ public class ComparePseudoPseudo implements PseudoInstruction {
             } else {
                 // first is reg, second is base pointer offset
                 return Collections.singletonList(
-                    new CompareRegAndBasePointerOffset(
+                    new CompareRegAndBPOffset(
                         context.getRegister(src1),
                         context.getBasePointer(src2),
                         src1.getSuffix()
@@ -53,7 +53,7 @@ public class ComparePseudoPseudo implements PseudoInstruction {
             if (context.isRegister(src2)) {
                 // first is base pointer offset, second is reg
                 return Collections.singletonList(
-                    new CompareBasePointerOffsetAndReg(
+                    new CompareBPOffsetAndReg(
                         context.getBasePointer(src1),
                         context.getRegister(src2),
                         src1.getSuffix()
@@ -62,12 +62,12 @@ public class ComparePseudoPseudo implements PseudoInstruction {
             } else {
                 // move first to the temp, compare temp and src2
                 return Arrays.asList(
-                    new MoveBasePointerOffsetToReg(
+                    new MoveBPOffsetToReg(
                         context.getBasePointer(src1),
                         context.getScratchRegister(),
                         src1.getSuffix()
                     ),
-                    new CompareRegAndBasePointerOffset(
+                    new CompareRegAndBPOffset(
                         context.getScratchRegister(),
                         context.getBasePointer(src2),
                         src1.getSuffix()

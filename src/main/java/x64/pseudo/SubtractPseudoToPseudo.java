@@ -1,9 +1,8 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
-import x64.X64InstructionSize;
 import x64.instructions.*;
-import x64.operands.BasePointerOffset;
+import x64.operands.BPOffset;
 import x64.operands.X64PseudoRegister;
 import x64.operands.X64Register;
 
@@ -13,17 +12,17 @@ public class SubtractPseudoToPseudo extends BinaryPseudoToPseudo {
 	}
 
 	@Override
-	@NotNull BinaryRegToReg createThisRegToReg(@NotNull X64Register source, @NotNull X64Register destination, @NotNull X64InstructionSize size) {
-		return new SubtractRegToReg(source, destination, size);
+	@NotNull BinaryRegToReg createThisRegToReg(@NotNull X64Register source, @NotNull X64Register destination) {
+		return new SubtractRegToReg(source, destination, this.source.getSuffix());
 	}
 
 	@Override
-	@NotNull BinaryRegToBasePointerOffset createThisRegToBPOffset(@NotNull X64Register source, @NotNull BasePointerOffset destination, @NotNull X64InstructionSize size) {
-		return new SubtractRegToBasePointerOffset(source, destination, size);
+	@NotNull BinaryRegToBPOffset createThisRegToBPOffset(@NotNull X64Register source, @NotNull BPOffset destination) {
+		return new SubtractRegToBPOffset(source, destination, this.source.getSuffix());
 	}
 
 	@Override
-	@NotNull BinaryBasePointerOffsetToReg createThisBPOffsetToReg(@NotNull BasePointerOffset source, @NotNull X64Register destination, @NotNull X64InstructionSize size) {
-		return new SubtractBasePointerOffsetToReg(source, destination, size);
+	@NotNull BinaryBPOffsetToReg createThisBPOffsetToReg(@NotNull BPOffset source, @NotNull X64Register destination) {
+		return new SubtractBPOffsetToReg(source, destination, this.source.getSuffix());
 	}
 }

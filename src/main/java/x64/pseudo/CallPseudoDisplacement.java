@@ -5,7 +5,7 @@ import x64.allocation.AllocationContext;
 import x64.allocation.RegistersUsed;
 import x64.instructions.CallRegDisplacement;
 import x64.instructions.Instruction;
-import x64.instructions.MoveBasePointerOffsetToReg;
+import x64.instructions.MoveBPOffsetToReg;
 import x64.operands.PseudoDisplacement;
 import x64.operands.RegDisplacement;
 
@@ -45,7 +45,7 @@ public class CallPseudoDisplacement implements PseudoInstruction {
 			return Arrays.asList(
 				// can't to a displacement of a displacement of the base pointer
 				//  also we know it's going to be a quad word since address
-				new MoveBasePointerOffsetToReg(context.getBasePointer(temp.register), context.getScratchRegister(), QUAD),
+				new MoveBPOffsetToReg(context.getBasePointer(temp.register), context.getScratchRegister(), QUAD),
 				new CallRegDisplacement(new RegDisplacement(temp.offset, context.getScratchRegister()))
 			);
 		}

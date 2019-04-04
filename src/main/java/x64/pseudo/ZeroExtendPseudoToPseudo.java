@@ -2,9 +2,10 @@ package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.AllocationContext;
+import x64.allocation.RegistersUsed;
 import x64.instructions.Instruction;
-import x64.instructions.MoveRegToBasePointerOffset;
-import x64.instructions.ZeroExtendBasePointerOffsetToReg;
+import x64.instructions.MoveRegToBPOffset;
+import x64.instructions.ZeroExtendBPOffsetToReg;
 import x64.instructions.ZeroExtendRegToReg;
 import x64.operands.X64PseudoRegister;
 
@@ -12,11 +13,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class ZeroExtendPseudoToPseudo extends BinaryPseudoToPseudo {
+public class ZeroExtendPseudoToPseudo implements PseudoInstruction {
+
+	@NotNull private final X64PseudoRegister source, destination;
 
 	public ZeroExtendPseudoToPseudo(@NotNull X64PseudoRegister source, @NotNull X64PseudoRegister destination) {
 		// move with zero extension
-		super("movz", source, destination);
+		this.source = source;
+		this.destination = destination;
+	}
+
+	@Override
+	public void markRegisters(int i, RegistersUsed usedRegs) {
+		usedRegs.markUsed(source,i);
+		usedRegs.markDefined(destination, i);
 	}
 
 	@Override
@@ -42,7 +52,7 @@ public class ZeroExtendPseudoToPseudo extends BinaryPseudoToPseudo {
 						source.getSuffix(),
 						destination.getSuffix()
 					),
-					new MoveRegToBasePointerOffset(
+					new MoveRegToBPOffset(
 						context.getScratchRegister(),
 						context.getBasePointer(destination),
 						destination.getSuffix()
@@ -53,7 +63,7 @@ public class ZeroExtendPseudoToPseudo extends BinaryPseudoToPseudo {
 			if (context.isRegister(destination)) {
 				// can be done with one instruction too
 				return Collections.singletonList(
-					new ZeroExtendBasePointerOffsetToReg(
+					new ZeroExtendBPOffsetToReg(
 						context.getBasePointer(source),
 						context.getRegister(destination),
 						source.getSuffix(),
@@ -67,13 +77,13 @@ public class ZeroExtendPseudoToPseudo extends BinaryPseudoToPseudo {
 				// 1. local source zero extend to temporary immediate
 				// 2. move temporary immediate to base pointer destination
 				return Arrays.asList(
-					new ZeroExtendBasePointerOffsetToReg(
+					new ZeroExtendBPOffsetToReg(
 						context.getBasePointer(source),
 						context.getScratchRegister(),
 						source.getSuffix(),
 						destination.getSuffix()
 					),
-					new MoveRegToBasePointerOffset(
+					new MoveRegToBPOffset(
 						context.getScratchRegister(),
 						context.getBasePointer(destination),
 						destination.getSuffix()
@@ -81,5 +91,10 @@ public class ZeroExtendPseudoToPseudo extends BinaryPseudoToPseudo {
 				);
 			}
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "movz " + source + ", " + destination;
 	}
 }

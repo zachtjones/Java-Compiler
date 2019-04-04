@@ -1,11 +1,10 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
-import x64.X64InstructionSize;
 import x64.allocation.AllocationContext;
 import x64.allocation.RegistersUsed;
 import x64.instructions.*;
-import x64.operands.BasePointerOffset;
+import x64.operands.BPOffset;
 import x64.operands.X64PseudoRegister;
 import x64.operands.X64Register;
 
@@ -44,11 +43,13 @@ public abstract class BinaryPseudoToPseudo implements PseudoInstruction {
 	}
 
 	@NotNull
-	abstract BinaryRegToReg createThisRegToReg(@NotNull X64Register source, @NotNull X64Register destination,
-											   @NotNull X64InstructionSize size);
+	abstract BinaryRegToReg createThisRegToReg(@NotNull X64Register source, @NotNull X64Register destination);
 
-	abstract BinaryRegToBasePointerOffset createThisRegToBPOffset(@NotNull X64Register source, @NotNull BasePointerOffset destination, @NotNull X64InstructionSize size);
-	abstract BinaryBasePointerOffsetToReg createThisBPOffsetToReg(@NotNull BasePointerOffset source, @NotNull X64Register destination, @NotNull X64InstructionSize size);
+	@NotNull
+	abstract BinaryRegToBPOffset createThisRegToBPOffset(@NotNull X64Register source, @NotNull BPOffset destination);
+
+	@NotNull
+	abstract BinaryBPOffsetToReg createThisBPOffsetToReg(@NotNull BPOffset source, @NotNull X64Register destination);
 
 	@Override
 	public final @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
@@ -59,8 +60,7 @@ public abstract class BinaryPseudoToPseudo implements PseudoInstruction {
 				return Collections.singletonList(
 					createThisRegToReg(
 						context.getRegister(source),
-						context.getRegister(destination),
-						destination.getSuffix()
+						context.getRegister(destination)
 					)
 				);
 			} else {
@@ -68,8 +68,7 @@ public abstract class BinaryPseudoToPseudo implements PseudoInstruction {
 				return Collections.singletonList(
 					createThisRegToBPOffset(
 						context.getRegister(source),
-						context.getBasePointer(destination),
-						destination.getSuffix()
+						context.getBasePointer(destination)
 					)
 				);
 			}
@@ -79,8 +78,8 @@ public abstract class BinaryPseudoToPseudo implements PseudoInstruction {
 				return Collections.singletonList(
 					createThisBPOffsetToReg(
 						context.getBasePointer(source),
-						context.getRegister(destination),
-						source.getSuffix())
+						context.getRegister(destination)
+					)
 				);
 			} else {
 				// op -16(%rbp), -24(%rbp)
@@ -88,15 +87,14 @@ public abstract class BinaryPseudoToPseudo implements PseudoInstruction {
 				// mov -16(%rbp), %temp
 				// op %temp, -24(%rbp)
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(
+					new MoveBPOffsetToReg(
 						context.getBasePointer(source),
 						context.getScratchRegister(),
 						source.getSuffix()
 					),
 					createThisRegToBPOffset(
 						context.getScratchRegister(),
-						context.getBasePointer(destination),
-						destination.getSuffix()
+						context.getBasePointer(destination)
 					)
 				);
 			}

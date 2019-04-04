@@ -2,14 +2,14 @@ package x64.instructions;
 
 import org.jetbrains.annotations.NotNull;
 import x64.X64InstructionSize;
-import x64.operands.BasePointerOffset;
+import x64.operands.BPOffset;
 import x64.operands.X64Register;
 
 /** This class represents a binary instruction with an immediate source and register destination */
-public abstract class BinaryRegToBasePointerOffset extends Instruction {
+public abstract class BinaryRegToBPOffset extends Instruction {
 
     @NotNull private final X64Register source;
-    @NotNull private final BasePointerOffset destination;
+    @NotNull private final BPOffset destination;
     @NotNull private final String name;
     @NotNull private final X64InstructionSize size;
 
@@ -20,8 +20,8 @@ public abstract class BinaryRegToBasePointerOffset extends Instruction {
      * @param source The Immediate source.
      * @param destination The register destination.
      */
-    BinaryRegToBasePointerOffset(@NotNull String name, @NotNull X64Register source,
-                                 @NotNull BasePointerOffset destination, @NotNull X64InstructionSize size) {
+    BinaryRegToBPOffset(@NotNull String name, @NotNull X64Register source,
+                        @NotNull BPOffset destination, @NotNull X64InstructionSize size) {
         this.name = name;
         this.source = source;
         this.destination = destination;

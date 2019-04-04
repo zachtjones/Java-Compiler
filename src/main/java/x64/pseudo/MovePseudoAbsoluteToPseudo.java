@@ -3,9 +3,9 @@ package x64.pseudo;
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.AllocationContext;
 import x64.instructions.Instruction;
-import x64.instructions.MoveBasePointerOffsetToReg;
+import x64.instructions.MoveBPOffsetToReg;
 import x64.instructions.MoveRegAbsoluteToReg;
-import x64.instructions.MoveRegToBasePointerOffset;
+import x64.instructions.MoveRegToBPOffset;
 import x64.operands.PseudoAbsolute;
 import x64.operands.X64PseudoRegister;
 
@@ -38,7 +38,7 @@ public class MovePseudoAbsoluteToPseudo extends BinaryPseudoAbsoluteToPseudo {
 						context.getScratchRegister(),
 						destination.getSuffix()
 					),
-					new MoveRegToBasePointerOffset(
+					new MoveRegToBPOffset(
 						context.getScratchRegister(),
 						context.getBasePointer(destination),
 						destination.getSuffix()
@@ -48,7 +48,7 @@ public class MovePseudoAbsoluteToPseudo extends BinaryPseudoAbsoluteToPseudo {
 		} else {
 			if (context.isRegister(destination)) {
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(
+					new MoveBPOffsetToReg(
 						context.getBasePointer(source.source),
 						context.getScratchRegister(),
 						destination.getSuffix()
@@ -62,7 +62,7 @@ public class MovePseudoAbsoluteToPseudo extends BinaryPseudoAbsoluteToPseudo {
 			} else {
 				// both are mapped to memory, but the first is already mapped to memory
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(
+					new MoveBPOffsetToReg(
 						context.getBasePointer(source.source),
 						context.getScratchRegister(),
 						destination.getSuffix()
@@ -72,7 +72,7 @@ public class MovePseudoAbsoluteToPseudo extends BinaryPseudoAbsoluteToPseudo {
 						context.getScratchRegister(),
 						destination.getSuffix()
 					),
-					new MoveRegToBasePointerOffset(
+					new MoveRegToBPOffset(
 						context.getScratchRegister(),
 						context.getBasePointer(destination),
 						destination.getSuffix()

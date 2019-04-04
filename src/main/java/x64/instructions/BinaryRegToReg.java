@@ -29,7 +29,7 @@ public abstract class BinaryRegToReg extends Instruction {
 
     /** Represents how this instruction should be represented */
     @Override
-    public final String assemblyRepresentation() {
+    public String assemblyRepresentation() {
         return '\t' + name + size + " " + source.assemblyRep(size) + ", " + destination.assemblyRep(size);
     }
 }

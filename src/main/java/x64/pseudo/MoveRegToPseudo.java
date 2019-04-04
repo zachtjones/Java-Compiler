@@ -3,7 +3,7 @@ package x64.pseudo;
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.AllocationContext;
 import x64.instructions.Instruction;
-import x64.instructions.MoveRegToBasePointerOffset;
+import x64.instructions.MoveRegToBPOffset;
 import x64.instructions.MoveRegToReg;
 import x64.operands.X64PseudoRegister;
 import x64.operands.X64Register;
@@ -30,7 +30,7 @@ public class MoveRegToPseudo extends BinaryRegToPseudoReg {
 			);
 		} else {
 			return Collections.singletonList(
-				new MoveRegToBasePointerOffset(
+				new MoveRegToBPOffset(
 					source,
 					context.getBasePointer(destination),
 					destination.getSuffix()

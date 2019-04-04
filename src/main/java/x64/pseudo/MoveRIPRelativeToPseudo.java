@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import x64.allocation.AllocationContext;
 import x64.instructions.Instruction;
 import x64.instructions.MoveRIPRelativeToReg;
-import x64.instructions.MoveRegToBasePointerOffset;
+import x64.instructions.MoveRegToBPOffset;
 import x64.operands.RIPRelativeData;
 import x64.operands.X64PseudoRegister;
 
@@ -37,7 +37,7 @@ public class MoveRIPRelativeToPseudo extends BinaryRIPRelativeToPseudo {
 					context.getScratchRegister(),
 					destination.getSuffix()
 				),
-				new MoveRegToBasePointerOffset(
+				new MoveRegToBPOffset(
 					context.getScratchRegister(),
 					context.getBasePointer(destination),
 					destination.getSuffix()

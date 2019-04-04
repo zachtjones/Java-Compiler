@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import x64.allocation.AllocationContext;
 import x64.allocation.RegistersUsed;
 import x64.instructions.Instruction;
-import x64.instructions.SetConditionBasePointerOffset;
+import x64.instructions.SetConditionBPOffset;
 import x64.instructions.SetConditionReg;
 import x64.operands.X64PseudoRegister;
 
@@ -35,7 +35,7 @@ public class SetConditionPseudo implements PseudoInstruction {
             );
         } else {
             return Collections.singletonList(
-                new SetConditionBasePointerOffset(type, context.getBasePointer(destination))
+                new SetConditionBPOffset(type, context.getBasePointer(destination))
             );
         }
     }

@@ -2,9 +2,10 @@ package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.AllocationContext;
+import x64.allocation.RegistersUsed;
 import x64.instructions.Instruction;
-import x64.instructions.MoveRegToBasePointerOffset;
-import x64.instructions.SignExtendBasePointerOffsetToReg;
+import x64.instructions.MoveRegToBPOffset;
+import x64.instructions.SignExtendBPOffsetToReg;
 import x64.instructions.SignExtendRegToReg;
 import x64.operands.X64PseudoRegister;
 
@@ -12,11 +13,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class SignExtendPseudoToPseudo extends BinaryPseudoToPseudo {
+public class SignExtendPseudoToPseudo implements PseudoInstruction {
+
+	@NotNull private final X64PseudoRegister source, destination;
 
 	public SignExtendPseudoToPseudo(@NotNull X64PseudoRegister source, @NotNull X64PseudoRegister destination) {
 		// move with sign extension
-		super("movs", source, destination);
+		this.source = source;
+		this.destination = destination;
+	}
+
+	@Override
+	public void markRegisters(int i, RegistersUsed usedRegs) {
+		usedRegs.markUsed(source,i);
+		usedRegs.markDefined(destination, i);
 	}
 
 	@Override
@@ -42,7 +52,7 @@ public class SignExtendPseudoToPseudo extends BinaryPseudoToPseudo {
 						source.getSuffix(),
 						destination.getSuffix()
 					),
-					new MoveRegToBasePointerOffset(
+					new MoveRegToBPOffset(
 						context.getScratchRegister(),
 						context.getBasePointer(destination),
 						destination.getSuffix()
@@ -53,7 +63,7 @@ public class SignExtendPseudoToPseudo extends BinaryPseudoToPseudo {
 			if (context.isRegister(destination)) {
 				// can be done with one instruction too
 				return Collections.singletonList(
-					new SignExtendBasePointerOffsetToReg(
+					new SignExtendBPOffsetToReg(
 						context.getBasePointer(source),
 						context.getRegister(destination),
 						source.getSuffix(),
@@ -67,13 +77,13 @@ public class SignExtendPseudoToPseudo extends BinaryPseudoToPseudo {
 				// 1. local source sign extend to temporary immediate
 				// 2. move temporary immediate to base pointer destination
 				return Arrays.asList(
-					new SignExtendBasePointerOffsetToReg(
+					new SignExtendBPOffsetToReg(
 						context.getBasePointer(source),
 						context.getScratchRegister(),
 						source.getSuffix(),
 						destination.getSuffix()
 					),
-					new MoveRegToBasePointerOffset(
+					new MoveRegToBPOffset(
 						context.getScratchRegister(),
 						context.getBasePointer(destination),
 						destination.getSuffix()

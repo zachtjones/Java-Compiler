@@ -3,9 +3,9 @@ package x64.pseudo;
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.AllocationContext;
 import x64.instructions.Instruction;
-import x64.instructions.MoveBasePointerOffsetToReg;
+import x64.instructions.MoveBPOffsetToReg;
 import x64.instructions.MoveRegDisplacementToReg;
-import x64.instructions.MoveRegToBasePointerOffset;
+import x64.instructions.MoveRegToBPOffset;
 import x64.operands.PseudoDisplacement;
 import x64.operands.RegDisplacement;
 import x64.operands.X64PseudoRegister;
@@ -42,7 +42,7 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 						context.getScratchRegister(),
 						destination.getSuffix()
 					),
-					new MoveRegToBasePointerOffset(
+					new MoveRegToBPOffset(
 						context.getScratchRegister(),
 						context.getBasePointer(destination),
 						destination.getSuffix()
@@ -58,7 +58,7 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 				// mov -16(%rbp), %temp
 				// mov 8(%temp), %r2
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(
+					new MoveBPOffsetToReg(
 						context.getBasePointer(source.register),
 						context.getScratchRegister(),
 						destination.getSuffix()
@@ -77,7 +77,7 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 				// mov 8(%temp), %temp
 				// mov %temp, -24(%rbp)
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(
+					new MoveBPOffsetToReg(
 						context.getBasePointer(source.register),
 						context.getScratchRegister(),
 						destination.getSuffix()
@@ -87,7 +87,7 @@ public class MovePseudoDisplacementToPseudo extends BinaryPseudoDisplacementToPs
 						context.getScratchRegister(),
 						destination.getSuffix()
 					),
-					new MoveRegToBasePointerOffset(
+					new MoveRegToBPOffset(
 						context.getScratchRegister(),
 						context.getBasePointer(destination),
 						destination.getSuffix()

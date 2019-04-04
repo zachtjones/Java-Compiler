@@ -2,7 +2,7 @@ package x64.allocation;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import x64.operands.BasePointerOffset;
+import x64.operands.BPOffset;
 import x64.operands.X64PseudoRegister;
 import x64.operands.X64Register;
 
@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class AllocationContext {
 	@NotNull private final Map<X64PseudoRegister, X64Register> mapping;
-	@NotNull private final Map<X64PseudoRegister, BasePointerOffset> locals;
+	@NotNull private final Map<X64PseudoRegister, BPOffset> locals;
 	@NotNull private final X64Register scratchRegister;
 	@Nullable private final X64Register secondScratch;
 
@@ -22,7 +22,7 @@ public class AllocationContext {
 	 * @param scratchRegister2 The second scratch register if needed.
 	 */
 	AllocationContext(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-							 @NotNull Map<X64PseudoRegister, BasePointerOffset> offsets,
+							 @NotNull Map<X64PseudoRegister, BPOffset> offsets,
 							 @NotNull X64Register scratchRegister,
 					  @Nullable X64Register scratchRegister2) {
 
@@ -44,7 +44,7 @@ public class AllocationContext {
 	}
 
 	/** Obtains the base pointer offset that pseudo is mapped to. */
-	public BasePointerOffset getBasePointer(X64PseudoRegister pseudo) {
+	public BPOffset getBasePointer(X64PseudoRegister pseudo) {
 		return locals.get(pseudo);
 	}
 

@@ -44,7 +44,7 @@ public class MovePseudoToArrayIndex implements PseudoInstruction {
 					// source, base are regs, index is a base pointer offset
 					// move the index to temp immediate, then do the indexing operation
 					return Arrays.asList(
-						new MoveBasePointerOffsetToReg(context.getBasePointer(index), context.getScratchRegister(), QUAD),
+						new MoveBPOffsetToReg(context.getBasePointer(index), context.getScratchRegister(), QUAD),
 						new MoveRegToArrayIndex(context.getRegister(source), context.getRegister(base), context.getScratchRegister(),
 							scaling, source.getSuffix()
 						)
@@ -55,7 +55,7 @@ public class MovePseudoToArrayIndex implements PseudoInstruction {
 					// index and source are registers; base is not
 					// move the base to the temp immediate, then do the indexing operation
 					return Arrays.asList(
-						new MoveBasePointerOffsetToReg(context.getBasePointer(base), context.getScratchRegister(), QUAD),
+						new MoveBPOffsetToReg(context.getBasePointer(base), context.getScratchRegister(), QUAD),
 						new MoveRegToArrayIndex(context.getRegister(source), context.getScratchRegister(), context.getRegister(index),
 							scaling, source.getSuffix()
 						)
@@ -64,12 +64,12 @@ public class MovePseudoToArrayIndex implements PseudoInstruction {
 					// source is a register, index and base are not
 					// simply move the base pointer offsets into index and base
 					return Arrays.asList(
-						new MoveBasePointerOffsetToReg(
+						new MoveBPOffsetToReg(
 							context.getBasePointer(base),
 							context.getScratchRegister(),
 							QUAD
 						),
-						new MoveBasePointerOffsetToReg(
+						new MoveBPOffsetToReg(
 							context.getBasePointer(index),
 							context.getSecondScratch(),
 							QUAD
@@ -90,7 +90,7 @@ public class MovePseudoToArrayIndex implements PseudoInstruction {
 					// base and index are registers, source is not
 					// move source, tempImm; do the indexing operation with tempImm as the source
 					return Arrays.asList(
-						new MoveBasePointerOffsetToReg(context.getBasePointer(source), context.getScratchRegister(), source.getSuffix()),
+						new MoveBPOffsetToReg(context.getBasePointer(source), context.getScratchRegister(), source.getSuffix()),
 						new MoveRegToArrayIndex(context.getScratchRegister(), context.getRegister(base), context.getRegister(index),
 							scaling, source.getSuffix()
 						)
@@ -103,12 +103,12 @@ public class MovePseudoToArrayIndex implements PseudoInstruction {
 					// move the index to scratch2
 					// move scratch1, (%base, %scratch2, scaling)
 					return Arrays.asList(
-						new MoveBasePointerOffsetToReg(
+						new MoveBPOffsetToReg(
 							context.getBasePointer(source),
 							context.getScratchRegister(),
 							source.getSuffix()
 						),
-						new MoveBasePointerOffsetToReg(
+						new MoveBPOffsetToReg(
 							context.getBasePointer(index),
 							context.getSecondScratch(),
 							QUAD
@@ -131,12 +131,12 @@ public class MovePseudoToArrayIndex implements PseudoInstruction {
 					// move the base to scratch2
 					// move scratch1, (scratch2, %index, scaling)
 					return Arrays.asList(
-						new MoveBasePointerOffsetToReg(
+						new MoveBPOffsetToReg(
 							context.getBasePointer(source),
 							context.getScratchRegister(),
 							source.getSuffix()
 						),
-						new MoveBasePointerOffsetToReg(
+						new MoveBPOffsetToReg(
 							context.getBasePointer(base),
 							context.getSecondScratch(),
 							QUAD
@@ -159,12 +159,12 @@ public class MovePseudoToArrayIndex implements PseudoInstruction {
 					// pop (scratch1, scratch2, scaling)
 
 					return Arrays.asList(
-						new MoveBasePointerOffsetToReg(
+						new MoveBPOffsetToReg(
 							context.getBasePointer(base),
 							context.getScratchRegister(),
 							QUAD
 						),
-						new MoveBasePointerOffsetToReg(
+						new MoveBPOffsetToReg(
 							context.getBasePointer(index),
 							context.getSecondScratch(),
 							QUAD

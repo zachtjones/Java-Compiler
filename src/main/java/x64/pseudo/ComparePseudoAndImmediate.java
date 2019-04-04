@@ -3,7 +3,7 @@ package x64.pseudo;
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.AllocationContext;
 import x64.allocation.RegistersUsed;
-import x64.instructions.CompareBasePointerOffsetAndImm;
+import x64.instructions.CompareBPOffsetAndImm;
 import x64.instructions.CompareRegAndImm;
 import x64.instructions.Instruction;
 import x64.operands.Immediate;
@@ -36,7 +36,7 @@ public class ComparePseudoAndImmediate implements PseudoInstruction {
             );
         } else {
             return Collections.singletonList(
-                new CompareBasePointerOffsetAndImm(context.getBasePointer(src1), src2, src1.getSuffix())
+                new CompareBPOffsetAndImm(context.getBasePointer(src1), src2, src1.getSuffix())
             );
         }
     }

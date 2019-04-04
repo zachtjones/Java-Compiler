@@ -47,7 +47,7 @@ public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplace
 				//   mov 16(%rbp), %temp
 				//   mov %r12, 8(%temp)
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(
+					new MoveBPOffsetToReg(
 						context.getBasePointer(destination.register),
 						context.getScratchRegister(),
 						source.getSuffix()
@@ -65,7 +65,7 @@ public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplace
 				// mov -16(%rbp), 8(%r14), which can't be done
 				// mov -16(%rbp), %temp; mov %temp, 8(%r14)
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(
+					new MoveBPOffsetToReg(
 						context.getBasePointer(source),
 						context.getScratchRegister(),
 						source.getSuffix()
@@ -85,12 +85,12 @@ public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplace
 				//  mov %temp1, 8(%temp2)
 
 				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(
+					new MoveBPOffsetToReg(
 						context.getBasePointer(source),
 						context.getScratchRegister(),
 						source.getSuffix()
 					),
-					new MoveBasePointerOffsetToReg(
+					new MoveBPOffsetToReg(
 						context.getBasePointer(destination.register),
 						context.getSecondScratch(),
 						QUAD

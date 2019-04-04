@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
 import x64.instructions.*;
-import x64.operands.BasePointerOffset;
+import x64.operands.BPOffset;
 import x64.operands.Immediate;
 import x64.operands.X64PseudoRegister;
 import x64.operands.X64Register;
@@ -147,8 +147,8 @@ public class RegisterTransformer {
 			}
 
 			for (int i = 0; i < totalPreserved; i++) {
-				au.prologue.add(new PushNativeReg(preserved[i]));
-				au.epilogue.addFirst(new PopNativeReg(preserved[i]));
+				au.prologue.add(new PushReg(preserved[i]));
+				au.epilogue.addFirst(new PopReg(preserved[i]));
 			}
 			if (totalPreserved % 2 == 0) {
 				// move another 8 bytes to maintains 16 byte alignment on function calls
@@ -172,19 +172,19 @@ public class RegisterTransformer {
 			// epilogue is kept in the order by addFirst on all calls
 			for (X64Register x64RegisterOperand : preservedLeft) {
 				// odd number of these due to number in both conventions
-				au.prologue.add(new PushNativeReg(x64RegisterOperand));
-				au.epilogue.addFirst(new PopNativeReg(x64RegisterOperand));
+				au.prologue.add(new PushReg(x64RegisterOperand));
+				au.epilogue.addFirst(new PopReg(x64RegisterOperand));
 			}
 
 			// preserve base pointer & set to the base of the stack frame
-			au.prologue.add(new PushNativeReg(RBP)); // stack now has even number pushed
+			au.prologue.add(new PushReg(RBP)); // stack now has even number pushed
 			au.prologue.add(new MoveRegToReg(RSP, RBP, QUAD));
 
 			// spaceNeeded should be oddNumber * 8.
 			au.prologue.add(new SubtractImmToReg(new Immediate(spaceNeeded), RSP, QUAD));
 
 			// restore stack and base pointer
-			au.epilogue.addFirst(new PopNativeReg(RBP));
+			au.epilogue.addFirst(new PopReg(RBP));
 			au.epilogue.addFirst(new MoveRegToReg(RBP, RSP, QUAD));
 
 			return au;
@@ -304,7 +304,7 @@ public class RegisterTransformer {
 
 		// allocate them, pulling from the lists until they're empty, then start allocating stack space
 		HashMap<RegisterMapped, X64Register> nativeAllocations = new HashMap<>();
-		HashMap<RegisterMapped, BasePointerOffset> basePointerOffsets = new HashMap<>();
+		HashMap<RegisterMapped, BPOffset> basePointerOffsets = new HashMap<>();
 
 		RegisterMapped next;
 		int stackNumberAllocated = 0;
@@ -318,7 +318,7 @@ public class RegisterTransformer {
 
 			} else { // ran out, start allocating stack space, first one -8(%rbp)
 				stackNumberAllocated++;
-				basePointerOffsets.put(next, new BasePointerOffset(8 * -stackNumberAllocated));
+				basePointerOffsets.put(next, new BPOffset(8 * -stackNumberAllocated));
 			}
 		}
 
@@ -327,7 +327,7 @@ public class RegisterTransformer {
 		}
 
 		HashMap<X64PseudoRegister, X64Register> natives = MapUtils.map(mapping, nativeAllocations);
-		HashMap<X64PseudoRegister, BasePointerOffset> locals = MapUtils.map(mapping, basePointerOffsets);
+		HashMap<X64PseudoRegister, BPOffset> locals = MapUtils.map(mapping, basePointerOffsets);
 		AllocationContext context = new AllocationContext(natives, locals, scratchRegister, scratchRegister2);
 
 		// Stream<List<Instruction>>

@@ -6,15 +6,15 @@ import x64.operands.Immediate;
 import x64.operands.X64PseudoRegister;
 
 /** Represents a binary instruction that uses an immediate source and a pseudo register destination. */
-public abstract class BinaryImmediateToPseudo implements PseudoInstruction {
+public abstract class BinaryImmToPseudo implements PseudoInstruction {
 
     @NotNull public final Immediate source;
     @NotNull public final X64PseudoRegister destination;
     @NotNull private final String name;
 
 
-    public BinaryImmediateToPseudo(@NotNull String name, @NotNull Immediate source,
-								   @NotNull X64PseudoRegister destination) {
+    public BinaryImmToPseudo(@NotNull String name, @NotNull Immediate source,
+                             @NotNull X64PseudoRegister destination) {
         this.name = name;
         this.source = source;
         this.destination = destination;
