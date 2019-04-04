@@ -1,17 +1,12 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
-import x64.allocation.AllocationContext;
-import x64.instructions.Instruction;
-import x64.instructions.MoveBPOffsetToReg;
+import x64.instructions.BinaryAbsoluteRegToReg;
 import x64.instructions.MoveRegAbsoluteToReg;
-import x64.instructions.MoveRegToBPOffset;
 import x64.operands.PseudoAbsolute;
+import x64.operands.RegAbsolute;
 import x64.operands.X64PseudoRegister;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import x64.operands.X64Register;
 
 public class MovePseudoAbsoluteToPseudo extends BinaryPseudoAbsoluteToPseudo {
 
@@ -21,64 +16,7 @@ public class MovePseudoAbsoluteToPseudo extends BinaryPseudoAbsoluteToPseudo {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
-		if (context.isRegister(source.source)) {
-			if (context.isRegister(destination)) {
-				return Collections.singletonList(
-					new MoveRegAbsoluteToReg(
-						context.getRegister(source.source),
-						context.getRegister(destination),
-						destination.getSuffix()
-					)
-				);
-			} else {
-				return Arrays.asList(
-					new MoveRegAbsoluteToReg(
-						context.getRegister(source.source),
-						context.getScratchRegister(),
-						destination.getSuffix()
-					),
-					new MoveRegToBPOffset(
-						context.getScratchRegister(),
-						context.getBasePointer(destination),
-						destination.getSuffix()
-					)
-				);
-			}
-		} else {
-			if (context.isRegister(destination)) {
-				return Arrays.asList(
-					new MoveBPOffsetToReg(
-						context.getBasePointer(source.source),
-						context.getScratchRegister(),
-						destination.getSuffix()
-					),
-					new MoveRegAbsoluteToReg(
-						context.getScratchRegister(),
-						context.getRegister(destination),
-						destination.getSuffix()
-					)
-				);
-			} else {
-				// both are mapped to memory, but the first is already mapped to memory
-				return Arrays.asList(
-					new MoveBPOffsetToReg(
-						context.getBasePointer(source.source),
-						context.getScratchRegister(),
-						destination.getSuffix()
-					),
-					new MoveRegAbsoluteToReg(
-						context.getScratchRegister(),
-						context.getScratchRegister(),
-						destination.getSuffix()
-					),
-					new MoveRegToBPOffset(
-						context.getScratchRegister(),
-						context.getBasePointer(destination),
-						destination.getSuffix()
-					)
-				);
-			}
-		}
+	BinaryAbsoluteRegToReg createThisRegAbsoluteToReg(@NotNull RegAbsolute source, @NotNull X64Register destination) {
+		return new MoveRegAbsoluteToReg(source, destination, this.destination.getSuffix());
 	}
 }
