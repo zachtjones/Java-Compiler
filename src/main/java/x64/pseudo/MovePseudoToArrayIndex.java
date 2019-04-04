@@ -182,12 +182,6 @@ public class MovePseudoToArrayIndex implements PseudoInstruction {
 			}
 		}
 
-		// TODO handle the 4 more complicated cases: 3 cases with 2 base pointers, and the case with all 3
-
-		// actually due to the complexity of this instruction, we might want to have at least 2 scratch registers.
-		//  this will involve first wanting to calculate the number of temporaries required by the instructions.
-		// then a second pass will do the transformation.
-
 		// also the subclasses of binary statements should just have a method that creates themselves, with
 		//  binary instruction doing the allocation.
 		// This way the allocation problem is only unique for each type of instruction, not based on the opcode.
