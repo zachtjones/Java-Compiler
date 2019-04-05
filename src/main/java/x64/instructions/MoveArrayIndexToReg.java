@@ -5,9 +5,11 @@ import x64.X64InstructionSize;
 import x64.operands.RegIndexing;
 import x64.operands.X64Register;
 
-public class MoveRegToArrayIndex extends BinaryRegToArrayIndex {
+/** Represents mov offset(base, index, scaling), destination. */
+public class MoveArrayIndexToReg extends BinaryArrayIndexToReg {
 
-	public MoveRegToArrayIndex(@NotNull X64Register source, @NotNull RegIndexing destination,
+	/** Represents mov offset(base, index, scaling), destination. */
+	public MoveArrayIndexToReg(@NotNull RegIndexing source, @NotNull X64Register destination,
 							   @NotNull X64InstructionSize size) {
 
 		super("mov", source, destination, size);
