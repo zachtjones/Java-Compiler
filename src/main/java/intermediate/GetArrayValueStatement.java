@@ -1,11 +1,11 @@
 package intermediate;
 
-import java.util.HashMap;
-
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
 
 public class GetArrayValueStatement implements InterStatement {
 	
@@ -39,8 +39,9 @@ public class GetArrayValueStatement implements InterStatement {
 		
 		// make sure the type of the array ends in []
 		Types resultingType = array.getType().removeArray(fileName, line);
-		array.setType(resultingType);
 
+		// fill in the result's type
+		result.setType(resultingType);
 		regs.put(result, resultingType);
 	}
 }
