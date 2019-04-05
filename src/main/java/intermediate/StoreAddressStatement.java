@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.jni.*;
 import x64.operands.PseudoDisplacement;
+import x64.operands.PseudoIndexing;
 import x64.operands.RIPRelativeData;
 import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToArrayIndex;
@@ -165,9 +166,7 @@ public class StoreAddressStatement implements InterStatement,
 				context.addInstruction(
 					new MovePseudoToArrayIndex(
 						intermediate.toX64(),
-						buffer,
-						index.toX64(),
-						destinationType.byteSize()
+						new PseudoIndexing(buffer, index.toX64(), destinationType.byteSize())
 					)
 				);
 
