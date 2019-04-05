@@ -6,16 +6,9 @@ import x64.operands.BPOffset;
 
 /** If the condition passes, makes the register hold the value 1, otherwise 0.*/
 public class SetConditionBPOffset extends Instruction {
-    @NotNull private final ConditionCode type;
-    @NotNull private final BPOffset offset;
 
+    /** Represents a statement that sets the memory at the base pointer to 1 if the condition holds, otherwise 0. */
     public SetConditionBPOffset(@NotNull ConditionCode type, @NotNull BPOffset offset) {
-        this.type = type;
-        this.offset = offset;
-    }
-
-    @Override
-    public String assemblyRepresentation() {
-        return "\tset" + type.x64Code() + " " + offset;
+		super("\tset" + type.x64Code() + " " + offset);
     }
 }

@@ -1,14 +1,9 @@
 package x64.directives;
 
+/** Uses a label to be used as the target of jumps, calls, and offsets. */
 public class LabelInstruction extends Directive {
-    private final String name;
 
     public LabelInstruction(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String assemblyRepresentation() {
-        return name + ":";
+        super(name + ":");
     }
 }

@@ -10,23 +10,21 @@ import static x64.allocation.CallingConvention.isLinux;
  */
 public class CallLabel extends Instruction {
 
-    private final String label;
-
     public CallLabel(String className, String functionName) {
-        label = SymbolNames.getMethodName(className, functionName) + (isLinux ? "@PLT" : "");
+		super("\tcall " + SymbolNames.getMethodName(className, functionName) + suffix());
     }
 
     public CallLabel(String label) {
-        this.label = label + (isLinux ? "@PLT": "");
+		super("\tcall " + label + suffix());
     }
+
+    /** Helper method for the suffix required on labels (@PLT on linux systems.) */
+    private static String suffix() {
+		return isLinux ? "@PLT" : "";
+	}
 
     @Override
     public boolean isCalling() {
         return true;
-    }
-
-    @Override
-    public String assemblyRepresentation() {
-        return "\tcall " + label;
     }
 }

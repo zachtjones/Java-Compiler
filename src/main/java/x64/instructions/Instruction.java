@@ -10,6 +10,14 @@ import java.util.List;
 /** Represents a real instruction, one that gcc could transform into machine code. */
 public abstract class Instruction implements PseudoInstruction {
 
+	private final String representation;
+
+	/** Creates an instruction, given the representation in x64 assembly code, at&t style. */
+	protected Instruction(String representation) {
+		this.representation = representation;
+	}
+
+
 	/**
 	 * All instructions using real operands can also act as a pseudo one.
 	 * Due to that, we need to be able to treat this like a pseudo as well.
@@ -23,7 +31,9 @@ public abstract class Instruction implements PseudoInstruction {
 	}
 
 	/** Returns how this should be written as a string to a file. */
-	public abstract String assemblyRepresentation();
+	public final String assemblyRepresentation() {
+		return representation;
+	}
 
 	/** Same as AssemblyRepresentation */
 	public String toString() {

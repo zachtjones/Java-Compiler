@@ -5,14 +5,8 @@ import x64.operands.X64Register;
 
 public class PopArrayIndex extends Instruction {
 
-	private final String rep;
-
+	/** Represents a pop off the stack into the memory at the indexing offset. */
 	public PopArrayIndex(@NotNull X64Register base, @NotNull X64Register index, int scaling) {
-		rep = "popq (" + base + ", " + index + ", " + scaling + ")";
-	}
-
-	@Override
-	public String assemblyRepresentation() {
-		return rep;
+		super("popq (" + base + ", " + index + ", " + scaling + ")");
 	}
 }

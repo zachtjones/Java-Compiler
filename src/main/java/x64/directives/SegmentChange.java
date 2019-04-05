@@ -1,18 +1,13 @@
 package x64.directives;
 
+/** Represents a change of segment to the one provided. */
 public class SegmentChange extends Directive {
 
     public static final String TEXT = "text";
     public static final String DATA = "data";
 
-    private final String type;
-
     public SegmentChange(String type) {
-        this.type = type;
+        super("." + type);
     }
 
-    @Override
-    public String assemblyRepresentation() {
-        return "." + type;
-    }
 }

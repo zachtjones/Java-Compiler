@@ -8,12 +8,6 @@ import x64.operands.X64Register;
 /** This class represents a binary instruction with a memory at register source and register destination */
 public abstract class BinaryAbsoluteRegToReg extends Instruction {
 
-    @NotNull private final RegAbsolute source;
-    @NotNull private final X64Register destination;
-    @NotNull private X64InstructionSize size;
-    @NotNull private final String name;
-
-
     /**
      * Represents a binary operation with a memory at register source and register destination.
      * @param name The binary instruction's name, like 'add'
@@ -22,15 +16,7 @@ public abstract class BinaryAbsoluteRegToReg extends Instruction {
      */
     BinaryAbsoluteRegToReg(@NotNull String name, @NotNull RegAbsolute source,
                            @NotNull X64Register destination, @NotNull X64InstructionSize size) {
-        this.name = name;
-        this.source = source;
-        this.destination = destination;
-        this.size = size;
-    }
 
-    /** Represents how this instruction should be represented */
-    @Override
-    public final String assemblyRepresentation() {
-        return '\t' + name + size + " " + source.toString() + ", " + destination.toString();
+        super('\t' + name + size + " " + source.toString() + ", " + destination.toString());
     }
 }

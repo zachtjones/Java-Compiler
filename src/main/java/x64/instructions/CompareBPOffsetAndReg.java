@@ -6,20 +6,10 @@ import x64.operands.BPOffset;
 import x64.operands.X64Register;
 
 public class CompareBPOffsetAndReg extends Instruction{
-    @NotNull private final BPOffset src1;
-    @NotNull private final X64Register src2;
-    @NotNull private final X64InstructionSize size;
 
+    /** Compares the memory at the base pointer offset and the register. */
     public CompareBPOffsetAndReg(@NotNull BPOffset src1, @NotNull X64Register src2,
                                  @NotNull X64InstructionSize size) {
-        this.src1 = src1;
-        this.src2 = src2;
-        this.size = size;
-    }
-
-    @Override
-    public String assemblyRepresentation() {
-        // reversed syntax with at&t style.
-        return "\tcmp" + size + " " + src2.assemblyRep(size) + ", " + src1;
+		super("\tcmp" + size + " " + src2.assemblyRep(size) + ", " + src1);
     }
 }

@@ -5,14 +5,8 @@ import x64.operands.X64Register;
 
 public class PopReg extends Instruction {
 
-	private X64Register reg;
-
+	/** Pops a register off the stack. This always uses 8 bytes. */
 	public PopReg(@NotNull X64Register reg) {
-		this.reg = reg;
-	}
-
-	@Override
-	public String assemblyRepresentation() {
-		return "\tpopq " + reg;
+		super("\tpopq " + reg);
 	}
 }

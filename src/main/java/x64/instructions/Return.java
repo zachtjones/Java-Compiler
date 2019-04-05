@@ -8,10 +8,7 @@ public class Return extends Instruction {
     public final static Return instance = new Return();
 
     /** prevent creation outside this class */
-    private Return() {}
-
-    @Override
-    public String assemblyRepresentation() {
-        return "\tret";
-    }
+    private Return() {
+		super("\tret");
+	}
 }

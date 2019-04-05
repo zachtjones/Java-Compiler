@@ -5,14 +5,9 @@ import x64.operands.BPOffset;
 
 /** represents pushing memory at a base pointer offset to the stack. */
 public class PushBasePointerOffset extends Instruction {
-    private BPOffset basePointerOffset;
 
+	/** Pushes the memory at the base pointer offset onto the stack. */
     public PushBasePointerOffset(@NotNull BPOffset basePointerOffset) {
-        this.basePointerOffset = basePointerOffset;
-    }
-
-    @Override
-    public String assemblyRepresentation() {
-        return "push\t" + basePointerOffset;
+		super("\tpush " + basePointerOffset);
     }
 }

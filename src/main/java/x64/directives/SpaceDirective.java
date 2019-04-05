@@ -1,14 +1,9 @@
 package x64.directives;
 
+/** Assembles some unallocated space, which cuts down on object file size. */
 public class SpaceDirective extends Directive {
-	private int size;
 
 	public SpaceDirective(int size) {
-		this.size = size;
-	}
-
-	@Override
-	public String assemblyRepresentation() {
-		return ".space " + size;
+		super(".space " + size);
 	}
 }

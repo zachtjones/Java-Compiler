@@ -76,7 +76,7 @@ public class X64File {
         nextDataItem++;
         String label = "L_.str" + nextDataItem;
         dataStrings.add(new LabelInstruction(label));
-        dataStrings.add(new AscizString(dataString));
+        dataStrings.add(new AsciizString(dataString));
         // put in the cache
         stringsMap.put(dataString, label);
         return label;

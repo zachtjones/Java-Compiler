@@ -8,14 +8,8 @@ import x64.operands.X64Register;
  */
 public class PushReg extends Instruction {
 
-	private X64Register reg;
-
+	/** Pushes a register's value to the top of the stack. */
 	public PushReg(@NotNull X64Register reg) {
-		this.reg = reg;
-	}
-
-	@Override
-	public String assemblyRepresentation() {
-		return "\tpushq " + reg;
+		super("\tpushq " + reg);
 	}
 }

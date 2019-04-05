@@ -5,14 +5,11 @@ import org.jetbrains.annotations.NotNull;
 /** Represents an unconditional jump to a label */
 public class JumpInstruction extends Instruction {
 
-    @NotNull private final String name;
-
+	/**
+	 * Represents a unconditional jump to the label.
+	 * @param name The label to jump to.
+	 */
     public JumpInstruction(@NotNull String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String assemblyRepresentation() {
-        return "\tjmp\t" + name;
+		super("\tjmp\t" + name);
     }
 }

@@ -1,16 +1,9 @@
 package x64.directives;
 
+/** Aligns the resulting output file at the current segment, padding with no-ops */
 public class ByteAlignment extends Directive {
 
-    private final int alignment;
-
     public ByteAlignment(int alignment) {
-        this.alignment = alignment;
-    }
-
-    @Override
-    public String assemblyRepresentation() {
-        // fill with the NOP instruction (0x90)
-        return String.format(".balign %d, 0x90", alignment);
+        super(String.format(".balign %d, 0x90", alignment));
     }
 }
