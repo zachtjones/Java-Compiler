@@ -38,7 +38,7 @@ public abstract class BinaryPseudoToRIPRelative implements PseudoInstruction {
                                                                @NotNull RIPRelativeData destination);
 
     @Override
-    public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
+    public final @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
         if (context.isRegister(source)) {
             return Collections.singletonList(
                 createThisRegToRipRelative(
