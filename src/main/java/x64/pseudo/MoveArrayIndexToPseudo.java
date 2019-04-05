@@ -2,11 +2,10 @@ package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
 import x64.instructions.BinaryArrayIndexToReg;
+import x64.instructions.BinaryRegToBPOffset;
 import x64.instructions.MoveArrayIndexToReg;
-import x64.operands.PseudoIndexing;
-import x64.operands.RegIndexing;
-import x64.operands.X64PseudoRegister;
-import x64.operands.X64Register;
+import x64.instructions.MoveRegToBPOffset;
+import x64.operands.*;
 
 public class MoveArrayIndexToPseudo extends BinaryArrayIndexToPseudo {
 
@@ -17,5 +16,10 @@ public class MoveArrayIndexToPseudo extends BinaryArrayIndexToPseudo {
 	@Override
 	BinaryArrayIndexToReg createThisArrayIndexToReg(@NotNull RegIndexing source, @NotNull X64Register destination) {
 		return new MoveArrayIndexToReg(source, destination, this.destination.getSuffix());
+	}
+
+	@Override
+	BinaryRegToBPOffset createThisRegToBPOffset(@NotNull X64Register source, @NotNull BPOffset destination) {
+		return new MoveRegToBPOffset(source, destination, this.destination.getSuffix());
 	}
 }
