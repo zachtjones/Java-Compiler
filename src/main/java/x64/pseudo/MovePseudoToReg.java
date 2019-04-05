@@ -1,15 +1,13 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
-import x64.allocation.AllocationContext;
-import x64.instructions.Instruction;
+import x64.instructions.BinaryBPOffsetToReg;
+import x64.instructions.BinaryRegToReg;
 import x64.instructions.MoveBPOffsetToReg;
 import x64.instructions.MoveRegToReg;
+import x64.operands.BPOffset;
 import x64.operands.X64PseudoRegister;
 import x64.operands.X64Register;
-
-import java.util.Collections;
-import java.util.List;
 
 public class MovePseudoToReg extends BinaryPseudoToReg {
 
@@ -19,24 +17,13 @@ public class MovePseudoToReg extends BinaryPseudoToReg {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
-
-		if (context.isRegister(source)) {
-			return Collections.singletonList(
-				new MoveRegToReg(
-					context.getRegister(source),
-					destination,
-					source.getSuffix()
-				)
-			);
-		} else {
-			return Collections.singletonList(
-				new MoveBPOffsetToReg(
-					context.getBasePointer(source),
-					destination,
-					source.getSuffix()
-				)
-			);
-		}
+	@NotNull BinaryRegToReg createThisRegToReg(@NotNull X64Register source, @NotNull X64Register destination) {
+		return new MoveRegToReg(source, destination, this.source.getSuffix());
 	}
+
+	@Override
+	@NotNull BinaryBPOffsetToReg createThisBPOffsetToReg(@NotNull BPOffset source, @NotNull X64Register destination) {
+		return new MoveBPOffsetToReg(source, destination, this.source.getSuffix());
+	}
+
 }
