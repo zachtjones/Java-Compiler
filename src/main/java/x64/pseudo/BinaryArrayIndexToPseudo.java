@@ -14,7 +14,8 @@ import java.util.List;
 import static x64.X64InstructionSize.QUAD;
 
 public abstract class BinaryArrayIndexToPseudo implements PseudoInstruction {
-	@NotNull private final PseudoIndexing source;
+	@NotNull
+	final PseudoIndexing source;
 	@NotNull
 	final X64PseudoRegister destination;
 
