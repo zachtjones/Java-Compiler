@@ -19,10 +19,13 @@ import static x64.X64InstructionSize.QUAD;
 public abstract class BinaryPseudoToArrayIndex implements PseudoInstruction {
 	@NotNull protected final X64PseudoRegister source;
 	@NotNull final PseudoIndexing dest;
+	@NotNull final String opcode;
 
-	BinaryPseudoToArrayIndex(@NotNull X64PseudoRegister source, @NotNull PseudoIndexing destination) {
+	BinaryPseudoToArrayIndex(@NotNull String opcode, @NotNull X64PseudoRegister source,
+							 @NotNull PseudoIndexing destination) {
 		this.source = source;
 		this.dest = destination;
+		this.opcode = opcode;
 	}
 
 	@Override
@@ -185,5 +188,10 @@ public abstract class BinaryPseudoToArrayIndex implements PseudoInstruction {
 				}
 			}
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "\t" + opcode + " " + source + ", " + dest;
 	}
 }

@@ -14,14 +14,15 @@ import java.util.List;
 import static x64.X64InstructionSize.QUAD;
 
 public abstract class BinaryArrayIndexToPseudo implements PseudoInstruction {
-	@NotNull
-	final PseudoIndexing source;
-	@NotNull
-	final X64PseudoRegister destination;
+	@NotNull final PseudoIndexing source;
+	@NotNull final X64PseudoRegister destination;
+	@NotNull private final String opcode;
 
-	BinaryArrayIndexToPseudo(@NotNull PseudoIndexing source, @NotNull X64PseudoRegister destination) {
+	BinaryArrayIndexToPseudo(@NotNull String opcode, @NotNull PseudoIndexing source,
+							 @NotNull X64PseudoRegister destination) {
 		this.source = source;
 		this.destination = destination;
+		this.opcode = opcode;
 	}
 
 	/**
@@ -191,5 +192,10 @@ public abstract class BinaryArrayIndexToPseudo implements PseudoInstruction {
 		usedRegs.markUsed(source.index, i);
 		// defines the result
 		usedRegs.markDefined(destination, i);
+	}
+
+	@Override
+	public String toString() {
+		return opcode + " " + source + ", " + destination;
 	}
 }

@@ -14,7 +14,7 @@ import static x64.X64InstructionSize.QUAD;
 public class MoveArrayIndexToPseudo extends BinaryArrayIndexToPseudo {
 
 	public MoveArrayIndexToPseudo(@NotNull PseudoIndexing source, @NotNull X64PseudoRegister destination) {
-		super(source, destination);
+		super("mov", source, destination);
 	}
 
 	@Override
