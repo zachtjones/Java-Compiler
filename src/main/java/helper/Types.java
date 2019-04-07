@@ -107,7 +107,7 @@ public class Types implements Comparable<Types> {
 	}
 
 	/** helper method for determining if this type is an array */
-	private boolean isArrayType() {
+	public boolean isArrayType() {
 		return rep.charAt(0) == '[';
 	}
 
