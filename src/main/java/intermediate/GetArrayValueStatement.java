@@ -1,5 +1,6 @@
 package intermediate;
 
+import conversions.Conversion;
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
@@ -11,8 +12,10 @@ import x64.jni.ReleasePrimitiveArrayElements;
 import x64.operands.PseudoIndexing;
 import x64.operands.X64PseudoRegister;
 import x64.pseudo.MoveArrayIndexToPseudo;
+import x64.pseudo.SignExtendPseudoToPseudo;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class GetArrayValueStatement implements InterStatement,
 	GetPrimitiveArrayElements, ReleasePrimitiveArrayElements,
@@ -22,6 +25,10 @@ public class GetArrayValueStatement implements InterStatement,
 	
 	@NotNull private final String fileName;
 	private final int line;
+
+	// filled in with assignment conversion for the index to int
+	private Register indexConverted;
+	private List<InterStatement> indexConversions;
 
 	/**
 	 * Represents getting a value out of an array.
@@ -45,6 +52,10 @@ public class GetArrayValueStatement implements InterStatement,
 		
 		UsageCheck.verifyDefined(array, regs, fileName, line);
 		UsageCheck.verifyDefined(index, regs, fileName, line);
+
+		// assignment convert index to int
+		indexConverted = func.allocator.getNext(Types.INT);
+		indexConversions = Conversion.assignmentConversion(index, indexConverted, fileName, line);
 		
 		// make sure the type of the array ends in []
 		Types resultingType = array.getType().removeArray(fileName, line);
@@ -56,6 +67,20 @@ public class GetArrayValueStatement implements InterStatement,
 
 	@Override
 	public void compile(@NotNull X64Context context) throws CompileException {
+
+		// compile in the conversions for the index to int
+		// index can be byte, short, char, or int -- need as int for intermediate language
+		for (InterStatement s : indexConversions) {
+			s.compile(context);
+		}
+		final X64PseudoRegister indexConvertedConverted = context.getNextQuadRegister();
+		// convert index to 64 bit value, need 64 bit value in array indexing operation
+		context.addInstruction(
+			new SignExtendPseudoToPseudo(
+				indexConverted.toX64(),
+				indexConvertedConverted
+			)
+		);
 
 		// note that this is NOT an assignment to the result. The conversion
 		//  is not needed here, it's the the result register is used there could be a need for a conversion.
@@ -73,7 +98,7 @@ public class GetArrayValueStatement implements InterStatement,
 			// mov (%baseReg, %indexReg, scale factor), %result
 			context.addInstruction(
 				new MoveArrayIndexToPseudo(
-					new PseudoIndexing(buffer, index.toX64(), destinationType.byteSize()),
+					new PseudoIndexing(buffer, indexConvertedConverted, destinationType.byteSize()),
 					result.toX64()
 				)
 			);
@@ -84,7 +109,8 @@ public class GetArrayValueStatement implements InterStatement,
 
 		} else {
 			// object GetObjectArrayElement(JNIEnv *env, jobjectArray array, jsize index)
-			addGetObjectArrayElement(context, array, index, result);
+			// can use the int size here for JNI
+			addGetObjectArrayElement(context, array, indexConverted, result);
 		}
 	}
 }

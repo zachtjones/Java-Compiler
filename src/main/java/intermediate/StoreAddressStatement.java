@@ -1,6 +1,5 @@
 package intermediate;
 
-import conversions.Conversion;
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
@@ -12,13 +11,12 @@ import x64.operands.PseudoDisplacement;
 import x64.operands.PseudoIndexing;
 import x64.operands.RIPRelativeData;
 import x64.operands.X64PseudoRegister;
-import x64.pseudo.MovePseudoToArrayIndex;
-import x64.pseudo.MovePseudoToPseudo;
-import x64.pseudo.MovePseudoToPseudoDisplacement;
-import x64.pseudo.MovePseudoToRIPRelative;
+import x64.pseudo.*;
 
 import java.util.HashMap;
 import java.util.List;
+
+import static conversions.Conversion.assignmentConversion;
 
 /** store %src at %addr */
 public class StoreAddressStatement implements InterStatement,
@@ -60,7 +58,7 @@ public class StoreAddressStatement implements InterStatement,
 		// this is an assignment, allocate another reg and save the conversion
 		destinationType = addr.getType().dereferencePointer(fileName, line);
 		intermediate = func.allocator.getNext(destinationType);
-		conversions = Conversion.assignmentConversion(src, intermediate, fileName, line);
+		conversions = assignmentConversion(src, intermediate, fileName, line);
 	}
 
 	@Override
@@ -155,7 +153,23 @@ public class StoreAddressStatement implements InterStatement,
 			final Register array = x.first;
 			final Register index = x.second;
 
+			// assignment conversion to int
+			final Register indexConverted = context.getNextILRegister(Types.INT);
+			List<InterStatement> conversions = assignmentConversion(index, indexConverted, fileName, line);
+			for (InterStatement s : conversions) {
+				s.compile(context);
+			}
+
 			if (destinationType.isPrimitive()) {
+				// promotion to 64 bit value via sign extension, required for the indexing operation
+				final X64PseudoRegister indexTo64 = context.getNextQuadRegister();
+				context.addInstruction(
+					new SignExtendPseudoToPseudo(
+						indexConverted.toX64(),
+						indexTo64
+					)
+				);
+
 				// buffer = Get<PrimitiveType>ArrayElements(JNIEnv *env, array, jboolean* isCopy)
 				//   isCopy can be used to determine if it's able to make a copy, or actually memory map it
 				//   can just pass null in instead, as we're going to do the release anyways
@@ -166,7 +180,7 @@ public class StoreAddressStatement implements InterStatement,
 				context.addInstruction(
 					new MovePseudoToArrayIndex(
 						intermediate.toX64(),
-						new PseudoIndexing(buffer, index.toX64(), destinationType.byteSize())
+						new PseudoIndexing(buffer, indexTo64, destinationType.byteSize())
 					)
 				);
 
@@ -176,7 +190,7 @@ public class StoreAddressStatement implements InterStatement,
 
 			} else {
 				// void SetObjectArrayElement(JNIEnv *env, jobjectArray array, jsize index, jobject value)
-				addSetObjectArrayElement(context, array, index, intermediate);
+				addSetObjectArrayElement(context, array, indexConverted, intermediate);
 			}
 
 		} else {
