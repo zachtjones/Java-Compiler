@@ -41,6 +41,13 @@ public class PrimitiveArrayAllocationNode extends NodeImpl implements Expression
 			Register result = f.allocator.getNext(Types.UNKNOWN);
 			f.addStatement(new CreateArrayStatement(size, type, result, getFileName(), getLine()));
 		} else {
+
+			// in java, an 2+ dimension array is an array of arrays
+			// for (int <var> = 0; <var> < expressions[0]; <var>++)
+			//    create the array with one less dimension
+			// only do the completely recursive call if the next expression isn't null
+
+
 			// TODO handle multi-dimensional arrays.
 			throw new CompileException("Multi-dimensional array creation not done yet.", "", -1);
 		}
