@@ -23,13 +23,13 @@ public class CreateArrayStatement implements InterStatement, FindClassJNI, NewPr
 	/**
 	 * A statement that creates an array of the type specified.
 	 * @param size The number of elements in the array.
-	 * @param type The type of the elements the array contains.
+	 * @param elementType The type of the elements the array contains.
 	 * @param result The Register that should hold the result of the creation.
 	 */
-	public CreateArrayStatement(@NotNull Register size, @NotNull Types type, @NotNull Register result,
+	public CreateArrayStatement(@NotNull Register size, @NotNull Types elementType, @NotNull Register result,
 								@NotNull String filename, int line) {
 		this.size = size;
-		this.type = type;
+		this.type = elementType;
 		this.result = result;
 		this.filename = filename;
 		this.line = line;
