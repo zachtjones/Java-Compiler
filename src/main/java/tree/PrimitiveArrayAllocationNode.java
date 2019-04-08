@@ -1,14 +1,12 @@
 package tree;
 
-import helper.ClassLookup;
-import helper.CompileException;
-import helper.Types;
-import intermediate.CreateArrayStatement;
-import intermediate.InterFunction;
-import intermediate.Register;
+import helper.*;
+import intermediate.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+
+import static helper.BinaryOperation.ADD;
 
 /** new type[expression or empty] ... */
 public class PrimitiveArrayAllocationNode extends NodeImpl implements Expression {
@@ -77,100 +75,112 @@ public class PrimitiveArrayAllocationNode extends NodeImpl implements Expression
 		// first thing; the initial create array statement
 		Register lastSize = sizes.remove(sizes.size() - 1);
 		Register a = f.allocator.getNext(Types.UNKNOWN);
-		f.addStatement(new CreateArrayStatement(lastSize, elementType, a, getFileName(), getLine()));
 
+		ArrayList<InterStatement> allStatements = new ArrayList<>();
+		allStatements.add(new CreateArrayStatement(lastSize, elementType, a, getFileName(), getLine()));
+
+		// build up the all statements list, with the parts of the for loop before and after what currently
+		//   has been built up so far
 		while (!sizes.isEmpty()) {
-			// get the size
+
+			// create new array, call it a
+			// for (int i = 0; i < lastSize; i++) {
+			//    what already is there, creating the array elements -> inner
+			//    put inner into a[i]
+			// }
+
+			ArrayList<InterStatement> thisIteration = new ArrayList<>();
+
+			// get the new size
 			lastSize = sizes.remove(sizes.size() - 1);
-			throw new CompileException("Multi-dimensional array creation not done yet.", "", -1);
+			Register inner = a;
+
+			// create the new array, and call it a
+			elementType = Types.arrayOf(elementType);
+			a = f.allocator.getNext(Types.UNKNOWN);
+			thisIteration.add(new CreateArrayStatement(lastSize, elementType, a, getFileName(), getLine()));
+
+			// int i = 0;
+			final String iName = ".i" + f.allocator.getNextLabel();
+			// declare int i;
+			thisIteration.add(new StartScopeStatement(iName, Types.INT));
+			// get 0 into a register
+			thisIteration.add(new LoadLiteralStatement("0", f.allocator, getFileName(), getLine()));
+			// store that register into the local
+			thisIteration.add(new PutLocalStatement(f.allocator.getLast(), iName, getFileName(), getLine()));
+
+			// if we decompose that for loop to the intermediate code: (already have the init part done)
+			//   init code
+			// conditionLabel:
+			//   boolean b = i < lastSize;
+			//   branch when b is false to end
+			//
+			//   the current list of statements from the previous iteration
+			//   put that into a[i]
+			//   // update step
+			//   putLocal i = i + 1;
+			//   jump to conditionLabel
+			// end:
+
+			LabelStatement conditionLabel = new LabelStatement("condition" + f.allocator.getNextLabel());
+			LabelStatement endLabel = new LabelStatement("end" + f.allocator.getNextLabel());
+
+			thisIteration.add(conditionLabel);
+
+			// boolean b = i < lastSize
+			Register b = f.allocator.getNext(Types.BOOLEAN);
+			Register iCondition = f.allocator.getNext(Types.INT);
+			// get local iName -> iCondition
+			thisIteration.add(new GetLocalStatement(iCondition, iName, getFileName(), getLine()));
+			thisIteration.add(
+				new SetConditionStatement(ConditionCode.LESS, iCondition, lastSize, b, getFileName(), getLine())
+			);
+
+			// branch when b is false to end
+			thisIteration.add(new BranchStatementFalse(endLabel, b, getFileName(), getLine()));
+
+			// the current list of statements from the previous iteration
+			thisIteration.addAll(allStatements);
+
+			// inner holds the pointer to the inner elements just created
+			// put inner into a[i]
+			Register iIndex = f.allocator.getNext(Types.INT);
+			thisIteration.add(new GetLocalStatement(iIndex, iName, getFileName(), getLine()));
+			Register pointer = f.allocator.getNext(Types.UNKNOWN); // filled in on type checking anyways
+			thisIteration.add(new GetArrayValueAddressStatement(inner, iIndex, pointer, getFileName(), getLine()));
+			thisIteration.add(new StoreAddressStatement(inner, pointer, getFileName(), getLine()));
+
+			// update i = 1 + 1:
+			//   - load literal i -> one
+			//   - getLocal i -> updateI
+			//   - updatedI = updateI + one
+			//   - putLocal i = updatedI
+			thisIteration.add(new LoadLiteralStatement("1", f.allocator, getFileName(), getLine()));
+			Register one = f.allocator.getLast();
+
+			Register updateI = f.allocator.getNext(Types.INT);
+			thisIteration.add(new GetLocalStatement(updateI, iName, getFileName(), getLine()));
+
+			Register updatedI = f.allocator.getNext(Types.INT);
+			thisIteration.add(new BinaryOpStatement(updateI, one, updatedI, ADD, getFileName(), getLine()));
+
+			thisIteration.add(new PutLocalStatement(updatedI, iName, getFileName(), getLine()));
+
+			// jump to condition label
+			thisIteration.add(new JumpStatement(conditionLabel));
+
+			// insert the ending label
+			thisIteration.add(endLabel);
+
+			// prepare for next step
+			allStatements = thisIteration;
 		}
 
-
-
-		// not a base case, we have established that the first expression is defined (not null)
-//		Expression first = expressions.remove(0);
-//		first.compile(s, f);
-//		Register size = f.allocator.getLast();
-//
-//		// the allocation of the element type
-//		Register inner = f.allocator.getNext(elementType);
-//		f.addStatement(new CreateArrayStatement(size, elementType, inner, getFileName(), getLine()));
-//
-//		// two cases left -- one with the next element null, which means stop recurring
-//		//  the other case means to create a for loop with a new local var to create the sub-elements
-//		if (expressions.get(0) == null) {
-//			// verify the rest are also null, handling case 4 described above
-//			for (int i = 1; i < expressions.size(); i++) {
-//				if (expressions.get(i) != null) {
-//					throw new CompileException("Invalid array creation", getFileName(), getLine());
-//				}
-//			}
-//			// rest are also null, we already added the create array statement so we're done
-//			// inner is the last allocated, so that's going to hold the result.
-//			return;
-//		}
-//
-//		// new int[4][5] means:
-//		//  create a an array of length 4, type of elements is int[], call it 'a'
-//		//  for (int i = 0; i < 4; i++) {
-//		//    a[i] = new int[5];
-//		// we need both a and i to be variables that couldn't possibly be locals in the .java file,
-//		//   so we can just give them names like .a13 or .i34
-//
-//		// introduce a new symbol table
-//		SymbolTable newTable = new SymbolTable(s, SymbolTable.local);
-//
-//		final String aName = ".a" + f.allocator.getNextLabel();
-//		final String iName = ".i" + f.allocator.getNextLabel();
-//
-//		newTable.putEntry(aName, type, getFileName(), getLine());
-//		newTable.putEntry(iName, Types.INT, getFileName(), getLine());
-//
-//		// do a set local inner -> .a; size -> .s
-//		f.addStatement(new PutLocalStatement(inner, aName, getFileName(), getLine()));
-//
-//		// create the for loop to initialize the rest of the elements - the loop counter is iName
-//		// initializer: int iName = 0;
-//		VariableDecNode iDec = new VariableDecNode(getFileName(), getLine());
-//		iDec.id = new VariableIdNode(getFileName(), getLine());
-//		iDec.id.name = iName;
-//		iDec.init = new VariableInitializerNode(getFileName(), getLine());
-//		iDec.init.e = new LiteralExpressionNode(getFileName(), getLine(), "0");
-//		ArrayList<VariableDecNode> inits = new ArrayList<>();
-//		inits.add(iDec);
-//		ForInitNode init = new LocalVariableDecNode(getFileName(), getLine(), Types.INT, inits);
-//
-//		// condition: iName < size
-//		Expression left = new UnknownIdentifierNode(iName, getFileName(), getLine());
-//		Expression condition = new RelationalExpressionNode(getFileName(), getLine(), left, size, LESS);
-//
-//		// update: i++
-//		PostIncrementExpressionNode update = new PostIncrementExpressionNode(getFileName(), getLine());
-//		update.expr = new UnknownIdentifierNode(iName, getFileName(), getLine());
-
-		// block is the recursive call -- might need a helper method for this
-		// TODO
-
-		// we have created the for loop
-		//ForStatementNode forStatementNode = new ForStatementNode(getFileName(),getLine(),
-		//	init, condition, update, block);
-
-		// compile the for loop
-		//forStatementNode.compile(newTable, f);
-
-
-		// inner holds the array
-		// in java, an 2+ dimension array is an array of arrays
-		// for (int <var> = 0; <var> < expressions[0]; <var>++)
-		//    create the array with one less dimension
-		// only do the completely recursive call if the next expression isn't null
-
-		//newTable.endScope(f);
-
-		// TODO handle multi-dimensional arrays.
+		// add the rest of the statements to the list
+		for (InterStatement st : allStatements) {
+			f.addStatement(st);
+		}
 
 		// TODO also merge in the code here for the object arrays, the logic is basically the same
-		//throw new CompileException("Multi-dimensional array creation not done yet.", "", -1);
-
 	}
 }
