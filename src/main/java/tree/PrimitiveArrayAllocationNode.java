@@ -147,7 +147,7 @@ public class PrimitiveArrayAllocationNode extends NodeImpl implements Expression
 			Register iIndex = f.allocator.getNext(Types.INT);
 			thisIteration.add(new GetLocalStatement(iIndex, iName, getFileName(), getLine()));
 			Register pointer = f.allocator.getNext(Types.UNKNOWN); // filled in on type checking anyways
-			thisIteration.add(new GetArrayValueAddressStatement(inner, iIndex, pointer, getFileName(), getLine()));
+			thisIteration.add(new GetArrayValueAddressStatement(a, iIndex, pointer, getFileName(), getLine()));
 			thisIteration.add(new StoreAddressStatement(inner, pointer, getFileName(), getLine()));
 
 			// update i = 1 + 1:
@@ -175,6 +175,10 @@ public class PrimitiveArrayAllocationNode extends NodeImpl implements Expression
 			// prepare for next step
 			allStatements = thisIteration;
 		}
+
+		// a holds the array, might not be the last register allocated, so will need to insert a copy
+		Register last = f.allocator.getNext(Types.UNKNOWN);
+		allStatements.add(new CopyStatement(a, last, getFileName(), getLine()));
 
 		// add the rest of the statements to the list
 		for (InterStatement st : allStatements) {

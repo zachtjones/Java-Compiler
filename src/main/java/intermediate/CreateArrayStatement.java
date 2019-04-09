@@ -60,6 +60,16 @@ public class CreateArrayStatement implements InterStatement, FindClassJNI, NewPr
 			// new<PrimitiveType>Array(JNI*, length) -- distinguished by the offset into the function v-table
 			addNewPrimitiveArrayJNI(context, offset, size, result);
 
+		} else if (type.isArrayType()) {
+
+			// create nested array type (array of arrays), create an object array, the elements are arrays
+			//  example int[][] is creating an array of int[]
+			final String className = result.getType().removeArray(filename, line).toString();
+			final X64PseudoRegister clazz = addFindClassJNICall(context, className);
+
+			// newObjectArray(JNI*, length, elementClass, initialElement)
+			addNewObjectArrayJNI(context, clazz, size, result);
+
 		} else {
 			// findClass(name)
 			final String className = result.getType().getClassName(filename, line);

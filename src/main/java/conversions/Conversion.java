@@ -43,7 +43,8 @@ public abstract class Conversion {
 		// TODO unboxing conversion
 		// TODO also could have narrowing conversion to byte, char, short, from a literal on the other side
 
-		throw new CompileException("Conversion not allowed for the assignment", fileName, line);
+		throw new CompileException("Conversion not allowed for the assignment "
+			+ sourceType + " -> " + destinationType, fileName, line);
 	}
 
 	/***
