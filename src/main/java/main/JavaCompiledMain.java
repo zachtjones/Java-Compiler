@@ -27,15 +27,18 @@ public class JavaCompiledMain {
     /** Compiles the Main class for java, saving it to the temp folder. */
     public void compile() throws CompileException {
 
-        // copy out the Main.java to the assembled location
-        writeToOutput(OutputDirs.ASSEMBLED, "Main.java", content);
+        if (! new File(OutputDirs.ASSEMBLED.location + "Main.class").exists()) {
 
-        ProcessRunner javac = new ProcessRunner("javac", "Main.java");
-        javac.setDirectory(new File(OutputDirs.ASSEMBLED.location));
+            // copy out the Main.java to the assembled location
+            writeToOutput(OutputDirs.ASSEMBLED, "Main.java", content);
 
-        ProcessRunner.ProcessResult result = javac.run();
-        if (result.getExitCode() != 0) {
-            throw new CompileException("Can't create Main.java, message: " + result.getError(), "Main.java", -1);
+            ProcessRunner javac = new ProcessRunner("javac", "Main.java");
+            javac.setDirectory(new File(OutputDirs.ASSEMBLED.location));
+
+            ProcessRunner.ProcessResult result = javac.run();
+            if (result.getExitCode() != 0) {
+                throw new CompileException("Can't create Main.java, message: " + result.getError(), "Main.java", -1);
+            }
         }
 
         // write the assembly bridge file
