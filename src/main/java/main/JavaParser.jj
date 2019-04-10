@@ -1313,7 +1313,7 @@ Expression AllocationExpression() :
     LOOKAHEAD(2)
     "new" p=PrimitiveType() list=ArrayDimensions()
     {
-        PrimitiveArrayAllocationNode a = new PrimitiveArrayAllocationNode(fileName, token.beginLine);
+        ArrayAllocationNode a = new ArrayAllocationNode(fileName, token.beginLine);
         a.type = p;
         a.expressions = list;
         return a;
@@ -1329,7 +1329,7 @@ Expression AllocationExpression() :
         }
     | list=ArrayDimensions()
     {
-        ObjectArrayAllocationNode o = new ObjectArrayAllocationNode(fileName, token.beginLine);
+        ArrayAllocationNode o = new ArrayAllocationNode(fileName, token.beginLine);
         o.type = Types.fromFullyQualifiedClass(n.primaryName);
         o.expressions = list;
         return o;

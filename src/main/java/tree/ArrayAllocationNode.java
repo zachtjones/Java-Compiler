@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import static helper.BinaryOperation.ADD;
 
 /** new type[expression or empty] ... */
-public class PrimitiveArrayAllocationNode extends NodeImpl implements Expression {
+public class ArrayAllocationNode extends NodeImpl implements Expression {
     public Types type;
     public ArrayList<Expression> expressions; // never empty list, but can have null in the list
     
-    public PrimitiveArrayAllocationNode(String fileName, int line) {
+    public ArrayAllocationNode(String fileName, int line) {
     	super(fileName, line);
     }
 
