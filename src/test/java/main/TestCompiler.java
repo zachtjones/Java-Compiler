@@ -21,7 +21,7 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
 
     @ParameterizedTest
     @MethodSource("programList")
-    void testValidPrograms(String inputProgramName, int exitCode, String output, String errorOut)
+    void testValidPrograms(String inputProgramName, String output, String errorOut)
         throws Exception {
 
         given()
@@ -33,8 +33,6 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
             .itRuns();
 
         then()
-            .theExitCodeIs(exitCode)
-            .and()
             .theOutputsMatches(output)
             .and()
             .theErrorMatches(errorOut);
@@ -43,27 +41,27 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
     /// names of the programs to run
     private static Stream<Arguments> programList() {
         return Stream.of(
-            Arguments.of("HelloWorld", 0, "Hello, World!\n", ""),
-            Arguments.of("BasicClass", 0, "b is: 5\na is: 1\n", ""),
-            Arguments.of("BasicClass2", 0, "12345\n", ""),
-            Arguments.of("OutOfRegisters", 0, "91\n", ""),
-            Arguments.of("PrintALot", 0, "4a6bcde63\n", ""),
-            Arguments.of("SimpleIfStatement", 0, "a is 6\nalways run\nalways run\n", ""),
-            Arguments.of("IfStatements", 0, "a is 6\na is 7\na is positive\na is negative\n", ""),
-            Arguments.of("SimpleWhileLoop", 0, "123456789\n", ""),
-            Arguments.of("SimpleDoWhileLoop", 0, "123456789\n", ""),
-            Arguments.of("SimpleForLoop", 0, "123456789\n", ""),
-            Arguments.of("IntermediateForLoop", 0, "12346789\n", ""),
-            Arguments.of("IntermediateWhileLoop", 0, "12346789\n", ""),
-            Arguments.of("IntermediateDoWhileLoop", 0, "12346789\n", ""),
-            Arguments.of("TwoVariableForLoop", 0, "123456789\n", ""),
-            Arguments.of("LabeledLoops", 0, "For loop:\n" +
-                                            "1, 0\n2, 0\n2, 1\n4, 0\n4, 1\n4, 2\n4, 3\n" +
-                                            "Do loop:\n" +
-                                            "1, 0\n2, 0\n2, 1\n4, 0\n4, 1\n4, 2\n4, 3\n" +
-                                            "While loop:\n" +
-                                            "1, 0\n2, 0\n2, 1\n4, 0\n4, 1\n4, 2\n4, 3\n", ""),
-            Arguments.of("DataSizes", 0, "true\n" +
+            Arguments.of("HelloWorld", "Hello, World!\n", ""),
+            Arguments.of("BasicClass", "b is: 5\na is: 1\n", ""),
+            Arguments.of("BasicClass2", "12345\n", ""),
+            Arguments.of("OutOfRegisters", "91\n", ""),
+            Arguments.of("PrintALot", "4a6bcde63\n", ""),
+            Arguments.of("SimpleIfStatement", "a is 6\nalways run\nalways run\n", ""),
+            Arguments.of("IfStatements", "a is 6\na is 7\na is positive\na is negative\n", ""),
+            Arguments.of("SimpleWhileLoop", "123456789\n", ""),
+            Arguments.of("SimpleDoWhileLoop", "123456789\n", ""),
+            Arguments.of("SimpleForLoop", "123456789\n", ""),
+            Arguments.of("IntermediateForLoop", "12346789\n", ""),
+            Arguments.of("IntermediateWhileLoop", "12346789\n", ""),
+            Arguments.of("IntermediateDoWhileLoop", "12346789\n", ""),
+            Arguments.of("TwoVariableForLoop", "123456789\n", ""),
+            Arguments.of("LabeledLoops", "For loop:\n" +
+                                         "1, 0\n2, 0\n2, 1\n4, 0\n4, 1\n4, 2\n4, 3\n" +
+                                         "Do loop:\n" +
+                                         "1, 0\n2, 0\n2, 1\n4, 0\n4, 1\n4, 2\n4, 3\n" +
+                                         "While loop:\n" +
+                                         "1, 0\n2, 0\n2, 1\n4, 0\n4, 1\n4, 2\n4, 3\n", ""),
+            Arguments.of("DataSizes", "true\n" +
                 "false\n" +
                 "127\n" +
                 "128\n" +
@@ -72,11 +70,11 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
                 "-18690\n" +
                 "-2147483648\n" +
                 "2147483648\n", ""),
-            Arguments.of("BasicArray", 0, "[1, 2, 3, 4]\n", ""),
-            Arguments.of("SimpleArray", 0, "[1, 1, 2, 3, 5, 8, 13, 21, 34, 55]\n", ""),
-            Arguments.of("ArrayLength", 0, "143\n", ""),
-            Arguments.of("TwoDimensionArray", 0, "[X, O, O]\n[O, X, O]\n[O, O, X]\n", ""),
-            Arguments.of("JaggedArray", 0, "[0]\n[0, 0]\n[0, 0, 0]\n[0, 0, 0, 0]\n", "")
+            Arguments.of("BasicArray", "[1, 2, 3, 4]\n", ""),
+            Arguments.of("SimpleArray", "[1, 1, 2, 3, 5, 8, 13, 21, 34, 55]\n", ""),
+            Arguments.of("ArrayLength", "143\n", ""),
+            Arguments.of("TwoDimensionArray", "[X, O, O]\n[O, X, O]\n[O, O, X]\n", ""),
+            Arguments.of("JaggedArray", "[0]\n[0, 0]\n[0, 0, 0]\n[0, 0, 0, 0]\n", "")
         );
     }
 
@@ -137,9 +135,6 @@ class ThenExpectedOutputIs extends Stage<ThenExpectedOutputIs> {
     @ExpectedScenarioState
     private String errOutput;
 
-    @ExpectedScenarioState
-    private int exitCode;
-
     ThenExpectedOutputIs theOutputsMatches(String content) {
         assertThat(output).isEqualToNormalizingNewlines(content);
         return self();
@@ -148,11 +143,6 @@ class ThenExpectedOutputIs extends Stage<ThenExpectedOutputIs> {
     @SuppressWarnings("UnusedReturnValue") // used by jGiven
     ThenExpectedOutputIs theErrorMatches(String content) {
         assertThat(errOutput).isEqualToNormalizingNewlines(content);
-        return self();
-    }
-
-    ThenExpectedOutputIs theExitCodeIs(int value) {
-        assertThat(exitCode).as("exit code, outputs: ", errOutput, output).isEqualTo(value);
         return self();
     }
 }
