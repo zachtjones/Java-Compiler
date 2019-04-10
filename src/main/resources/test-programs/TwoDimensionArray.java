@@ -6,7 +6,7 @@ public class TwoDimensionArray {
 		// place an X on the main diagonal, O everywhere else.
 		char[][] c = new char[3][3];
 		for (int i = 0; i < c.length; i++) {
-			for (int j = 0; j <= c[i].length; j++) {
+			for (int j = 0; j < c[i].length; j++) {
 				if (i == j) {
 					c[i][j] = 'X';
 				} else {
