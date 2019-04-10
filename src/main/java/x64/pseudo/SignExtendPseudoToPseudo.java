@@ -92,4 +92,9 @@ public class SignExtendPseudoToPseudo implements PseudoInstruction {
 			}
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "\tmovs " + source + ", " + destination;
+	}
 }
