@@ -2,6 +2,7 @@ package x64.instructions;
 
 import org.jetbrains.annotations.NotNull;
 import x64.allocation.AllocationContext;
+import x64.allocation.RegistersUsed;
 import x64.pseudo.PseudoInstruction;
 
 import java.util.Collections;
@@ -31,12 +32,16 @@ public abstract class Instruction implements PseudoInstruction {
 	}
 
 	/** Returns how this should be written as a string to a file. */
-	public final String assemblyRepresentation() {
+	private String assemblyRepresentation() {
 		return representation;
 	}
 
 	/** Same as AssemblyRepresentation */
-	public String toString() {
+	public final String toString() {
 		return assemblyRepresentation();
 	}
+
+	// don't use the pseudo registers.
+	@Override
+	public void markRegisters(int i, RegistersUsed usedRegs) {}
 }

@@ -17,7 +17,7 @@ public interface PseudoInstruction {
     }
 
     /** Call the methods for the marking the registers as used / defined. */
-    default void markRegisters(int i, RegistersUsed usedRegs) {}
+    void markRegisters(int i, RegistersUsed usedRegs);
 
     /**
      * Allocates the pseudo registers in these instructions to real ones / base pointer offsets.
