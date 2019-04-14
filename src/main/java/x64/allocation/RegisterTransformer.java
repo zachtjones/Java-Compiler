@@ -21,6 +21,10 @@ public class RegisterTransformer {
 
 	@NotNull private List<PseudoInstruction> initialContents;
 
+	/** Holds the last time a register is read. */
+	@NotNull private HashMap<X64PseudoRegister, Integer> lastReads;
+
+
 	/** This is r10 + r11, + the unused argument registers */
 	@NotNull private final List<X64Register> tempsAvailable;
 
@@ -30,9 +34,12 @@ public class RegisterTransformer {
 	 * Creates a register transformer, used to transform pseudo registers into real ones.
 	 * @param contents The contents of the function.
 	 * @param context The context to which the function was created.
+	 * @param lastLocalUsage The last usages of the local variables.
 	 */
-	public RegisterTransformer(@NotNull List<PseudoInstruction> contents, X64Context context) {
+	public RegisterTransformer(@NotNull List<PseudoInstruction> contents, @NotNull X64Context context,
+							   @NotNull HashMap<X64PseudoRegister, Integer> lastLocalUsage) {
 		this.initialContents = contents;
+		this.lastReads = lastLocalUsage;
 
 		tempsAvailable = new ArrayList<>(Arrays.asList(CallingConvention.temporaryRegisters()));
 
@@ -59,7 +66,7 @@ public class RegisterTransformer {
 	public AllocationUnit allocate() {
 
 		// determine the usages of the registers, as well as which ones are used across function calls
-		RegistersUsed usedRegs = new RegistersUsed();
+		RegistersUsed usedRegs = new RegistersUsed(lastReads);
 		for (int i = 0; i < initialContents.size(); i++) {
 			final PseudoInstruction temp = initialContents.get(i);
 			temp.markRegisters(i, usedRegs);
@@ -68,8 +75,7 @@ public class RegisterTransformer {
 			}
 		}
 
-		Map<Integer, X64PseudoRegister> lastUsedLines = usedRegs.getLastUsages();
-		Map<Integer, X64PseudoRegister> definedLines = usedRegs.getDefinitions();
+		// allocate as if there's infinite registers, but want to use as many as needed
 
 		Deque<RegisterMapped> preservedStack = new ArrayDeque<>();
 		int maxPreserved = 0; // after the next loop, this holds the number used
@@ -83,30 +89,29 @@ public class RegisterTransformer {
 			// we can use a register on both operands of the instruction
 			// if a preserved register is last used on the current line:
 			// - add the native register associated with it back to the stacks
-			if (lastUsedLines.containsKey(i)) {
-				final X64PseudoRegister doneWith = lastUsedLines.get(i);
-
+			for (X64PseudoRegister doneWith : usedRegs.getLastReads(i)) {
+				// some registers might not actually get mapped to anything
 				RegisterMapped doneWithMapped = mapping.get(doneWith);
-				if (doneWithMapped.needsPreserved) {
-					preservedStack.push(doneWithMapped);
-				} else {
-					temporaryStack.push(doneWithMapped);
+				if (doneWithMapped != null) {
+					if (doneWithMapped.needsPreserved) {
+						preservedStack.push(doneWithMapped);
+					} else {
+						temporaryStack.push(doneWithMapped);
+					}
 				}
 			}
 
 			// if the instruction defines a X64PreservedRegister, then:
 			// 1. add it to the map of currentUsed
 			// 2. pop from the stack
-			if (definedLines.containsKey(i)) {
-				final X64PseudoRegister using = definedLines.get(i);
-
-				if (usedRegs.canBeTemporary(using)) {
+			for (X64PseudoRegister newUsage : usedRegs.getFirstWrites(i)) {
+				if (usedRegs.canBeTemporary(newUsage)) {
 					if (temporaryStack.isEmpty()) {
 						// allocate a new one
 						temporaryStack.push(new RegisterMapped(maxTemp, false));
 						maxTemp++;
 					}
-					mapping.put(using, temporaryStack.pop());
+					mapping.put(newUsage, temporaryStack.pop());
 				} else {
 
 					if (preservedStack.isEmpty()) {
@@ -114,9 +119,8 @@ public class RegisterTransformer {
 						preservedStack.push(new RegisterMapped(maxPreserved, true));
 						maxPreserved++;
 					}
-					mapping.put(using, preservedStack.pop());
+					mapping.put(newUsage, preservedStack.pop());
 				}
-
 			}
 		}
 

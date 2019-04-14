@@ -68,7 +68,7 @@ public class X64Context {
 	}
 
 	/** Returns the next pseudo register available for the instruction size instance. */
-	public X64PseudoRegister getNextRegister(X64InstructionSize size) {
+	private X64PseudoRegister getNextRegister(X64InstructionSize size) {
 		nextRegister++;
 		return new X64PseudoRegister(nextRegister, size);
 	}
@@ -164,6 +164,8 @@ public class X64Context {
 
 	/** Deletes the local variable */
 	public void clearLocalVariable(String name) {
+		X64PseudoRegister reg = locals.get(name);
+		function.markRegisterNeededToNow(reg);
 		locals.remove(name);
 	}
 
