@@ -1153,7 +1153,8 @@ Expression PrimaryExpression() :
 
     // field name parsed in last suffix iteration -- might be the method name, so we have to deal with
     //   it in the next iteration
-    String fieldName = null;
+    // could also be a parameter or the local variable
+    String identifier = null;
 }
 {
     // the primary prefix -- literal, name, this, super, parentheses(expression), allocation expression.
@@ -1163,7 +1164,7 @@ Expression PrimaryExpression() :
         t=<IDENTIFIER>
         {
             // keep it for this iteration, use in the next one.
-            fieldName = t.image;
+            identifier = t.image;
         }
     |
         "this" { primaryThis = true; }
@@ -1188,18 +1189,20 @@ Expression PrimaryExpression() :
                     if (primaryThis) {
                         throw new ParseException("Can't array index 'this' qualifier.");
                     } else if (superIdentifier != null){
-                        // represents super.fieldName[expression]
+                        // represents super.identifier[expression]
                         builtUp = new SuperFieldExpressionNode(superIdentifier, fileName, token.beginLine);
-                    } else {
-                        // fieldName is not null, build up from that
-                        builtUp = new UnknownIdentifierNode(fieldName, fileName, token.beginLine);
                     }
                 }
-                // here builtUp is definitely not null
-                if (fieldName != null) {
+                
+                if (builtUp == null) {
+                    // identifier is not null, build up from that
+                    builtUp = new UnknownIdentifierNode(identifier, fileName, token.beginLine);
+                    identifier = null; // clear for the next iteration
+                } else if (identifier != null) {
+                    // here builtUp is definitely not null
                     // this means it's a true field name
-                    builtUp = new FieldExpressionNode(builtUp, fieldName, fileName, token.beginLine);
-                    fieldName = null; // clear for next iteration
+                    builtUp = new FieldExpressionNode(builtUp, identifier, fileName, token.beginLine);
+                    identifier = null; // clear for next iteration
                 }
 
                 // builtUp = the array indexing operator of builtUp
@@ -1213,44 +1216,44 @@ Expression PrimaryExpression() :
                         // this.identifier
                         builtUp = new ThisExpressionNode(fileName, token.beginLine);
                     } else if (superIdentifier != null){
-                        // super.fieldName.identifier
-                        builtUp = new SuperFieldExpressionNode(fieldName, fileName, token.beginLine);
+                        // super.identifier.identifier
+                        builtUp = new SuperFieldExpressionNode(identifier, fileName, token.beginLine);
                     } else {
                         // don't know what the specific type is
-                        builtUp = new UnknownIdentifierNode(fieldName, fileName, token.beginLine);
+                        builtUp = new UnknownIdentifierNode(identifier, fileName, token.beginLine);
                     }
-                    fieldName = t.image;
-                } else if (fieldName != null){
+                    identifier = t.image;
+                } else if (identifier != null){
                     // builtUp is already something, set the field name
-                    builtUp = new FieldExpressionNode(builtUp, fieldName, fileName, token.beginLine);
-                    fieldName = t.image;
+                    builtUp = new FieldExpressionNode(builtUp, identifier, fileName, token.beginLine);
+                    identifier = t.image;
                 } else {
-                    // fieldName == null, there's not anything extra we need to build up
-                    fieldName = t.image;
+                    // identifier == null, there's not anything extra we need to build up
+                    identifier = t.image;
                 }
 
             }
         |
             tempList=Arguments() // just grab the args
             {
-                if (fieldName == null) {
+                if (identifier == null) {
                     throw new ParseException("Method call specified without a name.");
                 }
-                // builtUp = a function call of builtUp.fieldName(arguments)
-                builtUp = new MethodCallNode(builtUp, fieldName, tempList, fileName, token.beginLine);
+                // builtUp = a function call of builtUp.identifier(arguments)
+                builtUp = new MethodCallNode(builtUp, identifier, tempList, fileName, token.beginLine);
 
                 // consumes the field name that was previously set
-                fieldName = null;
+                identifier = null;
             }
     )*
 
     {
         // potential the last result was a .name, so we have to add that in.
-        if (fieldName != null) {
+        if (identifier != null) {
             if (builtUp == null) {
-                builtUp = new UnknownIdentifierNode(fieldName, fileName, token.beginLine);
+                builtUp = new UnknownIdentifierNode(identifier, fileName, token.beginLine);
             } else {
-                builtUp = new FieldExpressionNode(builtUp, fieldName, fileName, token.beginLine);
+                builtUp = new FieldExpressionNode(builtUp, identifier, fileName, token.beginLine);
             }
         }
         return builtUp;
@@ -1310,7 +1313,7 @@ Expression AllocationExpression() :
     LOOKAHEAD(2)
     "new" p=PrimitiveType() list=ArrayDimensions()
     {
-        PrimitiveArrayAllocationNode a = new PrimitiveArrayAllocationNode(fileName, token.beginLine);
+        ArrayAllocationNode a = new ArrayAllocationNode(fileName, token.beginLine);
         a.type = p;
         a.expressions = list;
         return a;
@@ -1326,7 +1329,7 @@ Expression AllocationExpression() :
         }
     | list=ArrayDimensions()
     {
-        ObjectArrayAllocationNode o = new ObjectArrayAllocationNode(fileName, token.beginLine);
+        ArrayAllocationNode o = new ArrayAllocationNode(fileName, token.beginLine);
         o.type = Types.fromFullyQualifiedClass(n.primaryName);
         o.expressions = list;
         return o;

@@ -1,5 +1,6 @@
 package x64;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import x64.allocation.RegisterTransformer;
 import x64.directives.*;
@@ -25,6 +26,8 @@ public class X64Function {
 
 	@Nullable private RegisterTransformer.AllocationUnit au = null;
 
+	@NotNull private HashMap<X64PseudoRegister, Integer> lastUsages = new HashMap<>();
+
 	X64Function(String javaClass, String javaMethod, X64PseudoRegister jniEnvPointer, X64Context context) {
 		this.context = context;
 
@@ -48,11 +51,15 @@ public class X64Function {
 		this.contents.add(instruction);
 	}
 
-
+	/** Marks the register as needed until the now.
+	 * This is used for local variables needing a spot until their end of scope. */
+	void markRegisterNeededToNow(X64PseudoRegister reg) {
+		lastUsages.put(reg, contents.size());
+	}
 
 	/** Allocates the registers, transforming pseudo-registers to real ones */
 	void allocateRegisters() {
-		au = new RegisterTransformer(contents, context).allocate();
+		au = new RegisterTransformer(contents, context, lastUsages).allocate();
 	}
 
 	@Override

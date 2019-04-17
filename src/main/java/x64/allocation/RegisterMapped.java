@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 public class RegisterMapped implements Comparable<RegisterMapped> {
 	final int num;
 	final boolean needsPreserved;
-	int priorityValue; // incremented every usage
+	private int priorityValue; // incremented every usage
 
 	RegisterMapped(int num, boolean needsPreserved) {
 		this.num = num;
@@ -15,8 +15,8 @@ public class RegisterMapped implements Comparable<RegisterMapped> {
 		this.needsPreserved = needsPreserved;
 	}
 
-	public void increment() {
-		priorityValue++;
+	public void add(int value) {
+		priorityValue += value;
 	}
 
 	@Override

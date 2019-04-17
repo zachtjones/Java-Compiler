@@ -1,6 +1,5 @@
 package intermediate;
 
-import conversions.Conversion;
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
@@ -9,19 +8,21 @@ import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
 import x64.jni.*;
 import x64.operands.PseudoDisplacement;
+import x64.operands.PseudoIndexing;
 import x64.operands.RIPRelativeData;
 import x64.operands.X64PseudoRegister;
-import x64.pseudo.MovePseudoToPseudo;
-import x64.pseudo.MovePseudoToPseudoDisplacement;
-import x64.pseudo.MovePseudoToRIPRelative;
+import x64.pseudo.*;
 
 import java.util.HashMap;
 import java.util.List;
 
+import static conversions.Conversion.assignmentConversion;
+
 /** store %src at %addr */
 public class StoreAddressStatement implements InterStatement,
 		FindClassJNI, GetInstanceFieldIdJNI, SetInstanceFieldJNI,
-		GetStaticFieldIdJNI, SetStaticFieldJNI {
+		GetStaticFieldIdJNI, SetStaticFieldJNI,
+	SetObjectArrayElementJNI, GetPrimitiveArrayElements, ReleasePrimitiveArrayElements {
 
 	@NotNull private final Register src;
 	@NotNull private final Register addr;
@@ -32,6 +33,7 @@ public class StoreAddressStatement implements InterStatement,
 	// set in type checking, used for converting to the result.
 	private Register intermediate;
 	private List<InterStatement> conversions;
+	private Types destinationType;
 
 	public StoreAddressStatement(@NotNull Register src, @NotNull Register addr,
 								 @NotNull String fileName, int line) {
@@ -54,9 +56,9 @@ public class StoreAddressStatement implements InterStatement,
 		UsageCheck.verifyDefined(src, regs, fileName, line);
 
 		// this is an assignment, allocate another reg and save the conversion
-		Types destinationType = addr.getType().dereferencePointer(fileName, line);
-		intermediate = func.allocator.getNext(destinationType);
-		conversions = Conversion.assignmentConversion(src, intermediate, fileName, line);
+		destinationType = addr.getType().dereferencePointer(fileName, line);
+		intermediate = func.allocator.getNext(src.getType());
+		conversions = assignmentConversion(src, intermediate, fileName, line);
 	}
 
 	@Override
@@ -136,23 +138,60 @@ public class StoreAddressStatement implements InterStatement,
 			// this is an assignment to the local variable
 			final String localName = context.getLocalAddressLocalName(addr);
 
-			// create temporary register to act as copy
-			Types localType = addr.getType().dereferencePointer(fileName, line);
-			Register intermediateReg = context.getNextILRegister(localType);
-			conversions = Conversion.assignmentConversion(src, intermediateReg, fileName, line);
-
-			// add in the conversion
-			for (InterStatement i : conversions) {
-				i.compile(context);
-			}
-
 			// move the intermediate result to the final part
 			context.addInstruction(
 				new MovePseudoToPseudo(
-					intermediateReg.toX64(),
+					intermediate.toX64(),
 					context.getLocalVariable(localName)
 				)
 			);
+		} else if (context.registerIsArrayValueAddress(addr)) {
+
+			X64Context.Pair<Register, Register> x = context.getRegisterArrayAndIndex(addr);
+			// store intermediate at the array[index]
+			// have to see if the array is a primitive array or not
+			final Register array = x.first;
+			final Register index = x.second;
+
+			// assignment conversion to int
+			final Register indexConverted = context.getNextILRegister(Types.INT);
+			List<InterStatement> conversions = assignmentConversion(index, indexConverted, fileName, line);
+			for (InterStatement s : conversions) {
+				s.compile(context);
+			}
+
+			if (destinationType.isPrimitive()) {
+				// promotion to 64 bit value via sign extension, required for the indexing operation
+				final X64PseudoRegister indexTo64 = context.getNextQuadRegister();
+				context.addInstruction(
+					new SignExtendPseudoToPseudo(
+						indexConverted.toX64(),
+						indexTo64
+					)
+				);
+
+				// buffer = Get<PrimitiveType>ArrayElements(JNIEnv *env, array, jboolean* isCopy)
+				//   isCopy can be used to determine if it's able to make a copy, or actually memory map it
+				//   can just pass null in instead, as we're going to do the release anyways
+				X64PseudoRegister buffer = addGetPrimitiveArrayElements(context, array, intermediate.getType());
+
+				//  set the memory at the buffer+index*scaling
+				// mov %source, (%baseReg, %indexReg, scale factor)
+				context.addInstruction(
+					new MovePseudoToArrayIndex(
+						intermediate.toX64(),
+						new PseudoIndexing(buffer, indexTo64, destinationType.byteSize())
+					)
+				);
+
+				// Release<PrimitiveType>ArrayElements(JNIEnv *env, array, void* elements, int mode)
+				//   mode should always be 0, want to copy back the content and free the buffer
+				addReleasePrimitiveArrayElements(context, array, buffer, destinationType);
+
+			} else {
+				// void SetObjectArrayElement(JNIEnv *env, jobjectArray array, jsize index, jobject value)
+				addSetObjectArrayElement(context, array, indexConverted, intermediate);
+			}
 
 		} else {
 			throw new CompileException("store address statement unknown type", fileName, line);

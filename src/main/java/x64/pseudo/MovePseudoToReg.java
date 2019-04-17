@@ -1,16 +1,13 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
-import x64.instructions.Instruction;
-import x64.instructions.MoveBasePointerOffsetToReg;
+import x64.instructions.BinaryBPOffsetToReg;
+import x64.instructions.BinaryRegToReg;
+import x64.instructions.MoveBPOffsetToReg;
 import x64.instructions.MoveRegToReg;
-import x64.operands.BasePointerOffset;
-import x64.operands.X64Register;
+import x64.operands.BPOffset;
 import x64.operands.X64PseudoRegister;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import x64.operands.X64Register;
 
 public class MovePseudoToReg extends BinaryPseudoToReg {
 
@@ -20,26 +17,13 @@ public class MovePseudoToReg extends BinaryPseudoToReg {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
-
-		if (mapping.containsKey(source)) {
-			return Collections.singletonList(
-				new MoveRegToReg(
-					mapping.get(source),
-					destination,
-					source.getSuffix()
-				)
-			);
-		} else {
-			return Collections.singletonList(
-				new MoveBasePointerOffsetToReg(
-					locals.get(source),
-					destination,
-					source.getSuffix()
-				)
-			);
-		}
+	@NotNull BinaryRegToReg createThisRegToReg(@NotNull X64Register source, @NotNull X64Register destination) {
+		return new MoveRegToReg(source, destination, this.source.getSuffix());
 	}
+
+	@Override
+	@NotNull BinaryBPOffsetToReg createThisBPOffsetToReg(@NotNull BPOffset source, @NotNull X64Register destination) {
+		return new MoveBPOffsetToReg(source, destination, this.source.getSuffix());
+	}
+
 }

@@ -1,11 +1,12 @@
 package intermediate;
 
-import java.util.HashMap;
-
 import helper.CompileException;
 import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
+import x64.X64Context;
+
+import java.util.HashMap;
 
 public class GetArrayValueAddressStatement implements InterStatement {
 	
@@ -27,7 +28,7 @@ public class GetArrayValueAddressStatement implements InterStatement {
 	}
 
 	public String toString() {
-		return "getArrayValue " + result + " = " + array + " @ " + index + ";";
+		return "getArrayValueAddress " + result + " = " + array + " @ " + index + ";";
 	}
 
 	@Override
@@ -43,5 +44,11 @@ public class GetArrayValueAddressStatement implements InterStatement {
 		result.setType(resulting);
 
 		regs.put(result, resulting);
+	}
+
+	@Override
+	public void compile(@NotNull X64Context context) throws CompileException {
+		// just mark it here, handled in the store at address later.
+		context.markRegisterAsArrayValueAddress(result, array, index);
 	}
 }

@@ -2,18 +2,15 @@ package x64.pseudo;
 
 import helper.ConditionCode;
 import org.jetbrains.annotations.NotNull;
-import x64.allocation.RegisterMapped;
+import x64.allocation.AllocationContext;
 import x64.allocation.RegistersUsed;
 import x64.instructions.Instruction;
-import x64.instructions.SetConditionBasePointerOffset;
+import x64.instructions.SetConditionBPOffset;
 import x64.instructions.SetConditionReg;
-import x64.operands.BasePointerOffset;
 import x64.operands.X64PseudoRegister;
-import x64.operands.X64Register;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class SetConditionPseudo implements PseudoInstruction {
     @NotNull private final ConditionCode type;
@@ -30,22 +27,15 @@ public class SetConditionPseudo implements PseudoInstruction {
     }
 
     @Override
-    public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-        mapping.get(destination).increment();
-    }
+    public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
 
-    @Override
-    public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-                                                        @NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-                                                        @NotNull X64Register temporaryImmediate) {
-
-        if (mapping.containsKey(destination)) {
+        if (context.isRegister(destination)) {
             return Collections.singletonList(
-                new SetConditionReg(type, mapping.get(destination))
+                new SetConditionReg(type, context.getRegister(destination))
             );
         } else {
             return Collections.singletonList(
-                new SetConditionBasePointerOffset(type, locals.get(destination))
+                new SetConditionBPOffset(type, context.getBasePointer(destination))
             );
         }
     }

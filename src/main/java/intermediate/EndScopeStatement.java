@@ -1,11 +1,12 @@
 package intermediate;
 
-import java.util.HashMap;
-
 import helper.CompileException;
 import helper.Types;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
+import x64.operands.X64PseudoRegister;
+
+import java.util.HashMap;
 
 /** Represents the ending of a scope of a local variable. */
 public class EndScopeStatement implements InterStatement {
@@ -34,6 +35,10 @@ public class EndScopeStatement implements InterStatement {
 
 	@Override
 	public void compile(@NotNull X64Context context) throws CompileException {
-		context.clearLocalVariable(name);
+		// getLocalVariable returns null when it's not a local, parameters also go out of scope
+		X64PseudoRegister source = context.getLocalVariable(name);
+		if (source != null) {
+			context.clearLocalVariable(name);
+		}
 	}
 }

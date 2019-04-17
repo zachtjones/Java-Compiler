@@ -2,16 +2,16 @@ package x64.allocation;
 
 import helper.MapUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import x64.X64Context;
 import x64.instructions.*;
-import x64.operands.BasePointerOffset;
+import x64.operands.BPOffset;
 import x64.operands.Immediate;
 import x64.operands.X64PseudoRegister;
 import x64.operands.X64Register;
 import x64.pseudo.PseudoInstruction;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static x64.X64InstructionSize.QUAD;
 import static x64.allocation.CallingConvention.preservedRegistersNotRBP;
@@ -20,6 +20,10 @@ import static x64.operands.X64Register.*;
 public class RegisterTransformer {
 
 	@NotNull private List<PseudoInstruction> initialContents;
+
+	/** Holds the last time a register is read. */
+	@NotNull private HashMap<X64PseudoRegister, Integer> lastReads;
+
 
 	/** This is r10 + r11, + the unused argument registers */
 	@NotNull private final List<X64Register> tempsAvailable;
@@ -30,9 +34,12 @@ public class RegisterTransformer {
 	 * Creates a register transformer, used to transform pseudo registers into real ones.
 	 * @param contents The contents of the function.
 	 * @param context The context to which the function was created.
+	 * @param lastLocalUsage The last usages of the local variables.
 	 */
-	public RegisterTransformer(@NotNull List<PseudoInstruction> contents, X64Context context) {
+	public RegisterTransformer(@NotNull List<PseudoInstruction> contents, @NotNull X64Context context,
+							   @NotNull HashMap<X64PseudoRegister, Integer> lastLocalUsage) {
 		this.initialContents = contents;
+		this.lastReads = lastLocalUsage;
 
 		tempsAvailable = new ArrayList<>(Arrays.asList(CallingConvention.temporaryRegisters()));
 
@@ -59,7 +66,7 @@ public class RegisterTransformer {
 	public AllocationUnit allocate() {
 
 		// determine the usages of the registers, as well as which ones are used across function calls
-		RegistersUsed usedRegs = new RegistersUsed();
+		RegistersUsed usedRegs = new RegistersUsed(lastReads);
 		for (int i = 0; i < initialContents.size(); i++) {
 			final PseudoInstruction temp = initialContents.get(i);
 			temp.markRegisters(i, usedRegs);
@@ -68,8 +75,7 @@ public class RegisterTransformer {
 			}
 		}
 
-		Map<Integer, X64PseudoRegister> lastUsedLines = usedRegs.getLastUsages();
-		Map<Integer, X64PseudoRegister> definedLines = usedRegs.getDefinitions();
+		// allocate as if there's infinite registers, but want to use as many as needed
 
 		Deque<RegisterMapped> preservedStack = new ArrayDeque<>();
 		int maxPreserved = 0; // after the next loop, this holds the number used
@@ -83,30 +89,29 @@ public class RegisterTransformer {
 			// we can use a register on both operands of the instruction
 			// if a preserved register is last used on the current line:
 			// - add the native register associated with it back to the stacks
-			if (lastUsedLines.containsKey(i)) {
-				final X64PseudoRegister doneWith = lastUsedLines.get(i);
-
+			for (X64PseudoRegister doneWith : usedRegs.getLastReads(i)) {
+				// some registers might not actually get mapped to anything
 				RegisterMapped doneWithMapped = mapping.get(doneWith);
-				if (doneWithMapped.needsPreserved) {
-					preservedStack.push(doneWithMapped);
-				} else {
-					temporaryStack.push(doneWithMapped);
+				if (doneWithMapped != null) {
+					if (doneWithMapped.needsPreserved) {
+						preservedStack.push(doneWithMapped);
+					} else {
+						temporaryStack.push(doneWithMapped);
+					}
 				}
 			}
 
 			// if the instruction defines a X64PreservedRegister, then:
 			// 1. add it to the map of currentUsed
 			// 2. pop from the stack
-			if (definedLines.containsKey(i)) {
-				final X64PseudoRegister using = definedLines.get(i);
-
-				if (usedRegs.canBeTemporary(using)) {
+			for (X64PseudoRegister newUsage : usedRegs.getFirstWrites(i)) {
+				if (usedRegs.canBeTemporary(newUsage)) {
 					if (temporaryStack.isEmpty()) {
 						// allocate a new one
 						temporaryStack.push(new RegisterMapped(maxTemp, false));
 						maxTemp++;
 					}
-					mapping.put(using, temporaryStack.pop());
+					mapping.put(newUsage, temporaryStack.pop());
 				} else {
 
 					if (preservedStack.isEmpty()) {
@@ -114,9 +119,8 @@ public class RegisterTransformer {
 						preservedStack.push(new RegisterMapped(maxPreserved, true));
 						maxPreserved++;
 					}
-					mapping.put(using, preservedStack.pop());
+					mapping.put(newUsage, preservedStack.pop());
 				}
-
 			}
 		}
 
@@ -129,11 +133,13 @@ public class RegisterTransformer {
 			Map<X64PseudoRegister, X64Register> nativeMapping = getNatives(maxTemp, mapping);
 
 			// obtain the new list of instructions, with them swapped out
-			Map<X64PseudoRegister, BasePointerOffset> locals = new HashMap<>();
-			List<Instruction> results = initialContents.stream()
-				.map(i -> i.allocate(nativeMapping, locals, R10))
-				.flatMap(Collection::stream)
-				.collect(Collectors.toList());
+			AllocationContext context = new AllocationContext(nativeMapping, new HashMap<>(), R10, R11);
+			List<Instruction> results = new ArrayList<>();
+			try {
+				for (PseudoInstruction i : initialContents) {
+					results.addAll(i.allocate(context));
+				}
+			} catch (NotSecondScratchException ignored) {} // won't happen
 
 			// determine the function prologue and epilogue
 			AllocationUnit au = new AllocationUnit(results);
@@ -145,8 +151,8 @@ public class RegisterTransformer {
 			}
 
 			for (int i = 0; i < totalPreserved; i++) {
-				au.prologue.add(new PushNativeReg(preserved[i]));
-				au.epilogue.addFirst(new PopNativeReg(preserved[i]));
+				au.prologue.add(new PushReg(preserved[i]));
+				au.epilogue.addFirst(new PopReg(preserved[i]));
 			}
 			if (totalPreserved % 2 == 0) {
 				// move another 8 bytes to maintains 16 byte alignment on function calls
@@ -161,7 +167,7 @@ public class RegisterTransformer {
 			// here we use the base pointer for that allocation
 
 			// this function also changes the instructions
-			int spaceNeeded = rbpTransform(mapping, tempsAvailable);
+			int spaceNeeded = rbpTransform(mapping, tempsAvailable, usedRegs);
 
 			// we know we use all the registers, can't use the base pointer elsewhere
 			AllocationUnit au = new AllocationUnit(results);
@@ -170,19 +176,19 @@ public class RegisterTransformer {
 			// epilogue is kept in the order by addFirst on all calls
 			for (X64Register x64RegisterOperand : preservedLeft) {
 				// odd number of these due to number in both conventions
-				au.prologue.add(new PushNativeReg(x64RegisterOperand));
-				au.epilogue.addFirst(new PopNativeReg(x64RegisterOperand));
+				au.prologue.add(new PushReg(x64RegisterOperand));
+				au.epilogue.addFirst(new PopReg(x64RegisterOperand));
 			}
 
 			// preserve base pointer & set to the base of the stack frame
-			au.prologue.add(new PushNativeReg(RBP)); // stack now has even number pushed
+			au.prologue.add(new PushReg(RBP)); // stack now has even number pushed
 			au.prologue.add(new MoveRegToReg(RSP, RBP, QUAD));
 
 			// spaceNeeded should be oddNumber * 8.
 			au.prologue.add(new SubtractImmToReg(new Immediate(spaceNeeded), RSP, QUAD));
 
 			// restore stack and base pointer
-			au.epilogue.addFirst(new PopNativeReg(RBP));
+			au.epilogue.addFirst(new PopReg(RBP));
 			au.epilogue.addFirst(new MoveRegToReg(RBP, RSP, QUAD));
 
 			return au;
@@ -249,35 +255,60 @@ public class RegisterTransformer {
 	 * @param mapping The mapping of allocation if there were infinite registers,
 	 *                each being used as many times as possible.
 	 * @param tempsAvailable The hardware registers available as temporaries (may contain unused argument registers)
+	 * @param usedRegs The registers that are allocated if there's enough registers.
 	 * @return The number of bytes of stack space that needs allocated.
 	 * This amount will maintain stack alignment.
 	 */
 	private int rbpTransform(@NotNull HashMap<X64PseudoRegister, RegisterMapped> mapping,
-							 @NotNull List<X64Register> tempsAvailable) {
+							 @NotNull List<X64Register> tempsAvailable, @NotNull RegistersUsed usedRegs) {
 
 		// todo, loop through counting jumps to increase priority level,
 		//  jumps backwards = 3x as much, conditional jumps backwards 2x as much
 		// Could also do some prediction based on other heuristics, like forward jumps as well
-
 		// right now, a simple priority incremented by the number of usages
-		for (PseudoInstruction i : initialContents) {
-			i.prioritizeRegisters(mapping);
-		}
 
 		// now we can determine the which registers are more important, lower important ones get mapped
 		//  to base-pointer offsets
-		TreeSet<RegisterMapped> priorities = new TreeSet<>(mapping.values());
+		TreeSet<RegisterMapped> priorities = usedRegs.prioritize(mapping);
 
 		LinkedList<X64Register> tempsLeft = new LinkedList<>(tempsAvailable);
 
 		// this particular register is available for transitions of memory to memory to 2 instructions
-		final X64Register temporaryIntermediate = tempsLeft.remove(0);
+		final X64Register scratchRegister = tempsLeft.removeFirst();
+
+		try {
+			// create a copy of priorities and tempsLeft
+			TreeSet<RegisterMapped> copyPriorities = new TreeSet<>(priorities);
+			LinkedList<X64Register> copyTempsLeft = new LinkedList<>(tempsLeft);
+
+			return 8 * map(mapping, copyPriorities, copyTempsLeft, scratchRegister, null);
+
+		} catch (NotSecondScratchException e) {
+			// need to allocate a second
+			X64Register secondScratch = tempsLeft.removeFirst();
+
+			try {
+				return 8 * map(mapping, priorities, tempsLeft, scratchRegister, secondScratch);
+
+				// exception shouldn't happen here
+			} catch (NotSecondScratchException e2) {
+				throw new RuntimeException("There wasn't a second scratch register when there should have been.", e2);
+			}
+		}
+
+
+	}
+
+	private int map(@NotNull HashMap<X64PseudoRegister, RegisterMapped> mapping,
+					@NotNull TreeSet<RegisterMapped> priorities, @NotNull LinkedList<X64Register> tempsLeft,
+					@NotNull X64Register scratchRegister,
+					@Nullable X64Register scratchRegister2) throws NotSecondScratchException {
 
 		LinkedList<X64Register> preservedLeft = new LinkedList<>(Arrays.asList(preservedRegistersNotRBP()));
 
 		// allocate them, pulling from the lists until they're empty, then start allocating stack space
 		HashMap<RegisterMapped, X64Register> nativeAllocations = new HashMap<>();
-		HashMap<RegisterMapped, BasePointerOffset> basePointerOffsets = new HashMap<>();
+		HashMap<RegisterMapped, BPOffset> basePointerOffsets = new HashMap<>();
 
 		RegisterMapped next;
 		int stackNumberAllocated = 0;
@@ -291,7 +322,7 @@ public class RegisterTransformer {
 
 			} else { // ran out, start allocating stack space, first one -8(%rbp)
 				stackNumberAllocated++;
-				basePointerOffsets.put(next, new BasePointerOffset(8 * -stackNumberAllocated));
+				basePointerOffsets.put(next, new BPOffset(8 * -stackNumberAllocated));
 			}
 		}
 
@@ -300,14 +331,17 @@ public class RegisterTransformer {
 		}
 
 		HashMap<X64PseudoRegister, X64Register> natives = MapUtils.map(mapping, nativeAllocations);
-		HashMap<X64PseudoRegister, BasePointerOffset> locals = MapUtils.map(mapping, basePointerOffsets);
+		HashMap<X64PseudoRegister, BPOffset> locals = MapUtils.map(mapping, basePointerOffsets);
+		AllocationContext context = new AllocationContext(natives, locals, scratchRegister, scratchRegister2);
 
-		this.results = initialContents.stream()
-			.map(i -> i.allocate(natives, locals, temporaryIntermediate)) // Stream<List<Instruction>>
-			.flatMap(Collection::stream) // 'flattens' the stream of lists into a stream of instructions
-			.collect(Collectors.toList());
+		// Stream<List<Instruction>>
+		// 'flattens' the stream of lists into a stream of instructions
+		results = new ArrayList<>();
+		for (PseudoInstruction i : initialContents) {
+			results.addAll(i.allocate(context));
+		}
 
-		return stackNumberAllocated * 8;
+		return stackNumberAllocated;
 	}
 }
 

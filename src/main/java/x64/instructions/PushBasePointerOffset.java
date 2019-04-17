@@ -1,18 +1,13 @@
 package x64.instructions;
 
 import org.jetbrains.annotations.NotNull;
-import x64.operands.BasePointerOffset;
+import x64.operands.BPOffset;
 
 /** represents pushing memory at a base pointer offset to the stack. */
 public class PushBasePointerOffset extends Instruction {
-    private BasePointerOffset basePointerOffset;
 
-    public PushBasePointerOffset(@NotNull BasePointerOffset basePointerOffset) {
-        this.basePointerOffset = basePointerOffset;
-    }
-
-    @Override
-    public String assemblyRepresentation() {
-        return "push\t" + basePointerOffset;
+	/** Pushes the memory at the base pointer offset onto the stack. */
+    public PushBasePointerOffset(@NotNull BPOffset basePointerOffset) {
+		super("\tpush " + basePointerOffset);
     }
 }

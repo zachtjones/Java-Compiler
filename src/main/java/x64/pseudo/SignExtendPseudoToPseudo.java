@@ -1,35 +1,44 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
-import x64.instructions.*;
-import x64.operands.BasePointerOffset;
+import x64.allocation.AllocationContext;
+import x64.allocation.RegistersUsed;
+import x64.instructions.Instruction;
+import x64.instructions.MoveRegToBPOffset;
+import x64.instructions.SignExtendBPOffsetToReg;
+import x64.instructions.SignExtendRegToReg;
 import x64.operands.X64PseudoRegister;
-import x64.operands.X64Register;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-public class SignExtendPseudoToPseudo extends BinaryPseudoToPseudo {
+public class SignExtendPseudoToPseudo implements PseudoInstruction {
+
+	@NotNull private final X64PseudoRegister source, destination;
 
 	public SignExtendPseudoToPseudo(@NotNull X64PseudoRegister source, @NotNull X64PseudoRegister destination) {
 		// move with sign extension
-		super("movs", source, destination);
+		this.source = source;
+		this.destination = destination;
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
+	public void markRegisters(int i, RegistersUsed usedRegs) {
+		usedRegs.markUsed(source,i);
+		usedRegs.markDefined(destination, i);
+	}
 
-		if (mapping.containsKey(source)) {
-			if (mapping.containsKey(destination)) {
+	@Override
+	public @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
+
+		if (context.isRegister(source)) {
+			if (context.isRegister(destination)) {
 				// simple move source to destination
 				return Collections.singletonList(
 					new SignExtendRegToReg(
-						mapping.get(source),
-						mapping.get(destination),
+						context.getRegister(source),
+						context.getRegister(destination),
 						source.getSuffix(),
 						destination.getSuffix()
 					)
@@ -38,25 +47,25 @@ public class SignExtendPseudoToPseudo extends BinaryPseudoToPseudo {
 				// there isn't a sign extend to memory, only source can be memory
 				return Arrays.asList(
 					new SignExtendRegToReg(
-						mapping.get(source),
-						temporaryImmediate,
+						context.getRegister(source),
+						context.getScratchRegister(),
 						source.getSuffix(),
 						destination.getSuffix()
 					),
-					new MoveRegToBasePointerOffset(
-						temporaryImmediate,
-						locals.get(destination),
+					new MoveRegToBPOffset(
+						context.getScratchRegister(),
+						context.getBasePointer(destination),
 						destination.getSuffix()
 					)
 				);
 			}
 		} else {
-			if (mapping.containsKey(destination)) {
+			if (context.isRegister(destination)) {
 				// can be done with one instruction too
 				return Collections.singletonList(
-					new SignExtendBasePointerOffsetToReg(
-						locals.get(source),
-						mapping.get(destination),
+					new SignExtendBPOffsetToReg(
+						context.getBasePointer(source),
+						context.getRegister(destination),
 						source.getSuffix(),
 						destination.getSuffix()
 					)
@@ -68,19 +77,24 @@ public class SignExtendPseudoToPseudo extends BinaryPseudoToPseudo {
 				// 1. local source sign extend to temporary immediate
 				// 2. move temporary immediate to base pointer destination
 				return Arrays.asList(
-					new SignExtendBasePointerOffsetToReg(
-						locals.get(source),
-						temporaryImmediate,
+					new SignExtendBPOffsetToReg(
+						context.getBasePointer(source),
+						context.getScratchRegister(),
 						source.getSuffix(),
 						destination.getSuffix()
 					),
-					new MoveRegToBasePointerOffset(
-						temporaryImmediate,
-						locals.get(destination),
+					new MoveRegToBPOffset(
+						context.getScratchRegister(),
+						context.getBasePointer(destination),
 						destination.getSuffix()
 					)
 				);
 			}
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "\tmovs " + source + ", " + destination;
 	}
 }

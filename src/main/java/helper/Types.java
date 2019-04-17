@@ -45,12 +45,12 @@ public class Types implements Comparable<Types> {
 
 	/** Creates a types instance from the fully qualified class name */
 	public static Types fromFullyQualifiedClass(String className) {
-		return new Types("L" + className + ";", false);
+		return new Types("L" + className.replace('.', '/') + ";", false);
 	}
 
 	/** Creates a type instance that is an array of the type passed in. */
 	public static Types arrayOf(Types typeOfArray) {
-		return new Types("[" + typeOfArray.rep, false);
+		return new Types("[" + typeOfArray.rep, typeOfArray.isPrimitive);
 	}
 
 	/** Creates a type from the java representation
@@ -67,16 +67,18 @@ public class Types implements Comparable<Types> {
 			case "float": return FLOAT;
 			case "double": return DOUBLE;
 		}
+
+		// recursive case for array types, it's an array of the
+		if (type.endsWith("[]")) {
+			String sub = type.substring(0, type.length() - 2);
+			return arrayOf(fromJavaRepresentation(sub));
+		}
 		return Types.fromFullyQualifiedClass(type);
 	}
 
 	/** Creates a types instance from the Class instance, obtained via classLoader reflection. */
 	public static Types fromReflection(@NotNull Class<?> type) {
-		if (type.isPrimitive()) {
-			return fromJavaRepresentation(type.getName());
-		} else {
-			return Types.fromFullyQualifiedClass(type.getName().replace('.', '/'));
-		}
+		return fromJavaRepresentation(type.getCanonicalName());
 	}
 
 	/**
@@ -105,13 +107,13 @@ public class Types implements Comparable<Types> {
 	}
 
 	/** helper method for determining if this type is an array */
-	private boolean isArrayType() {
+	public boolean isArrayType() {
 		return rep.charAt(0) == '[';
 	}
 
 	/** Creates a new type that is a pointer to the argument */
 	public static Types pointerOf(@NotNull Types type) {
-		return new Types("*" + type.rep, false);
+		return new Types("*" + type.rep, type.isPrimitive);
 	}
 
 	/** Dereferences this pointer type, throwing an CompileException if this isn't a pointer */
@@ -138,31 +140,32 @@ public class Types implements Comparable<Types> {
 
 	/** returns the x64 instruction size that would be used with this types instance. */
 	public X64InstructionSize x64Type() {
-		if (this == BOOLEAN || this == BYTE) {
+		if (this.equals(BOOLEAN) || this.equals(BYTE)) {
 			return X64InstructionSize.BYTE;
 		}
-		if (this == CHAR || this == SHORT) {
+		if (this.equals(CHAR) || this.equals(SHORT)) {
 			return X64InstructionSize.WORD;
 		}
-		if (this == INT) {
+		if (this.equals(INT)) {
 			return X64InstructionSize.LONG;
 		}
-		if (this == LONG) {
+		if (this.equals(LONG)) {
 			return X64InstructionSize.QUAD;
 		}
-		if (this == FLOAT) {
+		if (this.equals(FLOAT)) {
 			return X64InstructionSize.SINGLE;
 		}
-		if (this == DOUBLE) {
+		if (this.equals(DOUBLE)) {
 			return X64InstructionSize.DOUBLE;
 		}
 		// pointers to classes
 		return X64InstructionSize.QUAD;
 	}
 
-	/** returns true if this resembles a primitive type */
+	/** returns true if this resembles a primitive type.
+	 * Note that arrays of primitive types are not primitive. */
 	public boolean isPrimitive() {
-		return isPrimitive;
+		return isPrimitive && !rep.startsWith("[");
 	}
 
 	/** Resolves the imports on this type, replacing partially qualified names with fully qualified ones
@@ -258,5 +261,14 @@ public class Types implements Comparable<Types> {
 	/** Returns if this type is a floating point one (float or double) */
 	public boolean isFloatingPoint() {
 		return this.equals(FLOAT) || this.equals(DOUBLE);
+	}
+
+	/** Returns the number of bytes required to represent this register. 1, 2, 4, or 8. */
+	public int byteSize() {
+		if (this.equals(BYTE) || this.equals(BOOLEAN)) return 1;
+		if (this.equals(SHORT) || this.equals(CHAR)) return 2;
+		if (this.equals(INT) || this.equals(FLOAT)) return 4;
+
+		return 8; // long, double, pointers.
 	}
 }

@@ -2,14 +2,9 @@ package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
 import x64.instructions.*;
-import x64.operands.BasePointerOffset;
-import x64.operands.X64Register;
+import x64.operands.BPOffset;
 import x64.operands.X64PseudoRegister;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import x64.operands.X64Register;
 
 public class SubtractPseudoToPseudo extends BinaryPseudoToPseudo {
 	public SubtractPseudoToPseudo(@NotNull X64PseudoRegister source, @NotNull X64PseudoRegister destination) {
@@ -17,58 +12,17 @@ public class SubtractPseudoToPseudo extends BinaryPseudoToPseudo {
 	}
 
 	@Override
-	public @NotNull List<@NotNull Instruction> allocate(@NotNull Map<X64PseudoRegister, X64Register> mapping,
-														@NotNull Map<X64PseudoRegister, BasePointerOffset> locals,
-														@NotNull X64Register temporaryImmediate) {
-		// example: sub %q1, %q2
-		if (mapping.containsKey(source)) {
-			if (mapping.containsKey(destination)) {
-				// sub %r1, %r2
-				return Collections.singletonList(
-					new SubtractRegToReg(
-						mapping.get(source),
-						mapping.get(destination),
-						destination.getSuffix()
-					)
-				);
-			} else {
-				// sub %r1, -16(%rbp)
-				return Collections.singletonList(
-					new SubtractRegToBasePointerOffset(
-						mapping.get(source),
-						locals.get(destination),
-						destination.getSuffix()
-					)
-				);
-			}
-		} else {
-			if (mapping.containsKey(destination)) {
-				// sub -16(%rbp), %r2
-				return Collections.singletonList(
-					new SubtractBasePointerOffsetToReg(
-						locals.get(source),
-						mapping.get(destination),
-						destination.getSuffix()
-					)
-				);
-			} else {
-				// sub -16(%rbp), -24(%rbp)
-				//  goes to:
-				// mov -16(%rbp), %temp
-				// sub %temp, -24(%rbp)
-				return Arrays.asList(
-					new MoveBasePointerOffsetToReg(
-						locals.get(source),
-						temporaryImmediate,
-						destination.getSuffix()
-					),
-					new SubtractRegToBasePointerOffset(
-						temporaryImmediate,
-						locals.get(destination),
-						destination.getSuffix()
-					)
-				);
-			}
-		}
+	@NotNull BinaryRegToReg createThisRegToReg(@NotNull X64Register source, @NotNull X64Register destination) {
+		return new SubtractRegToReg(source, destination, this.source.getSuffix());
+	}
+
+	@Override
+	@NotNull BinaryRegToBPOffset createThisRegToBPOffset(@NotNull X64Register source, @NotNull BPOffset destination) {
+		return new SubtractRegToBPOffset(source, destination, this.source.getSuffix());
+	}
+
+	@Override
+	@NotNull BinaryBPOffsetToReg createThisBPOffsetToReg(@NotNull BPOffset source, @NotNull X64Register destination) {
+		return new SubtractBPOffsetToReg(source, destination, this.source.getSuffix());
 	}
 }

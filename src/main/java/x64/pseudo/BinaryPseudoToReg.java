@@ -1,12 +1,15 @@
 package x64.pseudo;
 
 import org.jetbrains.annotations.NotNull;
-import x64.allocation.RegisterMapped;
+import x64.allocation.AllocationContext;
 import x64.allocation.RegistersUsed;
-import x64.operands.X64Register;
+import x64.instructions.*;
+import x64.operands.BPOffset;
 import x64.operands.X64PseudoRegister;
+import x64.operands.X64Register;
 
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
 /***
  * Represents a binary instruction that involves a pseudo register source and native register destination.
@@ -19,7 +22,7 @@ public abstract class BinaryPseudoToReg implements PseudoInstruction {
 	private final String name;
 
 
-	public BinaryPseudoToReg(String name, @NotNull X64PseudoRegister source,
+	BinaryPseudoToReg(String name, @NotNull X64PseudoRegister source,
 							 @NotNull X64Register destination) {
 		this.name = name;
 		this.source = source;
@@ -31,9 +34,30 @@ public abstract class BinaryPseudoToReg implements PseudoInstruction {
 		usedRegs.markUsed(source, i);
 	}
 
+	@NotNull
+	abstract BinaryRegToReg createThisRegToReg(@NotNull X64Register source, @NotNull X64Register destination);
+
+	@NotNull
+	abstract BinaryBPOffsetToReg createThisBPOffsetToReg(@NotNull BPOffset source, @NotNull X64Register destination);
+
 	@Override
-	public void prioritizeRegisters(Map<X64PseudoRegister, RegisterMapped> mapping) {
-		mapping.get(source).increment();
+	public final @NotNull List<@NotNull Instruction> allocate(@NotNull AllocationContext context) {
+
+		if (context.isRegister(source)) {
+			return Collections.singletonList(
+				createThisRegToReg(
+					context.getRegister(source),
+					destination
+				)
+			);
+		} else {
+			return Collections.singletonList(
+				createThisBPOffsetToReg(
+					context.getBasePointer(source),
+					destination
+				)
+			);
+		}
 	}
 
 	/** Represents how this instruction should be represented */
