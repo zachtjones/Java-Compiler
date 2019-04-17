@@ -19,6 +19,6 @@ public class MovePseudoToPseudoDisplacement extends BinaryPseudoToPseudoDisplace
 	@Override
 	BinaryRegToRegDisplacement createThisRegToRegDisplacement(@NotNull X64Register source,
 															  @NotNull RegDisplacement destination) {
-		return new MoveRegToRegDisplacement(source, destination);
+		return new MoveRegToRegDisplacement(source, destination, this.source.getSuffix());
 	}
 }

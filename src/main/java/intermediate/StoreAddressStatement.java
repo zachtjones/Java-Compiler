@@ -57,7 +57,7 @@ public class StoreAddressStatement implements InterStatement,
 
 		// this is an assignment, allocate another reg and save the conversion
 		destinationType = addr.getType().dereferencePointer(fileName, line);
-		intermediate = func.allocator.getNext(destinationType);
+		intermediate = func.allocator.getNext(src.getType());
 		conversions = assignmentConversion(src, intermediate, fileName, line);
 	}
 

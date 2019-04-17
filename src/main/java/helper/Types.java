@@ -140,22 +140,22 @@ public class Types implements Comparable<Types> {
 
 	/** returns the x64 instruction size that would be used with this types instance. */
 	public X64InstructionSize x64Type() {
-		if (this == BOOLEAN || this == BYTE) {
+		if (this.equals(BOOLEAN) || this.equals(BYTE)) {
 			return X64InstructionSize.BYTE;
 		}
-		if (this == CHAR || this == SHORT) {
+		if (this.equals(CHAR) || this.equals(SHORT)) {
 			return X64InstructionSize.WORD;
 		}
-		if (this == INT) {
+		if (this.equals(INT)) {
 			return X64InstructionSize.LONG;
 		}
-		if (this == LONG) {
+		if (this.equals(LONG)) {
 			return X64InstructionSize.QUAD;
 		}
-		if (this == FLOAT) {
+		if (this.equals(FLOAT)) {
 			return X64InstructionSize.SINGLE;
 		}
-		if (this == DOUBLE) {
+		if (this.equals(DOUBLE)) {
 			return X64InstructionSize.DOUBLE;
 		}
 		// pointers to classes
