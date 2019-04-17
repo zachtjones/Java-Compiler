@@ -35,10 +35,12 @@ public class MoveArrayIndexToPseudo extends BinaryArrayIndexToPseudo {
 
 		// move offset(-16(%rbp), -24(%rbp), scaling), -8(%rbp)
 
+		// To instructions we can encode:
 		// move -16(%rbp), scratch1
 		// move -24(%rbp), scratch2
-		// push (scratch1, scratch2, scaling)
-		// pop -8(%rbp)
+		// lea offset(scratch1, scratch2, scaling), scratch1
+		// move (scratch1), scratch2
+		// move scratch2, -8(%rbp)
 
 		return Arrays.asList(
 			new MoveBPOffsetToReg(
@@ -51,11 +53,19 @@ public class MoveArrayIndexToPseudo extends BinaryArrayIndexToPseudo {
 				context.getSecondScratch(),
 				QUAD
 			),
-			new PushArrayIndexing(
-				source.allocate(context.getScratchRegister(), context.getSecondScratch())
+			new LoadEffectiveAddressIndexingToReg(
+				source.allocate(context.getScratchRegister(), context.getSecondScratch()),
+				context.getScratchRegister()
 			),
-			new PopBasePointerOffset(
-				context.getBasePointer(destination)
+			new MoveRegAbsoluteToReg(
+				new RegAbsolute(context.getScratchRegister()),
+				context.getSecondScratch(),
+				destination.getSuffix()
+			),
+			new MoveRegToBPOffset(
+				context.getSecondScratch(),
+				context.getBasePointer(destination),
+				destination.getSuffix()
 			)
 		);
 	}

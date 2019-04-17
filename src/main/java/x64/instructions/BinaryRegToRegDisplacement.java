@@ -15,6 +15,6 @@ public abstract class BinaryRegToRegDisplacement extends Instruction {
      */
     BinaryRegToRegDisplacement(@NotNull String name, @NotNull X64Register source,
 							   @NotNull RegDisplacement destination, @NotNull X64InstructionSize size) {
-		super('\t' + name + size + " " + source.toString() + ", " + destination.toString());
+		super('\t' + name + size + " " + source.assemblyRep(size) + ", " + destination.toString());
     }
 }

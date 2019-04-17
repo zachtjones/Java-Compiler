@@ -16,6 +16,6 @@ public abstract class BinaryRegToRegAbsolute extends Instruction {
      */
     BinaryRegToRegAbsolute(@NotNull String name, @NotNull X64Register source,
 						   @NotNull RegAbsolute destination, @NotNull X64InstructionSize size) {
-		super('\t' + name + size + " " + source.toString() + ", " + destination.toString());
+		super('\t' + name + size + " " + source.assemblyRep(size) + ", " + destination.toString());
     }
 }
