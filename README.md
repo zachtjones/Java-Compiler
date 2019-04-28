@@ -12,10 +12,17 @@ Java library methods.
 
 The supported output language is x86-64 / AMD64.
 
+These output languages covers both Intel's 64-bit and AMD's 64-bit
+desktop computers, and this works on Linux, Mac, and Windows machines.
+
+> Don't use this compiler for mission-critical systems. Oracle's `javac` program is much more likely to work properly.
+
 ## Prerequisites
+ - running an x86-64 / AMD64 - based platform (virtual machines will work too)
  - java/javac 8+ in the path
  - gcc, also in the PATH (used to assemble and link results)
    - clang may be aliased to gcc on Mac OS is there is XCode installed; this is not a problem
+ - apache maven installed and in the path (command-line mvn)
 
 ### GCC / java instillation on Windows
  - For the other platforms, having the two on the path works fine for all versions I've tested
@@ -30,18 +37,20 @@ The supported output language is x86-64 / AMD64.
      - add `C:\path\to\msys64\mingw64\bin` to your PATH variable
      - verify gcc works by opening a new cmd.exe command prompt, and running `gcc -v`
 
-## Contributing
- - GitHub issues are being used for features & bugs that are planned to be implemented
- - Create a branch with a name resembling the issue
- - Implement the fix / feature
- - Run the tests, `mvn clean test jacoco:report`
- - Create a Pull request
-
 ## Usage
-1. Install Java 8+ and Apache Maven
-2. Run `mvn clean package`
-3. Invoke the jar on your main source file: `java -jar target/*.jar <your java file>`
+1. Run `mvn clean package`
+2. Invoke the jar on your main source file: `java -jar target/*.jar <your java file>`
    - This will compile your java files, starting from the references from the main java class.
+
+## Contributing
+ - See [Contributing.md](CONTRIBUTING.MD)
+ 
+# Code organization
+
+Main code is in the src/main/java folder.
+ - conversions: Represents the type conversions present in the java language, and the steps required to convert between types.
+ - helper: Classes that are used throughout many different steps are included here.
+ - intermediate: Classes that represent statements
 
 ## Compiler passes
 1. Parses the language, and builds the resulting tree from the context-free grammar.
@@ -64,48 +73,6 @@ The supported output language is x86-64 / AMD64.
 ## Pseudo assembly
  - the only difference between this and x64 is that there are an unlimited amount of registers
  - these extra registers are preserved between function calls
-
-## Optimizations (done)
-The key to most of these optimizations is to keep the IL in SSA form.
-SSA - Single static assignment - in function, only assign to register once.
-This makes some optimizations work in linear time that wouldn't work otherwise.
-- None yet
-
-## Optimizations (planned)
-- optimize out multiple reads to final variables
-  - try to put final static fields in instructions
-- Jumps to labels with jump statements
-- Dead code elimination (use control graphs)
-- Common subexpression elimination
-  - involves copy and constant propagation
-  - if functions/expressions are used, need to know if they are pure (no side effects)
-- Return statement Optimizations
-  - put return value into the correct register from the start
-  - eliminates a bunch of copy register
-- Constant folding
-- Register allocation (Assembly - minimize save / restore operations needed)
-- Register allocation (IL - use smaller numbers)
-- RISC -> CISC Optimizations
-  - grouping several instructions into one
-- remove useless statements
-  - code that assigns to a value not used & expression is side-effect free
-- replace instructions with faster ones
-  - x \*= 2 -> x << 1
-  - x = 0 with x ^= x
-  - and many more
-
-## Optimizations (potential)
-- Tail recursion -> iterative
-- maybe even tail sibling calls
-  - (calls to functions which take and return the same types as the caller)
-- Loop Optimizations
-  - loop unrolling for small # iteration loops
-  - move parts of a condition out
-    - (ex if going through string and length doesn't change)
-  - move constant parts of expressions out of the loop
-- instruction scheduling to avoid pipeline stalls
-- minimize cache misses (might need to be done on high level code & involve benchmarks)
-
 
 ## Tests
 - there are tests involving several of the language features implemented so far.
