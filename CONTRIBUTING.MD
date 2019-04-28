@@ -37,3 +37,22 @@ GitHub issues are being used for features & bugs that are planned to be implemen
 While the prerequisites above must be satisfied prior to having your pull request reviewed, 
 the reviewer(s) may ask you to complete additional design work, tests, or other changes before 
 your pull request can be ultimately accepted.
+
+
+## Debugging
+- When a test program fails, it can be difficult to know why it breaks.
+- If there is a crash from the compiler, then you can use your favorite IDE to debug.
+- If the crash is when you do `java -Djava.library.path=. Main`, then I've followed one of these two ways:
+- Option 1 (using the assembly):
+   - Disassemble to the Main.dll generated `objdump -d Main.dll > Main.txt`
+   - Use the assembly and the full crash log to figure out where the problem is
+   - You can compare the Main.txt to find the and the dynamic linking info to find the line where it breaks if it happens in the assembly code generated
+- Option 2 (using the comparable c code):
+   - Copy the Main.java from the resources to this nested folder
+   - Compile the java file: `javac -h . Main.java` from the resources/debug/&lt;program name&gt; folder
+   - Compile the C file: `gcc "-Ipath/to/jdk/include" "-Ipath/to/jdk/include/os_folder" program.c -shared -o Main.dll -O2 --save-temps`
+      - the paths include the directories necessary to find jni.h and jni_md.h
+      - os_folder is darwin on Mac OS X, or win32 on Windows (even if 64 bit)
+   - Run the program and make sure it works from the c code, if it does, then there's a problem with the assembly generation
+   - You can examine the differences between the assembly and what this compiler does for flaws
+ 
