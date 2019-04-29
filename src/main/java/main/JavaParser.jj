@@ -1293,10 +1293,13 @@ IntegerLiteralNode IntegerLiteral(): // either int or long
     long value;
 }
 {
-    value = DecimalLiteral()
-|   value = HexIntegerLiteral()
-|   value = OctalIntegerLiteral()
-|   value = BinaryIntegerLiteral()
+    (
+        value = DecimalLiteral()
+    |   value = HexIntegerLiteral()
+    |   value = OctalIntegerLiteral()
+    |   value = BinaryIntegerLiteral()
+    )
+    ( ["l" "L"] { return new LongLiteralNode(value); })?
     { return new IntegerLiteralNode(value); }
 }
 
@@ -1409,12 +1412,86 @@ void Underscores():{}
     "_" ("_")*
 }
 
+long HexIntegerLiteral():
+{
+    long value;
+}
+{
+    "0" ["X" "x"] value = HexDigits() { return value; }
+}
 
+// similar to DecimalDigits, but multiply by 16
+long HexDigits():
+{
+    long result;
+    long temp;
+    Long temp2;
+    String concat;
+}
+{
+    result=HexDigit()
+    (
+        (temp2=HexDigitsAndUnderscores() {
+            // concatenate result if not null
+            if (temp2 != null) {
+                concat = "" + result + temp2;
+                result = Long.parseLong(concat, 16);
+            }
+        })?
+        temp=HexDigit() { /* concatenate result */ result *= 16; result += temp; }
+    )?
+}
 
+// comsumes a hex digit and returns its value.
+long HexDigit():
+{
+    long value;
+}
+{
+    value=Digit() { return value; }
+|   ["a" "A"] { return 10; }
+|   ["b" "B"] { return 11; }
+|   ["c" "C"] { return 12; }
+|   ["d" "D"] { return 13; }
+|   ["e" "E"] { return 14; }
+|   ["f" "F"] { return 15; }
+}
 
+Long HexDigitsAndUnderscores():
+{
+    Long result = null;
+    Long temp;
+    String concat;
+}
+{
+    (
+        temp=HexDigitOrUnderscore()
+        {
+            if (result == null) {
+                result = temp;
+            } else if (temp != null) {
+                // concatenate
+                concat = "" + result + temp;
+                result = Long.parseLong(concat, 16);
+            }
+            // no change otherwise
+        }
+    )+
+    {
+        return result;
+    }
+}
 
+Long HexDigitOrUnderscore():
+{
+    long value;
+}
+{
+    value=HexDigit() { return value; }
+|
+    "_" { return null; }
+}
 
-long HexIntegerLiteral(): {}{}
 long OctalIntegerLiteral():{}{}
 long BinaryIntegerLiteral():{}{}
 
