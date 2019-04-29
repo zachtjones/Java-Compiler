@@ -12,10 +12,27 @@ Java library methods.
 
 The supported output language is x86-64 / AMD64.
 
+These output languages covers both Intel's 64-bit and AMD's 64-bit
+desktop computers, and this works on Linux, Mac, and Windows machines.
+
+> Don't use this compiler for mission-critical systems. 
+> Oracle's `javac` program is much more likely to work properly.
+
+This project is a side-project on mine that I designed to be a large, long-term,
+difficult project to combine my skills in various areas of computer science.
+
+I learned MIPS assembly in a class at school, and wanted to apply skills learned there
+to learn another assembly language implemented in the desktop computing hardware.
+
+This project combines both of those goals, while also doing something that isn't overdone
+in the computing industry.
+
 ## Prerequisites
+ - running an x86-64 / AMD64 - based platform (virtual machines will work too)
  - java/javac 8+ in the path
  - gcc, also in the PATH (used to assemble and link results)
    - clang may be aliased to gcc on Mac OS is there is XCode installed; this is not a problem
+ - apache maven installed and in the path (command-line mvn)
 
 ### GCC / java instillation on Windows
  - For the other platforms, having the two on the path works fine for all versions I've tested
@@ -30,127 +47,107 @@ The supported output language is x86-64 / AMD64.
      - add `C:\path\to\msys64\mingw64\bin` to your PATH variable
      - verify gcc works by opening a new cmd.exe command prompt, and running `gcc -v`
 
-## Contributing
- - GitHub issues are being used for features & bugs that are planned to be implemented
- - Create a branch with a name resembling the issue
- - Implement the fix / feature
- - Run the tests, `mvn clean test jacoco:report`
- - Create a Pull request
-
 ## Usage
-1. Install Java 8+ and Apache Maven
-2. Run `mvn clean package`
-3. Invoke the jar on your main source file: `java -jar target/*.jar <your java file>`
+1. Run `mvn clean package`
+2. Invoke the jar on your main source file: `java -jar target/*.jar <your java file>`
    - This will compile your java files, starting from the references from the main java class.
 
-## Compiler passes
-1. Parses the language, and builds the resulting tree from the context-free grammar.
-   - package main and the javaCC generated java source files. (using JavaCC)
-2. Resolve imports, and fully qualify names.
-   - package tree - method resolveImports()
-3. Build the symbol table, resolving the declarations of the symbols & convert to intermediate language (IL)
-   - package tree - method compile()
-4. Type-check the intermediate language
-   - package intermediate - method typeCheck(), which may bring in other source files into compilation to this step
-   - this also fully-qualifies the function calls & now all registers have a primitive/class type
-5. Convert to pseudo-assembly (see below)
-   - package intermediate - method compile()
-6. Allocate the hardware registers
-   - package x64.allocation and method allocate in all pseudo instructions
-7. Write out the x64 assembly
-8. Use the assembler to create the dynamic linked library
-
-
-## Pseudo assembly
- - the only difference between this and x64 is that there are an unlimited amount of registers
- - these extra registers are preserved between function calls
-
-## Optimizations (done)
-The key to most of these optimizations is to keep the IL in SSA form.
-SSA - Single static assignment - in function, only assign to register once.
-This makes some optimizations work in linear time that wouldn't work otherwise.
-- None yet
-
-## Optimizations (planned)
-- optimize out multiple reads to final variables
-  - try to put final static fields in instructions
-- Jumps to labels with jump statements
-- Dead code elimination (use control graphs)
-- Common subexpression elimination
-  - involves copy and constant propagation
-  - if functions/expressions are used, need to know if they are pure (no side effects)
-- Return statement Optimizations
-  - put return value into the correct register from the start
-  - eliminates a bunch of copy register
-- Constant folding
-- Register allocation (Assembly - minimize save / restore operations needed)
-- Register allocation (IL - use smaller numbers)
-- RISC -> CISC Optimizations
-  - grouping several instructions into one
-- remove useless statements
-  - code that assigns to a value not used & expression is side-effect free
-- replace instructions with faster ones
-  - x \*= 2 -> x << 1
-  - x = 0 with x ^= x
-  - and many more
-
-## Optimizations (potential)
-- Tail recursion -> iterative
-- maybe even tail sibling calls
-  - (calls to functions which take and return the same types as the caller)
-- Loop Optimizations
-  - loop unrolling for small # iteration loops
-  - move parts of a condition out
-    - (ex if going through string and length doesn't change)
-  - move constant parts of expressions out of the loop
-- instruction scheduling to avoid pipeline stalls
-- minimize cache misses (might need to be done on high level code & involve benchmarks)
-
-
-## Tests
-- there are tests involving several of the language features implemented so far.
-- these compare the output of running java with the dynamic linked library created.
-- use `mvn test jacoco:report` to get the code coverage report as well.
-
-# Debugging
-- When a test program fails, it can be difficult to know why it breaks.
-- If there is a crash from the compiler, then you can use your favorite IDE to debug.
-- If the crash is when you do `java -Djava.library.path=. Main`, then I've followed one of these two ways:
-- Option 1 (using the assembly):
-   - Disassemble to the Main.dll generated `objdump -d Main.dll > Main.txt`
-   - Use the assembly and the full crash log to figure out where the problem is
-   - You can compare the Main.txt to find the and the dynamic linking info to find the line where it breaks if it happens in the assembly code generated
-- Option 2 (using the comparable c code):
-   - Copy the Main.java from the resources to this nested folder
-   - Compile the java file: `javac -h . Main.java` from the resources/debug/&lt;program name&gt; folder
-   - Compile the C file: `gcc "-Ipath/to/jdk/include" "-Ipath/to/jdk/include/os_folder" program.c -shared -o Main.dll -O2 --save-temps`
-      - the paths include the directories necessary to find jni.h and jni_md.h
-      - os_folder is darwin on Mac OS X, or win32 on Windows (even if 64 bit)
-   - Run the program and make sure it works from the c code, if it does, then there's a problem with the assembly generation
-   - You can examine the differences between the assembly and what this compiler does for flaws
+## Contributing
+ - See [Contributing.md](CONTRIBUTING.MD)
  
+# Code organization
 
-## Java Features not implemented (parsing phase)
-You may get really strange error messages if you use any of these.
-- For...in loops (ex: for (Integer e : list) { ... }  )
-- Final local variables
-- Diamond for generics  (ex: <code>ArrayList<String> s = new ArrayList<>()</code>)
-- Nested classes
-- Annotations (currently treated as comments)
-- Lambdas
-- Method references
+## Naming:
 
+Node: classes with this 'Node' in the name are used to represent nodes in the parse tree.
 
-## Java Features not implemented (compile phase)
-These ones will give an error like: try statement not implemented yet.
-- native methods
-- synchronized methods
-- try ... catch blocks
-- switch statements
-- arrays
-- generics
+Statement: classes with this suffix or in the intermediate package be an abstraction of low level operations, and are designed
+ to be analogous to javac's bytecode. A crucial difference is these are for an abstract register machine, but bytecode is for a stack machine.
 
-## Current known bugs
-- Nested generics (ex: <code>HashMap&lt;String, ArrayList&lt;String&gt;&gt;</code>) have to be written without the <code>&gt;&gt;</code>
-  - write instead as <code>HashMap&lt;String, ArrayList&lt;String&gt; &gt;</code>
-  - nested generics makes the grammar not context-free, so this might be hard to implement
+x64: Throughout the code, in naming, I use x64 to refer to the 64-bit Intel/AMD assembly constructs.
+
+Pseudo: Classes with this name or in the x64.pseudo package are used to represent an abstraction of actual x64 instructions,
+but with unlimited registers. This stage was designed to reduce the difficult of converting intermediate language to actual assembly.
+This way, the intermediate classes don't have to worry about hardware register allocation.
+
+Register: a location to store a temporary value; used in calculations.
+  There are 3 different types of registers in this program:
+  - intermediate.Register - used in the intermediate language representing parts of calculations
+  - X64PseudoRegister - used to represent operands of calculations in assembly, but not allocated to specific hardware one
+  - X64Register - used in hardware calculations; these are %rax, %rbx, %rcx, %rdx, %rsi, %rdi, %rbp, %rsp, %rax, and %r8 - %r15.
+
+Instruction: these represent instructions that can be directly 
+ executed by the host CPU. These are written in assembly form, 
+ and used by gcc to create assemble and link.
+
+Directive: these represent things the assembler should do to the
+ resulting object file (where to place code, 
+ what bytes to write into data segment, ...)
+
+## Main project code
+
+Main code is in the src/main/java folder.
+ - conversions: Represents the type conversions present in the java language, and the steps required to convert between types.
+ - helper: Classes that are used throughout many different steps are included here.
+ - intermediate: Classes that represent statements in the intermediate language designed and implemented by this compiler.
+ - javaLibrary: Uses reflection to type-check java library function calls.
+ - main: The class that has the parser, as well as the entry point for this program.
+ - tree: Classes that represent parts of the parse tree. 
+ - x64: Classes used to represent 64-bit Intel/AMD assembly. These are broken up into:
+   - allocation: Classes to decide how to turn pseudo instructions into real ones.
+   - directives: Directions for the assembler on how to write object code.
+   - instructions: Instructions with hardware registers for the CPU to run.
+   - jni: Java Native Interface operations; used for interacting with the JVM for either JDK API calls or program management.
+   - operands: Operands used in instructions / pseudo instructions; what those operate on (registers, memory, ...)
+   - pseudo: Classes to represent an almost x64 assembly, but with unlimited registers.
+
+## Testing code
+
+The testing code is in src/test/java folder.
+
+There are several programs designed to test the functionality of this compiler located in `src/main/resources/test-programs`.
+
+C versions of some of the java code is located in the `src/main/resources/debug` folder. 
+GCC's outputted assembly should be similar to the output of this compiler (will be significantly different when optimizations aren't on).
+
+Tests are run by maven using `mvn test`.
+A code coverage report is generated by issuing: `mvn test jacoco:report`
+
+# Code steps overview
+1. Reads the source java files, and parses them into a tree, using a context free grammar and the javaCC source.
+   - [JavaCC](https://javacc.org/) is a parser generator tool, and is similar to Bison, Yacc, ANTLR, and many others. 
+   - JavaCC generates LL(k) parser based on recursive descent. This is different than the shift-reduce tables
+     generated by other parser generators.
+2. Resolve the imports and fully qualify names
+   - tree classes `resolveImports` method
+   - example: String -\> java/lang/String
+   - simplifies finding class definitions and usages later on
+3. Compile to intermediate language
+   - uses the tree classes `compile` method
+   - the program is now in a structure with statements that happen sequentially and labels / jumps
+   - uses a symbol table to keep track of variables and class names in scope
+4. Type checks the intermediate language
+   - uses the intermediate `typeCheck` method.
+   - brings other needed files into compilation, which will run them up to this step
+   - fills in the types of all registers and operations
+   - inserts the necessary statements to perform sign-extension, zero-extension, casts, and other conversions.
+   - this is performed after generating intermediate language as we need to know what the names mean.
+5. Compile to pseudo-assembly
+   - uses the intermediate `compile` method
+   - a sequence of pseudo-instructions are generated from each intermediate language statement.
+   - an unlimited amount of registers are used so intermediate language is independent of the number and restrictions
+     in the actual hardware.
+6. Allocate pseudo registers to hardware registers
+   - uses the x64.allocation classes and the `allocate` method in x64.pseudo classes
+   - combines usage count with scenarios like whether it's used across function calls to determine
+     either which hardware register gets used, or in the case that there's not enough spills some to the stack.
+   - determining which registers should be spilled to the stack is not an easy problem, and right now GCC will outperform this compiler
+7. Writes the assembly code to files
+   - GCC needs to operate on files on the hard drive,
+      although I could use redirection to gcc standard input to eliminate the need to wait for file writes
+8. Invokes GCC to assemble the code into object files and link them to create a DLL
+   - the outputted file is platform specific:
+     - .dll on Windows
+     - .dylib on Mac OS
+     - .so on Linux
+   - these all function similarly, and are dynamically linked with the java when it runs the 
