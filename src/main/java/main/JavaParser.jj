@@ -1278,6 +1278,182 @@ LiteralExpressionNode Literal() :
     }
 }
 
+/* These numerical literals are implemented in order of how they are in the Java Language Specification */
+
+LiteralExpressionNode NumericalLiteral():
+{ NumericalLiteralNode n; }
+{
+    n=IntegerLiteral() { return n; }
+|
+    n=FloatingPointLiteral() { return n; }
+}
+
+IntegerLiteralNode IntegerLiteral(): // either int or long
+{
+    long value;
+}
+{
+    value = DecimalLiteral()
+|   value = HexIntegerLiteral()
+|   value = OctalIntegerLiteral()
+|   value = BinaryIntegerLiteral()
+    { return new IntegerLiteralNode(value); }
+}
+
+long DecimalLiteral():
+{
+    long value = 0;
+    long temp;
+    String temp2;
+}
+{
+    "0" { return 0; }
+|   temp = NonZeroDigit() { value *= 10;  value += temp; }
+    ( temp=Digits() { temp2 = "" + value + temp; value = Long.parseLong(temp2); })?
+    {
+        return value;
+    }
+|
+    temp = NonZeroDigit() { value *= 10; value += temp; }
+    Underscores()
+    temp = Digits() { temp2 = "" + value + temp; value = Long.parseLong(temp2); }
+    {
+        return value;
+    }
+}
+
+long NonZeroDigit():{}
+{
+    "1" { return 1; }
+|   "2" { return 2; }
+|   "3" { return 3; }
+|   "4" { return 4; }
+|   "5" { return 5; }
+|   "6" { return 6; }
+|   "7" { return 7; }
+|   "8" { return 8; }
+|   "9" { return 9; }
+}
+
+// returns the numerical value of the digits
+long Digits():
+{
+    long result;
+    long temp;
+    Long temp2;
+    String concat;
+}
+{
+    result=Digit()
+    (
+        (temp2=DigitsAndUnderscores() {
+            // concatenate result if not null
+            if (temp2 != null) {
+                concat = "" + result + temp2;
+                result = Long.parseLong(concat);
+            }
+        })?
+        temp=Digit() { /* concatenate result */ result *= 10; result += temp; }
+    )?
+}
+
+long Digit():
+{
+    long temp;
+}
+{
+    "0" { return 0; }
+|   temp=NonZeroDigit() { return temp; }
+}
+
+// returns the value, or null if it's just a bunch of underscores
+Long DigitsAndUnderscores():
+{
+    Long result = null;
+    Long temp;
+    String concat;
+}
+{
+    (
+        temp=DigitOrUnderscore()
+        {
+            if (result == null) {
+                result = temp;
+            } else if (temp != null) {
+                // concatenate
+                concat = "" + result + temp;
+                result = Long.parseLong(concat);
+            }
+            // no change otherwise
+        }
+    )+
+    {
+        return result;
+    }
+}
+
+// will return null if it's an underscore
+Long DigitOrUnderscore():
+{
+    long temp;
+}
+{
+    temp=Digit() { return temp; }
+|
+    "_" { return null; }
+}
+
+// consumes underscore tokens
+void Underscores():{}
+{
+    "_" ("_")*
+}
+
+
+
+
+
+
+long HexIntegerLiteral(): {}{}
+long OctalIntegerLiteral():{}{}
+long BinaryIntegerLiteral():{}{}
+
+FloatingPointLiteral FloatingPointLiteral(): // either float or double
+{
+}
+{
+}
+
+// FloatingPointLiteral FloatingPointLiteral(): {} {}
+//
+
+/**
+  < INTEGER_LITERAL:
+        <DECIMAL_LITERAL> (["l","L"])?
+      | <HEX_LITERAL> (["l","L"])?
+      | <OCTAL_LITERAL> (["l","L"])?
+  >
+|
+  < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+|
+  < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+|
+  < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+|
+  < FLOATING_POINT_LITERAL:
+        (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
+      | "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
+      | (["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
+      | (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"]
+  >
+|
+  < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+
+*/
+
+
+
+
 ArrayList<Expression> Arguments() :
 {
     ArrayList<Expression> expressions = new ArrayList<Expression>();
