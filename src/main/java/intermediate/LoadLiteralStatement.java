@@ -139,7 +139,7 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 					r.toX64()
 				)
 			);
-		} else if (r.getType().getIntermediateRepresentation().equals(Types.STRING.getIntermediateRepresentation())) {
+		} else if (r.getType().equals(Types.STRING)) {
 			// trim off the " and the beginning and the end, insert into data segment
 			String label = context.insertDataString(value.substring(1, value.length() - 1));
 
