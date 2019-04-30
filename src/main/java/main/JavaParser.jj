@@ -104,29 +104,8 @@ TOKEN : /* RESERVED WORDS AND LITERALS */
 | < WHILE: "while" >
 }
 
-TOKEN : /* LITERALS */
+TOKEN : /* LITERALS that are regular expressions, numbers aren't easily represented as such */
 {
-  < INTEGER_LITERAL:
-        <DECIMAL_LITERAL> (["l","L"])?
-      | <HEX_LITERAL> (["l","L"])?
-      | <OCTAL_LITERAL> (["l","L"])?
-  >
-|
-  < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
-|
-  < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
-|
-  < #OCTAL_LITERAL: "0" (["0"-"7"])* >
-|
-  < FLOATING_POINT_LITERAL:
-        (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
-      | "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
-      | (["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
-      | (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"]
-  >
-|
-  < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
-|
   < CHARACTER_LITERAL:
       "'"
       (   (~["'","\\","\n","\r"])
@@ -156,9 +135,8 @@ TOKEN : /* LITERALS */
 
 TOKEN : /* IDENTIFIERS */
 {
-    < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
-|   < #LETTER: [ "A"-"Z", "a"-"z", "_" ] >
-|   < #DIGIT: [ "0"-"9" ] >
+    < LETTER: [ "A"-"Z", "a"-"z", "_" ] >
+|   < DIGIT: [ "0"-"9" ] >
 }
 
 TOKEN : /* SEPARATORS */
@@ -218,6 +196,25 @@ TOKEN : /* OPERATORS */
 
 
 /*************  ACTUAL GRAMMAR NOW *******/
+
+// identifiers
+String Identifier():
+{
+    StringBuilder value = new StringBuilder();
+    Token t;
+}
+{
+    t=<LETTER> { value.append(t.image); }
+    (
+        t=<LETTER> { value.append(t.image); }
+    |
+        t=<DIGIT> { value.append(t.image); }
+    )*
+    {
+        return value.toString();
+    }
+}
+
 // the whole file is a compilation unit
 CompilationUnit CompilationUnit(String filename) :
 {
@@ -289,7 +286,7 @@ TypeDecNode TypeDeclaration() :
 
 ClassNode ClassDeclaration() :
 {
-    Token t;
+    String name;
     ClassBodyNode b;
 
     ArrayList<ClassBodyNode> body = new ArrayList<ClassBodyNode>();
@@ -304,12 +301,12 @@ ClassNode ClassDeclaration() :
     ( <ABSTRACT> { isAbstract=true; }
         | <FINAL> { isFinal=true; }
         | <PUBLIC> { isPublic=true; } )*
-    <CLASS> t=<IDENTIFIER> [ typeParams=ClassTypeParameters() ]
+    <CLASS> name=Identifier() [ typeParams=ClassTypeParameters() ]
     [ <EXTENDS> superClass=Name() ]
     [ <IMPLEMENTS> interfaces=NameList() ]
     <LBRACE> ( b=ClassBodyDeclaration() { body.add(b); } )* <RBRACE>
     {
-        return new ClassNode(fileName, token.beginLine, isAbstract, isFinal, isPublic, t.image, typeParams,
+        return new ClassNode(fileName, token.beginLine, isAbstract, isFinal, isPublic, name, typeParams,
             superClass, interfaces, body);
     }
 }
@@ -361,14 +358,13 @@ void MethodDeclarationLookahead() :
 {}
 {
   ( "public" | "protected" | "private" | "static" | "abstract" | "final" | "native" | "synchronized" )*
-  ResultType() <IDENTIFIER> "("
+  ResultType() Identifier() "("
 }
 
 InterfaceNode InterfaceDeclaration() :
 {
     // temporaries
     ClassBodyNode b;
-    Token t;
 
     // fields of created object
     ArrayList<NameNode> extendsList = null;
@@ -377,7 +373,7 @@ InterfaceNode InterfaceDeclaration() :
 }
 {
     ( <ABSTRACT> | <PUBLIC> )* // all interfaces are public and abstract by default.
-    <INTERFACE> t=<IDENTIFIER> { name = t.image; }
+    <INTERFACE> name=Identifier()
     [ <EXTENDS> extendsList=NameList() ]
     "{" ( b=InterfaceMemberDeclaration() { body.add(b); } )* "}"
     {
@@ -407,10 +403,9 @@ EnumNode EnumDeclaration() :
 {
     ArrayList<String> body;
     String name;
-    Token t;
 }
 {
-    (<PUBLIC>)* <ENUM> t=<IDENTIFIER> {name = t.image; }
+    (<PUBLIC>)* <ENUM> name=Identifier()
     <LBRACE> body=EnumBody() <RBRACE>
     {
         return new EnumNode(fileName, token.beginLine, name, body);
@@ -420,11 +415,11 @@ EnumNode EnumDeclaration() :
 ArrayList<String> EnumBody() :
 {
     ArrayList<String> a = new ArrayList<String>();
-    Token t;
+    String t;
 }
 { // the constants that could be the values of the ENUM
-    t=<IDENTIFIER> { a.add(t.image); }
-    ("," t=<IDENTIFIER> { a.add(t.image); })*
+    t=Identifier() { a.add(t); }
+    ("," t=Identifier() { a.add(t); })*
     {
         return a;
     }
@@ -461,10 +456,10 @@ VariableDecNode VariableDeclarator() :
 VariableIdNode VariableDeclaratorId() :
 {
     VariableIdNode v = new VariableIdNode(fileName, token.beginLine);
-    Token t;
+    String t;
 }
 {
-    t=<IDENTIFIER>{ v.name=t.image; }
+    t=Identifier(){ v.name=t; }
     ( <LBRACKET> <RBRACKET> {v.numDimensions++; } )*
     {
         return v;
@@ -499,7 +494,6 @@ MethodNode MethodDeclaration() :
     ArrayList<NameNode> throwsList = null;
     BlockNode code = null;
 
-    Token t;
 }
 {
     ( <PUBLIC> { isPublic=true;} | <PROTECTED> { isProtected=true; }
@@ -507,7 +501,7 @@ MethodNode MethodDeclaration() :
     | <ABSTRACT> { isAbstract=true; } | <FINAL> { isFinal=true; }
     | <NATIVE> { isNative=true; } | <SYNCHRONIZED> { isSynchronized=true; } )*
     returnType=ResultType()
-    t=<IDENTIFIER> { name = t.image; }
+    name=Identifier()
     params=FormalParameters()
     // array parts after the parameters
     ( <LBRACKET> <RBRACKET> { returnType = Types.arrayOf(returnType); } )*
@@ -548,14 +542,14 @@ ParamNode FormalParameter() :
 ConstructorNode ConstructorDeclaration() :
 {
     ConstructorNode c = new ConstructorNode(fileName, token.beginLine);
-    Token t;
+    String t;
     BlockStatementNode b;
 }
 {
     [ <PUBLIC> { c.isPublic = true; }
     | <PROTECTED> {c.isProtected = true;}
     | <PRIVATE> {c.isPrivate = true; } ]
-    t=<IDENTIFIER> { c.name = t.image; }
+    t=Identifier() { c.name = t; }
     c.params=FormalParameters()
     [ <THROWS> c.throwsList=NameList() ]
     <LBRACE> [ LOOKAHEAD(2) ExplicitConstructorInvocation() ]
@@ -627,7 +621,6 @@ NameNode Name() :
  * Also support generics, making this require even more lookahead
  */
 {
-    Token t;
     String name;
     ArrayList<GenericNode> generics = null;
 }
@@ -635,8 +628,8 @@ NameNode Name() :
     // need to make this so that NameNode isn't recursively defined, so that
     //  we can make another method for the bounds, since you can have a list
     //  of them using super and extends, list is separated with '&'
-    t=<IDENTIFIER> { name = t.image; }
-    ( LOOKAHEAD(2) "." t=<IDENTIFIER> {
+    name=Identifier()
+    ( LOOKAHEAD(2) "." t=Identifier() {
         name += "." + t.image;
     } )*
     ( LOOKAHEAD(<LT> GenericList() <GT>) <LT> generics=GenericList() <GT>)?
@@ -1079,7 +1072,7 @@ void CastLookahead() :
   LOOKAHEAD("(" Name() "[")
   "(" Name() "[" "]"
 |
-  "(" Name() ")" ( "~" | "!" | "(" | <IDENTIFIER> | "this" | "super" | "new" | Literal() )
+  "(" Name() ")" ( "~" | "!" | "(" | Identifier() | "this" | "super" | "new" | Literal() )
 }
 
 Expression PostfixExpression() :
@@ -1135,7 +1128,7 @@ Expression PrimaryExpression() :
     Expression temp;
     NameNode tempName;
     ArrayList<Expression> tempList;
-    Token t;
+    String t;
 
 
     // if the primary expression part is just 'this', which is just a qualifier for the
@@ -1161,15 +1154,11 @@ Expression PrimaryExpression() :
     (
         builtUp = Literal()
     |
-        t=<IDENTIFIER>
-        {
-            // keep it for this iteration, use in the next one.
-            identifier = t.image;
-        }
+        identifier=Identifier()  // keep it for this iteration, use in the next one.
     |
         "this" { primaryThis = true; }
     |
-        "super" "." t=<IDENTIFIER> { superIdentifier = t.image; }
+        "super" "." superIdentifier=Identifier()
     |
         // parentheses are for specifying tree order, so don't need them in the result
         //  also we can't have anything after these expressions be part of the primary expression.
@@ -1209,7 +1198,7 @@ Expression PrimaryExpression() :
                 builtUp = new ArrayIndexExpressionNode(builtUp, temp, fileName, token.beginLine);
             }
         |
-            "." t=<IDENTIFIER>
+            "." t=Identifier()
             {
                 if (builtUp == null) {
                     if (primaryThis) {
@@ -1222,14 +1211,14 @@ Expression PrimaryExpression() :
                         // don't know what the specific type is
                         builtUp = new UnknownIdentifierNode(identifier, fileName, token.beginLine);
                     }
-                    identifier = t.image;
+                    identifier = t;
                 } else if (identifier != null){
                     // builtUp is already something, set the field name
                     builtUp = new FieldExpressionNode(builtUp, identifier, fileName, token.beginLine);
-                    identifier = t.image;
+                    identifier = t;
                 } else {
                     // identifier == null, there's not anything extra we need to build up
-                    identifier = t.image;
+                    identifier = t;
                 }
 
             }
@@ -1303,7 +1292,8 @@ IntegerLiteralNode IntegerLiteral(): // either int or long
     |   value = OctalIntegerLiteral()
     |   value = BinaryIntegerLiteral()
     )
-    ( ["l" "L"] { return new LongLiteralNode(value); })?
+    ( "l" { return new LongLiteralNode(value); })?
+    ( "L" { return new LongLiteralNode(value); })?
     { return new IntegerLiteralNode(value); }
 }
 
@@ -1453,12 +1443,12 @@ long HexDigit():
 }
 {
     value=Digit() { return value; }
-|   ["a" "A"] { return 10; }
-|   ["b" "B"] { return 11; }
-|   ["c" "C"] { return 12; }
-|   ["d" "D"] { return 13; }
-|   ["e" "E"] { return 14; }
-|   ["f" "F"] { return 15; }
+|   ("a" | "A") { return 10; }
+|   ("b" | "B") { return 11; }
+|   ("c" | "C") { return 12; }
+|   ("d" | "D") { return 13; }
+|   ("e" | "E") { return 14; }
+|   ("f" | "F") { return 15; }
 }
 
 Long HexDigitsAndUnderscores():
@@ -1816,12 +1806,12 @@ StatementNode Statement() :
 LabeledStatementNode LabeledStatement() :
 {
     StatementNode statement;
-    Token t;
+    String t;
 }
 {
-    t=<IDENTIFIER> ":" statement=Statement()
+    t=Identifier() ":" statement=Statement()
     {
-        return new LabeledStatementNode(fileName, token.beginLine, t.image, statement);
+        return new LabeledStatementNode(fileName, token.beginLine, t, statement);
     }
 }
 
@@ -1844,7 +1834,7 @@ BlockStatementNode BlockStatement() :
     BlockStatementNode b;
 }
 {
-    LOOKAHEAD(Type() <IDENTIFIER>)
+    LOOKAHEAD(Type() Identifier())
     b=LocalVariableDeclaration() <SEMICOLON>
     {
         return b;
@@ -2009,7 +1999,7 @@ ForInitNode ForInit() :
     ForInitNode temp;
 }
 {
-    LOOKAHEAD( Type() <IDENTIFIER> )
+    LOOKAHEAD( Type() Identifier() )
     temp=LocalVariableDeclaration()
     {
         return temp;
@@ -2048,11 +2038,10 @@ StatementExprNodeList ForUpdate() :
 
 BreakStatementNode BreakStatement() :
 {
-    Token t;
     String image = null;
 }
 {
-    <BREAK> [ t=<IDENTIFIER> { image = t.image; }] <SEMICOLON>
+    <BREAK> [ image=Identifier() ] <SEMICOLON>
     {
         return new BreakStatementNode(fileName, token.beginLine, image);
     }
@@ -2060,11 +2049,10 @@ BreakStatementNode BreakStatement() :
 
 ContinueStatementNode ContinueStatement() :
 {
-    Token t;
     String image = null;
 }
 {
-    <CONTINUE> [ t=<IDENTIFIER> { image = t.image; } ] <SEMICOLON>
+    <CONTINUE> [ image=Identifier() ] <SEMICOLON>
     {
         return new ContinueStatementNode(fileName, token.beginLine, image);
     }
