@@ -104,8 +104,81 @@ TOKEN : /* RESERVED WORDS AND LITERALS */
 | < WHILE: "while" >
 }
 
-TOKEN : /* LITERALS that are regular expressions, numbers aren't easily represented as such */
+TOKEN : /* LITERALS */
 {
+  < INTEGER_LITERAL:
+        <DECIMAL_LITERAL> (["l","L"])?
+      | <HEX_LITERAL> (["l","L"])?
+      | <OCTAL_LITERAL> (["l","L"])?
+      | <BINARY_LITERAL> (["l","L"])?
+  >
+|
+// base 10
+  < #DECIMAL_LITERAL:
+    "0"
+  | ["1"-"9"] (<DIGITS>)?
+  | ["1"-"9"] <UNDERSCORES> <DIGITS>
+  >
+|
+  < #UNDERSCORES: ("_")+ >
+|
+  < #DIGITS: <DIGIT> ((<DIGITS_AND_UNDERSCORES>)? <DIGIT>)? >
+|
+  < #DIGITS_AND_UNDERSCORES: (<DIGIT_OR_UNDERSCORE>)+ >
+|
+  < #DIGIT_OR_UNDERSCORE: <DIGIT> | "_" >
+|
+  < #DIGIT: ["0"-"9"]>
+|
+
+// base 16
+  < #HEX_LITERAL: "0" ["x","X"] <HEX_DIGITS> >
+|
+  < #HEX_DIGITS: <HEX_DIGIT> ((<HEX_DIGITS_AND_UNDERSCORES>)? <HEX_DIGIT>)?>
+|
+  < #HEX_DIGITS_AND_UNDERSCORES: (<HEX_DIGIT_OR_UNDERSCORE>)+ >
+|
+  < #HEX_DIGIT_OR_UNDERSCORE: <HEX_DIGIT> | "_" >
+|
+  < #HEX_DIGIT: ["0"-"9", "A"-"F", "a"-"f"] >
+|
+
+// base 8
+  < #OCTAL_LITERAL: "0" (<UNDERSCORES>)? <OCTAL_DIGITS> > // intentional, Java Language Spec is different here
+|
+  < #OCTAL_DIGITS: <OCTAL_DIGIT> ((<OCTAL_DIGITS_AND_UNDERSCORES>)? <OCTAL_DIGIT>)? >
+|
+  < #OCTAL_DIGITS_AND_UNDERSCORES: (<OCTAL_DIGIT_OR_UNDERSCORE>)+ >
+|
+  < #OCTAL_DIGIT_OR_UNDERSCORE: <OCTAL_DIGIT> | "_" >
+|
+  < #OCTAL_DIGIT: ["0"-"7"] >
+|
+
+// base 2
+  < #BINARY_LITERAL: "0" ["b", "B"] <BINARY_DIGITS> >
+|
+  < #BINARY_DIGITS: <BINARY_DIGIT> ((<BINARY_DIGITS_AND_UNDERSCORES>)? <BINARY_DIGIT>)? >
+|
+  < #BINARY_DIGITS_AND_UNDERSCORES: (<BINARY_DIGIT_OR_UNDERSCORE>)+ >
+|
+  < #BINARY_DIGIT_OR_UNDERSCORE: <BINARY_DIGIT> | "_" >
+|
+  < #BINARY_DIGIT: "0" | "1" >
+|
+
+// floats and doubles
+  < FLOATING_POINT_LITERAL:
+        (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
+      | "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
+      | (["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
+      | (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"]
+  >
+|
+  < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+|
+  < #NON_ZERO_DIGIT: ["1"-"9"] >
+|
   < CHARACTER_LITERAL:
       "'"
       (   (~["'","\\","\n","\r"])
@@ -131,6 +204,12 @@ TOKEN : /* LITERALS that are regular expressions, numbers aren't easily represen
       )*
       "\""
   >
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+    < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+|   < #LETTER: [ "A"-"Z", "a"-"z", "_" ] >
 }
 
 TOKEN : /* SEPARATORS */
@@ -190,40 +269,6 @@ TOKEN : /* OPERATORS */
 
 
 /*************  ACTUAL GRAMMAR NOW *******/
-
-// identifiers
-String Identifier():
-{
-    StringBuilder value = new StringBuilder();
-    char t;
-    long n;
-}
-{
-    t=Letter() { value.append(t); }
-    (
-        t=Letter() { value.append(t); }
-    |
-        n=Digit() { value.append("" + n); }
-    )*
-    {
-        return value.toString();
-    }
-}
-
-// This would be a part of a regex token, but then there's problems with conflicts with the x, and a-f in
-//  the literals for numbers
-char Letter():
-{}
-{
-    ("A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M"
-  | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
-  | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M"
-  | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z")
-  {
-    return token.image.charAt(0);
-  }
-}
-
 // the whole file is a compilation unit
 CompilationUnit CompilationUnit(String filename) :
 {
@@ -295,7 +340,7 @@ TypeDecNode TypeDeclaration() :
 
 ClassNode ClassDeclaration() :
 {
-    String name;
+    Token t;
     ClassBodyNode b;
 
     ArrayList<ClassBodyNode> body = new ArrayList<ClassBodyNode>();
@@ -310,12 +355,12 @@ ClassNode ClassDeclaration() :
     ( <ABSTRACT> { isAbstract=true; }
         | <FINAL> { isFinal=true; }
         | <PUBLIC> { isPublic=true; } )*
-    <CLASS> name=Identifier() [ typeParams=ClassTypeParameters() ]
+    <CLASS> t=<IDENTIFIER> [ typeParams=ClassTypeParameters() ]
     [ <EXTENDS> superClass=Name() ]
     [ <IMPLEMENTS> interfaces=NameList() ]
     <LBRACE> ( b=ClassBodyDeclaration() { body.add(b); } )* <RBRACE>
     {
-        return new ClassNode(fileName, token.beginLine, isAbstract, isFinal, isPublic, name, typeParams,
+        return new ClassNode(fileName, token.beginLine, isAbstract, isFinal, isPublic, t.image, typeParams,
             superClass, interfaces, body);
     }
 }
@@ -367,13 +412,14 @@ void MethodDeclarationLookahead() :
 {}
 {
   ( "public" | "protected" | "private" | "static" | "abstract" | "final" | "native" | "synchronized" )*
-  ResultType() Identifier() "("
+  ResultType() <IDENTIFIER> "("
 }
 
 InterfaceNode InterfaceDeclaration() :
 {
     // temporaries
     ClassBodyNode b;
+    Token t;
 
     // fields of created object
     ArrayList<NameNode> extendsList = null;
@@ -382,7 +428,7 @@ InterfaceNode InterfaceDeclaration() :
 }
 {
     ( <ABSTRACT> | <PUBLIC> )* // all interfaces are public and abstract by default.
-    <INTERFACE> name=Identifier()
+    <INTERFACE> t=<IDENTIFIER> { name = t.image; }
     [ <EXTENDS> extendsList=NameList() ]
     "{" ( b=InterfaceMemberDeclaration() { body.add(b); } )* "}"
     {
@@ -412,9 +458,10 @@ EnumNode EnumDeclaration() :
 {
     ArrayList<String> body;
     String name;
+    Token t;
 }
 {
-    (<PUBLIC>)* <ENUM> name=Identifier()
+    (<PUBLIC>)* <ENUM> t=<IDENTIFIER> {name = t.image; }
     <LBRACE> body=EnumBody() <RBRACE>
     {
         return new EnumNode(fileName, token.beginLine, name, body);
@@ -424,11 +471,11 @@ EnumNode EnumDeclaration() :
 ArrayList<String> EnumBody() :
 {
     ArrayList<String> a = new ArrayList<String>();
-    String t;
+    Token t;
 }
 { // the constants that could be the values of the ENUM
-    t=Identifier() { a.add(t); }
-    ("," t=Identifier() { a.add(t); })*
+    t=<IDENTIFIER> { a.add(t.image); }
+    ("," t=<IDENTIFIER> { a.add(t.image); })*
     {
         return a;
     }
@@ -465,10 +512,10 @@ VariableDecNode VariableDeclarator() :
 VariableIdNode VariableDeclaratorId() :
 {
     VariableIdNode v = new VariableIdNode(fileName, token.beginLine);
-    String t;
+    Token t;
 }
 {
-    t=Identifier(){ v.name=t; }
+    t=<IDENTIFIER>{ v.name=t.image; }
     ( <LBRACKET> <RBRACKET> {v.numDimensions++; } )*
     {
         return v;
@@ -503,6 +550,7 @@ MethodNode MethodDeclaration() :
     ArrayList<NameNode> throwsList = null;
     BlockNode code = null;
 
+    Token t;
 }
 {
     ( <PUBLIC> { isPublic=true;} | <PROTECTED> { isProtected=true; }
@@ -510,7 +558,7 @@ MethodNode MethodDeclaration() :
     | <ABSTRACT> { isAbstract=true; } | <FINAL> { isFinal=true; }
     | <NATIVE> { isNative=true; } | <SYNCHRONIZED> { isSynchronized=true; } )*
     returnType=ResultType()
-    name=Identifier()
+    t=<IDENTIFIER> { name = t.image; }
     params=FormalParameters()
     // array parts after the parameters
     ( <LBRACKET> <RBRACKET> { returnType = Types.arrayOf(returnType); } )*
@@ -551,14 +599,14 @@ ParamNode FormalParameter() :
 ConstructorNode ConstructorDeclaration() :
 {
     ConstructorNode c = new ConstructorNode(fileName, token.beginLine);
-    String t;
+    Token t;
     BlockStatementNode b;
 }
 {
     [ <PUBLIC> { c.isPublic = true; }
     | <PROTECTED> {c.isProtected = true;}
     | <PRIVATE> {c.isPrivate = true; } ]
-    t=Identifier() { c.name = t; }
+    t=<IDENTIFIER> { c.name = t.image; }
     c.params=FormalParameters()
     [ <THROWS> c.throwsList=NameList() ]
     <LBRACE> [ LOOKAHEAD(2) ExplicitConstructorInvocation() ]
@@ -630,6 +678,7 @@ NameNode Name() :
  * Also support generics, making this require even more lookahead
  */
 {
+    Token t;
     String name;
     ArrayList<GenericNode> generics = null;
 }
@@ -637,8 +686,8 @@ NameNode Name() :
     // need to make this so that NameNode isn't recursively defined, so that
     //  we can make another method for the bounds, since you can have a list
     //  of them using super and extends, list is separated with '&'
-    name=Identifier()
-    ( LOOKAHEAD(2) "." t=Identifier() {
+    t=<IDENTIFIER> { name = t.image; }
+    ( LOOKAHEAD(2) "." t=<IDENTIFIER> {
         name += "." + t.image;
     } )*
     ( LOOKAHEAD(<LT> GenericList() <GT>) <LT> generics=GenericList() <GT>)?
@@ -1081,7 +1130,7 @@ void CastLookahead() :
   LOOKAHEAD("(" Name() "[")
   "(" Name() "[" "]"
 |
-  "(" Name() ")" ( "~" | "!" | "(" | Identifier() | "this" | "super" | "new" | Literal() )
+  "(" Name() ")" ( "~" | "!" | "(" | <IDENTIFIER> | "this" | "super" | "new" | Literal() )
 }
 
 Expression PostfixExpression() :
@@ -1137,7 +1186,7 @@ Expression PrimaryExpression() :
     Expression temp;
     NameNode tempName;
     ArrayList<Expression> tempList;
-    String t;
+    Token t;
 
 
     // if the primary expression part is just 'this', which is just a qualifier for the
@@ -1163,11 +1212,15 @@ Expression PrimaryExpression() :
     (
         builtUp = Literal()
     |
-        identifier=Identifier()  // keep it for this iteration, use in the next one.
+        t=<IDENTIFIER>
+        {
+            // keep it for this iteration, use in the next one.
+            identifier = t.image;
+        }
     |
         "this" { primaryThis = true; }
     |
-        "super" "." superIdentifier=Identifier()
+        "super" "." t=<IDENTIFIER> { superIdentifier = t.image; }
     |
         // parentheses are for specifying tree order, so don't need them in the result
         //  also we can't have anything after these expressions be part of the primary expression.
@@ -1191,7 +1244,7 @@ Expression PrimaryExpression() :
                         builtUp = new SuperFieldExpressionNode(superIdentifier, fileName, token.beginLine);
                     }
                 }
-                
+
                 if (builtUp == null) {
                     // identifier is not null, build up from that
                     builtUp = new UnknownIdentifierNode(identifier, fileName, token.beginLine);
@@ -1207,7 +1260,7 @@ Expression PrimaryExpression() :
                 builtUp = new ArrayIndexExpressionNode(builtUp, temp, fileName, token.beginLine);
             }
         |
-            "." t=Identifier()
+            "." t=<IDENTIFIER>
             {
                 if (builtUp == null) {
                     if (primaryThis) {
@@ -1220,14 +1273,14 @@ Expression PrimaryExpression() :
                         // don't know what the specific type is
                         builtUp = new UnknownIdentifierNode(identifier, fileName, token.beginLine);
                     }
-                    identifier = t;
+                    identifier = t.image;
                 } else if (identifier != null){
                     // builtUp is already something, set the field name
                     builtUp = new FieldExpressionNode(builtUp, identifier, fileName, token.beginLine);
-                    identifier = t;
+                    identifier = t.image;
                 } else {
                     // identifier == null, there's not anything extra we need to build up
-                    identifier = t;
+                    identifier = t.image;
                 }
 
             }
@@ -1262,12 +1315,11 @@ Expression PrimaryExpression() :
 LiteralExpressionNode Literal() :
 {
     Token t;
-    LiteralExpressionNode n;
 }
 {
-    (n=NumericalLiteral() { return n; })
-|
-    (t=<CHARACTER_LITERAL>
+    (t=<INTEGER_LITERAL>
+|   t=<FLOATING_POINT_LITERAL>
+|   t=<CHARACTER_LITERAL>
 |   t=<STRING_LITERAL>
 |   t=<TRUE>
 |   t=<FALSE>
@@ -1276,379 +1328,6 @@ LiteralExpressionNode Literal() :
         return new LiteralExpressionNode(fileName, token.beginLine, t.image);
     }
 }
-
-/* These numerical literals are implemented in order of how they are in the Java Language Specification */
-
-LiteralExpressionNode NumericalLiteral():
-{ NumericalLiteralNode n; }
-{
-    n=IntegerLiteral() { return n; }
-/*|
-    n=FloatingPointLiteral() { return n; }
-    When floating point literals are implemented,
-    https://docs.oracle.com/javase/specs/jls/se11/html/jls-3.html#jls-FloatingPointLiteral
-    */
-}
-
-IntegerLiteralNode IntegerLiteral(): // either int or long
-{
-    long value;
-}
-{
-    (
-        value = DecimalLiteral()
-    |   value = HexIntegerLiteral()
-    |   value = OctalIntegerLiteral()
-    |   value = BinaryIntegerLiteral()
-    )
-    ( "l" { return new LongLiteralNode(value); })?
-    ( "L" { return new LongLiteralNode(value); })?
-    { return new IntegerLiteralNode(value); }
-}
-
-long DecimalLiteral():
-{
-    long value = 0;
-    long temp;
-    String temp2;
-}
-{
-    "0" { return 0; }
-|   temp = NonZeroDigit() { value *= 10;  value += temp; }
-    ( temp=Digits() { temp2 = "" + value + temp; value = Long.parseLong(temp2); })?
-    {
-        return value;
-    }
-|
-    temp = NonZeroDigit() { value *= 10; value += temp; }
-    Underscores()
-    temp = Digits() { temp2 = "" + value + temp; value = Long.parseLong(temp2); }
-    {
-        return value;
-    }
-}
-
-long NonZeroDigit():{}
-{
-    "1" { return 1; }
-|   "2" { return 2; }
-|   "3" { return 3; }
-|   "4" { return 4; }
-|   "5" { return 5; }
-|   "6" { return 6; }
-|   "7" { return 7; }
-|   "8" { return 8; }
-|   "9" { return 9; }
-}
-
-// returns the numerical value of the digits
-long Digits():
-{
-    long result;
-    long temp;
-    Long temp2;
-    String concat;
-}
-{
-    result=Digit()
-    (
-        (temp2=DigitsAndUnderscores() {
-            // concatenate result if not null
-            if (temp2 != null) {
-                concat = "" + result + temp2;
-                result = Long.parseLong(concat);
-            }
-        })?
-        temp=Digit() { /* concatenate result */ result *= 10; result += temp; }
-    )?
-}
-
-long Digit():
-{
-    long temp;
-}
-{
-    "0" { return 0; }
-|   temp=NonZeroDigit() { return temp; }
-}
-
-// returns the value, or null if it's just a bunch of underscores
-Long DigitsAndUnderscores():
-{
-    Long result = null;
-    Long temp;
-    String concat;
-}
-{
-    (
-        temp=DigitOrUnderscore()
-        {
-            if (result == null) {
-                result = temp;
-            } else if (temp != null) {
-                // concatenate
-                concat = "" + result + temp;
-                result = Long.parseLong(concat);
-            }
-            // no change otherwise
-        }
-    )+
-    {
-        return result;
-    }
-}
-
-// will return null if it's an underscore
-Long DigitOrUnderscore():
-{
-    long temp;
-}
-{
-    temp=Digit() { return temp; }
-|
-    "_" { return null; }
-}
-
-// consumes underscore tokens
-void Underscores():{}
-{
-    "_" ("_")*
-}
-
-long HexIntegerLiteral():
-{
-    long value;
-}
-{
-    "0" ["X" "x"] value = HexDigits() { return value; }
-}
-
-// similar to DecimalDigits, but multiply by 16
-long HexDigits():
-{
-    long result;
-    long temp;
-    Long temp2;
-    String concat;
-}
-{
-    result=HexDigit()
-    (
-        (temp2=HexDigitsAndUnderscores() {
-            // concatenate result if not null
-            if (temp2 != null) {
-                concat = "" + result + temp2;
-                result = Long.parseLong(concat, 16);
-            }
-        })?
-        temp=HexDigit() { /* concatenate result */ result *= 16; result += temp; }
-    )?
-}
-
-// comsumes a hex digit and returns its value.
-long HexDigit():
-{
-    long value;
-}
-{
-    value=Digit() { return value; }
-|   ("a" | "A") { return 10; }
-|   ("b" | "B") { return 11; }
-|   ("c" | "C") { return 12; }
-|   ("d" | "D") { return 13; }
-|   ("e" | "E") { return 14; }
-|   ("f" | "F") { return 15; }
-}
-
-Long HexDigitsAndUnderscores():
-{
-    Long result = null;
-    Long temp;
-    String concat;
-}
-{
-    (
-        temp=HexDigitOrUnderscore()
-        {
-            if (result == null) {
-                result = temp;
-            } else if (temp != null) {
-                // concatenate
-                concat = "" + result + temp;
-                result = Long.parseLong(concat, 16);
-            }
-            // no change otherwise
-        }
-    )+
-    {
-        return result;
-    }
-}
-
-Long HexDigitOrUnderscore():
-{
-    long value;
-}
-{
-    value=HexDigit() { return value; }
-|
-    "_" { return null; }
-}
-
-// similar pattern as the hex ones
-long OctalIntegerLiteral():
-{
-    long value;
-}
-{
-    "0" (Underscores())? value=OctalDigits() { return value; }
-}
-
-long OctalDigits():
-{
-    long result;
-    long temp;
-    Long temp2;
-    String concat;
-}
-{
-    result=OctalDigit()
-    (
-        (temp2=OctalDigitsAndUnderscores() {
-            // concatenate result if not null
-            if (temp2 != null) {
-                concat = "" + result + temp2;
-                result = Long.parseLong(concat, 8);
-            }
-        })?
-        temp=HexDigit() { /* concatenate result */ result *= 8; result += temp; }
-    )?
-}
-
-// comsumes a octal digit and returns its value.
-long OctalDigit():{}
-{
-    "0" { return 0; }
-|   "1" { return 1; }
-|   "2" { return 2; }
-|   "3" { return 3; }
-|   "4" { return 4; }
-|   "5" { return 5; }
-|   "6" { return 6; }
-|   "7" { return 7; }
-|   "8" { return 8; }
-|   "9" { return 9; }
-}
-
-Long OctalDigitsAndUnderscores():
-{
-    Long result = null;
-    Long temp;
-    String concat;
-}
-{
-    (
-        temp=OctalDigitOrUnderscore()
-        {
-            if (result == null) {
-                result = temp;
-            } else if (temp != null) {
-                // concatenate
-                concat = "" + result + temp;
-                result = Long.parseLong(concat, 8);
-            }
-            // no change otherwise
-        }
-    )+
-    {
-        return result;
-    }
-}
-
-
-Long OctalDigitOrUnderscore():
-{
-    long value;
-}
-{
-    value=OctalDigit() { return value; }
-|
-    "_" { return null; }
-}
-
-// also similar pattern
-long BinaryIntegerLiteral():
-{
-    long value;
-}
-{
-    "0" ["b" "B"] (Underscores())? value=BinaryDigits() { return value; }
-}
-
-long BinaryDigits():
-{
-    long result;
-    long temp;
-    Long temp2;
-    String concat;
-}
-{
-    result=BinaryDigit()
-    (
-        (temp2=BinaryDigitsAndUnderscores() {
-            // concatenate result if not null
-            if (temp2 != null) {
-                concat = "" + result + temp2;
-                result = Long.parseLong(concat, 2);
-            }
-        })?
-        temp=BinaryDigit() { /* concatenate result */ result *= 8; result += temp; }
-    )?
-}
-
-// comsumes a binary digit and returns its value.
-long BinaryDigit():{}
-{
-    "0" { return 0; }
-|   "1" { return 1; }
-}
-
-Long BinaryDigitsAndUnderscores():
-{
-    Long result = null;
-    Long temp;
-    String concat;
-}
-{
-    (
-        temp=BinaryDigitOrUnderscore()
-        {
-            if (result == null) {
-                result = temp;
-            } else if (temp != null) {
-                // concatenate
-                concat = "" + result + temp;
-                result = Long.parseLong(concat, 2);
-            }
-            // no change otherwise
-        }
-    )+
-    {
-        return result;
-    }
-}
-
-
-Long BinaryDigitOrUnderscore():
-{
-    long value;
-}
-{
-    value=BinaryDigit() { return value; }
-|
-    "_" { return null; }
-}
-
 
 ArrayList<Expression> Arguments() :
 {
@@ -1815,12 +1494,12 @@ StatementNode Statement() :
 LabeledStatementNode LabeledStatement() :
 {
     StatementNode statement;
-    String t;
+    Token t;
 }
 {
-    t=Identifier() ":" statement=Statement()
+    t=<IDENTIFIER> ":" statement=Statement()
     {
-        return new LabeledStatementNode(fileName, token.beginLine, t, statement);
+        return new LabeledStatementNode(fileName, token.beginLine, t.image, statement);
     }
 }
 
@@ -1843,7 +1522,7 @@ BlockStatementNode BlockStatement() :
     BlockStatementNode b;
 }
 {
-    LOOKAHEAD(Type() Identifier())
+    LOOKAHEAD(Type() <IDENTIFIER>)
     b=LocalVariableDeclaration() <SEMICOLON>
     {
         return b;
@@ -2008,7 +1687,7 @@ ForInitNode ForInit() :
     ForInitNode temp;
 }
 {
-    LOOKAHEAD( Type() Identifier() )
+    LOOKAHEAD( Type() <IDENTIFIER> )
     temp=LocalVariableDeclaration()
     {
         return temp;
@@ -2047,10 +1726,11 @@ StatementExprNodeList ForUpdate() :
 
 BreakStatementNode BreakStatement() :
 {
+    Token t;
     String image = null;
 }
 {
-    <BREAK> [ image=Identifier() ] <SEMICOLON>
+    <BREAK> [ t=<IDENTIFIER> { image = t.image; }] <SEMICOLON>
     {
         return new BreakStatementNode(fileName, token.beginLine, image);
     }
@@ -2058,10 +1738,11 @@ BreakStatementNode BreakStatement() :
 
 ContinueStatementNode ContinueStatement() :
 {
+    Token t;
     String image = null;
 }
 {
-    <CONTINUE> [ image=Identifier() ] <SEMICOLON>
+    <CONTINUE> [ t=<IDENTIFIER> { image = t.image; } ] <SEMICOLON>
     {
         return new ContinueStatementNode(fileName, token.beginLine, image);
     }
