@@ -1492,14 +1492,91 @@ Long HexDigitOrUnderscore():
     "_" { return null; }
 }
 
-long OctalIntegerLiteral():{}{}
-long BinaryIntegerLiteral():{}{}
+// similar pattern as the hex ones
+long OctalIntegerLiteral():
+{
+    long value;
+}
+{
+    "0" (Underscores())? value=OctalDigits() { return value; }
+}
 
-FloatingPointLiteral FloatingPointLiteral(): // either float or double
+long OctalDigits():
 {
+    long result;
+    long temp;
+    Long temp2;
+    String concat;
 }
 {
+    result=OctalDigit()
+    (
+        (temp2=OctalDigitsAndUnderscores() {
+            // concatenate result if not null
+            if (temp2 != null) {
+                concat = "" + result + temp2;
+                result = Long.parseLong(concat, 8);
+            }
+        })?
+        temp=HexDigit() { /* concatenate result */ result *= 8; result += temp; }
+    )?
 }
+
+// comsumes a octal digit and returns its value.
+long OctalDigit():{}
+{
+    "0" { return 0; }
+|   "1" { return 1; }
+|   "2" { return 2; }
+|   "3" { return 3; }
+|   "4" { return 4; }
+|   "5" { return 5; }
+|   "6" { return 6; }
+|   "7" { return 7; }
+|   "8" { return 8; }
+|   "9" { return 9; }
+}
+
+Long OctalDigitsAndUnderscores():
+{
+    Long result = null;
+    Long temp;
+    String concat;
+}
+{
+    (
+        temp=OctalDigitOrUnderscore()
+        {
+            if (result == null) {
+                result = temp;
+            } else if (temp != null) {
+                // concatenate
+                concat = "" + result + temp;
+                result = Long.parseLong(concat, 8);
+            }
+            // no change otherwise
+        }
+    )+
+    {
+        return result;
+    }
+}
+
+
+Long OctalDigitOrUnderscore():
+{
+    long value;
+}
+{
+    value=OctalDigit() { return value; }
+|
+    "_" { return null; }
+}
+
+
+// long BinaryIntegerLiteral():{}{}
+
+// FloatingPointLiteral FloatingPointLiteral():{}{} // either float or double
 
 // FloatingPointLiteral FloatingPointLiteral(): {} {}
 //
