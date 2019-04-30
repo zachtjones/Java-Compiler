@@ -133,12 +133,6 @@ TOKEN : /* LITERALS that are regular expressions, numbers aren't easily represen
   >
 }
 
-TOKEN : /* IDENTIFIERS */
-{
-    < LETTER: [ "A"-"Z", "a"-"z", "_" ] >
-|   < DIGIT: [ "0"-"9" ] >
-}
-
 TOKEN : /* SEPARATORS */
 {
   < LPAREN: "(" >
@@ -201,18 +195,33 @@ TOKEN : /* OPERATORS */
 String Identifier():
 {
     StringBuilder value = new StringBuilder();
-    Token t;
+    char t;
+    long n;
 }
 {
-    t=<LETTER> { value.append(t.image); }
+    t=Letter() { value.append(t); }
     (
-        t=<LETTER> { value.append(t.image); }
+        t=Letter() { value.append(t); }
     |
-        t=<DIGIT> { value.append(t.image); }
+        n=Digit() { value.append("" + n); }
     )*
     {
         return value.toString();
     }
+}
+
+// This would be a part of a regex token, but then there's problems with conflicts with the x, and a-f in
+//  the literals for numbers
+char Letter():
+{}
+{
+    ("A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M"
+  | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+  | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M"
+  | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z")
+  {
+    return token.image.charAt(0);
+  }
 }
 
 // the whole file is a compilation unit
