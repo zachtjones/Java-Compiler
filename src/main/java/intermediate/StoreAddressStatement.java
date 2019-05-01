@@ -173,7 +173,7 @@ public class StoreAddressStatement implements InterStatement,
 				// buffer = Get<PrimitiveType>ArrayElements(JNIEnv *env, array, jboolean* isCopy)
 				//   isCopy can be used to determine if it's able to make a copy, or actually memory map it
 				//   can just pass null in instead, as we're going to do the release anyways
-				X64PseudoRegister buffer = addGetPrimitiveArrayElements(context, array, intermediate.getType());
+				X64PseudoRegister buffer = addGetPrimitiveArrayElements(context, array, destinationType);
 
 				//  set the memory at the buffer+index*scaling
 				// mov %source, (%baseReg, %indexReg, scale factor)

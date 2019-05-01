@@ -1,7 +1,6 @@
 package intermediate;
 
-import java.util.HashMap;
-
+import conversions.Conversion;
 import helper.CompileException;
 import helper.ConditionCode;
 import helper.Types;
@@ -10,7 +9,11 @@ import x64.X64Context;
 import x64.pseudo.ComparePseudoPseudo;
 import x64.pseudo.SetConditionPseudo;
 
-import static helper.ConditionCode.*;
+import java.util.HashMap;
+import java.util.List;
+
+import static helper.ConditionCode.EQUAL;
+import static helper.ConditionCode.NOT_EQUAL;
 
 public class SetConditionStatement implements InterStatement {
 	
@@ -21,7 +24,15 @@ public class SetConditionStatement implements InterStatement {
 	
 	@NotNull private final String fileName;
 	private final int line;
-	
+
+	// conversion used in being able to compare the two types
+	private List<InterStatement> conversionLeft;
+	private List<InterStatement> conversionRight;
+	private Register leftConverted;
+	private Register rightConverted;
+
+
+	/** Sets the boolean result to 1 when the condition holds, 0 otherwise. */
 	public SetConditionStatement(@NotNull ConditionCode type, @NotNull Register left, @NotNull Register right,
 								 @NotNull Register result,
 								 @NotNull String fileName, int line) {
@@ -49,6 +60,15 @@ public class SetConditionStatement implements InterStatement {
 						+ " != are only defined on primitives.", fileName, line);
 			}
 		}
+
+		Types larger = left.getType().getResult(right.getType());
+
+		// add the conversions necessary
+		leftConverted = func.allocator.getNext(larger);
+		rightConverted = func.allocator.getNext(larger);
+		conversionLeft = Conversion.assignmentConversion(left, leftConverted, fileName, line);
+		conversionRight = Conversion.assignmentConversion(right, rightConverted, fileName, line);
+
 		result.setType(Types.BOOLEAN);
 		regs.put(result, Types.BOOLEAN);
 	}
@@ -60,8 +80,19 @@ public class SetConditionStatement implements InterStatement {
 		// SETcc, where cc is the condition code. Note this sets a byte register/mem
 		//  the result byte will have the value 1 if the condition holds, 0 otherwise.
 
+		// convert left
+		for (InterStatement s : conversionLeft) {
+			s.compile(context);
+		}
+
+		// convert right
+		for (InterStatement s : conversionRight) {
+			s.compile(context);
+		}
+
+		// compare the converted types
 		context.addInstruction(
-			new ComparePseudoPseudo(left.toX64(), right.toX64())
+			new ComparePseudoPseudo(leftConverted.toX64(), rightConverted.toX64())
 		);
 
 		context.addInstruction(
