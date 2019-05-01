@@ -82,19 +82,17 @@ public class Types implements Comparable<Types> {
 	}
 
 	/**
-	 * Gets the larger type (the one with the most range of values)
+	 * Gets the larger type (the one with the most range of values) that is a result of the operation.
 	 * Ex: float & long = float;
+	 * byte + char => int, and similar stuff
 	 * @param other The Register constant type of the second item.
 	 * @return The Register constant type of the result.
 	 */
-	public Types getLarger(@NotNull Types other) {
-		if (this.equals(other)) return this;
+	public Types getResult(@NotNull Types other) {
 		if (this.equals(DOUBLE) || other.equals(DOUBLE)) return DOUBLE;
 		if (this.equals(FLOAT) || other.equals(FLOAT)) return FLOAT;
 		if (this.equals(LONG) || other.equals(LONG)) return LONG;
-		if (this.equals(INT) || other.equals(INT)) return INT;
-		if (this.equals(SHORT) || other.equals(SHORT)) return SHORT;
-		return BYTE;
+		return INT;
 	}
 
 	/** Removes an array dimension, returning the new type. If it can't be removed, throws a CompileException */
@@ -256,11 +254,6 @@ public class Types implements Comparable<Types> {
 
 		// not a primitive or boolean -- can't be converted from other primitives
 		return -1;
-	}
-
-	/** Returns if this type is a floating point one (float or double) */
-	public boolean isFloatingPoint() {
-		return this.equals(FLOAT) || this.equals(DOUBLE);
 	}
 
 	/** Returns the number of bytes required to represent this register. 1, 2, 4, or 8. */

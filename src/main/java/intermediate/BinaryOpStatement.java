@@ -70,7 +70,7 @@ public class BinaryOpStatement implements InterStatement {
 				throw new CompileException("Can't perform operator: " + type.getRepresentation() + " on boolean.",
 					fileName, line);
 			}
-			Types larger = src1.getType().getLarger(src2.getType());
+			Types larger = src1.getType().getResult(src2.getType());
 
 			// add the conversions necessary
 			src1Converted = func.allocator.getNext(larger);
@@ -92,7 +92,7 @@ public class BinaryOpStatement implements InterStatement {
 		//  op src2, temp ---- this means temp = temp op src2
 		//  mov temp, dest
 
-		X64PseudoRegister temp = context.getNextQuadRegister();
+		X64PseudoRegister temp = context.getNextRegister(src1Converted.getType());
 
 		// convert src1 to src1Converted
 		for (InterStatement s : conversionSrc1) {
