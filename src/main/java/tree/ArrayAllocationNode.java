@@ -1,10 +1,15 @@
 package tree;
 
-import helper.*;
+import conversions.Conversion;
+import helper.ClassLookup;
+import helper.CompileException;
+import helper.ConditionCode;
+import helper.Types;
 import intermediate.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static helper.BinaryOperation.ADD;
 
@@ -68,7 +73,18 @@ public class ArrayAllocationNode extends NodeImpl implements Expression {
 				break;
 			}
 			first.compile(s, f);
-			sizes.add(f.allocator.getLast());
+			Register size = f.allocator.getLast();
+			// convert to int
+			Register sizeInt = f.allocator.getNext(Types.INT);
+
+			// assignment conversion from potentially smaller to int.
+			List<InterStatement> conversion = Conversion.assignmentConversion(size, sizeInt, getFileName(), getLine());
+
+			for (InterStatement st : conversion) {
+				f.addStatement(st);
+			}
+
+			sizes.add(sizeInt);
 			elementType = elementType.removeArray(getFileName(), getLine());
 		}
 
