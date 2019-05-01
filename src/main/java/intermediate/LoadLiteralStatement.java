@@ -19,11 +19,14 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 	@NotNull public String value;
 	// 4 types of literals: char, String, long, double.
 	@NotNull public final Register r;
-	
+
+	private long val;
+
 	public LoadLiteralStatement(@NotNull String literalValue, @NotNull RegisterAllocator regAlloc,
 			@NotNull String fileName, int line) throws CompileException {
 
 		value = literalValue; // or set to something else later.
+
 		if (literalValue.charAt(0) == '"') {
 			r = regAlloc.getNext(Types.STRING);
 		} else if (literalValue.charAt(0) == '\'') {
@@ -34,36 +37,57 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 			r = regAlloc.getNext(Types.BOOLEAN);
 		} else if (literalValue.equals("null")) {
 			r = regAlloc.getNext(Types.NULL);
-		} else if (getLastLetter() == 'f' || getLastLetter() == 'F') {
+		} else if (value.endsWith("f") || value.endsWith("F")) {
 			r = regAlloc.getNext(Types.FLOAT);
 			removeLastLetter();
 
-		} else if (getLastLetter() == 'd' || getLastLetter() == 'D') {
+		} else if (value.endsWith("d") || value.endsWith("D")) {
 			r = regAlloc.getNext(Types.DOUBLE);
 			removeLastLetter();
 
 		} else if (literalValue.contains(".")) {
 			// default floating point number is double
 			r = regAlloc.getNext(Types.DOUBLE);
-		} else if (getLastLetter() == 'l' || getLastLetter() == 'L') {
-			r = regAlloc.getNext(Types.LONG);
-			removeLastLetter();
-
 		} else {
-			// should be an int (bytes & shorts don't have literals)
-			r = regAlloc.getNext(Types.INT);
-			try {
-				Integer.parseInt(literalValue);
-			} catch(NumberFormatException e) {
-				throw new CompileException("The literal: " + literalValue + " is not a valid literal.",
-						fileName, line);
+			// integral type: int or long
+
+			// if it ends in l or L, it's a long, otherwise is 'int' size
+			boolean isLong = value.endsWith("l") || value.endsWith("L");
+			if (isLong) {
+				removeLastLetter();
+			}
+
+			// remove underscores
+			value = value.replace("_", "");
+
+			// detect based on the starting characters - starts with 0x it's hex, 0b it's binary, 0 it's octal
+			//   otherwise decimal (base 10)
+			if (value.equals("0")) {
+				val = 0;
+			} else if (value.startsWith("0x") || value.startsWith("0X")) {
+				val = Long.parseLong(value.substring(2), 16);
+			} else if (value.startsWith("0b") || value.startsWith("0B")) {
+				val = Long.parseLong(value.substring(2), 2);
+			} else if (value.startsWith("0")) { // Octal
+				val = Long.parseLong(value.substring(1), 8);
+			} else {
+				val = Long.parseLong(value);
+			}
+
+			// in order to not have to cast literals, treat this as the smallest type that it fits into
+			//   unless explicitly is a long
+			if (isLong) {
+				r = regAlloc.getNext(Types.LONG);
+			} else if (val <= Byte.MAX_VALUE) {
+				r = regAlloc.getNext(Types.BYTE);
+			} else if (val <= Short.MAX_VALUE) {
+				r = regAlloc.getNext(Types.SHORT);
+			} else if (val <= Integer.MAX_VALUE) {
+				r = regAlloc.getNext(Types.INT);
+			} else { // number larger than 32 bits without 'l' or 'L' suffix
+				throw new CompileException("Integer literal larger than the maximum size.", fileName, line);
 			}
 		}
-	}
-
-	/** Gets the last letter of the value field */
-	private char getLastLetter() {
-		return value.charAt(value.length() - 1);
 	}
 
 	/** Removes the last letter from value */
@@ -86,7 +110,7 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 
 	@Override
 	public void compile(@NotNull X64Context context) throws CompileException {
-		if (r.getType() == Types.BOOLEAN) {
+		if (r.getType().equals(Types.BOOLEAN)) {
 			if (value.equals("true")) {
 				context.addInstruction(
 					new MoveImmToPseudo(
@@ -102,14 +126,7 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 					)
 				);
 			}
-		} else if (r.getType() == Types.BYTE) {
-			context.addInstruction(
-				new MoveImmToPseudo(
-					new Immediate(Byte.parseByte(value)),
-					r.toX64()
-				)
-			);
-		} else if (r.getType() == Types.CHAR) {
+		} else if (r.getType().equals(Types.CHAR)) {
 			// value = '2', or 'a', or something like that
 			context.addInstruction(
 				new MoveImmToPseudo(
@@ -118,27 +135,17 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 					r.toX64()
 				)
 			);
-		} else if (r.getType() == Types.SHORT) {
+
+		} else if (r.getType().equals(Types.NULL)) {
+
+			// load null, which is 0
 			context.addInstruction(
 				new MoveImmToPseudo(
-					new Immediate(Short.parseShort(value)),
+					new Immediate(0),
 					r.toX64()
 				)
 			);
-		} else if (r.getType() == Types.INT) {
-			context.addInstruction(
-				new MoveImmToPseudo(
-					new Immediate(Integer.parseInt(value)),
-					r.toX64()
-				)
-			);
-		} else if (r.getType() == Types.LONG) {
-			context.addInstruction(
-				new MoveImmToPseudo(
-					new Immediate(Long.parseLong(value)),
-					r.toX64()
-				)
-			);
+
 		} else if (r.getType().equals(Types.STRING)) {
 			// trim off the " and the beginning and the end, insert into data segment
 			String label = context.insertDataString(value.substring(1, value.length() - 1));
@@ -154,9 +161,20 @@ public class LoadLiteralStatement implements InterStatement, NewStringUTF_JNI {
 
 			// NewStringUTF(JNIEnv, %temp) -> result
 			addNewStringUTF_JNI(context, chars, r);
-		} else {
-			// float and double
+
+		} else if (r.getType().equals(Types.FLOAT) || r.getType().equals(Types.DOUBLE)) {
+			// not implemented yet
 			throw new CompileException("Floating point literals not implemented yet", "", -1);
+		} else {
+
+			// in x64, can load a 64-bit immediate value into a register
+			context.addInstruction(
+				new MoveImmToPseudo(
+					new Immediate(val),
+					r.toX64()
+				)
+			);
+
 		}
 	}
 }
