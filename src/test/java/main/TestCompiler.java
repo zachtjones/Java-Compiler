@@ -74,7 +74,8 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
             Arguments.of("SimpleArray", "[1, 1, 2, 3, 5, 8, 13, 21, 34, 55]\n", ""),
             Arguments.of("ArrayLength", "143\n", ""),
             Arguments.of("TwoDimensionArray", "[X, O, O]\n[O, X, O]\n[O, O, X]\n", ""),
-            Arguments.of("JaggedArray", "[0]\n[0, 0]\n[0, 0, 0]\n[0, 0, 0, 0]\n", "")
+            Arguments.of("JaggedArray", "[0]\n[0, 0]\n[0, 0, 0]\n[0, 0, 0, 0]\n", ""),
+            Arguments.of("IntegerLiterals", "16\n16\n16\n16\n16\n16\n16\n16\n16\n16\n", "")
         );
     }
 
