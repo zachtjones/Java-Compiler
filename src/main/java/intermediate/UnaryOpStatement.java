@@ -75,6 +75,10 @@ public class UnaryOpStatement implements InterStatement {
 			case BITNOT:
 				// bitwise 1's complement, instruction not
 
+				context.addInstruction(new NotPseudo(
+					dest.toX64()
+				));
+				break;
 
 
 			case LOGNOT:
