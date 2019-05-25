@@ -7,8 +7,12 @@ import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
+import x64.operands.X64PseudoRegister;
+import x64.pseudo.MovePseudoToPseudo;
+import x64.pseudo.NegationPseudo;
+import x64.pseudo.NotPseudo;
 
-/** dest = OP src2 */
+/** dest = OP src1 */
 public class UnaryOpStatement implements InterStatement {
 	public static final char BITNOT = '~';
 	public static final char LOGNOT = '!';
@@ -47,11 +51,43 @@ public class UnaryOpStatement implements InterStatement {
 			throw new CompileException("operator: " + type + " is only defined for primitives, but saw: "
 					+ src1, fileName, line);
 		}
-		if (type == '!' && src1.getType() != Types.BOOLEAN) {
+		if (type == LOGNOT && src1.getType() != Types.BOOLEAN) {
 			throw new CompileException("operator: ! is only defined for booleans, but saw: "
 					+ src1, fileName, line);
 		}
 		dest.setType(src1.getType());
 		regs.put(dest, src1.getType());
+	}
+
+	@Override
+	public void compile(@NotNull X64Context context) throws CompileException {
+
+		// copy src1 to the destination, then modify the destination
+
+		context.addInstruction(new MovePseudoToPseudo(
+			src1.toX64(),
+			dest.toX64()
+		));
+
+		// perform the operation
+
+		switch (type) {
+			case BITNOT:
+				// bitwise 1's complement, instruction not
+
+
+
+			case LOGNOT:
+				// we want 1 -> 0, 0 -> 1
+				// xor $1, dest
+
+
+			default: // arithmetic negation
+
+				context.addInstruction(new NegationPseudo(
+					dest.toX64()
+				));
+				break;
+		}
 	}
 }
