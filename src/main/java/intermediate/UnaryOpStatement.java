@@ -7,10 +7,12 @@ import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
+import x64.operands.Immediate;
 import x64.operands.X64PseudoRegister;
 import x64.pseudo.MovePseudoToPseudo;
 import x64.pseudo.NegationPseudo;
 import x64.pseudo.NotPseudo;
+import x64.pseudo.XorImmToPseudo;
 
 /** dest = OP src1 */
 public class UnaryOpStatement implements InterStatement {
@@ -85,6 +87,13 @@ public class UnaryOpStatement implements InterStatement {
 				// we want 1 -> 0, 0 -> 1
 				// xor $1, dest
 
+				context.addInstruction(
+					new XorImmToPseudo(
+						new Immediate(1),
+						dest.toX64()
+					)
+				);
+				break;
 
 			default: // arithmetic negation
 
