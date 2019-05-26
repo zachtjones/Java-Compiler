@@ -26,28 +26,13 @@ public class PreIncrementExpressionNode extends NodeImpl implements StatementExp
 
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
-		// get new one = expr
-		// expr -- (but have to use the previous answer + 1, can't calculate 2x)
-		// copy new new one from new one
-		expr.compile(s, f);
-		Register result = f.allocator.getLast();
 
-		// add 1
-		f.addStatement(new LoadLiteralStatement("1", f.allocator, getFileName(), getLine()));
-		Register one = f.allocator.getLast();
+    	// expr += 1, return the result
+		// construct an AssignmentNode:  expr += 1;
+		LiteralExpressionNode literal = new LiteralExpressionNode(getFileName(), getLine(), "1");
 
-		f.addStatement(new BinaryOpStatement(result, one, f.allocator.getNext(result.getType()), BinaryOperation.ADD,
-			getFileName(), getLine()));
-		Register minusOne = f.allocator.getLast();
-		// compile in the store to the address
-		if (!(expr instanceof LValue)) {
-			throw new CompileException("Can't assign the expression.", getFileName(), getLine());
-		}
-		((LValue)expr).compileAddress(s, f);
-		// store it back
-		f.addStatement(new CopyStatement(minusOne, f.allocator.getLast(), getFileName(), getLine()));
-
-		// result is before the addition
-		f.addStatement(new CopyStatement(result, f.allocator.getNext(result.getType()), getFileName(), getLine()));
+		AssignmentNode n = new AssignmentNode(getFileName(), getLine(), expr, literal, BinaryOperation.ADD);
+		// compile it
+		n.compile(s, f);
 	}
 }

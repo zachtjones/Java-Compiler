@@ -23,6 +23,6 @@ public class MoveImmToPseudo extends BinaryImmToPseudo {
 
 	@Override
 	BinaryImmToBPOffset createThisImmToBPOffset(@NotNull Immediate source, @NotNull BPOffset destination) {
-		return new MoveImmToBPOffset(source, destination);
+		return new MoveImmToBPOffset(source, destination, this.destination.getSuffix());
 	}
 }

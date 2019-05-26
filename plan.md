@@ -10,7 +10,6 @@ more useful, and/or easy to implement.
 
 
 ## Java Features that still need implemented
- - unary operators (~, !, -)
  - integer math (bitwise and multiplicative), 
    addition and subtraction are already implemented.
  - array literals (`new int[]{1, 4, 2, 6 }`)

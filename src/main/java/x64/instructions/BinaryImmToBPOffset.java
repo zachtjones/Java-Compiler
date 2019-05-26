@@ -1,6 +1,7 @@
 package x64.instructions;
 
 import org.jetbrains.annotations.NotNull;
+import x64.X64InstructionSize;
 import x64.operands.BPOffset;
 import x64.operands.Immediate;
 
@@ -14,8 +15,8 @@ public abstract class BinaryImmToBPOffset extends Instruction {
      * @param destination The register destination.
      */
     BinaryImmToBPOffset(@NotNull String name, @NotNull Immediate source,
-                               @NotNull BPOffset destination) {
+                        @NotNull BPOffset destination, @NotNull X64InstructionSize size) {
 
-		super('\t' + name + "q " + source.toString() + ", " + destination.toString());
+		super('\t' + name + size.size + " " + source.toString() + ", " + destination.toString());
     }
 }
