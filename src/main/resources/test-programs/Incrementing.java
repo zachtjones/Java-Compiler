@@ -6,9 +6,9 @@ public class Incrementing {
         int k=1;
         int l=1;
 
-        System.out.println(i++ + i++);
-        System.out.println(++j + ++j);
-        System.out.println(k++ + ++k);
-        System.out.println(++l + l++);
+        System.out.println(i++ + i++); // 1 + 2
+        System.out.println(++j + ++j); // 2 + 3
+        System.out.println(k++ + ++k); // 1 + 3
+        System.out.println(++l + l++); // 2 + 2
     }
 }
