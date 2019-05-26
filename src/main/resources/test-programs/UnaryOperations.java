@@ -11,6 +11,12 @@ public class UnaryOperations {
         System.out.println(!(x != 20));
         System.out.println((short)~y);
 
+        System.out.println(-x);
+        int x2 = ~x;
+        System.out.println(!foo(x));
+        System.out.println((long)x2);;
+        System.out.println(+20); // also valid
+
         // Total printout
         // -128
         // false
@@ -18,5 +24,12 @@ public class UnaryOperations {
         // 0
         // true
         // 255
+        // -20
+        // true
+        // -21
+    }
+
+    static boolean foo(int x) {
+        return x == 15;
     }
 }

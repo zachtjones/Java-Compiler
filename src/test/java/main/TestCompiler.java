@@ -77,7 +77,7 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
             Arguments.of("JaggedArray", "[0]\n[0, 0]\n[0, 0, 0]\n[0, 0, 0, 0]\n", ""),
             Arguments.of("IntegerLiterals", "16\n16\n16\n16\n16\n16\n16\n16\n16\n16\n", ""),
             Arguments.of("UnaryOperations", "-128\nfalse\n10101111000011110010101000001111\n" +
-                "0\ntrue\n-1\n", "")
+                "0\ntrue\n-1\n-20\ntrue\n-21\n20\n", "")
         );
     }
 
