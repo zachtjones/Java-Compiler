@@ -3,7 +3,8 @@ package tree;
 import helper.BinaryOperation;
 import helper.ClassLookup;
 import helper.CompileException;
-import intermediate.InterFunction;
+import helper.Types;
+import intermediate.*;
 import org.jetbrains.annotations.NotNull;
 
 /** expr -- */
@@ -21,11 +22,26 @@ public class PostDecrementExpressionNode extends NodeImpl implements StatementEx
 
 	@Override
 	public void compile(@NotNull SymbolTable s, @NotNull InterFunction f) throws CompileException {
-		// construct an AssignmentNode:  expr -= 1;
-		LiteralExpressionNode literal = new LiteralExpressionNode(getFileName(), getLine(), "1");
+		// evaluate expression
+		expr.compile(s, f);
+		Register result = f.allocator.getLast();
 
-		AssignmentNode n = new AssignmentNode(getFileName(), getLine(), expr, literal, BinaryOperation.SUBTRACT);
+		// subtract one from it
+		f.addStatement(new LoadLiteralStatement("1", f.allocator, getFileName(), getLine()));
+		Register one = f.allocator.getLast();
+
+		Register minusOne = f.allocator.getNext(Types.UNKNOWN);
+		f.addStatement(new BinaryOpStatement(result, one, minusOne, BinaryOperation.SUBTRACT, getFileName(), getLine()));
+
+		// assign minusOne to the expression's address
+		AssignmentNode n = new AssignmentNode(getFileName(), getLine(), expr, minusOne, null);
+
 		// compile it
 		n.compile(s, f);
+
+		// need the result to be the last created register, so need to do a copy
+		f.addStatement(
+			new CopyStatement(result, f.allocator.getNext(result.getType()), getFileName(), getLine())
+		);
 	}
 }

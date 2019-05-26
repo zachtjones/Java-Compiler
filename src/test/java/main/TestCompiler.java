@@ -78,7 +78,8 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
             Arguments.of("IntegerLiterals", "16\n16\n16\n16\n16\n16\n16\n16\n16\n16\n", ""),
             Arguments.of("UnaryOperations", "-128\nfalse\n10101111000011110010101000001111\n" +
                 "0\ntrue\n-1\n-20\ntrue\n-21\n20\n", ""),
-            Arguments.of("Incrementing", "3\n5\n4\n4\n", "")
+            Arguments.of("Incrementing", "3\n5\n4\n4\n", ""),
+            Arguments.of("Decrementing", "5\n3\n4\n4\n", "")
         );
     }
 
