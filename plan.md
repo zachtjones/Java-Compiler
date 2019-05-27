@@ -13,7 +13,6 @@ more useful, and/or easy to implement.
  - integer math (bitwise and multiplicative), 
    addition and subtraction are already implemented.
  - array literals (`new int[]{1, 4, 2, 6 }`)
- - underscores in numerical literals
  - floating point math
  - For in loops
  - boolean logic
@@ -91,7 +90,10 @@ These are some optimizations that are left to be implemented:
     - increases code size = cache misses = slower though
     - result is only to inline small enough methods
     - very useful for functions that just call another one with slightly different args
-    
+  - replace instructions with faster ones for specific usages
+    - multiplication and division with 3 operands if one source is an immediate
+    - load effective address instead of multiplication
+    - replace multiply/divide by 2 to a power with shifts (integral types only)
 
 
 These ones are already performed:
