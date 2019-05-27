@@ -7,12 +7,20 @@ import helper.Types;
 import helper.UsageCheck;
 import org.jetbrains.annotations.NotNull;
 import x64.X64Context;
+import x64.X64InstructionSize;
+import x64.instructions.MoveImmToReg;
+import x64.instructions.PopReg;
+import x64.instructions.PushReg;
+import x64.instructions.SignExtendAX;
+import x64.operands.Immediate;
 import x64.operands.X64PseudoRegister;
-import x64.pseudo.MovePseudoToPseudo;
+import x64.operands.X64Register;
+import x64.pseudo.*;
 
 import java.util.HashMap;
 import java.util.List;
 
+import static helper.BinaryOperation.DIVIDE;
 import static helper.Types.BOOLEAN;
 
 /** dest = src1 OP src2 */
@@ -98,14 +106,91 @@ public class BinaryOpStatement implements InterStatement {
 		for (InterStatement s : conversionSrc1) {
 			s.compile(context);
 		}
+
+		// mov src1Converted -> temp
 		context.addInstruction(new MovePseudoToPseudo(src1Converted.toX64(), temp));
 
 		// convert src2 to src2Converted
 		for (InterStatement s : conversionSrc2) {
 			s.compile(context);
 		}
+
 		// do the math operation
-		context.addInstruction(type.getInstruction(src2Converted.toX64(), temp));
+		switch (type) {
+			case ADD:
+				context.addInstruction(new AddPseudoToPseudo(src2Converted.toX64(), temp));
+				break;
+
+			case SUBTRACT:
+				context.addInstruction(new SubtractPseudoToPseudo(src2Converted.toX64(), temp));
+				break;
+
+			case TIMES:
+				context.addInstruction(new SignedMultiplyPseudoToPseudo(src2Converted.toX64(), temp));
+				break;
+
+			case DIVIDE:
+			case MOD:
+
+				// div uses the AX and DX registers as operands and the results (quotient and remainder)
+				//  so we need to save/restore those registers
+				// the operation will either be EDX:EAX = EDX:EAX /% src2Converted,
+				//   or the same with the
+
+				// save
+				context.addInstruction(new PushReg(X64Register.RAX));
+				context.addInstruction(new PushReg(X64Register.RDX));
+
+				// move the src1Converted to the AX register
+				context.addInstruction(
+					new MovePseudoToReg(
+						src1Converted.toX64(),
+						X64Register.RAX
+					)
+				);
+
+				// sign extend into DX:AX (32-bit or 64-bit version)
+				context.addInstruction(
+					new SignExtendAX(src1Converted.toX64().getSuffix())
+				);
+
+				// perform the operation with src2Converted
+				context.addInstruction(new SignedDivisionPseudo(src2Converted.toX64()));
+
+				// quotient is in the AX register, remainder in DX
+				if (type == DIVIDE) {
+					context.addInstruction(new MoveRegToPseudo(
+						X64Register.RAX,
+						temp
+					));
+				} else {
+					context.addInstruction(new MoveRegToPseudo(
+						X64Register.RDX,
+						temp
+					));
+				}
+
+				// restore
+				context.addInstruction(new PopReg(X64Register.RDX));
+				context.addInstruction(new PopReg(X64Register.RAX));
+
+				break;
+			case AND:
+				break;
+			case XOR:
+				break;
+			case OR:
+				break;
+			case LEFT_SHIFT:
+				break;
+			case RIGHT_SHIFT_SIGN:
+				break;
+			case RIGHT_SHIFT_UNSIGNED:
+				break;
+			case CONCAT:
+				break;
+		}
+
 
 		// store the result, no assignment conversion needed
 		context.addInstruction(new MovePseudoToPseudo(temp, dest.toX64()));
