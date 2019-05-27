@@ -80,7 +80,7 @@ class TestCompiler extends ScenarioTest<GivenInputProgram, WhenItCompilesAndRuns
                 "0\ntrue\n-1\n-20\ntrue\n-21\n20\n", ""),
             Arguments.of("Incrementing", "3\n5\n4\n4\n", ""),
             Arguments.of("Decrementing", "5\n3\n4\n4\n", ""),
-            Arguments.of("MultiplicativeOperators", "30\n-80\n400\n8\n0\n0\n5\n-5\n-2\n-2\n", "")
+            Arguments.of("MultiplicativeOperators", "30\n-80\n200\n8\n0\n0\n5\n-5\n-2\n-2\n", "")
         );
     }
 

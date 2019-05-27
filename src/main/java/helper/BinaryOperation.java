@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import x64.operands.X64PseudoRegister;
 import x64.pseudo.AddPseudoToPseudo;
 import x64.pseudo.PseudoInstruction;
+import x64.pseudo.SignedMultiplyPseudoToPseudo;
 import x64.pseudo.SubtractPseudoToPseudo;
 
 /** These are the non short-circuiting binary operations (+ - / * % ^ & &lt;&lt; &gt;&gt; &gt;&gt;&gt;) */
@@ -40,7 +41,8 @@ public enum BinaryOperation {
 				return new SubtractPseudoToPseudo(source, destination);
 
 			case TIMES:
-				break;
+				return new SignedMultiplyPseudoToPseudo(source, destination);
+
 			case DIVIDE:
 				break;
 			case MOD:
